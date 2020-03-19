@@ -1,0 +1,10 @@
+.dcl.field {
+  min-width: 200px;
+}
+.dcl.field .ui.sub.header {
+  text-transform: none;
+  font-size: 15px;
+}
+a.dg.Link {
+  cursor: pointer;
+}
