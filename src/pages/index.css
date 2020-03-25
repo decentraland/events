@@ -1,5 +1,59 @@
+.ui.card.CardGoingEvent .date,
 .ui.card.CardEvent .date {
   font-size: 13px;
   font-weight: 600;
   color: #736e7d;
+}
+
+.ui.card.CardGoingEvent .content {
+  padding: 18px 16px;
+}
+
+.ui.card.CardGoingEvent .header {
+  font-size: 17px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.53;
+  letter-spacing: -0.2px;
+  color: #16141a;
+}
+
+.ui.card.CardGoingEvent .dg.ImgFixed {
+  border-radius: 8px 0 0 8px;
+}
+
+.ui.card.CardGoingEvent .JumpInButton {
+  position: absolute;
+  background: white !important;
+  border: 1px solid white;
+  margin: 0;
+  border-radius: 100%;
+  bottom: 4px;
+  right: 4px;
+}
+
+.ui.card.CardGoingEvent .JumpInButton img {
+  margin: 0;
+}
+
+.ui.card.CardEvent.pending {
+  opacity: 0.7;
+  background: #eee;
+}
+
+.GroupTitle {
+  width: 100%;
+  padding: 42px 0 21px;
+}
+
+.GroupTitle .dg.SubTitle {
+  font-size: 13px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.38;
+  letter-spacing: normal;
+  color: #736e7d;
+  text-transform: uppercase;
 }

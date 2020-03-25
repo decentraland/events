@@ -1,0 +1,27 @@
+.SocialButtons .ui.button.pending {
+  width: 100%;
+}
+
+.SocialButtons .ui.button.attending-status,
+.ui.modal .SocialButtons .ui.button.attending-status {
+  width: calc(100% - 46px);
+  border-color: rgba(115, 110, 125, 0.32);
+  background: transparent;
+}
+
+.SocialButtons .ui.button.attending-status.attending {
+  color: var(--primary);
+}
+
+.SocialButtons .ui.button.share,
+.ui.modal .SocialButtons .ui.button.share {
+  min-width: 34px;
+  height: 34px;
+  padding: 5px 2px;
+  margin: 0 0 0 8px;
+  border-color: rgba(115, 110, 125, 0.32);
+}
+
+.SocialButtons .ui.button.share img {
+  vertical-align: text-bottom;
+}

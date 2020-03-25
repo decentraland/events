@@ -4,7 +4,7 @@ import Options from './Options'
 import { EventAttributes } from '../entities/Event/types'
 import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
 
-export type NewEvent = Omit<EventAttributes, 'id' | 'user' | 'image' | 'created_at' | 'approved' | 'approved'>
+export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'coordinates' | 'start_at' | 'finish_at'>
 
 export default class Events extends API {
 
@@ -24,6 +24,16 @@ export default class Events extends API {
     return this.from(env('EVENTS_URL', this.Url))
   }
 
+  static parse(event: Record<string, any>): EventAttributes {
+    return {
+      ...event,
+      start_at: event.start_at && new Date(Date.parse(event.start_at.toString())),
+      finish_at: event.finish_at && new Date(Date.parse(event.finish_at.toString())),
+      created_at: event.created_at && new Date(Date.parse(event.created_at.toString())),
+      updated_at: event.updated_at && new Date(Date.parse(event.updated_at.toString())),
+    } as EventAttributes
+  }
+
   options(options: RequestOptions = {}) {
     return new Options(options)
   }
@@ -33,16 +43,26 @@ export default class Events extends API {
     return result.data
   }
 
+  async fetchOne(url: string, options: Options = new Options({})) {
+    const result = await this.fetch(url, options) as any
+    return Events.parse(result)
+  }
+
+  async fetchMany(url: string, options: Options = new Options({})) {
+    const result = await this.fetch(url, options) as any
+    return (result || []).map(Events.parse)
+  }
+
   async getEvents() {
-    return this.fetch<EventAttributes[]>(`/events`, this.options().authorization())
+    return this.fetchMany(`/events`, this.options().authorization())
   }
 
   async getAttendingEvent() {
-    return this.fetch<EventAttributes[]>(`/events/attending`, this.options().authorization())
+    return this.fetchMany(`/events/attending`, this.options().authorization())
   }
 
   async createEvent(event: NewEvent) {
-    return this.fetch<EventAttributes>(
+    return this.fetchOne(
       '/events',
       this.options()
         .method('POST')
@@ -52,11 +72,7 @@ export default class Events extends API {
   }
 
   async updateEvent(event: Pick<EventAttributes, 'id'> & Partial<Omit<EventAttributes, 'id'>>) {
-    if (!event.id) {
-      return event
-    }
-
-    return this.fetch<EventAttributes>(
+    return this.fetchOne(
       `/events/${event.id}`,
       this.options({ method: 'PATCH' })
         .authorization()
@@ -72,7 +88,31 @@ export default class Events extends API {
     )
   }
 
+  async setEventAttendee(eventId: string, attending: boolean) {
+    if (attending) {
+      return this.creteEventAttendee(eventId)
+    } else {
+      return this.deleteEventAttendee(eventId)
+    }
+  }
+
+  async creteEventAttendee(eventId: string) {
+    return this.fetch<string[]>(
+      `/events/${eventId}/attendees`,
+      this.options({ method: 'POST' })
+        .authorization()
+    )
+  }
+
+  async deleteEventAttendee(eventId: string) {
+    return this.fetch<string[]>(
+      `/events/${eventId}/attendees`,
+      this.options({ method: 'DELETE' })
+        .authorization()
+    )
+  }
+
   async getEventById(eventId: string) {
-    return this.fetch<EventAttributes>(`/events/${eventId}`, this.options().authorization())
+    return this.fetchOne(`/events/${eventId}`, this.options().authorization())
   }
 }

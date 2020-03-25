@@ -4,12 +4,14 @@ import { Response } from "express";
 import RequestError from "../Route/error";
 import isURL from "validator/lib/isURL";
 
+const DEFAULT_AVATAR = 'https://peer.decentraland.org/content/contents/QmVBJco6a5bug9sezgvpt2akKmaUaw1WFALV9oFjjfsEzk'
+
 export default routes((router) => {
-  router.get('profile/:user/face.png', withProfile(), redirectToFace)
-  router.get('profile/:user/body.png', withProfile(), redirectToBody)
+  router.get('/profile/:user/face.png', withProfile(), redirectToFace)
+  router.get('/profile/:user/body.png', withProfile(), redirectToBody)
 })
 
-export function redirectTo(res: Response, url: any) {
+export function redirectTo(res: Response, url: string | null = DEFAULT_AVATAR) {
   if (typeof url === 'string' && isURL(url)) {
     res.setHeader('Cache-Control', 'max-age=86400')
     res.redirect(302, url)

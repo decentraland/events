@@ -1,0 +1,12 @@
+.ui.button.JumpInButton {
+  padding: 0;
+  line-height: 13px;
+  display: inherit;
+}
+
+.JumpInButton img {
+  margin-left: 6px;
+  width: 16px;
+  height: auto;
+  vertical-align: text-top;
+}

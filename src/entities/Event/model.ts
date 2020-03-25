@@ -5,6 +5,8 @@ import { EventAttributes, PublicEventAttributes } from './types'
 import { Address } from 'web3x/address'
 import EventAttendee from '../EventAttendee/model'
 import schema from '../Schema'
+import { table, conditional } from '../Database/utils';
+import isAdmin from '../Auth/isAdmin';
 
 export default class Event extends Model<EventAttributes> {
   static tableName = 'events'
@@ -25,12 +27,15 @@ export default class Event extends Model<EventAttributes> {
         maxLength: 100,
       },
       description: {
-        type: 'string',
+        type: ['string', 'null'],
         minLength: 0,
         maxLength: 500,
       },
+      approved: {
+        type: 'boolean'
+      },
       image: {
-        type: 'string',
+        type: ['string', 'null'],
         format: 'url',
         optional: true,
       },
@@ -57,9 +62,18 @@ export default class Event extends Model<EventAttributes> {
         format: 'email'
       },
       details: {
+        type: ['string', 'null'],
+        minLength: 0,
+        maxLength: 500,
+      },
+      url: {
+        type: 'string',
+        format: 'url',
+      },
+      sceneName: {
         type: 'string',
         minLength: 0,
-        maxLength: 100,
+        maxLength: 500,
       }
     }
     // id: string // primary key
@@ -76,16 +90,31 @@ export default class Event extends Model<EventAttributes> {
     // detail: string
   })
 
-  static async getAttending(user: string) {
-    if (!Address.isAddress(user)) {
+  static async getEvents(user?: string | null) {
+    const query = SQL`
+      SELECT 
+        e.*
+        ${conditional(!!user, SQL`, a.user is not null as attending`)}
+      FROM ${table(Event)} e
+        ${conditional(!!user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}`)}
+      WHERE
+        finish_at > now()
+        ${conditional(!isAdmin(user), SQL`AND approved IS TRUE`)}
+      ORDER BY start_at ASC
+    `
+    return Event.query<EventAttributes>(query)
+  }
+
+  static async getAttending(user?: string | null) {
+    if (!Address.isAddress(user || '')) {
       return []
     }
 
     return Event.query<EventAttributes>(SQL`
-      SELECT e.*
-      FROM ${raw(Event.tableName)} e
-      LEFT JOIN ${raw(EventAttendee.tableName)} a on e.id = a.event_id
-      WHERE a.user = ${user}
+      SELECT e.*, a.user is not null as attending
+      FROM ${table(Event)} e
+      LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}
+      WHERE finish_at > now()
     `)
   }
 
@@ -95,7 +124,6 @@ export default class Event extends Model<EventAttributes> {
     }
 
     const errors: string[] = []
-    const now = Date.now()
     const start_at = new Date(Date.parse(event.start_at.toString()))
     const finish_at = new Date(Date.parse(event.finish_at.toString()))
 
@@ -115,10 +143,15 @@ export default class Event extends Model<EventAttributes> {
   }
 
   static toPublic(event: EventAttributes, user?: string | null): PublicEventAttributes | EventAttributes {
-    if (event.user === user) {
-      return event
+    const editable = isAdmin(user)
+
+    if (event.user !== user && !editable) {
+      event = utils.omit(event, ['contact', 'details'])
     }
 
-    return utils.omit(event, ['contact', 'details'])
+    return {
+      ...event,
+      editable
+    }
   }
 }

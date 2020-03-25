@@ -65,7 +65,7 @@ export function auth(options: AuthOptions = {}) {
 function getPayload(authChain: AuthChain, type: AuthLinkType) {
   for (const chain of authChain) {
     if (chain.type === type) {
-      return chain.payload
+      return chain.payload.toLowerCase()
     }
   }
 

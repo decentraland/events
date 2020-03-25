@@ -4,9 +4,12 @@ import database from './entities/Database/index'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
 import profiles from './entities/Profile/routes'
+import social from './entities/Social/routes'
 import { status } from './entities/Route/routes'
 
 const app = express()
+
+app.use(social)
 
 app.use('/api', [
   (req: Request, res: Response, next: NextFunction) => {
@@ -23,6 +26,7 @@ app.use('/api', [
   profiles,
   status()
 ])
+
 app.use(express.static('public'))
 
 Promise.resolve()

@@ -11,13 +11,13 @@ import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 
 import Layout from "../components/Layout/Layout"
-import Image from "../components/image"
 import SEO from "../components/seo"
 import Events, { NewEvent } from "../api/Events"
 import BackButton from "../components/Button/BackButton"
 
 import './submit.css'
-import { EventAttributes } from "../entities/Event/types"
+import { toInputDate, toInputTime, fromInputDate, fromInputTime } from "../components/Date/utils"
+import { navigate } from "gatsby-plugin-intl"
 
 const info = require('../images/info.svg')
 
@@ -43,61 +43,6 @@ export default function IndexPage(props: any) {
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
 
-  function toDate(date: Date): string {
-    if (!date || Number.isNaN(date.getTime())) {
-      return ''
-    }
-
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    return [
-      year,
-      month > 9 ? month : '0' + month,
-      day > 9 ? day : '0' + day,
-    ].join('-')
-  }
-
-  function setDate(date: Date, value: string): Date {
-    if (!value) {
-      return date
-    }
-
-    const [year, month, day] = value.split('-').map(Number)
-    const newDate = new Date(date.getTime())
-    newDate.setFullYear(year)
-    newDate.setMonth(month - 1)
-    newDate.setDate(day)
-    return newDate
-  }
-
-  function toTime(date: Date): string {
-    if (!date || Number.isNaN(date.getTime())) {
-      return ''
-    }
-
-    const hours = date.getHours()
-    const minutes = date.getMinutes()
-
-    return [
-      hours > 9 ? hours : '0' + hours,
-      minutes > 9 ? minutes : '0' + minutes
-    ].join(':')
-  }
-
-  function setTime(date: Date, value: string): Date {
-    if (!value) {
-      return date
-    }
-
-    const [hours, minutes] = value.split(':').map(Number)
-    const newDate = new Date(date.getTime())
-    newDate.setHours(hours)
-    newDate.setMinutes(minutes)
-    return newDate
-  }
-
-
   function handleValueChange(_: any, props: InputOnChangeData) {
     setErrors((current) => ({ ...current, general: undefined, [props.name]: undefined }))
     setEvent((current) => ({ ...current, [props.name]: props.value }))
@@ -105,7 +50,7 @@ export default function IndexPage(props: any) {
 
   function handleChangeStartDate(_: any, props: InputOnChangeData) {
     setErrors((current) => ({ ...current, general: undefined, [props.name]: undefined }))
-    const start_at = setDate(event.start_at, props.value)
+    const start_at = fromInputDate(props.value, event.start_at)
     if (start_at !== event.start_at) {
       const finish_at = start_at.getTime() > event.finish_at.getTime() ? start_at : event.finish_at
       setEvent((current) => ({ ...current, start_at, finish_at }))
@@ -114,7 +59,7 @@ export default function IndexPage(props: any) {
 
   function handleChangeStartTime(_: any, props: InputOnChangeData) {
     setErrors((current) => ({ ...current, general: undefined, [props.name]: undefined }))
-    const start_at = setTime(event.start_at, props.value)
+    const start_at = fromInputTime(props.value, event.start_at)
     if (start_at !== event.start_at) {
       const finish_at = start_at.getTime() > event.finish_at.getTime() ? start_at : event.finish_at
       setEvent((current) => ({ ...current, start_at, finish_at }))
@@ -123,7 +68,7 @@ export default function IndexPage(props: any) {
 
   function handleChangeFinishDate(_: any, props: InputOnChangeData) {
     setErrors((current) => ({ ...current, general: undefined, [props.name]: undefined }))
-    const finish_at = setDate(event.finish_at, props.value)
+    const finish_at = fromInputDate(props.value, event.finish_at)
     if (finish_at !== event.finish_at) {
       setEvent((current) => ({ ...current, finish_at }))
     }
@@ -131,7 +76,7 @@ export default function IndexPage(props: any) {
 
   function handleChangeFinishTime(_: any, props: InputOnChangeData) {
     setErrors((current) => ({ ...current, general: undefined, [props.name]: undefined }))
-    const finish_at = setTime(event.finish_at, props.value)
+    const finish_at = fromInputTime(props.value, event.finish_at)
     if (finish_at !== event.finish_at) {
       setEvent((current) => ({ ...current, finish_at }))
     }
@@ -178,6 +123,7 @@ export default function IndexPage(props: any) {
         .createEvent(newEvent as any)
         .then(() => {
           setCreating(Status.Created)
+          navigate('/')
         })
         .catch(err => {
           const message = err.body?.error || err.message
@@ -220,18 +166,18 @@ export default function IndexPage(props: any) {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={toDate(event.start_at)} min={toDate(new Date())} onChange={handleChangeStartDate} />
+                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={toInputDate(event.start_at)} min={toInputDate(new Date())} onChange={handleChangeStartDate} />
                   </Grid.Column>
                   <Grid.Column mobile="4">
-                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={toTime(event.start_at)} onChange={handleChangeStartTime} />
+                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={toInputTime(event.start_at)} onChange={handleChangeStartTime} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={toDate(event.finish_at)} min={toDate(event.start_at)} onChange={handleChangeFinishDate} />
+                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={toInputDate(event.finish_at)} min={toInputDate(event.start_at)} onChange={handleChangeFinishDate} />
                   </Grid.Column>
                   <Grid.Column mobile="4">
-                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={toTime(event.finish_at)} onChange={handleChangeFinishTime} />
+                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={toInputTime(event.finish_at)} onChange={handleChangeFinishTime} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>

@@ -1,5 +1,6 @@
 import { utils } from 'decentraland-commons';
 import env from 'decentraland-gatsby/dist/utils/env'
+import Land from 'decentraland-gatsby/dist/utils/api/Land'
 import uuid from 'uuid/v4';
 import Event from './model';
 import routes from "../Route/routes";
@@ -10,52 +11,39 @@ import { EventAttributes, adminPatchAttributes, patchAttributes } from './types'
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from '../Route/handle';
+import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
-import { SQL, raw } from 'decentraland-server';
 
 const LAND_URL = env('LAND_URL', '')
+const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
 
 export default routes((router) => {
 
-  const withAuth = auth({ optional: true })
+  const withAuth = auth()
   const withOptionalAuth = auth({ optional: true })
   const withEventExists = withEvent()
   const withEventOwner = withEvent({ owner: true })
 
   router.get('/events', withOptionalAuth, handle(listEvents))
-  router.post('/events', withAuth, handle(createNewEvent))
+  router.post('/events', withAuth, withAuthProfile(), handle(createNewEvent))
   router.get('/events/attending', withAuth, handle(getAttendingEvents))
   router.get(BASE_PATH, withOptionalAuth, withEventExists, handle(getEvent))
   router.patch(BASE_PATH, withAuth, withEventOwner, handle(updateEvent))
 })
 
 export async function listEvents(req: WithAuth) {
-  const query = SQL`
-    SELECT *
-    FROM ${raw(Event.tableName)}
-    WHERE finish_at > now()
-    AND approved IS TRUE
-    ORDER BY start_at ASC
-  `
-  const events = await Event.query<EventAttributes>(query)
+  const events = await Event.getEvents(req.auth)
   return events.map((event) => Event.toPublic(event, req.auth))
 }
 
 export async function getEvent(req: WithAuth<WithEvent>) {
-  const user = req.auth
-  const event = req.event
-  const [total_attendees, latest_attendees] = await Promise.all([
-    EventAttendee.count({ event_id: event.id }),
-    EventAttendee.latest(event.id),
-  ] as const)
-
   let attending = false
-  if (user) {
-    attending = (await EventAttendee.count({ user })) > 0
+  if (req.auth) {
+    attending = (await EventAttendee.count({ user: req.auth })) > 0
   }
 
-  return { ...Event.toPublic(event), attending, total_attendees, latest_attendees }
+  return { ...Event.toPublic(req.event, req.auth), attending }
 }
 
 export async function getAttendingEvents(req: WithAuth) {
@@ -63,46 +51,61 @@ export async function getAttendingEvents(req: WithAuth) {
   return events.map((event) => Event.toPublic(event, req.auth))
 }
 
-export async function createNewEvent(req: WithAuth) {
+export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
-  const now = new Date()
+  const userProfile = req.authProfile!
+  const data = req.body as EventAttributes
+  data.url = data.url || `${DECENTRALAND_URL}/?position=${(data.coordinates || [0, 0]).join(',')}`
 
-  const errors = Event.validate(req.body)
+  const errors = Event.validate(data)
   if (errors) {
     throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, errors)
   }
 
+  const now = new Date()
   const event_id = uuid()
-  const data = req.body as EventAttributes
   const [x, y] = data.coordinates
+  const parcel = await Land.get().getParcel(data.coordinates)
 
   const event: EventAttributes = {
     ...data,
     id: event_id,
     image: `${LAND_URL}/parcels/${x}/${y}/map.png`,
     user,
+    user_name: userProfile.name || null,
+    scene_name: parcel?.data?.name || null,
     approved: false,
+    total_attendees: 0,
+    latest_attendees: [],
     created_at: now
   }
 
   await Event.create(event)
-  return event
+
+  return Event.toPublic(event, user)
 }
 
-export async function updateEvent(req: WithAuth<WithEvent>) {
+export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   const user = req.auth!
+  const event = req.event
   const attributes = isAdmin(user) ? adminPatchAttributes : patchAttributes
-  const updatedAttributes = {
-    ...utils.pick(req.event, attributes),
-    ...utils.pick(req.body, attributes)
+  let updatedAttributes = {
+    ...utils.pick(event, attributes),
+    ...utils.pick(req.body, attributes),
   } as EventAttributes
 
+  console.log(updatedAttributes)
   const errors = Event.validate(updatedAttributes)
   if (errors) {
     throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, errors)
   }
 
-  await Event.update(updatedAttributes, { id: req.event.id })
+  const userProfile = await Katalyst.get().getProfile(event.user)
+  if (userProfile && userProfile.name && event.user_name !== userProfile.name) {
+    updatedAttributes.user_name = userProfile.name
+  }
 
-  return { ...req.event, ...updatedAttributes }
+  await Event.update(updatedAttributes, { id: event.id })
+
+  return Event.toPublic({ ...event, ...updatedAttributes }, user)
 }

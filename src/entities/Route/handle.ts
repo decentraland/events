@@ -1,30 +1,41 @@
-import { Request, Response, json } from "express";
+import { Request, Response, json, NextFunction } from "express";
 import RequestError from "./error";
 
-export type Handler = (req: Request & any, res: Response & any) => Promise<any> | any
+export type Handler = (req: Request & any, res: Response & any, next: NextFunction) => Promise<any> | any
 export default function handle(handler: Handler) {
-  return function (req: Request, res: Response) {
-    handler(req, res)
+  return function (req: Request, res: Response, next: NextFunction) {
+
+    let nextCalled = false
+    function callNext() {
+      nextCalled = true
+      next()
+    }
+
+    handler(req, res, callNext)
       .then((data: any) => {
-        res
-          .status(defaultStatusCode(req))
-          .json({ ok: true, data })
+        if (!nextCalled && !res.writableFinished) {
+          res
+            .status(defaultStatusCode(req))
+            .json({ ok: true, data })
+        }
       })
       .catch((err: RequestError) => {
-        const result: any = {
-          ok: false,
-          error: err.message,
-        }
-
-        if (err.data) {
-          result.data = err.data
-        }
-
-        res
-          .status(err.statusCode || RequestError.StatusCode.InternalServerError)
-          .json(result)
-
         console.error(err);
+
+        if (!nextCalled && !res.writableFinished) {
+          const result: any = {
+            ok: false,
+            error: err.message,
+          }
+
+          if (err.data) {
+            result.data = err.data
+          }
+
+          res
+            .status(err.statusCode || RequestError.StatusCode.InternalServerError)
+            .json(result)
+        }
       })
   }
 }
@@ -36,8 +47,6 @@ function defaultStatusCode(req: Request) {
       return 201
 
     case 'DELETE':
-      return 204
-
     case 'GET':
     default:
       return 200

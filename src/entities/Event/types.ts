@@ -6,17 +6,22 @@ export type EventAttributes = {
   start_at: Date
   finish_at: Date
   coordinates: [number, number]
+  url: string | null
   user: string
+  scene_name: string | null
+  user_name: string | null
   approved: boolean
   created_at: Date
+  updated_at: Date
   contact: string,
-  details: string
+  details: string,
+  total_attendees: number,
+  latest_attendees: string[]
 }
 
 export type PublicEventAttributes = Omit<EventAttributes, 'contact' | 'details'> & {
   attending: boolean
-  total_attendees: number,
-  latest_attendees: string[]
+  editable: boolean
 }
 
 export const patchAttributes: (keyof EventAttributes)[] = [
@@ -36,5 +41,7 @@ export const adminPatchAttributes: (keyof EventAttributes)[] = [
   'description',
   'start_at',
   'finish_at',
+  'url',
+  'scene_name',
   'coordinates',
 ]

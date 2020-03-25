@@ -5,9 +5,14 @@ import API from "decentraland-gatsby/dist/utils/api/API";
 import { middleware } from "../Middleware";
 import RequestError from "../Route/error";
 import param from "../Route/param";
+import { WithAuth } from "../Auth/middleware";
 
 export type WithProfile<R extends Request = Request> = R & {
   profile?: Avatar
+}
+
+export type WithAuthProfile<R extends Request = Request> = R & {
+  authProfile?: Avatar
 }
 
 export type WithProfileOptions = {
@@ -24,10 +29,29 @@ export function withProfile(options: WithProfileOptions = {}) {
     const profile = await API.catch(Katalyst.get().getProfile(user))
 
     if (!profile && !options.optional) {
-      throw new RequestError(`Not found profile "${user}"`, RequestError.StatusCode.NotFound)
+      throw new RequestError(`Not found profile for "${user}"`, RequestError.StatusCode.NotFound)
     }
 
     Object.assign(req, { profile })
   })
 }
 
+export function withAuthProfile(options: WithProfileOptions = {}) {
+  return middleware(async (req) => {
+    const user = (req as WithAuth).auth
+
+    if (!user && !options.optional) {
+      throw new RequestError(`Not found user "${user}"`, RequestError.StatusCode.Forbidden)
+    } else if (!user) {
+      return
+    }
+
+    const authProfile = await API.catch(Katalyst.get().getProfile(user))
+
+    if (!authProfile && !options.optional) {
+      throw new RequestError(`Not found profile for "${user}"`, RequestError.StatusCode.NotFound)
+    }
+
+    Object.assign(req, { authProfile })
+  })
+}

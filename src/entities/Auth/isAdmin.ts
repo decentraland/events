@@ -6,6 +6,10 @@ const adminAddresses = new Set((env('ADMIN_ADDRESSES', '') || '')
   .filter(Address.isAddress)
   .map(address => address.toLowerCase()))
 
-export default function isAdmin(user: string) {
+export default function isAdmin(user?: string | null | undefined) {
+  if (!user) {
+    return false
+  }
+
   return adminAddresses.has(user)
 }

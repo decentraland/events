@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import Event from '../src/entities/Event/model'
+import Model from '../src/entities/Event/model'
 
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 
-  pgm.createTable(Event.tableName, {
+  pgm.createTable(Model.tableName, {
     id: {
       primaryKey: true,
       type: 'UUID',
@@ -64,5 +64,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable(Event.tableName)
+  pgm.dropTable(Model.tableName)
 }
