@@ -71,3 +71,4 @@ yarn-error.log
 lib
 public
 node_modules
+tsconfig.tsbuildinfo
