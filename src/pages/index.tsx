@@ -80,37 +80,38 @@ export default function IndexPage(props: any) {
           <Paragraph secondary style={{ textAlign: 'center' }}>There are not events coming soon.</Paragraph>
           <Divider />
         </>}
-        {!state.loading && events.length > 0 && attendingEvents.length > 0 && <Card.Group>
+        {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
-          {attendingEvents.map(event => {
-            const startAt = new Date(Date.parse(event.start_at.toString()))
-            function handleOpenEvent(e: React.MouseEvent<any>) {
-              e.preventDefault()
-              navigate(url.toEvent(location, event.id))
-            }
+          <Card.Group>
+            {attendingEvents.map(event => {
+              const startAt = new Date(Date.parse(event.start_at.toString()))
+              function handleOpenEvent(e: React.MouseEvent<any>) {
+                e.preventDefault()
+                navigate(url.toEvent(location, event.id))
+              }
 
-            return <Card key={'attending-' + event.id} className="CardGoingEvent" href={url.toEvent(location, event.id)} onClick={handleOpenEvent}>
-              <div style={{ display: 'flex' }}>
-                <div style={{ flex: '0 0 96px', position: 'relative' }}>
-                  <JumpInButton size="small" event={event}>{''}</JumpInButton>
-                  <ImgFixed src={event.image} dimension="square" />
-                  <div className="CardGoingEvent__Attendees">
-                    <div className="CardGoingEvent__Attendees__More">
-                      +{event.total_attendees}
+              return <Card key={'attending-' + event.id} className="CardGoingEvent" href={url.toEvent(location, event.id)} onClick={handleOpenEvent}>
+                <div style={{ display: 'flex' }}>
+                  <div style={{ flex: '0 0 96px', position: 'relative' }}>
+                    <JumpInButton size="small" event={event}>{''}</JumpInButton>
+                    <ImgFixed src={event.image} dimension="square" />
+                    <div className="CardGoingEvent__Attendees">
+                      <div className="CardGoingEvent__Attendees__More">
+                        +{event.total_attendees}
+                      </div>
                     </div>
                   </div>
+                  <Card.Content>
+                    <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
+                    <Card.Header>{event.name}</Card.Header>
+                  </Card.Content>
                 </div>
-                <Card.Content>
-                  <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
-                  <Card.Header>{event.name}</Card.Header>
-                </Card.Content>
-              </div>
-            </Card>
-          })}
-        </Card.Group>}
+              </Card>
+            })}
+          </Card.Group></>}
         {!state.loading && events.length > 0 && <>
+          <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
           <Card.Group>
-            <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
             {events.map((event) => {
               const startAt = new Date(Date.parse(event.start_at.toString()))
 

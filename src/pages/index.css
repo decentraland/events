@@ -1,3 +1,12 @@
+.dcl.header-menu {
+  margin: 0;
+}
+
+.ui.cards,
+.ui.cards ~ .ui.cards {
+  margin: -0.875em -0.5em;
+}
+
 .ui.card.CardGoingEvent .date,
 .ui.card.CardEvent .date {
   font-size: 13px;
@@ -17,6 +26,10 @@
   line-height: 1.53;
   letter-spacing: -0.2px;
   color: #16141a;
+}
+
+.ui.card.CardEvent .dg.ImgFixed {
+  border-radius: 8px 8px 0 0;
 }
 
 .ui.card.CardGoingEvent .dg.ImgFixed {
@@ -81,7 +94,7 @@
 
 .GroupTitle {
   width: 100%;
-  padding: 42px 0 21px;
+  padding: 24px 0;
 }
 
 .GroupTitle .dg.SubTitle {
