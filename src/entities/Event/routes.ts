@@ -1,7 +1,7 @@
 import { utils } from 'decentraland-commons';
 import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import Event from './model';
 import routes from "../Route/routes";
 import EventAttendee from '../EventAttendee/model';
