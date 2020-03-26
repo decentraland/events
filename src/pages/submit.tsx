@@ -27,7 +27,9 @@ enum Status {
   Created
 }
 
-export default function IndexPage(props: any) {
+let pageStatus = Status.None;
+
+export default function SubmitPage(props: any) {
 
   const [profile, loadingProfile, profileActions] = useProfile()
   const [creating, setCreating] = useState(Status.None)
@@ -42,6 +44,11 @@ export default function IndexPage(props: any) {
   })
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
+
+  function setCreatingStatus(newStatus: Status) {
+    pageStatus = newStatus
+    setCreating(newStatus)
+  }
 
   function handleValueChange(_: any, props: InputOnChangeData) {
     setErrors((current) => ({ ...current, general: undefined, [props.name]: undefined }))
@@ -94,7 +101,7 @@ export default function IndexPage(props: any) {
   }
 
   function handleSubmit() {
-    if (creating !== Status.None) {
+    if (pageStatus !== Status.None) {
       return
     }
 
@@ -110,7 +117,7 @@ export default function IndexPage(props: any) {
       console.log(newError)
       setErrors(newError)
     } else {
-      setCreating(Status.Creating)
+      setCreatingStatus(Status.Creating)
       const newEvent: Record<string, any> = {}
       for (const key of Object.keys(event) as (keyof NewEvent)[]) {
         if (event[key]) {
@@ -121,13 +128,10 @@ export default function IndexPage(props: any) {
 
       Events.get()
         .createEvent(newEvent as any)
-        .then(() => {
-          setCreating(Status.Created)
-          navigate('/')
-        })
+        .then(() => (window.location.pathname = '/'))
         .catch(err => {
           const message = err.body?.error || err.message
-          setCreating(Status.None)
+          setCreatingStatus(Status.None)
           setErrors((current) => ({ ...current, general: 'Server error: ' + message }))
         })
     }
