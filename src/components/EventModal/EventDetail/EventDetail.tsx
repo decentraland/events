@@ -128,7 +128,7 @@ export default function EventDetail({ event }: EventDetailProps) {
         <div className="EventDetail__Detail__Item">
           <Paragraph>
             {event.scene_name || 'Decentraland'}
-            {position !== '0,0' && `(${position})`}
+            {position !== '0,0' && ` (${position})`}
           </Paragraph>
         </div>
         <div className="EventDetail__Detail__Action">

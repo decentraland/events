@@ -44,7 +44,7 @@ export default function IndexPage(props: any) {
   const isSharing = location && searchParams.get('view') === 'share' || false
   const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
   const state = useEntityStore(stores.event)
-  const events = useMemo(() => Object.values(state.data).sort((a, b) => a.start_at.getTime() - b.start_at.getTime()), [state])
+  const events = useMemo(() => Object.values(state.data).filter(event => !event.rejected).sort((a, b) => a.start_at.getTime() - b.start_at.getTime()), [state])
   const attendingEvents = useMemo(() => events.filter(event => (event as any).attending), [state])
   const currentEvent = eventId && state.data[eventId] || null
 

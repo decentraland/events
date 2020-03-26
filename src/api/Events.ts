@@ -6,6 +6,7 @@ import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 
 export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'coordinates' | 'start_at' | 'finish_at'>
+export type UpdateEvent = Pick<EventAttributes, 'id'> & Partial<Omit<EventAttributes, 'id'>>
 
 export default class Events extends API {
 
@@ -76,7 +77,7 @@ export default class Events extends API {
     )
   }
 
-  async updateEvent(event: Pick<EventAttributes, 'id'> & Partial<Omit<EventAttributes, 'id'>>) {
+  async updateEvent(event: UpdateEvent) {
     return this.fetchOne(
       `/events/${event.id}`,
       this.options({ method: 'PATCH' })

@@ -59,7 +59,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
 
   const errors = Event.validate(data)
   if (errors) {
-    throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, errors)
+    throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, body: data })
   }
 
   const now = new Date()
@@ -77,6 +77,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     user_name: userProfile.name || null,
     scene_name: state?.data?.name || parcel?.data?.name || null,
     approved: false,
+    rejected: false,
     total_attendees: 0,
     latest_attendees: [],
     created_at: now
@@ -96,10 +97,9 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     ...utils.pick(req.body, attributes),
   } as EventAttributes
 
-  console.log(updatedAttributes)
   const errors = Event.validate(updatedAttributes)
   if (errors) {
-    throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, errors)
+    throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, update: updatedAttributes, body: req.body })
   }
 
   const userProfile = await Katalyst.get().getProfile(event.user)

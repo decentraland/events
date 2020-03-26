@@ -1,5 +1,11 @@
-.SocialButtons .ui.button.pending {
-  width: 100%;
+.SocialButtons.pending {
+  display: flex;
+  justify-content: space-between;
+}
+
+.SocialButtons.pending .ui.button {
+  width: 49%;
+  margin: 0;
 }
 
 .SocialButtons .ui.button.attending-status,

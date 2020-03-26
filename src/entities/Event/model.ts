@@ -34,6 +34,9 @@ export default class Event extends Model<EventAttributes> {
       approved: {
         type: 'boolean'
       },
+      rejected: {
+        type: 'boolean'
+      },
       image: {
         type: ['string', 'null'],
         format: 'url',
@@ -70,24 +73,12 @@ export default class Event extends Model<EventAttributes> {
         type: 'string',
         format: 'url',
       },
-      sceneName: {
-        type: 'string',
+      scene_name: {
+        type: ['string', 'null'],
         minLength: 0,
         maxLength: 500,
       }
     }
-    // id: string // primary key
-    // name: string
-    // image: string
-    // description: string
-    // timestamp: Date
-    // duration: number
-    // coordinates: [number, number]
-    // user: string
-    // approved: boolean
-    // created_at: Date
-    // contact: string,
-    // detail: string
   })
 
   static async getEvents(user?: string | null) {
@@ -98,7 +89,7 @@ export default class Event extends Model<EventAttributes> {
       FROM ${table(Event)} e
         ${conditional(!!user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}`)}
       WHERE
-        finish_at > now()
+        e.finish_at > now() AND e.rejected IS FALSE
         ${conditional(!user, SQL`AND approved IS TRUE`)}
         ${conditional(!!user && !isAdmin(user), SQL`AND (approved IS TRUE OR a.user = ${user})`)}
       ORDER BY start_at ASC
@@ -115,7 +106,7 @@ export default class Event extends Model<EventAttributes> {
       SELECT e.*, a.user is not null as attending
       FROM ${table(Event)} e
       LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}
-      WHERE finish_at > now()
+      WHERE e.finish_at > now() AND e.rejected IS FALSE
     `)
   }
 

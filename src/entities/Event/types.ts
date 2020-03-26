@@ -11,6 +11,7 @@ export type EventAttributes = {
   scene_name: string | null
   user_name: string | null
   approved: boolean
+  rejected: boolean
   created_at: Date
   updated_at: Date
   contact: string,
@@ -37,6 +38,7 @@ export const patchAttributes: (keyof EventAttributes)[] = [
 export const adminPatchAttributes: (keyof EventAttributes)[] = [
   'image',
   'approved',
+  'rejected',
   'name',
   'description',
   'start_at',
