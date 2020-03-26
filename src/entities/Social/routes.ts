@@ -19,7 +19,7 @@ export async function injectSocialTag(req: WithSocialUserAgent, res: Response, n
     return next()
   }
 
-  const event = await Event.findOne<EventAttributes>({ id: req.query.event })
+  const event = await Event.findOne<EventAttributes>({ id: req.query.event, approved: true })
   if (!event) {
     return next()
   }
