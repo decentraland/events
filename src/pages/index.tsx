@@ -66,7 +66,7 @@ export default function IndexPage(props: any) {
           <HeaderMenu.Right>
             <Button primary={!isMobile} basic={!!isMobile} size="small" {...{ to: '/submit', as: Link }}>
               <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem', display: isMobile ? 'none' : '' }} width="16" height="16" />
-          SUMMIT EVENT
+              SUBMIT EVENT
         </Button>
           </HeaderMenu.Right>
         </HeaderMenu>
