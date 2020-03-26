@@ -22,6 +22,7 @@ import { HeaderMenu } from "decentraland-ui/dist/components/HeaderMenu/HeaderMen
 import './index.css'
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import EventModal from "../components/EventModal/EventModal"
 import JumpInButton from "../components/Button/JumpInButton"
 import { toMonthName } from "../components/Date/utils"
@@ -34,6 +35,7 @@ const primaryAdd = require('../images/primary-add.svg')
 export default function IndexPage(props: any) {
   const [profile] = useProfile()
   const location = useLocation()
+  const isMobile = useMobileDetector()
   const searchParams = new URLSearchParams(location.search)
   const eventId = location && searchParams.get('event') || null
   const isSharing = location && searchParams.get('view') === 'share' || false
@@ -59,8 +61,8 @@ export default function IndexPage(props: any) {
             <Title small>World Events</Title>
           </HeaderMenu.Left>
           <HeaderMenu.Right>
-            <Button primary size="small" {...{ to: '/submit', as: Link }}>
-              <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
+            <Button primary={!isMobile} basic={!!isMobile} size="small" {...{ to: '/submit', as: Link }}>
+              <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem', display: isMobile ? 'none' : '' }} width="16" height="16" />
           SUMMIT EVENT
         </Button>
           </HeaderMenu.Right>
