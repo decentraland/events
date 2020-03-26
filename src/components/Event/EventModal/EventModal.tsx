@@ -8,7 +8,7 @@ import EventShare from './EventShare/EventShare';
 import './EventModal.css'
 import EventAttendeeList from './EventAttendeeList/EventAttendeeList';
 
-const close = require('../../images/remove.svg')
+const close = require('../../../images/remove.svg')
 
 export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: EventAttributes | null

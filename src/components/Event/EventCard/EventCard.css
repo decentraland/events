@@ -1,0 +1,41 @@
+.ui.card.EventCard .date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #736e7d;
+}
+
+.ui.card.EventCard .dg.ImgFixed {
+  border-radius: 8px 8px 0 0;
+}
+
+.ui.card.EventCard.pending {
+  opacity: 0.7;
+  background: #eee;
+}
+
+.ui.card.EventCard .EventCard__Attendees {
+  position: absolute;
+  z-index: 100;
+  top: 12px;
+  right: 12px;
+}
+
+.ui.card.EventCard .EventCard__Attendees .dg.ImgAvatar {
+  margin-right: -10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.ui.card.EventCard .EventCard__Attendees .EventCard__Attendees__More {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #37333d;
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0 0.4em;
+  box-sizing: content-box;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  top: 2px;
+  position: relative;
+}

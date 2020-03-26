@@ -1,0 +1,70 @@
+.ui.card.EventCardMini.pending {
+  opacity: 0.7;
+  background: #eee;
+}
+
+.ui.card.EventCardMini .date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #736e7d;
+}
+
+.ui.card.EventCardMini .content {
+  padding: 18px 16px;
+}
+
+.ui.card.EventCardMini .header {
+  font-size: 17px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.53;
+  letter-spacing: -0.2px;
+  color: #16141a;
+}
+
+.ui.card.EventCardMini .dg.ImgFixed {
+  border-radius: 8px 0 0 8px;
+}
+
+.ui.card.EventCardMini .JumpInButton {
+  position: absolute;
+  background: white !important;
+  border: 1px solid white;
+  margin: 0;
+  border-radius: 100%;
+  bottom: 6px;
+  right: 6px;
+}
+
+.ui.card.EventCardMini .JumpInButton img {
+  margin: 0;
+}
+
+.ui.card.EventCardMini .EventCardMini__Attendees {
+  position: absolute;
+  z-index: 100;
+  top: 6px;
+  right: 6px;
+}
+
+.ui.card.EventCardMini .EventCardMini__Attendees .dg.ImgAvatar {
+  margin-right: -10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.ui.card.EventCardMini
+  .EventCardMini__Attendees
+  .EventCardMini__Attendees__More {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #37333d;
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0 0.4em;
+  box-sizing: content-box;
+  line-height: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}

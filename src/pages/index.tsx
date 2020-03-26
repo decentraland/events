@@ -23,16 +23,13 @@ import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import EventModal from "../components/Event/EventModal/EventModal"
-import JumpInButton from "../components/Button/JumpInButton"
-import { toMonthName } from "../components/Date/utils"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import EventCard from "../components/Event/EventCard/EventCard"
+import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 
 import './index.css'
 
 const primaryAdd = require('../images/primary-add.svg')
-const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
-const EVENTS_LIST = 3
 
 export default function IndexPage(props: any) {
   const [profile] = useProfile()
@@ -83,31 +80,12 @@ export default function IndexPage(props: any) {
         {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
-            {attendingEvents.map(event => {
-              const startAt = new Date(Date.parse(event.start_at.toString()))
-              function handleOpenEvent(e: React.MouseEvent<any>) {
-                e.preventDefault()
-                navigate(url.toEvent(location, event.id))
-              }
-
-              return <Card key={'attending-' + event.id} className="CardGoingEvent" href={url.toEvent(location, event.id)} onClick={handleOpenEvent}>
-                <div style={{ display: 'flex' }}>
-                  <div style={{ flex: '0 0 96px', position: 'relative' }}>
-                    <JumpInButton size="small" event={event}>{''}</JumpInButton>
-                    <ImgFixed src={event.image} dimension="square" />
-                    <div className="CardGoingEvent__Attendees">
-                      <div className="CardGoingEvent__Attendees__More">
-                        +{event.total_attendees}
-                      </div>
-                    </div>
-                  </div>
-                  <Card.Content>
-                    <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
-                    <Card.Header>{event.name}</Card.Header>
-                  </Card.Content>
-                </div>
-              </Card>
-            })}
+            {attendingEvents.map(event => <EventCardMini event={event} />)}
+          </Card.Group></>}
+        {!state.loading && events.length > 0 && myEvents.length > 0 && <>
+          <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
+          <Card.Group>
+            {myEvents.map(event => <EventCardMini event={event} />)}
           </Card.Group></>}
         {!state.loading && events.length > 0 && <>
           <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
