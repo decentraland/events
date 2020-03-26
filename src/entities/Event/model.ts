@@ -99,7 +99,8 @@ export default class Event extends Model<EventAttributes> {
         ${conditional(!!user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}`)}
       WHERE
         finish_at > now()
-        ${conditional(!isAdmin(user), SQL`AND approved IS TRUE`)}
+        ${conditional(!user, SQL`AND approved IS TRUE`)}
+        ${conditional(!!user && !isAdmin(user), SQL`AND (approved IS TRUE OR a.user = ${user})`)}
       ORDER BY start_at ASC
     `
     return Event.query<EventAttributes>(query)
