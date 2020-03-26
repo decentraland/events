@@ -6,6 +6,8 @@ const adminAddresses = new Set((env('ADMIN_ADDRESSES', '') || '')
   .filter(Address.isAddress)
   .map(address => address.toLowerCase()))
 
+adminAddresses.forEach(address => console.log('admin address: ', address))
+
 export default function isAdmin(user?: string | null | undefined) {
   if (!user) {
     return false
