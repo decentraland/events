@@ -22,6 +22,7 @@ const friends = require('../../../images/secondary-friends.svg')
 
 import './EventDetail.css'
 import url from '../../../url'
+import classname from 'decentraland-gatsby/dist/utils/classname'
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
@@ -136,7 +137,7 @@ export default function EventDetail({ event }: EventDetailProps) {
       {/* ATTENDEES */}
       <Divider line />
       <div className="EventDetail__Detail">
-        <div className="EventDetail__Detail__Icon center">
+        <div className={classname(['EventDetail__Detail__Icon', event.total_attendees > 0 && 'center'])}>
           <img src={friends} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
