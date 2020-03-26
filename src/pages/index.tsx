@@ -77,7 +77,7 @@ export default function IndexPage(props: any) {
         </>}
         {!state.loading && events.length === 0 && <>
           <Divider />
-          <Paragraph secondary style={{ textAlign: 'center' }}>There are not events coming soon.</Paragraph>
+          <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </>}
         {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
