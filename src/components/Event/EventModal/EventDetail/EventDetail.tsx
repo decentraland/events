@@ -15,6 +15,7 @@ import AddToCalendarButton from '../../../Button/AddToCalendarButton'
 import DateBox from '../../../Date/DateBox'
 import { useLocation } from '@reach/router'
 
+const extra = require('../../../../images/info.svg')
 const info = require('../../../../images/secondary-info.svg')
 const clock = require('../../../../images/secondary-clock.svg')
 const pin = require('../../../../images/secondary-pin.svg')
@@ -23,6 +24,7 @@ const friends = require('../../../../images/secondary-friends.svg')
 import './EventDetail.css'
 import url from '../../../../url'
 import classname from 'decentraland-gatsby/dist/utils/classname'
+import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
@@ -39,6 +41,10 @@ export default function EventDetail({ event }: EventDetailProps) {
   const position = (event?.coordinates || [0, 0]).join()
   const attendeesDiff = event.total_attendees - EVENTS_LIST
   const location = useLocation()
+  const [profile] = useProfile()
+  const editable = (event as any).editable
+  const owner = event.user.toLowerCase() === profile?.address.toString().toLowerCase()
+  const canSeeDetails = editable || owner
 
   return <>
     {event && <ImgFixed src={event.image} dimension="wide" />}
@@ -156,6 +162,36 @@ export default function EventDetail({ event }: EventDetailProps) {
         </div>
         <div className="EventDetail__Detail__Action" />
       </div>
+
+      {/* CONTACT */}
+      {!event.approved && canSeeDetails && <Divider line />}
+      {!event.approved && canSeeDetails && <div className="EventDetail__Detail extra">
+        <div className="EventDetail__Detail__Icon">
+          <img src={extra} width="16" height="16" />
+        </div>
+        <div className="EventDetail__Detail__Item">
+          {event.contact && <Paragraph>{event.contact}</Paragraph>}
+          {!event.contact && <Paragraph secondary={!event.contact} >
+            <Italic>No contact</Italic>
+          </Paragraph>}
+        </div>
+        <div className="EventDetail__Detail__Action"></div>
+      </div>}
+
+      {/* DETAILS */}
+      {!event.approved && canSeeDetails && <Divider line />}
+      {!event.approved && canSeeDetails && <div className="EventDetail__Detail extra">
+        <div className="EventDetail__Detail__Icon">
+          <img src={extra} width="16" height="16" />
+        </div>
+        <div className="EventDetail__Detail__Item">
+          {event.details && <Paragraph>{event.details}</Paragraph>}
+          {!event.details && <Paragraph secondary={!event.details} >
+            <Italic>No details</Italic>
+          </Paragraph>}
+        </div>
+        <div className="EventDetail__Detail__Action"></div>
+      </div>}
 
       {/* SOCIAL */}
       <Divider line />

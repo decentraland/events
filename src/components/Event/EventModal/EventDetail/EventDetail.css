@@ -1,7 +1,3 @@
-.EventDetail {
-  padding: 16px 24px;
-}
-
 .EventDetail .Paragraph {
   font-size: 15px;
   line-height: 16px;
@@ -18,7 +14,7 @@
 .EventDetail .Divider {
   opacity: 0.24;
   border-color: #736e7d;
-  margin: 18px 0;
+  margin: 0 24px;
 }
 
 .EventNote {
@@ -41,6 +37,7 @@
 
 .EventDetail .EventDetail__Header {
   display: flex;
+  padding: 18px 24px;
 }
 
 .EventDetail .EventDetail__Header .EventDetail__Header__Event {
@@ -63,8 +60,18 @@
   line-height: 26px;
 }
 
+.EventDetail .EventDetail__Actions,
 .EventDetail .EventDetail__Detail {
   display: flex;
+  padding: 18px 24px;
+}
+
+.EventDetail .EventDetail__Actions .SocialButtons {
+  width: 100%;
+}
+
+.EventDetail .EventDetail__Detail.extra {
+  background-color: #ffeed6;
 }
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Icon {
