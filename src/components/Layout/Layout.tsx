@@ -43,9 +43,9 @@ export default function Layout({ children, ...props }: any) {
 
   useEffect(() => {
     const onWindowScroll = function () {
-      if (window.scrollY < 100 && isScrolled) {
+      if (window.scrollY < 10 && isScrolled) {
         setIsScrolled(false)
-      } else if (window.scrollY > 100 && !isScrolled) {
+      } else if (window.scrollY > 10 && !isScrolled) {
         setIsScrolled(true)
       }
     }
