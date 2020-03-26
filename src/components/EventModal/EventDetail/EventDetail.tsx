@@ -26,7 +26,7 @@ import classname from 'decentraland-gatsby/dist/utils/classname'
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
-const EVENTS_LIST = 1
+const EVENTS_LIST = 10
 
 export type EventDetailProps = {
   event: EventAttributes
