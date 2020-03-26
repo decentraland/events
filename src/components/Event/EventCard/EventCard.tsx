@@ -37,12 +37,12 @@ export default function EventCard(props: EventCardProps) {
 
   return (
     <Card key={event.id} link className={classname(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
-      <div className="EventCard__Attendees">
+      {event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
-        <div className="EventCard__Attendees__More">
+        {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
           <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
-        </div>
-      </div>
+        </div>}
+      </div>}
       <ImgFixed src={event.image} dimension="wide" />
       <Card.Content>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
