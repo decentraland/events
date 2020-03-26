@@ -26,6 +26,7 @@ import classname from 'decentraland-gatsby/dist/utils/classname'
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
+const EVENTS_LIST = 1
 
 export type EventDetailProps = {
   event: EventAttributes
@@ -36,6 +37,7 @@ export default function EventDetail({ event }: EventDetailProps) {
   const { start_at, finish_at } = event || { start_at: now, finish_at: now }
   const duration = finish_at.getTime() - start_at.getTime()
   const position = (event?.coordinates || [0, 0]).join()
+  const attendeesDiff = event.total_attendees - EVENTS_LIST
   const location = useLocation()
 
   return <>
@@ -141,9 +143,16 @@ export default function EventDetail({ event }: EventDetailProps) {
           <img src={friends} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {(event.latest_attendees || []).slice(0, 9).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
+          {(event.latest_attendees || []).slice(0, EVENTS_LIST).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
-          {event.total_attendees > 10 && null}
+          {attendeesDiff > 0 && <div className={classname([
+            "EventDetail__Detail__ShowAttendees",
+            attendeesDiff >= 10 && 'MoreThan10',
+            attendeesDiff >= 100 && 'MoreThan100',
+            attendeesDiff >= 1000 && 'MoreThan1000',
+          ])} onClick={() => navigate(url.toEventAttendees(location, event.id))}>
+            {`+${attendeesDiff}`}
+          </div>}
         </div>
         <div className="EventDetail__Detail__Action" />
       </div>

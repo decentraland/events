@@ -43,8 +43,6 @@
   display: flex;
 }
 
-
-
 .EventDetail .EventDetail__Header .EventDetail__Header__Event {
   padding-left: 16px;
 }
@@ -80,6 +78,41 @@
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Item {
   flex: 1 0 auto;
+}
+
+.EventDetail .EventDetail__Detail .EventDetail__Detail__Item .dg.ImgAvatar {
+  margin-right: 8px;
+}
+
+.EventDetail .EventDetail__Detail__ShowAttendees {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+  background: #37333d;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: normal;
+  color: white;
+  cursor: pointer;
+}
+
+.EventDetail .EventDetail__Detail__ShowAttendees.MoreThan10 {
+  font-size: 14px;
+}
+
+.EventDetail .EventDetail__Detail__ShowAttendees.MoreThan100 {
+  font-size: 12px;
+}
+
+.EventDetail .EventDetail__Detail__ShowAttendees.MoreThan1000 {
+  font-size: 9px;
 }
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Action {

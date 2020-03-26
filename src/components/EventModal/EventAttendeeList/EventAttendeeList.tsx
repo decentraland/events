@@ -14,6 +14,7 @@ import { navigate } from 'gatsby'
 import url from '../../../url'
 
 const back = require('../../../images/back.svg')
+const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 
 const attendees = new Map<string, EventAttendeeAttributes[]>()
 
@@ -43,9 +44,9 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
     {!list && <Loader size="massive" />}
     {list && list.length === 0 && <div />}
     {list && list.length > 0 && list.map((attendee) => {
-      return <div className="EventAttendeeList__Item">
-        <ImgAvatar address={attendee.user} />
-        <Paragraph>{attendee.user_name}</Paragraph>
+      return <div key={attendee.user} className="EventAttendeeList__Item">
+        <ImgAvatar address={attendee.user} src={`${EVENTS_URL}/profile/${attendee.user}/face.png`} />
+        <Paragraph>{attendee.user_name || 'Guest'}</Paragraph>
       </div>
     })}
   </div>
