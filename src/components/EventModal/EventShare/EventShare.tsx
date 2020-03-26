@@ -34,15 +34,13 @@ export default function EventShare(props: EventShareProps) {
     e.preventDefault()
 
     const params = new URLSearchParams()
-    params.set('u', url.toEvent(location, props.event.id))
+    params.set('u', location.origin + url.toEvent(location, props.event.id))
 
     if (props.event.description) {
       params.set('description', props.event.description)
     }
 
     share('https://www.facebook.com/sharer/sharer.php?' + params.toString())
-
-    // `https://twitter.com/intent/tweet?text=Just added a new design to Decentraland via the Builder. Check it out below then create your own. The virtual world’s not gonna build itself you know! {url}&hashtags=builder,virtualworld,gaming`
   }
 
   function handleShareTwitter(e: React.MouseEvent<any>) {
@@ -51,9 +49,9 @@ export default function EventShare(props: EventShareProps) {
     const params = new URLSearchParams()
 
     if (props.event.description) {
-      params.set('text', props.event.description + ' ' + url.toEvent(location, props.event.id))
+      params.set('text', props.event.description + ' ' + location.origin + url.toEvent(location, props.event.id))
     } else {
-      params.set('text', url.toEvent(location, props.event.id))
+      params.set('text', location.origin + url.toEvent(location, props.event.id))
     }
 
     params.set('hashtags', 'builder,virtualworld,gaming')
