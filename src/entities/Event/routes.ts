@@ -65,15 +65,17 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const now = new Date()
   const event_id = uuid()
   const [x, y] = data.coordinates
-  const parcel = await Land.get().getParcel(data.coordinates)
+  const content = await Land.get().getMapContent([x, y], [x, y])
+  const state = content.assets.estates[0]
+  const parcel = content.assets.parcels[0]
 
   const event: EventAttributes = {
     ...data,
     id: event_id,
-    image: `${LAND_URL}/parcels/${x}/${y}/map.png`,
+    image: state ? Land.get().getEstateImage(state.id) : Land.get().getParcelImage([x, y]),
     user,
     user_name: userProfile.name || null,
-    scene_name: parcel?.data?.name || null,
+    scene_name: state?.data?.name || parcel?.data?.name || null,
     approved: false,
     total_attendees: 0,
     latest_attendees: [],
