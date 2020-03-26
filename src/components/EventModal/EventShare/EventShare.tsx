@@ -51,21 +51,14 @@ export default function EventShare(props: EventShareProps) {
     const params = new URLSearchParams()
 
     if (props.event.description) {
-
+      params.set('text', props.event.description + ' ' + url.toEvent(location, props.event.id))
     } else {
-
-    }
-    params.set('text', url.toEvent(location, props.event.id))
-
-    if (props.event.description) {
-      params.set('description', props.event.description)
+      params.set('text', url.toEvent(location, props.event.id))
     }
 
     params.set('hashtags', 'builder,virtualworld,gaming')
 
     share('https://twitter.com/intent/tweet?' + params.toString())
-    // `https://www.facebook.com/sharer/sharer.php?u={url}&description=${props.event.description}`
-    // `https://twitter.com/intent/tweet?text=Just added a new design to Decentraland via the Builder. Check it out below then create your own. The virtual world’s not gonna build itself you know! {url}&hashtags=builder,virtualworld,gaming`
   }
 
   return <div className="EventShare">
@@ -74,8 +67,8 @@ export default function EventShare(props: EventShareProps) {
       <SubTitle>Share Event</SubTitle>
     </div>
     <div className="EventShare__Body">
-      <Button inverted primary onClick={handleShareFacebook} >facebook</Button>
-      <Button inverted primary onClick={handleShareTwitter}>twitter</Button>
+      <Button inverted primary onClick={handleShareFacebook} >Facebook</Button>
+      <Button inverted primary onClick={handleShareTwitter}>Twitter</Button>
     </div>
   </div>
 }
