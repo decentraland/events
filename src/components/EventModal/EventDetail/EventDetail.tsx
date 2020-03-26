@@ -141,7 +141,7 @@ export default function EventDetail({ event }: EventDetailProps) {
           <img src={friends} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {(event.latest_attendees || []).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
+          {(event.latest_attendees || []).slice(0, 9).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
           {event.total_attendees > 10 && null}
         </div>
