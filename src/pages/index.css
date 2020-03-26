@@ -29,8 +29,8 @@
   border: 1px solid white;
   margin: 0;
   border-radius: 100%;
-  bottom: 4px;
-  right: 4px;
+  bottom: 6px;
+  right: 6px;
 }
 
 .ui.card.CardGoingEvent .JumpInButton img {
@@ -40,6 +40,43 @@
 .ui.card.CardEvent.pending {
   opacity: 0.7;
   background: #eee;
+}
+
+.ui.card.CardEvent .CardEvent__Attendees {
+  position: absolute;
+  z-index: 100;
+  top: 12px;
+  right: 12px;
+}
+
+.ui.card.CardGoingEvent .CardGoingEvent__Attendees {
+  position: absolute;
+  z-index: 100;
+  top: 6px;
+  right: 6px;
+}
+
+.ui.card.CardEvent .CardEvent__Attendees .dg.ImgAvatar,
+.ui.card.CardGoingEvent .CardGoingEvent__Attendees .dg.ImgAvatar {
+  margin-right: -10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.ui.card.CardEvent .CardEvent__Attendees .CardEvent__Attendees__More,
+.ui.card.CardGoingEvent
+  .CardGoingEvent__Attendees
+  .CardGoingEvent__Attendees__More {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #37333d;
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0 0.4em;
+  box-sizing: content-box;
+  line-height: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .GroupTitle {

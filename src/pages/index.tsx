@@ -29,8 +29,11 @@ import { toMonthName } from "../components/Date/utils"
 import classname from "decentraland-gatsby/dist/utils/classname"
 import SocialButton from "../components/Button/SocialButtons"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import ImgAvatar from "decentraland-gatsby/dist/components/Profile/ImgAvatar"
 
 const primaryAdd = require('../images/primary-add.svg')
+const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
+const EVENTS_LIST = 3
 
 export default function IndexPage(props: any) {
   const [profile] = useProfile()
@@ -91,6 +94,11 @@ export default function IndexPage(props: any) {
                 <div style={{ flex: '0 0 96px', position: 'relative' }}>
                   <JumpInButton size="small" event={event}>{''}</JumpInButton>
                   <ImgFixed src={event.image} dimension="square" />
+                  <div className="CardGoingEvent__Attendees">
+                    <div className="CardGoingEvent__Attendees__More">
+                      +{event.total_attendees}
+                    </div>
+                  </div>
                 </div>
                 <Card.Content>
                   <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
@@ -118,6 +126,12 @@ export default function IndexPage(props: any) {
 
               return (
                 <Card key={event.id} link className={classname(['CardEvent', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
+                  <div className="CardEvent__Attendees">
+                    {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
+                    <div className="CardEvent__Attendees__More">
+                      +{Math.max(event.total_attendees - EVENTS_LIST, 0)}
+                    </div>
+                  </div>
                   <ImgFixed src={event.image} dimension="wide" />
                   <Card.Content>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
