@@ -12,6 +12,7 @@ const app = express()
 app.use(social)
 
 app.use('/api', [
+  status(),
   (req: Request, res: Response, next: NextFunction) => {
     const start = Date.now()
     res.on('close', () => {
@@ -23,8 +24,7 @@ app.use('/api', [
   bodyParser.json(),
   events,
   attendees,
-  profiles,
-  status()
+  profiles
 ])
 
 app.use(express.static('public'))
