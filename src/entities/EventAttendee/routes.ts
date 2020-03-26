@@ -23,8 +23,7 @@ export default routes((router) => {
 })
 
 export async function getEventAttendeeList(event_id: string) {
-  const attendees = await EventAttendee.find<EventAttendeeAttributes>({ event_id })
-  return attendees.map(attendee => attendee.user)
+  return await EventAttendee.find<EventAttendeeAttributes>({ event_id })
 }
 
 export async function getEventAttendees(req: WithEvent) {

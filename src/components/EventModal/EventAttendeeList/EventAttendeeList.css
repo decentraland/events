@@ -1,0 +1,41 @@
+.EventAttendeeList {
+  position: relative;
+  min-height: 400px;
+  padding: 16px 24px;
+}
+
+.EventAttendeeList .EventAttendeeList__Header {
+  text-align: center;
+  padding: 5px 0;
+  align-items: center;
+  display: relative;
+}
+
+.EventAttendeeList .EventAttendeeList__Header img {
+  display: block;
+  position: absolute;
+  left: 24px;
+  top: 18px;
+  padding: 8px;
+  cursor: pointer;
+  box-sizing: content-box;
+}
+
+.EventAttendeeList .EventAttendeeList__Header .SubTitle {
+  margin: 0;
+  font-size: 21px;
+  width: 100%;
+}
+
+.EventAttendeeList .EventAttendeeList__Item {
+  padding: 12px 0;
+  display: flex;
+}
+
+.EventAttendeeList .EventAttendeeList__Item img {
+  margin-right: 12px;
+}
+
+.EventAttendeeList .EventAttendeeList__Item .Paragraph {
+  font-weight: 600;
+}

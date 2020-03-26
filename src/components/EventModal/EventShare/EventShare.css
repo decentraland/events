@@ -1,0 +1,34 @@
+.EventShare {
+  position: relative;
+  padding: 16px 24px;
+}
+
+.EventShare .EventShare__Header {
+  text-align: center;
+  padding: 5px 0;
+  align-items: center;
+  display: relative;
+}
+
+.EventShare .EventShare__Header img {
+  display: block;
+  position: absolute;
+  left: 24px;
+  top: 18px;
+  padding: 8px;
+  cursor: pointer;
+  box-sizing: content-box;
+}
+
+.EventShare .EventShare__Header .SubTitle {
+  margin: 0;
+  font-size: 21px;
+  width: 100%;
+}
+
+.EventShare .EventShare__Body {
+  min-height: 300px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}

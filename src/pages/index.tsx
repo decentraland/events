@@ -5,8 +5,8 @@ import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import useEntityStore from "decentraland-gatsby/dist/hooks/useEntityStore"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
-
 import { useLocation } from "@reach/router"
+import url from '../url'
 
 import stores from '../store'
 import Layout from "../components/Layout/Layout"
@@ -36,6 +36,8 @@ export default function IndexPage(props: any) {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const eventId = location && searchParams.get('event') || null
+  const isSharing = location && searchParams.get('view') === 'share' || false
+  const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
   const state = useEntityStore(stores.event)
   const events = useMemo(() => Object.values(state.data).sort((a, b) => a.start_at.getTime() - b.start_at.getTime()), [state])
   const attendingEvents = useMemo(() => events.filter(event => (event as any).attending), [state])
@@ -44,18 +46,13 @@ export default function IndexPage(props: any) {
   useAsyncEffect(async () => {
     stores.event.setLoading()
     const events = await Events.get().getEvents()
-    console.log(profile, events)
     stores.event.setEntities(events)
   }, [profile])
 
   return (
     <Layout {...props}>
       <SEO title="Decentraland Events" />
-      <EventModal size="tiny" event={currentEvent} onClose={() => {
-        const targetSearchParams = new URLSearchParams(location.search)
-        targetSearchParams.delete('event')
-        navigate(location.pathname + targetSearchParams.toString())
-      }} />
+      <EventModal size="tiny" event={currentEvent} share={isSharing} attendees={isListingAttendees} onClose={() => navigate(url.toHome(location))} />
       <Container style={{ paddingTop: "110px" }}>
         <HeaderMenu>
           <HeaderMenu.Left>
@@ -75,20 +72,19 @@ export default function IndexPage(props: any) {
         </>}
         {!state.loading && events.length === 0 && <>
           <Divider />
-          <Paragraph secondary style={{ textAlign: 'center' }}>There is not events coming soon.</Paragraph>
+          <Paragraph secondary style={{ textAlign: 'center' }}>There are not events coming soon.</Paragraph>
           <Divider />
         </>}
         {!state.loading && events.length > 0 && attendingEvents.length > 0 && <Card.Group>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           {attendingEvents.map(event => {
             const startAt = new Date(Date.parse(event.start_at.toString()))
-            const targetSearchParams = new URLSearchParams(location.search)
-            targetSearchParams.set('event', event.id)
-            const href = location.pathname + '?' + targetSearchParams.toString()
-            return <Card key={'attending-' + event.id} className="CardGoingEvent" href={href} onClick={(e: React.MouseEvent<any>) => {
+            function handleOpenEvent(e: React.MouseEvent<any>) {
               e.preventDefault()
-              navigate(href)
-            }}>
+              navigate(url.toEvent(location, event.id))
+            }
+
+            return <Card key={'attending-' + event.id} className="CardGoingEvent" href={url.toEvent(location, event.id)} onClick={handleOpenEvent}>
               <div style={{ display: 'flex' }}>
                 <div style={{ flex: '0 0 96px', position: 'relative' }}>
                   <JumpInButton size="small" event={event}>{''}</JumpInButton>
@@ -105,31 +101,33 @@ export default function IndexPage(props: any) {
         {!state.loading && events.length > 0 && <>
           <Card.Group>
             <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
-
             {events.map((event) => {
-
               const startAt = new Date(Date.parse(event.start_at.toString()))
-              const targetSearchParams = new URLSearchParams(location.search)
-              targetSearchParams.set('event', event.id)
-              const href = location.pathname + '?' + targetSearchParams.toString()
+
+              function handleOpen(e: React.MouseEvent<any>) {
+                e.preventDefault()
+                navigate(url.toEvent(location, event.id))
+              }
+
+              function handleShare(e: React.MouseEvent<any>) {
+                e.preventDefault()
+                navigate(url.toEventShare(location, event.id))
+              }
 
               return (
-                <Card key={event.id} link className={classname(['CardEvent', !event.approved && 'pending'])} href={href} onClick={(e: React.MouseEvent<any>) => {
-                  e.preventDefault()
-                  navigate(href)
-                }} >
+                <Card key={event.id} link className={classname(['CardEvent', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
                   <ImgFixed src={event.image} dimension="wide" />
                   <Card.Content>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
                       <div>
-                        <JumpInButton size="small" href={`https://play.decentraland.org/?position=${event.coordinates.join(',')}`} />
+                        <JumpInButton size="small" event={event} />
                       </div>
                     </div>
 
                     <Card.Header>{event.name}</Card.Header>
                     <Card.Description>
-                      <SocialButton event={event} />
+                      <SocialButton event={event} onShareFallback={handleShare} />
                     </Card.Description>
                   </Card.Content>
                 </Card>)

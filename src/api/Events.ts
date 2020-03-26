@@ -3,6 +3,7 @@ import env from 'decentraland-gatsby/dist/utils/env'
 import Options from './Options'
 import { EventAttributes } from '../entities/Event/types'
 import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
+import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 
 export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'coordinates' | 'start_at' | 'finish_at'>
 
@@ -57,8 +58,12 @@ export default class Events extends API {
     return this.fetchMany(`/events`, this.options().authorization())
   }
 
-  async getAttendingEvent() {
+  async getUserAttendingEvent() {
     return this.fetchMany(`/events/attending`, this.options().authorization())
+  }
+
+  async getEventAttending(eventId: string) {
+    return this.fetch<EventAttendeeAttributes[]>(`/events/${eventId}/attendees`)
   }
 
   async createEvent(event: NewEvent) {
