@@ -36,7 +36,7 @@ const template = (event: EventAttributes, url: string) => `<!DOCTYPE html>
   <meta name="twitter:site" content="@decentraland" />
   <meta property="og:url" content="${url}" />
   <meta property="og:title" content="${event.name}" />
-  <meta property="og:description" content="${event.description}" />
+  ${event.description && `<meta property="og:description" content="${event.description}" />` || ''}
   <meta property="og:image" content="${event.image}" />
 </head>
 <body></body>
