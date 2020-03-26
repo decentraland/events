@@ -13,6 +13,7 @@ import isAdmin from '../Auth/isAdmin';
 import handle from '../Route/handle';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
+import { notifyNewEvent, notifyApprovedEvent } from '../Slack/utils';
 
 const LAND_URL = env('LAND_URL', '')
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
@@ -84,6 +85,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   await Event.create(event)
+  await notifyNewEvent(event)
 
   return Event.toPublic(event, user)
 }
@@ -108,6 +110,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   }
 
   await Event.update(updatedAttributes, { id: event.id })
+
+  if (!req.event.approved && updatedAttributes.approved) {
+    notifyApprovedEvent(updatedAttributes)
+  }
 
   return Event.toPublic({ ...event, ...updatedAttributes }, user)
 }
