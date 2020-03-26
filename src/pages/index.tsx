@@ -19,17 +19,16 @@ import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { HeaderMenu } from "decentraland-ui/dist/components/HeaderMenu/HeaderMenu"
 
-import './index.css'
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
-import EventModal from "../components/EventModal/EventModal"
+import EventModal from "../components/Event/EventModal/EventModal"
 import JumpInButton from "../components/Button/JumpInButton"
 import { toMonthName } from "../components/Date/utils"
-import classname from "decentraland-gatsby/dist/utils/classname"
-import SocialButton from "../components/Button/SocialButtons"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import ImgAvatar from "decentraland-gatsby/dist/components/Profile/ImgAvatar"
+import EventCard from "../components/Event/EventCard/EventCard"
+
+import './index.css'
 
 const primaryAdd = require('../images/primary-add.svg')
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
@@ -45,6 +44,7 @@ export default function IndexPage(props: any) {
   const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
   const state = useEntityStore(stores.event)
   const events = useMemo(() => Object.values(state.data).filter(event => !event.rejected).sort((a, b) => a.start_at.getTime() - b.start_at.getTime()), [state])
+  const myEvents = useMemo(() => events.filter(event => profile && event.user === profile.address.toString()), [state])
   const attendingEvents = useMemo(() => events.filter(event => (event as any).attending), [state])
   const currentEvent = eventId && state.data[eventId] || null
 
@@ -77,7 +77,7 @@ export default function IndexPage(props: any) {
         </>}
         {!state.loading && events.length === 0 && <>
           <Divider />
-          <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
+          <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet. Fill in your event details.</Paragraph>
           <Divider />
         </>}
         {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
@@ -112,43 +112,7 @@ export default function IndexPage(props: any) {
         {!state.loading && events.length > 0 && <>
           <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
           <Card.Group>
-            {events.map((event) => {
-              const startAt = new Date(Date.parse(event.start_at.toString()))
-
-              function handleOpen(e: React.MouseEvent<any>) {
-                e.preventDefault()
-                navigate(url.toEvent(location, event.id))
-              }
-
-              function handleShare(e: React.MouseEvent<any>) {
-                e.preventDefault()
-                navigate(url.toEventShare(location, event.id))
-              }
-
-              return (
-                <Card key={event.id} link className={classname(['CardEvent', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
-                  <div className="CardEvent__Attendees">
-                    {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" address={address} src={`${EVENTS_URL}/profile/${address}/face.png`} />)}
-                    <div className="CardEvent__Attendees__More">
-                      +{Math.max(event.total_attendees - EVENTS_LIST, 0)}
-                    </div>
-                  </div>
-                  <ImgFixed src={event.image} dimension="wide" />
-                  <Card.Content>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
-                      <div>
-                        <JumpInButton size="small" event={event} />
-                      </div>
-                    </div>
-
-                    <Card.Header>{event.name}</Card.Header>
-                    <Card.Description>
-                      <SocialButton event={event} onShareFallback={handleShare} />
-                    </Card.Description>
-                  </Card.Content>
-                </Card>)
-            })}
+            {events.map((event) => <EventCard event={event} />)}
           </Card.Group></>}
       </Container>
     </Layout>

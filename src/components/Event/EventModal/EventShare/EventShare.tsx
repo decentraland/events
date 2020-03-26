@@ -1,14 +1,14 @@
 import React from 'react'
-import { EventAttributes } from '../../../entities/Event/types'
+import { EventAttributes } from '../../../../entities/Event/types'
 
 import './EventShare.css'
 import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
-import url from '../../../url'
+import url from '../../../../url'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
 
-const back = require('../../../images/back.svg')
+const back = require('../../../../images/back.svg')
 
 export type EventShareProps = {
   event: EventAttributes

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal";
-import { EventAttributes } from "../../entities/Event/types";
+import { EventAttributes } from "../../../entities/Event/types";
 import classname from 'decentraland-gatsby/dist/utils/classname';;
 import EventDetail from './EventDetail/EventDetail';
 import EventShare from './EventShare/EventShare';

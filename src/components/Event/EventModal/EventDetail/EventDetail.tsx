@@ -1,27 +1,27 @@
 import React from 'react'
 import { navigate } from 'gatsby'
-import { EventAttributes } from '../../../entities/Event/types'
+import { EventAttributes } from '../../../../entities/Event/types'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
-import { toMonthName, toDayNumber, toDayName } from '../../Date/utils'
+import { toMonthName, toDayNumber, toDayName } from '../../../Date/utils'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
-import SocialButton from '../../Button/SocialButtons'
-import JumpInButton from '../../Button/JumpInButton'
-import AddToCalendarButton from '../../Button/AddToCalendarButton'
-import DateBox from '../../Date/DateBox'
+import SocialButton from '../../../Button/SocialButtons'
+import JumpInButton from '../../../Button/JumpInButton'
+import AddToCalendarButton from '../../../Button/AddToCalendarButton'
+import DateBox from '../../../Date/DateBox'
 import { useLocation } from '@reach/router'
 
-const info = require('../../../images/secondary-info.svg')
-const clock = require('../../../images/secondary-clock.svg')
-const pin = require('../../../images/secondary-pin.svg')
-const friends = require('../../../images/secondary-friends.svg')
+const info = require('../../../../images/secondary-info.svg')
+const clock = require('../../../../images/secondary-clock.svg')
+const pin = require('../../../../images/secondary-pin.svg')
+const friends = require('../../../../images/secondary-friends.svg')
 
 import './EventDetail.css'
-import url from '../../../url'
+import url from '../../../../url'
 import classname from 'decentraland-gatsby/dist/utils/classname'
 
 const DAY = 1000 * 60 * 60 * 24

@@ -78,6 +78,7 @@
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Item {
   flex: 1 0 auto;
+  max-width: 90%;
 }
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Item .dg.ImgAvatar {
