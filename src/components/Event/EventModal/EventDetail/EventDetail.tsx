@@ -25,6 +25,7 @@ import './EventDetail.css'
 import url from '../../../../url'
 import classname from 'decentraland-gatsby/dist/utils/classname'
 import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
+import isEmail from 'validator/lib/isEmail'
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
@@ -171,7 +172,10 @@ export default function EventDetail({ event }: EventDetailProps) {
           <img src={extra} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {event.contact && <Paragraph>{event.contact}</Paragraph>}
+          {event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
+          {event.contact && isEmail(event.contact) && <Paragraph>
+            <Link href={'mailto:' + event.contact} target="_blank">{event.contact}</Link>
+          </Paragraph>}
           {!event.contact && <Paragraph secondary={!event.contact} >
             <Italic>No contact</Italic>
           </Paragraph>}
