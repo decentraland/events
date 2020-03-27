@@ -48,7 +48,8 @@ export default function EventDetail({ event }: EventDetailProps) {
 
   return <>
     {event && <ImgFixed src={event.image} dimension="wide" />}
-    {event && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
+    {event && event.rejected && <div className="EventError"><code>This event was rejected</code></div>}
+    {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className="EventDetail">
       {/* <Modal.Header>{event.name}</Modal.Header> */}
       <div className="EventDetail__Header">
