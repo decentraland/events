@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-// import Segment from "~/components/Util/Segment"
+import Segment from "decentraland-gatsby/dist/components/Segment/Segment"
 // import { withPrefix } from "gatsby"
 
 export default function HTML(props) {
@@ -31,8 +31,7 @@ export default function HTML(props) {
           dangerouslySetInnerHTML={{ __html: props.body }}
         />
         {props.postBodyComponents}
-
-        {/* <Segment analyticsKey="7qBT3z1TmRolRDSyscr3YzxDxqrWZMGF" /> */}
+        <Segment analyticsKey={process.env.SEGMENT_KEY} />
       </body>
     </html>
   )
