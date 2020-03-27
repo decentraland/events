@@ -45,7 +45,7 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
     {list && list.length === 0 && <div />}
     {list && list.length > 0 && list.map((attendee) => {
       return <div key={attendee.user} className="EventAttendeeList__Item">
-        <ImgAvatar address={attendee.user} src={`${EVENTS_URL}/profile/${attendee.user}/face.png`} />
+        <ImgAvatar address={attendee.user} src={`${EVENTS_URL}/profile/${attendee.user.toString()}/face.png`} />
         <Paragraph>{attendee.user_name || 'Guest'}</Paragraph>
       </div>
     })}
