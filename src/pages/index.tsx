@@ -80,17 +80,17 @@ export default function IndexPage(props: any) {
         {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
-            {attendingEvents.map(event => <EventCardMini event={event} />)}
+            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
           </Card.Group></>}
         {!state.loading && events.length > 0 && myEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
           <Card.Group>
-            {myEvents.map(event => <EventCardMini event={event} />)}
+            {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} />)}
           </Card.Group></>}
         {!state.loading && events.length > 0 && <>
           <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
           <Card.Group>
-            {events.map((event) => <EventCard event={event} />)}
+            {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
           </Card.Group></>}
       </Container>
     </Layout>
