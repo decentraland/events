@@ -156,16 +156,16 @@ export default function SubmitPage(props: any) {
             </Grid.Column>
             <Grid.Column mobile="15">
               <Title style={{ fontSize: '34px', lineHeight: '42px' }}>Submit event</Title>
-              <Paragraph secondary>Text explaining some stuff about this screen. Might get long, lets hope not.</Paragraph>
+              <Paragraph secondary>Be sure to fill in as many details as possible to generate interest in your event.</Paragraph>
               <Grid stackable style={{ paddingTop: '48px' }}>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field style={{ width: '100%' }} name="name" error={!!errors['name']} message={errors['name']} label="Event Name" placeholder="Awesome event name" defaultValue={event.name} onChange={handleValueChange} />
+                    <Field label="Event Name" placeholder="Be as descriptive as you can" style={{ width: '100%' }} name="name" error={!!errors['name']} message={errors['name']} defaultValue={event.name} onChange={handleValueChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Description" name="description" error={!!errors['description']} message={errors['description']} placeholder="A short description of the event" defaultValue={event.description} onChange={handleValueChange} />
+                    <Field label="Description" placeholder="Keep it short but keep it interesting!" name="description" error={!!errors['description']} message={errors['description']} defaultValue={event.description} onChange={handleValueChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
@@ -186,17 +186,17 @@ export default function SubmitPage(props: any) {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="Coordinates" name="coordinates" error={!!errors['coordinates']} message={errors['coordinates']} defaultValue={event.coordinates.join(',')} onChange={handleChangeCoordinates} />
+                    <Field label="Decentraland coordinates" name="coordinates" error={!!errors['coordinates']} message={errors['coordinates']} defaultValue={event.coordinates.join(',')} onChange={handleChangeCoordinates} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Contact info (email o discord)" name="contact" error={!!errors['contact']} message={errors['contact']} placeholder="hello@decentraland.org" defaultValue={event.name} onChange={handleValueChange} />
+                    <Field label="Email or Discord username" placeholder="hello@decentraland.org" name="contact" error={!!errors['contact']} message={errors['contact']} defaultValue={event.name} onChange={handleValueChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Anything else you want to tell us?" name="details" error={!!errors['details']} message={errors['details']} placeholder="Add useful information for our reviewers" defaultValue={event.name} onChange={handleValueChange} />
+                    <Field label="Additional info" placeholder="Add any other useful details for our reviewers" name="details" error={!!errors['details']} message={errors['details']} defaultValue={event.name} onChange={handleValueChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
