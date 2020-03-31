@@ -38,7 +38,7 @@ export default function EventCard(props: EventCardProps) {
   return (
     <Card key={event.id} link className={classname(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
-        {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
+        {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
           <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
         </div>}
