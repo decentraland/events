@@ -61,8 +61,7 @@ export default class Event extends Model<EventAttributes> {
         }
       },
       contact: {
-        type: 'string',
-        format: 'email'
+        type: ['string', 'null'],
       },
       details: {
         type: ['string', 'null'],
