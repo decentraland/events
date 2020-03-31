@@ -3,3 +3,5 @@ lib
 public
 node_modules
 .cache
+.git
+.DS_Store
