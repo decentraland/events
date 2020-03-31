@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
+import { useLocation } from '@reach/router'
+import { useIntl } from 'gatsby-plugin-intl'
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
@@ -14,10 +16,10 @@ import Layout from "../components/Layout/Layout"
 import SEO from "../components/seo"
 import Events, { NewEvent } from "../api/Events"
 import BackButton from "../components/Button/BackButton"
+import { toInputDate, toInputTime, fromInputDate, fromInputTime, date } from "../components/Date/utils"
+import url from '../url'
 
 import './submit.css'
-import { toInputDate, toInputTime, fromInputDate, fromInputTime } from "../components/Date/utils"
-import { navigate } from "gatsby-plugin-intl"
 
 const info = require('../images/info.svg')
 
@@ -31,16 +33,19 @@ let pageStatus = Status.None;
 
 export default function SubmitPage(props: any) {
 
+  const location = useLocation()
   const [profile, loadingProfile, profileActions] = useProfile()
   const [creating, setCreating] = useState(Status.None)
+
+  const currentDate = date({ seconds: 0, milliseconds: 0 })
   const [event, setEvent] = useState<NewEvent>({
     name: '',
     description: '',
     contact: '',
     details: '',
     coordinates: [0, 0],
-    start_at: new Date(),
-    finish_at: new Date(),
+    start_at: currentDate,
+    finish_at: currentDate,
   })
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
@@ -128,7 +133,11 @@ export default function SubmitPage(props: any) {
 
       Events.get()
         .createEvent(newEvent as any)
-        .then(() => (window.location.pathname = '/'))
+        .then((event) => {
+          const newLocation = { ...location, pathname: location.pathname.replace('/submit', '') }
+          const target = event && event.id ? url.toEvent(newLocation, event.id) : url.toHome(newLocation)
+          window.location.pathname = target
+        })
         .catch(err => {
           const message = err.body?.error || err.message
           setCreatingStatus(Status.None)
