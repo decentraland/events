@@ -17,12 +17,11 @@ COPY ./tsconfig.json     /app/tsconfig.json
 RUN apk update && \
   apk --no-cache upgrade && \
   apk --no-cache add git && \
-  npm install --unsafe-perm && \
   rm -rf /var/cache/apk/*
 
 RUN rm -rf node_modules
 
-RUN npm install
+RUN npm install --unsafe-perm
 
 RUN npm run build
 
