@@ -74,7 +74,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     ...data,
     id: event_id,
     image: state ? Land.get().getEstateImage(state.id) : Land.get().getParcelImage([x, y]),
-    user,
+    user: user.toLowerCase(),
     user_name: userProfile.name || null,
     scene_name: state?.data?.name || parcel?.data?.name || null,
     approved: false,

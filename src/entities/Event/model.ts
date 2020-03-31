@@ -81,18 +81,25 @@ export default class Event extends Model<EventAttributes> {
   })
 
   static async getEvents(user?: string | null) {
+
     const query = SQL`
       SELECT 
         e.*
         ${conditional(!!user, SQL`, a.user is not null as attending`)}
       FROM ${table(Event)} e
-        ${conditional(!!user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}`)}
+        ${conditional(!!user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${user}`)}
       WHERE
-        e.finish_at > now() AND e.rejected IS FALSE
-        ${conditional(!user, SQL`AND approved IS TRUE`)}
-        ${conditional(!!user && !isAdmin(user), SQL`AND (approved IS TRUE OR a.user = ${user})`)}
+        e.finish_at > now()
+        AND e.rejected IS FALSE
+        ${conditional(!user, SQL`AND e.approved IS TRUE`)}
+        ${conditional(!!user && !isAdmin(user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${user})`)}
       ORDER BY start_at ASC
     `
+
+
+    console.log(!!user && !isAdmin(user))
+    console.log(query.text, query.values)
+
     return Event.query<EventAttributes>(query)
   }
 
