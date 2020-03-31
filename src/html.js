@@ -1,7 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
 import Segment from "decentraland-gatsby/dist/components/Segment/Segment"
-// import { withPrefix } from "gatsby"
 
 export default function HTML(props) {
   return (
@@ -13,11 +12,6 @@ export default function HTML(props) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
-        {/* <link
-          type="text/css"
-          rel="stylesheet"
-          href={withPrefix("global.css")}
-        /> */}
         {props.headComponents}
       </head>
       <body {...props.bodyAttributes}>

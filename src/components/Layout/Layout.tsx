@@ -22,17 +22,7 @@ import { Button } from "decentraland-ui/dist/components/Button/Button"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import ImgAvatar from "decentraland-gatsby/dist/components/Profile/ImgAvatar"
 
-// import "../theme.css"
 import "./Layout.css"
-
-const LangLabel = {
-  en: "ENG",
-  es: "ESP",
-  fr: "FRA",
-  ja: "日本語",
-  zh: "中文",
-  ko: "KOR",
-}
 
 export default function Layout({ children, ...props }: any) {
   const language: Locale = props?.pageContext?.intl?.language || 'en'
@@ -68,12 +58,6 @@ export default function Layout({ children, ...props }: any) {
 
   return (
     <>
-      <Helmet meta={[
-        {
-          property: `og:url`,
-          content: String(process.env.GATSBY_BASE_URL || 'https://contest.decentraland.org') + props.location.pathname,
-        }
-      ]} />
       <Navbar
         className={isScrolled ? "" : "initial"}
         rightMenu={<>
