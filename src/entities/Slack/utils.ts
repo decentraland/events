@@ -6,6 +6,7 @@ import { resolve } from 'url'
 
 const SLACK_WEBHOOK = env('SLACK_WEBHOOK', '')
 const EVENTS_URL = env('EVENTS_URL', 'https://events.centraland.org/api')
+const DECENTRALAND_URL = env('DECENTRALAND_URL', 'https://play.decentraland.org')
 
 if (!isURL(SLACK_WEBHOOK)) {
   console.log(`missing config SLACK_WEBHOOK`)
@@ -29,8 +30,8 @@ export async function notifyNewEvent(event: EventAttributes) {
             `*<${url(event)}|${event.name}>* by ${event.user_name || 'Guest'}`,
             `_${event.description || 'No description'}_`,
             '',
-            event.coordinates.join(',') !== '0,0' && `at <${event.url}|${event.scene_name || 'Decentraland'} (${event.coordinates.join(',')})>`,
-            event.coordinates.join(',') === '0,0' && `at ${event.url}`
+            event.url && event.url.startsWith(DECENTRALAND_URL) && `at <${event.url}|${event.scene_name || 'Decentraland'} (${event.coordinates.join(',')})>`,
+            (!event.url || event.url.startsWith(DECENTRALAND_URL)) && `at ${event.url}`
           ].filter(Boolean).join('\n')
         },
         "accessory": {
@@ -60,7 +61,7 @@ export async function notifyApprovedEvent(event: EventAttributes) {
 }
 
 function url(event: EventAttributes) {
-  return resolve(EVENTS_URL, `/en/?event${event.id}`)
+  return resolve(EVENTS_URL, `/en/?event=${event.id}`)
 }
 
 async function sendToSlack(body: object) {

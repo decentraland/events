@@ -111,9 +111,11 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   await Event.update(updatedAttributes, { id: event.id })
 
-  if (!req.event.approved && updatedAttributes.approved) {
-    notifyApprovedEvent(updatedAttributes)
+  const updatedEvent = { ...event, ...updatedAttributes }
+
+  if (!req.event.approved && updatedEvent.approved) {
+    notifyApprovedEvent(updatedEvent)
   }
 
-  return Event.toPublic({ ...event, ...updatedAttributes }, user)
+  return Event.toPublic(updatedEvent, user)
 }
