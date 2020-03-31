@@ -31,7 +31,7 @@ export async function notifyNewEvent(event: EventAttributes) {
             `_${event.description || 'No description'}_`,
             '',
             event.url && event.url.startsWith(DECENTRALAND_URL) && `at <${event.url}|${event.scene_name || 'Decentraland'} (${event.coordinates.join(',')})>`,
-            (!event.url || event.url.startsWith(DECENTRALAND_URL)) && `at ${event.url}`
+            (!event.url || !event.url.startsWith(DECENTRALAND_URL)) && `at ${event.url}`
           ].filter(Boolean).join('\n')
         },
         "accessory": {
