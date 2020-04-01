@@ -1,5 +1,5 @@
 .dcl.field {
-  min-width: 200px;
+  min-width: auto;
 }
 .dcl.field .ui.sub.header {
   text-transform: none;
@@ -7,4 +7,8 @@
 }
 a.dg.Link {
   cursor: pointer;
+}
+
+p.FieldNote {
+  margin-top: 18px;
 }

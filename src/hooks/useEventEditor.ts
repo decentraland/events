@@ -1,14 +1,18 @@
 import { useState } from "react";
 import Events, { NewEvent, UpdateEvent } from "../api/Events";
-import { date, fromInputTime, fromInputDate } from "../components/Date/utils";
+import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime } from "../components/Date/utils";
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
+
+type EventEditorState = NewEvent & {
+  errors: Record<string, string>
+}
 
 export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   const currentDate = date({ seconds: 0, milliseconds: 0 })
   const start_at = defaultEvent.start_at || currentDate
   const finish_at = defaultEvent.finish_at && defaultEvent.finish_at.getTime() > start_at.getDate() ? defaultEvent.finish_at : new Date(start_at.getTime() + DEFAULT_EVENT_DURATION)
-  const [event, setEvent] = useState<NewEvent & { errors: Record<string, string> }>({
+  const [event, setEvent] = useState<EventEditorState>({
     name: defaultEvent.name || '',
     description: defaultEvent.description || '',
     contact: defaultEvent.contact || '',
@@ -19,6 +23,22 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     finish_at: finish_at,
     errors: {}
   })
+
+  function getStartDate() {
+    return toUTCInputDate(event.start_at)
+  }
+
+  function getStartTime() {
+    return toUTCInputTime(event.start_at)
+  }
+
+  function getFinishDate() {
+    return toUTCInputDate(event.finish_at)
+  }
+
+  function getFinishTime() {
+    return toUTCInputTime(event.finish_at)
+  }
 
   function setError(key: string, description: string) {
     setEvent((current) => {
@@ -71,7 +91,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   }
 
   function handleChangeStartDate(value?: string) {
-    const start_at = fromInputDate(value || '', event.start_at)
+    const start_at = fromUTCInputDate(value || '', event.start_at)
     if (start_at !== event.start_at) {
       const finish_at = start_at.getTime() > event.finish_at.getTime() ? new Date(start_at.getTime() + DEFAULT_EVENT_DURATION) : event.finish_at
       setValues({ start_at, finish_at })
@@ -79,7 +99,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   }
 
   function handleChangeStartTime(value?: string) {
-    const start_at = fromInputTime(value || '', event.start_at)
+    const start_at = fromUTCInputTime(value || '', event.start_at)
     if (start_at !== event.start_at) {
       const finish_at = start_at.getTime() > event.finish_at.getTime() ? new Date(start_at.getTime() + DEFAULT_EVENT_DURATION) : event.finish_at
       setValues({ start_at, finish_at })
@@ -87,14 +107,14 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   }
 
   function handleChangeFinishDate(value?: string) {
-    const finish_at = fromInputDate(value || '', event.finish_at)
+    const finish_at = fromUTCInputDate(value || '', event.finish_at)
     if (finish_at !== event.finish_at) {
       setValue('finish_at', finish_at)
     }
   }
 
   function handleChangeFinishTime(value?: string) {
-    const finish_at = fromInputTime(value || '', event.finish_at)
+    const finish_at = fromUTCInputTime(value || '', event.finish_at)
     if (finish_at !== event.finish_at) {
       setValue('finish_at', finish_at)
     }
@@ -172,5 +192,20 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     return Events.get().updateEvent(data)
   }
 
-  return [event, { setValue, setValues, setError, setErrors, handleChange, validate, create, update }] as const
+  const actions = {
+    getStartDate,
+    getStartTime,
+    getFinishDate,
+    getFinishTime,
+    setValue,
+    setValues,
+    setError,
+    setErrors,
+    handleChange,
+    validate,
+    create,
+    update
+  }
+
+  return [event, actions] as const
 }

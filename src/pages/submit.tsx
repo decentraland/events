@@ -4,6 +4,7 @@ import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import { Field } from 'decentraland-ui/dist/components/Field/Field'
@@ -18,7 +19,6 @@ import { toInputDate, toInputTime } from "../components/Date/utils"
 import url from '../url'
 
 import './submit.css'
-import { navigate } from "gatsby"
 
 const info = require('../images/info.svg')
 
@@ -91,18 +91,24 @@ export default function SubmitPage(props: any) {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={toInputDate(event.start_at)} min={toInputDate(new Date())} onChange={actions.handleChange} />
+                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={actions.getStartDate()} min={toInputDate(new Date())} onChange={actions.handleChange} />
                   </Grid.Column>
-                  <Grid.Column mobile="4">
-                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={toInputTime(event.start_at)} onChange={actions.handleChange} />
+                  <Grid.Column mobile="2">
+                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={actions.getStartTime()} onChange={actions.handleChange} />
+                  </Grid.Column>
+                  <Grid.Column mobile="2">
+                    <Paragraph className="FieldNote">UTC</Paragraph>
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={toInputDate(event.finish_at)} min={toInputDate(event.start_at)} onChange={actions.handleChange} />
+                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={actions.getFinishDate()} min={toInputDate(event.start_at)} onChange={actions.handleChange} />
                   </Grid.Column>
-                  <Grid.Column mobile="4">
-                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={toInputTime(event.finish_at)} onChange={actions.handleChange} />
+                  <Grid.Column mobile="2">
+                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={actions.getFinishTime()} onChange={actions.handleChange} />
+                  </Grid.Column>
+                  <Grid.Column mobile="2">
+                    <Paragraph className="FieldNote">UTC</Paragraph>
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
