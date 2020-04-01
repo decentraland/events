@@ -2,10 +2,12 @@ import { useState } from "react";
 import Events, { NewEvent, UpdateEvent } from "../api/Events";
 import { date, fromInputTime, fromInputDate } from "../components/Date/utils";
 
+const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
+
 export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   const currentDate = date({ seconds: 0, milliseconds: 0 })
   const start_at = defaultEvent.start_at || currentDate
-  const finish_at = defaultEvent.finish_at && defaultEvent.finish_at.getTime() > start_at.getDate() ? defaultEvent.finish_at : start_at
+  const finish_at = defaultEvent.finish_at && defaultEvent.finish_at.getTime() > start_at.getDate() ? defaultEvent.finish_at : new Date(start_at.getTime() + DEFAULT_EVENT_DURATION)
   const [event, setEvent] = useState<NewEvent & { errors: Record<string, string> }>({
     name: defaultEvent.name || '',
     description: defaultEvent.description || '',
@@ -71,7 +73,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   function handleChangeStartDate(value?: string) {
     const start_at = fromInputDate(value || '', event.start_at)
     if (start_at !== event.start_at) {
-      const finish_at = start_at.getTime() > event.finish_at.getTime() ? start_at : event.finish_at
+      const finish_at = start_at.getTime() > event.finish_at.getTime() ? new Date(start_at.getTime() + DEFAULT_EVENT_DURATION) : event.finish_at
       setValues({ start_at, finish_at })
     }
   }
@@ -79,7 +81,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   function handleChangeStartTime(value?: string) {
     const start_at = fromInputTime(value || '', event.start_at)
     if (start_at !== event.start_at) {
-      const finish_at = start_at.getTime() > event.finish_at.getTime() ? start_at : event.finish_at
+      const finish_at = start_at.getTime() > event.finish_at.getTime() ? new Date(start_at.getTime() + DEFAULT_EVENT_DURATION) : event.finish_at
       setValues({ start_at, finish_at })
     }
   }
