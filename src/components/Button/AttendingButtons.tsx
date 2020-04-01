@@ -73,7 +73,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     }
   }
 
-  return <div className="SocialButtons">
+  return <div className="AttendingButtons">
     <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={classname(['attending-status', event.attending && 'attending'])}>
       {event.attending && 'GOING'}
       {!event.attending && 'WANT TO GO'}

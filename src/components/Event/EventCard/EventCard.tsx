@@ -8,7 +8,7 @@ import classname from 'decentraland-gatsby/dist/utils/classname'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import JumpInButton from '../../Button/JumpInButton'
-import SocialButtons from '../../Button/AttendingButtons'
+import AttendingButtons from '../../Button/AttendingButtons'
 import { toMonthName } from '../../Date/utils'
 
 import './EventCard.css'
@@ -54,7 +54,7 @@ export default function EventCard(props: EventCardProps) {
 
         <Card.Header>{event.name}</Card.Header>
         <Card.Description>
-          <SocialButtons event={event} onShareFallback={handleShare} />
+          <AttendingButtons event={event} onShareFallback={handleShare} />
         </Card.Description>
       </Card.Content>
     </Card>)
