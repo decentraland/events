@@ -127,6 +127,15 @@ export function toMonthName(date: Date, options: ToNameOptions = {}) {
   return result;
 }
 
+export function toTimezoneName(value: Date) {
+  const offset = value.getTimezoneOffset()
+  const hour = toFixedNumber(Math.floor(offset / 60))
+  const minutes = toFixedNumber(offset % 60)
+  const diff = offset > 0 ? '-' : '+'
+
+  return `GMT${diff}${hour}:${minutes}`
+}
+
 export function toInputDate(date: Date): string {
   if (!date || Number.isNaN(date.getTime())) {
     return ''

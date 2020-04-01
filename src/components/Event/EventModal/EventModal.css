@@ -1,6 +1,7 @@
 .ui.modal.EventModal {
   border: 0;
-  width: 520px;
+  width: 100%;
+  max-width: 580px;
   position: relative;
   max-height: 90vh;
   overflow: auto;

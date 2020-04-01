@@ -124,7 +124,7 @@
 }
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Item {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   max-width: 90%;
 }
 
@@ -164,5 +164,5 @@
 }
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Action {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
 }
