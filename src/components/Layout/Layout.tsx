@@ -61,7 +61,7 @@ export default function Layout({ children, ...props }: any) {
       <Navbar
         className={isScrolled ? "" : "initial"}
         rightMenu={<>
-          {!profile && <Button size="small" primary loading={loadingProfile} disabled={loadingProfile} onClick={() => actions.connect()}>Sign in</Button>}
+          {!profile && <Button size="small" basic loading={loadingProfile} disabled={loadingProfile} onClick={() => actions.connect()}>Sign in</Button>}
           {profile && <Button size="small" basic loading={loadingProfile} disabled={loadingProfile} onClick={() => actions.disconnect()}>Logout</Button>}
           {profile && <ImgAvatar size="small" profile={profile} style={{ margin: ' 0 0 0 .5rem' }} />}
         </>}
