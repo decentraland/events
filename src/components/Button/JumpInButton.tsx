@@ -15,7 +15,13 @@ export type JumpInButtonProps = ButtonProps & {
 
 export default function JumpInButton({ primary, secondary, inverted, event, href, ...props }: JumpInButtonProps) {
   const to = href || jumpTo(event) || '#'
-  return <Button size="small" target="_blank" {...props} href={to} basic className={classname(['JumpInButton', props.className])} >
+  function handleClick(e: React.MouseEvent<any>, data: any) {
+    e.stopPropagation()
+    if (props.onClick) {
+      props.onClick(e, data)
+    }
+  }
+  return <Button size="small" target="_blank" {...props} onClick={handleClick} href={to} basic className={classname(['JumpInButton', props.className])} >
     {props.children ?? 'JUMP IN'}
     <img src={jumpIn} width="16" height="16" />
   </Button>
