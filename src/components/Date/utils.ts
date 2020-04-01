@@ -81,6 +81,7 @@ function capitalize(value: string) {
 export type ToNameOptions = {
   short?: boolean,
   capitalized?: boolean,
+  utc?: boolean
 }
 
 export function toFixedNumber(value: number) {
@@ -92,7 +93,8 @@ export function toDayNumber(date: Date) {
 }
 
 export function toDayName(date: Date, options: ToNameOptions = {}) {
-  let result = days[date.getDay()]
+  const day = options.utc ? date.getUTCDay() : date.getDay()
+  let result = days[day]
 
   if (options.short) {
     result = short(result)
@@ -106,7 +108,8 @@ export function toDayName(date: Date, options: ToNameOptions = {}) {
 }
 
 export function toMonthName(date: Date, options: ToNameOptions = {}) {
-  let result = months[date.getMonth()]
+  const month = options.utc ? date.getMonth() : date.getMonth()
+  let result = months[month]
 
   if (options.short) {
     result = short(result)
@@ -134,6 +137,21 @@ export function toInputDate(date: Date): string {
   ].join('-')
 }
 
+export function toUTCInputDate(date: Date): string {
+  if (!date || Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  const year = date.getUTCFullYear()
+  const month = date.getUTCMonth() + 1
+  const day = date.getUTCDate()
+  return [
+    year,
+    toFixedNumber(month),
+    toFixedNumber(day),
+  ].join('-')
+}
+
 export function fromInputDate(value: string, base: Date = today()) {
   if (!value) {
     return base
@@ -144,6 +162,19 @@ export function fromInputDate(value: string, base: Date = today()) {
   newDate.setFullYear(year)
   newDate.setMonth(month - 1)
   newDate.setDate(day)
+  return newDate
+}
+
+export function fromUTCInputDate(value: string, base: Date = today()) {
+  if (!value) {
+    return base
+  }
+
+  const [year, month, day] = value.split('-').map(Number)
+  const newDate = new Date(base.getTime())
+  newDate.setUTCFullYear(year)
+  newDate.setUTCMonth(month - 1)
+  newDate.setUTCDate(day)
   return newDate
 }
 
@@ -161,6 +192,20 @@ export function toInputTime(date: Date): string {
   ].join(':')
 }
 
+export function toUTCInputTime(date: Date): string {
+  if (!date || Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  const hours = date.getUTCHours()
+  const minutes = date.getUTCMinutes()
+
+  return [
+    toFixedNumber(hours),
+    toFixedNumber(minutes),
+  ].join(':')
+}
+
 export function fromInputTime(value: string, base: Date = today()) {
   if (!value) {
     return base
@@ -170,6 +215,19 @@ export function fromInputTime(value: string, base: Date = today()) {
   const newDate = new Date(base.getTime())
   newDate.setHours(hours)
   newDate.setMinutes(minutes)
+  return newDate
+}
+
+
+export function fromUTCInputTime(value: string, base: Date = today()) {
+  if (!value) {
+    return base
+  }
+
+  const [hours, minutes] = value.split(':').map(Number)
+  const newDate = new Date(base.getTime())
+  newDate.setUTCHours(hours)
+  newDate.setUTCMinutes(minutes)
   return newDate
 }
 
