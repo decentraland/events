@@ -84,12 +84,17 @@ export type ToNameOptions = {
   utc?: boolean
 }
 
+export type ToNumberOptions = {
+  utc?: boolean
+}
+
 export function toFixedNumber(value: number) {
   return value > 9 ? String(value) : String('0' + value)
 }
 
-export function toDayNumber(date: Date) {
-  return toFixedNumber(date.getDate())
+export function toDayNumber(date: Date, options: ToNumberOptions = {}) {
+  const day = options.utc ? date.getUTCDate() : date.getDate()
+  return toFixedNumber(day)
 }
 
 export function toDayName(date: Date, options: ToNameOptions = {}) {
@@ -232,7 +237,6 @@ export function fromUTCInputTime(value: string, base: Date = today()) {
 }
 
 export function toCalendarDate(date: Date) {
-
   const year = date.getUTCFullYear()
   const month = date.getUTCMonth() + 1
   const day = date.getUTCDate()
@@ -246,6 +250,7 @@ export function toCalendarDate(date: Date) {
     'T',
     toFixedNumber(hours),
     toFixedNumber(minutes),
-    toFixedNumber(seconds)
+    toFixedNumber(seconds),
+    'Z'
   ].join('')
 }

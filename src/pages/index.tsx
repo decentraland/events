@@ -14,7 +14,6 @@ import SEO from "../components/seo"
 import Events from "../api/Events"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { HeaderMenu } from "decentraland-ui/dist/components/HeaderMenu/HeaderMenu"
@@ -27,7 +26,12 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 
+import useListEvents from '../hooks/useListEvents'
+import useListEventsByMonth from '../hooks/useListEventsByMonth'
+
 import './index.css'
+import { EventAttributes } from "../entities/Event/types"
+import { toMonthName } from "../components/Date/utils"
 
 const primaryAdd = require('../images/primary-add.svg')
 
@@ -35,15 +39,18 @@ export default function IndexPage(props: any) {
   const [profile] = useProfile()
   const location = useLocation()
   const isMobile = useMobileDetector()
+  const now = Date.now()
   const searchParams = new URLSearchParams(location.search)
   const eventId = location && searchParams.get('event') || null
   const isSharing = location && searchParams.get('view') === 'share' || false
   const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
   const isEditing = location && searchParams.get('view') === 'edit' || false
   const state = useEntityStore(stores.event)
-  const events = useMemo(() => Object.values(state.data).filter(event => !event.rejected).sort((a, b) => a.start_at.getTime() - b.start_at.getTime()), [state])
-  const myEvents = useMemo(() => events.filter(event => profile && event.user === profile.address.toString()), [state])
-  const attendingEvents = useMemo(() => events.filter(event => (event as any).attending), [state])
+  const events = useListEvents(state.data)
+  const eventsByMonth = useListEventsByMonth(events)
+  const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [state])
+  const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
+  const happeningEvents = useMemo(() => events.filter(event => event.start_at.getTime() >= now && event.finish_at.getTime() <= now), [state])
   const currentEvent = eventId && state.data[eventId] || null
 
   useAsyncEffect(async () => {
@@ -88,11 +95,24 @@ export default function IndexPage(props: any) {
           <Card.Group>
             {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} />)}
           </Card.Group></>}
-        {!state.loading && events.length > 0 && <>
+        {!state.loading && events.length > 0 && happeningEvents.length > 0 && <>
+          <div className="GroupTitle"><SubTitle>AT THIS MOMENT</SubTitle></div>
+          <Card.Group>
+            {happeningEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
+          </Card.Group></>}
+        {!state.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <>
+          <div className="GroupTitle">
+            <SubTitle>{toMonthName(date, { utc: true })}</SubTitle>
+          </div>
+          <Card.Group>
+            {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
+          </Card.Group>
+        </>)}
+        {/* {!state.loading && eventsByMonth.length > 0 && <>
           <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
           <Card.Group>
             {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
-          </Card.Group></>}
+          </Card.Group></>} */}
       </Container>
     </Layout>
   )

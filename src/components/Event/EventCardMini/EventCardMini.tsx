@@ -39,7 +39,7 @@ export default function EventCardMini(props: EventCardMiniProps) {
         </div>
       </div>
       <Card.Content>
-        <div className="date">{toMonthName(startAt)}{' '}{startAt.getDate()}</div>
+        <div className="date">{toMonthName(startAt, { utc: true })}{' '}{startAt.getUTCDate()}</div>
         <Card.Header>{event.name}</Card.Header>
       </Card.Content>
     </div>

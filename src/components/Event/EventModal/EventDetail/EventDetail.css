@@ -62,6 +62,12 @@
   width: 100%;
 }
 
+.EventDetail input.error,
+.EventDetail textarea.error,
+.EventInput input.error {
+  border: 1px solid #ff0000;
+}
+
 .EventDetail .EventDetail__Header {
   display: flex;
   padding: 18px 24px;
