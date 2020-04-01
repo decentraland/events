@@ -11,21 +11,21 @@ import url from '../../url'
 
 const share = require('../../images/share.svg')
 
-import './SocialButtons.css'
+import './AttendingButtons.css'
 
-type SocialButtonState = {
+type AttendingButtonsState = {
   loading: boolean
 }
 
-export type SocialButton = {
+export type AttendingButtonsProps = {
   event: EventAttributes,
   onShareFallback?: (e: React.MouseEvent<any>, event: EventAttributes) => void
 }
 
-export default function SocialButton(props: SocialButton) {
+export default function AttendingButtons(props: AttendingButtonsProps) {
 
   const event: PublicEventAttributes = props.event as any
-  const [state, patchState] = usePatchState<SocialButtonState>({ loading: false })
+  const [state, patchState] = usePatchState<AttendingButtonsState>({ loading: false })
   const [profile, loadingProfile, actions] = useProfile()
   const location = useLocation()
   const loading = loadingProfile || state.loading

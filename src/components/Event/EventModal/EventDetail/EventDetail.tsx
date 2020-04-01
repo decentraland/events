@@ -9,7 +9,7 @@ import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
-import SocialButton from '../../../Button/SocialButtons'
+import AttendingButtons from '../../../Button/AttendingButtons'
 import EditButtons from '../../../Button/EditButtons'
 import JumpInButton from '../../../Button/JumpInButton'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
@@ -285,7 +285,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* SOCIAL */}
       <Divider line />
       <div className="EventDetail__Actions">
-        {!edit && event.approved && <SocialButton event={event} onShareFallback={() => navigate(url.toEventShare(location, event.id))} />}
+        {!edit && event.approved && <AttendingButtons event={event} onShareFallback={() => navigate(url.toEventShare(location, event.id))} />}
         {!edit && !event.approved && <EditButtons event={event} />}
         {!!edit && <EditButtons event={event} onSave={handleSave} />}
       </div>

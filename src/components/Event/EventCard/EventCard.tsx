@@ -8,7 +8,7 @@ import classname from 'decentraland-gatsby/dist/utils/classname'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import JumpInButton from '../../Button/JumpInButton'
-import SocialButtons from '../../Button/SocialButtons'
+import SocialButtons from '../../Button/AttendingButtons'
 import { toMonthName } from '../../Date/utils'
 
 import './EventCard.css'
