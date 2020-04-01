@@ -13,6 +13,7 @@ if (!isURL(SLACK_WEBHOOK)) {
 }
 
 export async function notifyNewEvent(event: EventAttributes) {
+  console.log(`sending new event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
       {
@@ -46,6 +47,7 @@ export async function notifyNewEvent(event: EventAttributes) {
 }
 
 export async function notifyApprovedEvent(event: EventAttributes) {
+  console.log(`sending approved event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
       {
@@ -68,8 +70,6 @@ async function sendToSlack(body: object) {
   if (!isURL(SLACK_WEBHOOK)) {
     return
   }
-
-  console.log(`sending to: ${SLACK_WEBHOOK}: ${JSON.stringify(body, null, 2)}`)
 
   try {
     const response = await fetch(SLACK_WEBHOOK, {

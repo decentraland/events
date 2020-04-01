@@ -5,6 +5,10 @@ export type WindowLocation = Window['location'] & HLocation;
 export default {
 
   toUrl(pathname: string, params: string = '', hash: string = '') {
+    if (pathname.slice(-1) !== '/') {
+      pathname = pathname + '/'
+    }
+
     if (params && params[0] !== '?') {
       params = '?' + params
     }

@@ -56,7 +56,14 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
   const data = req.body as EventAttributes
-  data.url = data.url || `${DECENTRALAND_URL}/?position=${(data.coordinates || [0, 0]).join(',')}`
+
+  if (!data.url) {
+    data.url = `${DECENTRALAND_URL}/?position=${(data.coordinates || [0, 0]).join(',')}`
+  }
+
+  if (!data.image) {
+    (data as any).image = null
+  }
 
   const errors = Event.validate(data)
   if (errors) {

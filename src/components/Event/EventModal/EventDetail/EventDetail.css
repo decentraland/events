@@ -23,6 +23,11 @@
   color: #ff3d61;
 }
 
+.EventInput {
+  padding: 0.5em;
+}
+
+.EventInput,
 .EventNote {
   background: #eee;
   border: 1px solid #736e7d;
@@ -37,6 +42,7 @@
   border-right: 0;
 }
 
+.EventDetail__Detail__Item code,
 .EventError code,
 .EventNote code {
   font-size: 14px;
@@ -46,6 +52,16 @@
     DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
 }
 
+.EventDetail input,
+.EventDetail textarea,
+.EventInput input {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 14px;
+  width: 100%;
+}
+
 .EventDetail .EventDetail__Header {
   display: flex;
   padding: 18px 24px;
@@ -53,6 +69,7 @@
 
 .EventDetail .EventDetail__Header .EventDetail__Header__Event {
   padding-left: 16px;
+  flex: 1;
 }
 
 .EventDetail .EventDetail__Header .EventDetail__Header__Event .dg.SubTitle {
@@ -87,6 +104,12 @@
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Icon {
   flex: 0 0 28px;
+}
+
+.EventDetail
+  .EventDetail__Detail.EventDetail__Detail--edit
+  .EventDetail__Detail__Icon {
+  padding-top: 0.5em;
 }
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Icon.center {

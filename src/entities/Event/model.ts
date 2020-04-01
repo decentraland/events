@@ -96,10 +96,6 @@ export default class Event extends Model<EventAttributes> {
       ORDER BY start_at ASC
     `
 
-
-    console.log(!!user && !isAdmin(user))
-    console.log(query.text, query.values)
-
     return Event.query<EventAttributes>(query)
   }
 

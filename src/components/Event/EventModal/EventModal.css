@@ -22,10 +22,10 @@
   margin: 24px;
 }
 
-.EventModal .EventModal__Close {
-  width: 32px;
-  height: 32px;
-  border-radius: 100%;
+.EventModal .EventModal__Action {
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 16px;
   position: absolute;
   top: 20px;
   right: 20px;
@@ -34,14 +34,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
 }
 
-.EventModal .EventModal__Close .EventModal__Close__Background {
-  width: 32px;
-  height: 32px;
+.EventModal .EventModal__Action.edit {
+  right: 64px;
+}
+
+.EventModal .EventModal__Action .EventModal__Action__Content {
+  padding: 0 1em;
+}
+
+.EventModal .EventModal__Action .EventModal__Action__Background {
+  width: 100%;
+  height: 100%;
   opacity: 0.16;
   background-color: #16141a;
-  border-radius: 100%;
+  border-radius: 16px;
   position: absolute;
   border: 1px solid white;
   top: 0;

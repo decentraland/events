@@ -39,6 +39,7 @@ export default function IndexPage(props: any) {
   const eventId = location && searchParams.get('event') || null
   const isSharing = location && searchParams.get('view') === 'share' || false
   const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
+  const isEditing = location && searchParams.get('view') === 'edit' || false
   const state = useEntityStore(stores.event)
   const events = useMemo(() => Object.values(state.data).filter(event => !event.rejected).sort((a, b) => a.start_at.getTime() - b.start_at.getTime()), [state])
   const myEvents = useMemo(() => events.filter(event => profile && event.user === profile.address.toString()), [state])
@@ -54,7 +55,7 @@ export default function IndexPage(props: any) {
   return (
     <Layout {...props}>
       <SEO title="Decentraland Events" />
-      <EventModal size="tiny" event={currentEvent} share={isSharing} attendees={isListingAttendees} onClose={() => navigate(url.toHome(location))} />
+      <EventModal event={currentEvent} share={isSharing} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
       <Container style={{ paddingTop: "110px" }}>
         <HeaderMenu>
           <HeaderMenu.Left>

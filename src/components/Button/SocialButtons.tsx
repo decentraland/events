@@ -30,55 +30,6 @@ export default function SocialButton(props: SocialButton) {
   const location = useLocation()
   const loading = loadingProfile || state.loading
 
-  function updateEvent(update: UpdateEvent) {
-    patchState({ loading: true })
-    Promise.resolve(profile || actions.connect())
-      .then(async (profile) => {
-        if (profile) {
-          const newEvent = await Events.get().updateEvent(update)
-          stores.event.setEntity(newEvent)
-        }
-      })
-      .then(() => patchState({ loading: false }))
-      .catch((err) => {
-        console.error(err)
-        patchState({ loading: false })
-      })
-  }
-
-  function handleReject(e: React.MouseEvent<any>) {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (loading) {
-      return
-    }
-
-    updateEvent({ id: event.id, rejected: true })
-  }
-
-  function handleRestore(e: React.MouseEvent<any>) {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (loading) {
-      return
-    }
-
-    updateEvent({ id: event.id, rejected: false })
-  }
-
-  function handleApprove(e: React.MouseEvent<any>) {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (loading) {
-      return
-    }
-
-    updateEvent({ id: event.id, approved: true })
-  }
-
   function handleAttend(e: React.MouseEvent<any>) {
     e.preventDefault()
     e.stopPropagation()
@@ -120,14 +71,6 @@ export default function SocialButton(props: SocialButton) {
       e.stopPropagation()
       props.onShareFallback(e, props.event)
     }
-  }
-
-  if (!event.approved && event.editable) {
-    return <div className="SocialButtons pending">
-      {!event.rejected && <Button basic size="small" onClick={handleReject} loading={loading} disabled={loading}>REJECT</Button>}
-      {event.rejected && <Button inverted primary size="small" onClick={handleRestore} loading={loading} disabled={loading}>RESTORE</Button>}
-      <Button primary size="small" onClick={handleApprove} loading={loading} disabled={loading}>APPROVE</Button>
-    </div>
   }
 
   return <div className="SocialButtons">
