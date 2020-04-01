@@ -170,5 +170,5 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     return Events.get().updateEvent(data)
   }
 
-  return [event, { setError, setErrors, handleChange, validate, create, update }] as const
+  return [event, { setValue, setValues, setError, setErrors, handleChange, validate, create, update }] as const
 }
