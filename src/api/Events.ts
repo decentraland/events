@@ -103,7 +103,7 @@ export default class Events extends API {
   }
 
   async creteEventAttendee(eventId: string) {
-    return this.fetch<string[]>(
+    return this.fetch<EventAttendeeAttributes[]>(
       `/events/${eventId}/attendees`,
       this.options({ method: 'POST' })
         .authorization()
@@ -111,7 +111,7 @@ export default class Events extends API {
   }
 
   async deleteEventAttendee(eventId: string) {
-    return this.fetch<string[]>(
+    return this.fetch<EventAttendeeAttributes[]>(
       `/events/${eventId}/attendees`,
       this.options({ method: 'DELETE' })
         .authorization()

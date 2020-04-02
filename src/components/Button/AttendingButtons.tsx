@@ -43,11 +43,12 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       .then(async (profile) => {
         if (profile) {
           const newAttendees = await Events.get().setEventAttendee(event.id, !event.attending)
+          const attendees = newAttendees.map(attendee => attendee.user)
           const newEvent = {
             ...event,
             attending: !event.attending,
-            total_attendees: newAttendees.length,
-            latest_attendees: newAttendees.slice(0, 10)
+            total_attendees: attendees.length,
+            latest_attendees: attendees.slice(0, 10)
           }
           stores.event.setEntity(newEvent as any)
         }
