@@ -168,7 +168,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '.5em' }}>
             <code>{'FROM: '}</code>
             <input type="date" name="start_date" value={actions.getStartDate()} onChange={actions.handleChange} style={{ width: '200px' }} />
-            <input type="time" name="finish_time" value={actions.getFinishTime()} onChange={actions.handleChange} style={{ width: '125px' }} />
+            <input type="time" name="start_time" value={actions.getStartTime()} onChange={actions.handleChange} style={{ width: '125px' }} />
             <code>{' UTC'}</code>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '.5em' }}>
