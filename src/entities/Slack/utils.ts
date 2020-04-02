@@ -62,6 +62,23 @@ export async function notifyApprovedEvent(event: EventAttributes) {
   )
 }
 
+
+export async function notifyEditedEvent(event: EventAttributes) {
+  console.log(`sending edited event "${event.id}" to slack`)
+  await sendToSlack({
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": `:pencil2: user ${event.user_name} just edited his event: *<${url(event)}|${event.name}>*`
+        }
+      }
+    ]
+  }
+  )
+}
+
 function url(event: EventAttributes) {
   return resolve(EVENTS_URL, `/en/?event=${event.id}`)
 }

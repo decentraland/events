@@ -50,7 +50,7 @@ export default function IndexPage(props: any) {
   const eventsByMonth = useListEventsByMonth(events)
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [state])
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
-  const happeningEvents = useMemo(() => events.filter(event => event.start_at.getTime() <= now && event.finish_at.getTime() >= now), [state])
+  const happeningEvents = useMemo(() => events.filter(event => event.approved && !event.rejected && event.start_at.getTime() <= now && event.finish_at.getTime() >= now), [state])
   const currentEvent = eventId && state.data[eventId] || null
 
   useAsyncEffect(async () => {

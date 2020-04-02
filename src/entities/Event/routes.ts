@@ -13,9 +13,8 @@ import isAdmin from '../Auth/isAdmin';
 import handle from '../Route/handle';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
-import { notifyNewEvent, notifyApprovedEvent } from '../Slack/utils';
+import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent } from '../Slack/utils';
 
-const LAND_URL = env('LAND_URL', '')
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
 
@@ -106,6 +105,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     ...utils.pick(req.body, attributes),
   } as EventAttributes
 
+  if (!updatedAttributes.url || updatedAttributes.url.startsWith(DECENTRALAND_URL)) {
+    updatedAttributes.url = `${DECENTRALAND_URL}/?position=${(updatedAttributes.coordinates || [0, 0]).join(',')}`
+  }
+
   const errors = Event.validate(updatedAttributes)
   if (errors) {
     throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, update: updatedAttributes, body: req.body })
@@ -122,6 +125,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   if (!req.event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)
+  } else if (!isAdmin(user)) {
+    notifyEditedEvent(updatedEvent)
   }
 
   return Event.toPublic(updatedEvent, user)

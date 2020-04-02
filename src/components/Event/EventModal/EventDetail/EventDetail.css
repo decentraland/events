@@ -11,6 +11,12 @@
   font-weight: 300;
 }
 
+.EventDetail .Paragraph.error {
+  color: #ff0000;
+  text-align: right;
+  margin-top: 0.1em;
+}
+
 .EventDetail .Divider {
   opacity: 0.24;
   border-color: #736e7d;
@@ -24,7 +30,7 @@
 }
 
 .EventInput {
-  padding: 0.5em;
+  padding: 0.5em 24px;
 }
 
 .EventInput,
@@ -89,9 +95,16 @@
   margin: 0;
 }
 
-.EventDetail .EventDetail__Header .EventDetail__Header__Event .dg.Paragraph {
+.EventDetail
+  .EventDetail__Header
+  .EventDetail__Header__Event
+  .EventDetail__Header__Event__By {
   font-size: 17px;
   line-height: 26px;
+}
+
+.EventDetail .EventDetail__Header .EventDetail__Header__Actions {
+  padding-left: 1em;
 }
 
 .EventDetail .EventDetail__Actions,

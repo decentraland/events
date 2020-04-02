@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Events, { NewEvent, UpdateEvent } from "../api/Events";
 import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime } from "../components/Date/utils";
+import isURL from "validator/lib/isURL";
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
 
@@ -19,6 +20,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     details: defaultEvent.details || '',
     image: defaultEvent.image || '',
     coordinates: defaultEvent.coordinates || [0, 0],
+    url: defaultEvent.url || '',
     start_at: start_at,
     finish_at: finish_at,
     errors: {}
@@ -139,6 +141,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
       case 'details':
       case 'contact':
       case 'image':
+      case 'url':
         return setValue(name, value)
 
       case 'coordinates':
@@ -162,12 +165,26 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
   }
 
   function validate() {
-    if (Object.values(event.errors).filter(Boolean).length) {
+    const errors: Record<string, string> = {}
+
+    if (!event.name) {
+      errors['name'] = 'Event name is required'
+    }
+
+    if (event.url && !isURL(event.url)) {
+      errors['url'] = 'Event URL is invalid'
+    }
+
+    if (event.image && !isURL(event.image)) {
+      errors['image'] = 'Event image is invalid'
+    }
+
+    if (Object.values(errors).filter(Boolean).length) {
+      setErrors(errors)
       return false
     }
 
-    if (!event.name) {
-      setError('name', 'Name is required')
+    if (Object.values(event.errors).filter(Boolean).length) {
       return false
     }
 
@@ -180,7 +197,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
 
   }
 
-  async function update(eventId: string, props: (keyof UpdateEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'coordinates', 'start_at', 'finish_at']) {
+  async function update(eventId: string, props: (keyof UpdateEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'coordinates', 'url', 'start_at', 'finish_at']) {
     const data: UpdateEvent = {
       id: eventId
     }

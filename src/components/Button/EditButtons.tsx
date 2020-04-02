@@ -14,6 +14,7 @@ type EditButtonsState = {
 
 export type EditButtonsProps = {
   event: EventAttributes,
+  loading?: boolean,
   onSave?: (e: React.MouseEvent<any>, event: EventAttributes) => void
 }
 
@@ -22,7 +23,7 @@ export default function EditButtons(props: EditButtonsProps) {
   const event: PublicEventAttributes = props.event as any
   const [state, patchState] = usePatchState<EditButtonsState>({ loading: false })
   const [profile, loadingProfile, actions] = useProfile()
-  const loading = loadingProfile || state.loading
+  const loading = loadingProfile || state.loading || props.loading
 
   function updateEvent(update: UpdateEvent) {
     patchState({ loading: true })
