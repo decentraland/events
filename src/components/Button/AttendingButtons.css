@@ -31,3 +31,13 @@
 .AttendingButtons .ui.button.share img {
   vertical-align: text-bottom;
 }
+
+.AttendingButtons .ui.button.share.mobile,
+.ui.modal .AttendingButtons .ui.button.mobile {
+  width: 100%;
+  margin: 0;
+}
+
+.AttendingButtons .ui.button.share.mobile img {
+  margin-right: 0.5em;
+}

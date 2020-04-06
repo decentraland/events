@@ -22,13 +22,15 @@ import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import ImgAvatar from "decentraland-gatsby/dist/components/Profile/ImgAvatar"
 
 import "./Layout.css"
+import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 
 export default function Layout({ children, ...props }: any) {
   const language: Locale = props?.pageContext?.intl?.language || 'en'
   const languages: Locale[] = props?.pageContext?.intl?.languages || ['en']
   const currentPath: string = props?.pageContext?.intl?.originalPath || '/'
   const [isScrolled, setIsScrolled] = useState(false)
-  const [profile, loadingProfile, actions] = useProfile()
+  const [profile, actions] = useProfile()
+  const isMobile = useMobileDetector()
 
   useEffect(() => {
     const onWindowScroll = function () {
@@ -59,9 +61,9 @@ export default function Layout({ children, ...props }: any) {
     <>
       <Navbar
         className={isScrolled ? "" : "initial"}
-        rightMenu={<>
-          {!profile && <Button size="small" basic loading={loadingProfile} disabled={loadingProfile} onClick={() => actions.connect()}>Sign in</Button>}
-          {profile && <Button size="small" basic loading={loadingProfile} disabled={loadingProfile} onClick={() => actions.disconnect()}>Logout</Button>}
+        rightMenu={(actions.provider || !isMobile) && <>
+          {!profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.connect()}>Sign in</Button>}
+          {profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.disconnect()}>Logout</Button>}
           {profile && <ImgAvatar size="small" profile={profile} style={{ margin: ' 0 0 0 .5rem' }} />}
         </>}
       />

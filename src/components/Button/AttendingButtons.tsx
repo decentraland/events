@@ -12,6 +12,7 @@ import url from '../../url'
 const share = require('../../images/share.svg')
 
 import './AttendingButtons.css'
+import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 
 type AttendingButtonsState = {
   loading: boolean
@@ -26,9 +27,10 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
 
   const event: PublicEventAttributes = props.event as any
   const [state, patchState] = usePatchState<AttendingButtonsState>({ loading: false })
-  const [profile, loadingProfile, actions] = useProfile()
+  const [profile, actions] = useProfile()
   const location = useLocation()
-  const loading = loadingProfile || state.loading
+  const isMobile = useMobileDetector()
+  const loading = actions.loading || state.loading
 
   function handleAttend(e: React.MouseEvent<any>) {
     e.preventDefault()
@@ -75,12 +77,17 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   }
 
   return <div className="AttendingButtons">
-    <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={classname(['attending-status', event.attending && 'attending'])}>
+    {(actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={classname(['attending-status', event.attending && 'attending'])}>
       {event.attending && 'GOING'}
       {!event.attending && 'WANT TO GO'}
-    </Button>
-    <Button inverted primary size="small" className="share" disabled={loading || !event.approved} onClick={handleShare}>
+    </Button>}
+
+    {(actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || !event.approved} onClick={handleShare}>
       <img src={share} width="16" height="16" />
-    </Button>
+    </Button>}
+
+    {!actions.provider && isMobile && <Button inverted primary size="small" className="share mobile" disabled={loading || !event.approved} onClick={handleShare}>
+      <img src={share} width="16" height="16" /> SHARE
+    </Button>}
   </div>
 }

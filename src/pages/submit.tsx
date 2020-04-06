@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useLocation } from '@reach/router'
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
@@ -19,6 +19,7 @@ import { toInputDate, toInputTime } from "../components/Date/utils"
 import url from '../url'
 
 import './submit.css'
+import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 
 const info = require('../images/info.svg')
 
@@ -30,21 +31,28 @@ type SubmitPageState = {
 export default function SubmitPage(props: any) {
 
   const location = useLocation()
-  const [profile, loadingProfile, profileActions] = useProfile()
+  const [profile, profileActions] = useProfile()
   const [state, setState] = useState<SubmitPageState>({})
-  const [event, actions] = useEventEditor()
+  const [event, eventActions] = useEventEditor()
+  const [requireWallet, setRequireWallet] = useState(false)
+
+  useEffect(() => {
+    if (Boolean(profileActions.error && profileActions.error.code === 'CONNECT_ERROR')) {
+      setRequireWallet(true)
+    }
+  }, [profileActions.error, profileActions.error && profileActions.error.code])
 
   function handleSubmit() {
     if (state.loading) {
       return
     }
 
-    if (!actions.validate()) {
+    if (!eventActions.validate()) {
       return
     }
 
     setState({ loading: true })
-    actions.create()
+    eventActions.create()
       .then((event) => {
         const newLocation = { ...location, pathname: location.pathname.replace('/submit', '') }
         const target = event && event.id ? url.toEvent(newLocation, event.id) : url.toHome(newLocation)
@@ -62,10 +70,11 @@ export default function SubmitPage(props: any) {
     <Layout {...props} >
       <SEO title="Submit event" />
       <Container style={{ paddingTop: '110px' }}>
+        <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
         {!profile && <Grid stackable>
           <Grid.Row centered>
             <Grid.Column mobile="8" textAlign="center" style={{ paddingTop: '30vh', paddingBottom: '30vh' }}>
-              {loadingProfile && <Loader size="big" />}
+              {profileActions.loading && <Loader size="big" />}
               <Paragraph secondary>You need to <Link onClick={() => profileActions.connect()}>sign in</Link> before to submit an event</Paragraph>
             </Grid.Column>
           </Grid.Row>
@@ -81,20 +90,20 @@ export default function SubmitPage(props: any) {
               <Grid stackable style={{ paddingTop: '48px' }}>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Event Name" placeholder="Be as descriptive as you can" style={{ width: '100%' }} name="name" error={!!errors['name']} message={errors['name']} defaultValue={event.name} onChange={actions.handleChange} />
+                    <Field label="Event Name" placeholder="Be as descriptive as you can" style={{ width: '100%' }} name="name" error={!!errors['name']} message={errors['name']} defaultValue={event.name} onChange={eventActions.handleChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Description" placeholder="Keep it short but keep it interesting!" name="description" error={!!errors['description']} message={errors['description']} defaultValue={event.description} onChange={actions.handleChange} />
+                    <Field label="Description" placeholder="Keep it short but keep it interesting!" name="description" error={!!errors['description']} message={errors['description']} defaultValue={event.description} onChange={eventActions.handleChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={actions.getStartDate()} min={toInputDate(new Date())} onChange={actions.handleChange} />
+                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={eventActions.getStartDate()} min={toInputDate(new Date())} onChange={eventActions.handleChange} />
                   </Grid.Column>
                   <Grid.Column mobile="2">
-                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={actions.getStartTime()} onChange={actions.handleChange} />
+                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={eventActions.getStartTime()} onChange={eventActions.handleChange} />
                   </Grid.Column>
                   <Grid.Column mobile="2">
                     <Paragraph className="FieldNote">UTC</Paragraph>
@@ -102,10 +111,10 @@ export default function SubmitPage(props: any) {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={actions.getFinishDate()} min={toInputDate(event.start_at)} onChange={actions.handleChange} />
+                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={eventActions.getFinishDate()} min={toInputDate(event.start_at)} onChange={eventActions.handleChange} />
                   </Grid.Column>
                   <Grid.Column mobile="2">
-                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={actions.getFinishTime()} onChange={actions.handleChange} />
+                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={eventActions.getFinishTime()} onChange={eventActions.handleChange} />
                   </Grid.Column>
                   <Grid.Column mobile="2">
                     <Paragraph className="FieldNote">UTC</Paragraph>
@@ -113,17 +122,17 @@ export default function SubmitPage(props: any) {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="Decentraland coordinates" name="coordinates" error={!!errors['coordinates']} message={errors['coordinates']} defaultValue={event.coordinates.join(',')} onChange={actions.handleChange} />
+                    <Field label="Decentraland coordinates" name="coordinates" error={!!errors['coordinates']} message={errors['coordinates']} defaultValue={event.coordinates.join(',')} onChange={eventActions.handleChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Email or Discord username" placeholder="hello@decentraland.org" name="contact" error={!!errors['contact']} message={errors['contact']} defaultValue={event.name} onChange={actions.handleChange} />
+                    <Field label="Email or Discord username" placeholder="hello@decentraland.org" name="contact" error={!!errors['contact']} message={errors['contact']} defaultValue={event.name} onChange={eventActions.handleChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="8">
-                    <Field label="Additional info" placeholder="Add any other useful details for our reviewers" name="details" error={!!errors['details']} message={errors['details']} defaultValue={event.name} onChange={actions.handleChange} />
+                    <Field label="Additional info" placeholder="Add any other useful details for our reviewers" name="details" error={!!errors['details']} message={errors['details']} defaultValue={event.name} onChange={eventActions.handleChange} />
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>

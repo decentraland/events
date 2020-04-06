@@ -22,8 +22,8 @@ export default function EditButtons(props: EditButtonsProps) {
 
   const event: PublicEventAttributes = props.event as any
   const [state, patchState] = usePatchState<EditButtonsState>({ loading: false })
-  const [profile, loadingProfile, actions] = useProfile()
-  const loading = loadingProfile || state.loading || props.loading
+  const [profile, actions] = useProfile()
+  const loading = actions.loading || state.loading || props.loading
 
   function updateEvent(update: UpdateEvent) {
     patchState({ loading: true })

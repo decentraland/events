@@ -1,5 +1,4 @@
-import React, { useMemo } from "react"
-import { Responsive } from "semantic-ui-react"
+import React, { useMemo, useEffect, useState } from "react"
 import { Link } from "gatsby-plugin-intl"
 import { navigate } from "gatsby"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
@@ -33,11 +32,12 @@ import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import './index.css'
 import { EventAttributes } from "../entities/Event/types"
 import { toMonthName } from "../components/Date/utils"
+import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 
 const primaryAdd = require('../images/primary-add.svg')
 
 export default function IndexPage(props: any) {
-  const [profile] = useProfile()
+  const [profile, actions] = useProfile()
   const location = useLocation()
   const isMobile = useMobileDetector()
   const now = Date.now()
@@ -53,6 +53,7 @@ export default function IndexPage(props: any) {
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
   const happeningEvents = useMemo(() => events.filter(event => event.approved && !event.rejected && event.start_at.getTime() <= now && event.finish_at.getTime() >= now), [state])
   const currentEvent = eventId && state.data[eventId] || null
+  const [requireWallet, setRequireWallet] = useState(false)
 
   useAsyncEffect(async () => {
     stores.event.setLoading()
@@ -60,30 +61,26 @@ export default function IndexPage(props: any) {
     stores.event.setEntities(events)
   }, [profile])
 
+  useEffect(() => {
+    if (Boolean(actions.error && actions.error.code === 'CONNECT_ERROR')) {
+      setRequireWallet(true)
+    }
+  }, [actions.error, actions.error && actions.error.code])
+
   return (
     <Layout {...props}>
       <SEO title="Decentraland Events" />
+      <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EventModal event={currentEvent} share={isSharing} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
       <Container style={{ paddingTop: "110px" }}>
         <HeaderMenu>
           <HeaderMenu.Left>
             <Title small>World Events</Title>
           </HeaderMenu.Left>
-          <Responsive
-            minWidth={Responsive.onlyTablet.minWidth}
-            as={HeaderMenu.Right}
-          >
-            <Button primary size="small" {...{ to: '/submit', as: Link }}>
-              <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
+          <HeaderMenu.Right>{!isMobile && <Button primary size="small" {...{ to: '/submit', as: Link }}>
+            <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
                 SUBMIT EVENT
-          </Button>
-          </Responsive>
-          <Responsive
-            maxWidth={Responsive.onlyMobile.maxWidth}
-            as={HeaderMenu.Right}
-          >
-            <Button basic size="small" {...{ to: '/submit', as: Link }}>SUBMIT EVENT</Button>
-          </Responsive>
+          </Button>}</HeaderMenu.Right>
         </HeaderMenu>
         {state.loading && <>
           <Divider />
