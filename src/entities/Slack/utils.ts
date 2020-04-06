@@ -3,6 +3,8 @@ import { EventAttributes } from '../Event/types';
 import isURL from 'validator/lib/isURL';
 import env from 'decentraland-gatsby/dist/utils/env';
 import { resolve } from 'url'
+import RequestError from '../Route/error';
+import { Avatar } from 'decentraland-gatsby/dist/utils/api/Katalyst';
 
 const SLACK_WEBHOOK = env('SLACK_WEBHOOK', '')
 const EVENTS_URL = env('EVENTS_URL', 'https://events.centraland.org/api')
@@ -77,6 +79,30 @@ export async function notifyEditedEvent(event: EventAttributes) {
     ]
   }
   )
+}
+
+const SEND_CLOUD_DOWN = 1000 * 60 * 5
+let NEXT_ERROR_AT = 0
+export async function notifyEventError(user: Avatar, error: RequestError) {
+  if (Date.now() > NEXT_ERROR_AT) {
+    NEXT_ERROR_AT = Date.now() + SEND_CLOUD_DOWN
+    console.log(`sending error to slack`)
+    const userName = user.name || 'Guest'
+    const userContact = user.email ? `<mailto:${user.email}|${userName}>` : userName
+    const errorDetails = '```' + JSON.stringify({ message: error.message, statusCode: error.statusCode, data: error.data || null }, null, 2) + '```'
+    await sendToSlack({
+      // :x:
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": `:x: An error occurred while creating an event (${userContact})\n\n${errorDetails}`
+          }
+        }
+      ]
+    })
+  }
 }
 
 function url(event: EventAttributes) {

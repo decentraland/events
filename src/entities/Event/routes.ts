@@ -13,7 +13,7 @@ import isAdmin from '../Auth/isAdmin';
 import handle from '../Route/handle';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
-import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent } from '../Slack/utils';
+import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
@@ -66,7 +66,9 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
 
   const errors = Event.validate(data)
   if (errors) {
-    throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, body: data })
+    const error = new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, body: data })
+    await notifyEventError(userProfile, error)
+    throw error
   }
 
   const now = new Date()
