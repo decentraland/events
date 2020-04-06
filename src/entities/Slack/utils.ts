@@ -88,7 +88,7 @@ export async function notifyEventError(user: Avatar, error: RequestError) {
     NEXT_ERROR_AT = Date.now() + SEND_CLOUD_DOWN
     console.log(`sending error to slack`)
     const userName = user.name || 'Guest'
-    const userContact = user.email ? `<mailto:${user.email}|${userName}>` : userName
+    const userContact = user.email ? `<mailto:${user.email}|${userName}[${user.ethAddress}]>` : `${userName}[${user.ethAddress}]`
     const errorDetails = '```' + JSON.stringify({ message: error.message, statusCode: error.statusCode, data: error.data || null }, null, 2) + '```'
     await sendToSlack({
       // :x:
@@ -97,7 +97,7 @@ export async function notifyEventError(user: Avatar, error: RequestError) {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": `:x: An error occurred while creating an event (${userContact})\n\n${errorDetails}`
+            "text": `:x: An error occurred while creating an event (user: ${userContact})\n\n${errorDetails}`
           }
         }
       ]
