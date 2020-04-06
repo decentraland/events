@@ -15,7 +15,7 @@
     "concurrently": "^5.1.0",
     "dcl-crypto": "^2.1.0",
     "decentraland-crypto": "0.0.2",
-    "decentraland-gatsby": "^2.0.1",
+    "decentraland-gatsby": "^2.0.2",
     "decentraland-server": "^2.11.6",
     "decentraland-ui": "^2.16.1",
     "dotenv": "^8.2.0",
@@ -55,7 +55,7 @@
   "license": "MIT",
   "scripts": {
     "build": "gatsby build && tsc -p .",
-    "develop": "gatsby develop",
+    "develop": "gatsby develop -H 0.0.0.0",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "concurrently -c blue,green -n SERVER,FRONT 'npm run serve' 'npm run develop'",
     "serve": "DOTENV_CONFIG_PATH=.env.development nodemon --watch src/entities --watch src/server.ts -e ts,json --exec 'ts-node -r dotenv/config.js' src/server",

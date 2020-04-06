@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express'
 import bodyParser from 'body-parser'
+import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
 import database from './entities/Database/index'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
@@ -31,8 +32,8 @@ app.use(express.static('public'))
 
 Promise.resolve()
   .then(() => database.connect())
-  .then(() => {
-    const server = app.listen(process.env.PORT || 3001, () => {
-      console.log('server initiated: ', server.address())
-    })
-  })
+  .then(() => listen(
+    app,
+    process.env.PORT,
+    process.env.HOST
+  ))
