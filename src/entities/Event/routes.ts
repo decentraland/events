@@ -33,7 +33,12 @@ export default routes((router) => {
 })
 
 export async function listEvents(req: WithAuth) {
-  const events = await Event.getEvents(req.auth)
+  const options = {
+    user: req.auth,
+    offset: Number(req.query['offset']),
+    limit: Number(req.query['limit']),
+  }
+  const events = await Event.getEvents(options)
   return events.map((event) => Event.toPublic(event, req.auth))
 }
 

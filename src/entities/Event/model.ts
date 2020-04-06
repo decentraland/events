@@ -1,11 +1,11 @@
 
 import { Model, SQL, raw } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
-import { EventAttributes, PublicEventAttributes } from './types'
+import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
+import { EventAttributes, PublicEventAttributes, EventListOptions } from './types'
 import { Address } from 'web3x/address'
 import EventAttendee from '../EventAttendee/model'
 import schema from '../Schema'
-import { table, conditional } from '../Database/utils';
 import isAdmin from '../Auth/isAdmin';
 
 export default class Event extends Model<EventAttributes> {
@@ -80,7 +80,7 @@ export default class Event extends Model<EventAttributes> {
     }
   })
 
-  static async getEvents(user?: string | null) {
+  static async getEvents({ user, limit: limitValue, offset: offsetValue }: Partial<EventListOptions> = {}) {
 
     const query = SQL`
       SELECT 
@@ -94,6 +94,8 @@ export default class Event extends Model<EventAttributes> {
         ${conditional(!user, SQL`AND e.approved IS TRUE`)}
         ${conditional(!!user && !isAdmin(user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${user})`)}
       ORDER BY start_at ASC
+      ${limit(limitValue)}
+      ${offset(offsetValue)}
     `
 
     return Event.query<EventAttributes>(query)

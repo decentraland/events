@@ -25,6 +25,12 @@ export type PublicEventAttributes = Omit<EventAttributes, 'contact' | 'details'>
   editable: boolean
 }
 
+export type EventListOptions = {
+  user: string | null | undefined,
+  limit: number | null | undefined,
+  offset: number | null | undefined,
+}
+
 export const patchAttributes: (keyof EventAttributes)[] = [
   'name',
   'description',
