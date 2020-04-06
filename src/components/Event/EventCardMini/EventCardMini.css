@@ -21,6 +21,8 @@
   line-height: 1.53;
   letter-spacing: -0.2px;
   color: #16141a;
+  max-height: 3em;
+  overflow: hidden;
 }
 
 .ui.card.EventCardMini .dg.ImgFixed {
@@ -33,7 +35,7 @@
   border: 1px solid white;
   margin: 0;
   border-radius: 100%;
-  bottom: 6px;
+  top: 74px;
   right: 6px;
 }
 
@@ -43,7 +45,7 @@
 
 .ui.card.EventCardMini .EventCardMini__Attendees {
   position: absolute;
-  z-index: 100;
+  z-index: 10;
   top: 6px;
   right: 6px;
 }
