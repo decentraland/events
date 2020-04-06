@@ -55,17 +55,17 @@ export default function IndexPage(props: any) {
   const currentEvent = eventId && state.data[eventId] || null
   const [requireWallet, setRequireWallet] = useState(false)
 
-  useAsyncEffect(async () => {
-    stores.event.setLoading()
-    const events = await Events.get().getEvents()
-    stores.event.setEntities(events)
-  }, [profile])
-
   useEffect(() => {
     if (Boolean(actions.error && actions.error.code === 'CONNECT_ERROR')) {
       setRequireWallet(true)
     }
   }, [actions.error, actions.error && actions.error.code])
+
+  useAsyncEffect(async () => {
+    stores.event.setLoading()
+    const events = await Events.get().getEvents()
+    stores.event.setEntities(events)
+  }, [profile])
 
   return (
     <Layout {...props}>
@@ -115,11 +115,6 @@ export default function IndexPage(props: any) {
             {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
           </Card.Group>
         </>)}
-        {/* {!state.loading && eventsByMonth.length > 0 && <>
-          <div className="GroupTitle"><SubTitle>COMING SOON</SubTitle></div>
-          <Card.Group>
-            {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
-          </Card.Group></>} */}
       </Container>
     </Layout>
   )
