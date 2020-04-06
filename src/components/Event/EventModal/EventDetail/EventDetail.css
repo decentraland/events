@@ -110,6 +110,8 @@
 .EventDetail .EventDetail__Actions,
 .EventDetail .EventDetail__Detail {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   padding: 18px 24px;
 }
 
