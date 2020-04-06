@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect } from "react"
+import React, { useMemo } from "react"
+import { Responsive } from "semantic-ui-react"
 import { Link } from "gatsby-plugin-intl"
 import { navigate } from "gatsby"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
@@ -68,12 +69,21 @@ export default function IndexPage(props: any) {
           <HeaderMenu.Left>
             <Title small>World Events</Title>
           </HeaderMenu.Left>
-          <HeaderMenu.Right>
-            <Button primary={!isMobile} basic={!!isMobile} size="small" {...{ to: '/submit', as: Link }}>
-              <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem', display: isMobile ? 'none' : '' }} width="16" height="16" />
-              SUBMIT EVENT
-        </Button>
-          </HeaderMenu.Right>
+          <Responsive
+            minWidth={Responsive.onlyTablet.minWidth}
+            as={HeaderMenu.Right}
+          >
+            <Button primary size="small" {...{ to: '/submit', as: Link }}>
+              <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
+                SUBMIT EVENT
+          </Button>
+          </Responsive>
+          <Responsive
+            maxWidth={Responsive.onlyMobile.maxWidth}
+            as={HeaderMenu.Right}
+          >
+            <Button basic size="small" {...{ to: '/submit', as: Link }}>SUBMIT EVENT</Button>
+          </Responsive>
         </HeaderMenu>
         {state.loading && <>
           <Divider />

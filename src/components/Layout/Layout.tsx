@@ -6,8 +6,7 @@
  */
 
 import React, { useState, useEffect } from "react"
-import Helmet from "react-helmet"
-import { Menu, DropdownProps, Responsive } from "semantic-ui-react"
+import { DropdownProps } from "semantic-ui-react"
 import { /* Link, */ changeLocale } from "gatsby-plugin-intl"
 
 import 'semantic-ui-css/semantic.min.css'
