@@ -3,14 +3,14 @@ import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
 import { v4 as uuid } from 'uuid';
 import Event from './model';
-import routes from "../Route/routes";
+import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
-import RequestError from '../Route/error';
+import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { auth, WithAuth } from '../Auth/middleware';
 import { EventAttributes, adminPatchAttributes, patchAttributes } from './types';
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
-import handle from '../Route/handle';
+import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
@@ -71,7 +71,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
 
   const errors = Event.validate(data)
   if (errors) {
-    const error = new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, body: data })
+    const error = new RequestError('Invalid event data', RequestError.BadRequest, { errors, body: data })
     await notifyEventError(userProfile, error)
     throw error
   }
@@ -118,7 +118,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   const errors = Event.validate(updatedAttributes)
   if (errors) {
-    throw new RequestError('Invalid event data', RequestError.StatusCode.BadRequest, { errors, update: updatedAttributes, body: req.body })
+    throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, update: updatedAttributes, body: req.body })
   }
 
   const userProfile = await Katalyst.get().getProfile(event.user)

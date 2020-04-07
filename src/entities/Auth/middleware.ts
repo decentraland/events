@@ -2,9 +2,8 @@ import { Request } from 'express'
 import { Authenticator, AuthLinkType, AuthIdentity, AuthChain } from 'dcl-crypto'
 import { fromBase64 } from 'decentraland-gatsby/dist/utils/base64'
 import { HttpProvider } from 'web3x/providers'
-import { Address } from 'web3x/address'
-import middleware from "../Middleware/middleware"
-import RequestError from '../Route/error'
+import { middleware } from "decentraland-gatsby/dist/entities/Route/handle"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 
 export type WithAuth<R extends Request = Request> = R & {
   auth: string | null
@@ -21,14 +20,14 @@ export function auth(options: AuthOptions = {}) {
     if (!authorization && options.optional) {
       return
     } else if (!authorization) {
-      throw new RequestError(`Unauthorized`, RequestError.StatusCode.Unauthorized)
+      throw new RequestError(`Unauthorized`, RequestError.Unauthorized)
     }
 
     const [type, token] = authorization.split(' ')
     if (type.toLowerCase() !== 'bearer' && options.allowInvalid) {
       return
     } else if (type.toLowerCase() !== 'bearer') {
-      throw new RequestError(`Invalid authorization type: "${type}"`, RequestError.StatusCode.Unauthorized)
+      throw new RequestError(`Invalid authorization type: "${type}"`, RequestError.Unauthorized)
     }
 
     let identity: AuthIdentity
@@ -41,7 +40,7 @@ export function auth(options: AuthOptions = {}) {
       if (options.allowInvalid) {
         return
       } else {
-        throw new RequestError(`Invalid authorization token`, RequestError.StatusCode.Unauthorized)
+        throw new RequestError(`Invalid authorization token`, RequestError.Unauthorized)
       }
     }
 
@@ -54,7 +53,7 @@ export function auth(options: AuthOptions = {}) {
     if (!result.ok && options.allowInvalid) {
       return
     } else if (!result.ok) {
-      throw new RequestError(result.message || 'Invalid authorization data', RequestError.StatusCode.Forbidden)
+      throw new RequestError(result.message || 'Invalid authorization data', RequestError.Forbidden)
     }
 
     const auth = getPayload(identity.authChain, AuthLinkType.SIGNER)

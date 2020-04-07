@@ -1,4 +1,4 @@
-import routes from "../Route/routes";
+import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import { withProfile, WithProfile } from "./middleware";
 import { Response } from "express";
 import isURL from "validator/lib/isURL";

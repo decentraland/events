@@ -1,7 +1,6 @@
-import routes from "../Route/routes";
+import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import { withSocialUserAgent, WithSocialUserAgent } from "./middleware";
 import { Response, NextFunction } from "express";
-import handle from "../Route/handle";
 import Event from "../Event/model";
 import isUUID from "validator/lib/isUUID";
 import { EventAttributes } from "../Event/types";
@@ -11,20 +10,22 @@ import { resolve } from 'url'
 const EVENTS_URL = env('EVENTS_URL', 'https://events.centraland.org/api')
 
 export default routes((router) => {
-  router.use('/:lang(en|es|fr|ja|zh|ko)', withSocialUserAgent() as any, handle(injectSocialTag))
+  router.use('/:lang(en|es|fr|ja|zh|ko)', withSocialUserAgent() as any, injectSocialTag as any)
 })
 
-export async function injectSocialTag(req: WithSocialUserAgent, res: Response, next: NextFunction) {
+export function injectSocialTag(req: WithSocialUserAgent, res: Response, next: NextFunction) {
   if (!req.isSocialUserAgent() || !isUUID(req.query.event)) {
     return next()
   }
 
-  const event = await Event.findOne<EventAttributes>({ id: req.query.event, rejected: false })
-  if (!event) {
-    return next()
-  }
-
-  res.status(200).send(template(event, resolve(EVENTS_URL, req.originalUrl)))
+  Event.findOne<EventAttributes>({ id: req.query.event, rejected: false })
+    .then((event) => {
+      if (!event) {
+        return next()
+      } else {
+        res.status(200).send(template(event, resolve(EVENTS_URL, req.originalUrl)))
+      }
+    })
 }
 
 const template = (event: EventAttributes, url: string) => `<!DOCTYPE html>

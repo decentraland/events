@@ -1,11 +1,11 @@
 import { Request } from 'express';
-import routes from "../Route/routes";
+import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import { auth, WithAuth } from '../Auth/middleware';
 import { BASE_PATH } from '../Event/routes';
 import { getEventIdParam, withEvent, WithEvent } from "../Event/middleware";
 import { EventAttendeeAttributes } from './types';
-import handle from '../Route/handle';
+import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import Event from '../Event/model';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
