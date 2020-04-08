@@ -25,7 +25,10 @@ export default function HTML(props) {
           dangerouslySetInnerHTML={{ __html: props.body }}
         />
         {props.postBodyComponents}
-        <Segment analyticsKey={process.env.SEGMENT_KEY} />
+        <Segment
+          analyticsKey={process.env.GATSBY_SEGMENT_KEY}
+          trackPage={false}
+        />
       </body>
     </html>
   )
