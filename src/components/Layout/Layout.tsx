@@ -18,36 +18,22 @@ import { Footer } from "decentraland-ui/dist/components/Footer/Footer"
 import { Locale } from "decentraland-ui/dist/components/LanguageIcon/LanguageIcon"
 import { Navbar } from "decentraland-ui/dist/components/Navbar/Navbar"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
-import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import ImgAvatar from "decentraland-gatsby/dist/components/Profile/ImgAvatar"
+import useWindowScroll from "decentraland-gatsby/dist/hooks/useWindowScroll"
+import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
+import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 
 import "./Layout.css"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 
 export default function Layout({ children, ...props }: any) {
   const language: Locale = props?.pageContext?.intl?.language || 'en'
   const languages: Locale[] = props?.pageContext?.intl?.languages || ['en']
   const currentPath: string = props?.pageContext?.intl?.originalPath || '/'
-  const [isScrolled, setIsScrolled] = useState(false)
   const [profile, actions] = useProfile()
   const isMobile = useMobileDetector()
 
-  useEffect(() => {
-    const onWindowScroll = function () {
-      if (window.scrollY < 10 && isScrolled) {
-        setIsScrolled(false)
-      } else if (window.scrollY > 10 && !isScrolled) {
-        setIsScrolled(true)
-      }
-    }
-
-    window.addEventListener("scroll", onWindowScroll)
-    onWindowScroll()
-
-    return () => {
-      window.removeEventListener("scroll", onWindowScroll)
-    }
-  })
+  const scroll = useWindowScroll()
+  const isScrolled = scroll.scrollY.get() > 0
 
   const handleChangeLocal = function (
     _: React.SyntheticEvent<HTMLElement>,

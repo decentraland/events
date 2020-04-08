@@ -4,22 +4,22 @@ import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import { Field } from 'decentraland-ui/dist/components/Field/Field'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import track from "decentraland-gatsby/dist/components/Segment/track"
 
 import Layout from "../components/Layout/Layout"
 import SEO from "../components/seo"
 import useEventEditor from "../hooks/useEventEditor"
 import BackButton from "../components/Button/BackButton"
 import { toInputDate, toInputTime } from "../components/Date/utils"
+import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 import url from '../url'
 
 import './submit.css'
-import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 
 const info = require('../images/info.svg')
 
@@ -42,6 +42,8 @@ export default function SubmitPage(props: any) {
     }
   }, [profileActions.error, profileActions.error && profileActions.error.code])
 
+  useEffect(() => track((analytics) => analytics.page('Submit')), [])
+
   function handleBack(event: React.MouseEvent<any>) {
     event.stopPropagation()
     event.preventDefault()
@@ -60,6 +62,7 @@ export default function SubmitPage(props: any) {
     setState({ loading: true })
     eventActions.create()
       .then((event) => {
+        track((analytics) => analytics.track('New Event', { event }))
         const newLocation = { ...location, pathname: location.pathname.replace('/submit', '') }
         const target = event && event.id ? url.toEvent(newLocation, event.id) : url.toHome(newLocation)
         window.location = target as any

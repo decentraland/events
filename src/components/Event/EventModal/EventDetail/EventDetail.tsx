@@ -18,6 +18,7 @@ import { useLocation } from '@reach/router'
 import url from '../../../../url'
 import classname from 'decentraland-gatsby/dist/utils/classname'
 import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
+import track from 'decentraland-gatsby/dist/components/Segment/track'
 import isEmail from 'validator/lib/isEmail'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
 import useEventEditor from '../../../../hooks/useEventEditor'
@@ -105,6 +106,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       .then((updatedEvent) => {
         stores.event.setEntity(updatedEvent)
         navigate(url.toEvent(location, event.id))
+        setState({ loading: false })
+        track((analytics) => analytics.track('Edit Event', { event: updatedEvent }))
       })
       .catch((error) => {
         console.log(error)

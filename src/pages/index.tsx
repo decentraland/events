@@ -21,6 +21,7 @@ import { HeaderMenu } from "decentraland-ui/dist/components/HeaderMenu/HeaderMen
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
+import track from 'decentraland-gatsby/dist/components/Segment/track'
 import EventModal from "../components/Event/EventModal/EventModal"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -53,13 +54,20 @@ export default function IndexPage(props: any) {
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
   const happeningEvents = useMemo(() => events.filter(event => event.approved && !event.rejected && event.start_at.getTime() <= now && event.finish_at.getTime() >= now), [state])
   const currentEvent = eventId && state.data[eventId] || null
-  const [requireWallet, setRequireWallet] = useState(false)
 
+  const [requireWallet, setRequireWallet] = useState(false)
   useEffect(() => {
     if (Boolean(actions.error && actions.error.code === 'CONNECT_ERROR')) {
       setRequireWallet(true)
     }
   }, [actions.error, actions.error && actions.error.code])
+
+  const title = currentEvent && currentEvent.name || "Decentraland Events"
+  const path = url.toUrl(location.pathname, location.search)
+  useEffect(() => track((analytics) => {
+    const name = currentEvent ? 'Event' : 'Home'
+    analytics.page(name, { title, path })
+  }), [path])
 
   useAsyncEffect(async () => {
     stores.event.setLoading()
@@ -69,7 +77,7 @@ export default function IndexPage(props: any) {
 
   return (
     <Layout {...props}>
-      <SEO title="Decentraland Events" />
+      <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EventModal event={currentEvent} share={isSharing} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
       <Container style={{ paddingTop: "110px" }}>
