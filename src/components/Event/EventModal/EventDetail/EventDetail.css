@@ -111,7 +111,7 @@
 .EventDetail .EventDetail__Detail {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding: 18px 24px;
 }
 
@@ -180,4 +180,11 @@
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Action {
   flex: 0 0 auto;
+}
+
+@media only screen and (max-width: 375px) {
+  .EventDetail .EventDetail__Actions,
+  .EventDetail .EventDetail__Detail {
+    justify-content: flex-end;
+  }
 }
