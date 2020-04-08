@@ -42,6 +42,12 @@ export default function SubmitPage(props: any) {
     }
   }, [profileActions.error, profileActions.error && profileActions.error.code])
 
+  function handleBack(event: React.MouseEvent<any>) {
+    event.stopPropagation()
+    event.preventDefault()
+    window.location = '/' as any
+  }
+
   function handleSubmit() {
     if (state.loading) {
       return
@@ -82,7 +88,7 @@ export default function SubmitPage(props: any) {
         {profile && <Grid stackable>
           <Grid.Row>
             <Grid.Column style={{ width: '58px', paddingRight: '8px' }}>
-              <BackButton to="/" style={{ margin: '5px 3px' }} />
+              <BackButton to="/" onClick={handleBack} style={{ margin: '5px 3px' }} />
             </Grid.Column>
             <Grid.Column mobile="15">
               <Title style={{ fontSize: '34px', lineHeight: '42px' }}>Submit event</Title>
