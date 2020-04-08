@@ -27,6 +27,6 @@ Promise.resolve()
   .then(() => database.connect())
   .then(() => listen(
     app,
-    process.env.PORT,
+    process.env.PORT || 3001,
     process.env.HOST
   ))
