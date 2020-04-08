@@ -58,7 +58,7 @@
   left: 0;
 }
 
-@media only screen and (max-width: 375px) {
+@media only screen and (max-width: 767px) {
   .ui.page.modals.dimmer.active.visible {
     padding: 0;
   }
