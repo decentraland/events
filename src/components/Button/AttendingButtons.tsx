@@ -1,10 +1,11 @@
 import React from 'react'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
-import classname from 'decentraland-gatsby/dist/utils/classname'
-import { EventAttributes, PublicEventAttributes } from '../../entities/Event/types'
 import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
-import Events, { UpdateEvent } from '../../api/Events'
+import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
+import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import { EventAttributes, PublicEventAttributes } from '../../entities/Event/types'
+import Events from '../../api/Events'
 import stores from '../../store'
 import { useLocation } from '@reach/router'
 import url from '../../url'
@@ -12,7 +13,6 @@ import url from '../../url'
 const share = require('../../images/share.svg')
 
 import './AttendingButtons.css'
-import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 
 type AttendingButtonsState = {
   loading: boolean
@@ -77,7 +77,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   }
 
   return <div className="AttendingButtons">
-    {(actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={classname(['attending-status', event.attending && 'attending'])}>
+    {(actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={TokenList.join(['attending-status', event.attending && 'attending'])}>
       {event.attending && 'GOING'}
       {!event.attending && 'WANT TO GO'}
     </Button>}
