@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Button";
-import classname from "decentraland-gatsby/dist/utils/classname";
+import TokenList from "decentraland-gatsby/dist/utils/TokenList"
 
 import { EventAttributes } from "../../entities/Event/types";
 import { jumpTo } from "./JumpInButton";
@@ -14,7 +14,7 @@ export type AddToCalendarButtonProps = ButtonProps & {
 
 export default function AddToCalendarButton({ href, event, ...props }: AddToCalendarButtonProps) {
   const to = href || getGoogleCalendar(event) || '#'
-  return <Button size="small" target="_blank" {...props} href={to} basic className={classname(['AddToCalendarButton', props.className])} >
+  return <Button size="small" target="_blank" {...props} href={to} basic className={TokenList.join(['AddToCalendarButton', props.className])} >
     {props.children || 'ADD TO CALENDAR'}
   </Button>
 }

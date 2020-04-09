@@ -1,28 +1,30 @@
 import React, { useState } from 'react'
 import { navigate } from 'gatsby'
-import { EventAttributes } from '../../../../entities/Event/types'
+import { useLocation } from '@reach/router'
+import isEmail from 'validator/lib/isEmail'
+import { Button } from 'decentraland-ui/dist/components/Button/Button'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
-import { toMonthName, toDayName, toTimezoneName } from '../../../Date/utils'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
+import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
+import track from 'decentraland-gatsby/dist/components/Segment/track'
+import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import { EventAttributes } from '../../../../entities/Event/types'
+import { toMonthName, toDayName, toTimezoneName } from '../../../Date/utils'
 import AttendingButtons from '../../../Button/AttendingButtons'
 import EditButtons from '../../../Button/EditButtons'
 import JumpInButton from '../../../Button/JumpInButton'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
 import DateBox from '../../../Date/DateBox'
-import { useLocation } from '@reach/router'
 import url from '../../../../url'
-import classname from 'decentraland-gatsby/dist/utils/classname'
-import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
-import track from 'decentraland-gatsby/dist/components/Segment/track'
-import isEmail from 'validator/lib/isEmail'
-import { Button } from 'decentraland-ui/dist/components/Button/Button'
 import useEventEditor from '../../../../hooks/useEventEditor'
 import stores from '../../../../store'
+
+import './EventDetail.css'
 
 const extra = require('../../../../images/info.svg')
 const info = require('../../../../images/secondary-info.svg')
@@ -31,7 +33,6 @@ const pin = require('../../../../images/secondary-pin.svg')
 const jump = require('../../../../images/secondary-jump-in.svg')
 const friends = require('../../../../images/secondary-friends.svg')
 
-import './EventDetail.css'
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
@@ -72,8 +73,6 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     url: event.url,
   })
 
-  const errors = Object.keys(edited.errors)
-
   function handleCancel() {
     actions.setValues({
       name: event.name,
@@ -113,11 +112,15 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         console.log(error)
         setState({ loading: false, error: error.message })
       })
-    // navigate(url.toEvent(location, event.id))
+  }
+
+  function handleShare(e: React.MouseEvent<any>, event: EventAttributes) {
+    e.preventDefault()
+    e.stopPropagation()
+    navigate(url.toEventShare(location, event.id))
   }
 
   return <>
-    {/* {event && <>} */}
     {event && <ImgFixed src={edited.image} dimension="wide" />}
     {event && !edit && event.rejected && <div className="EventError"><code>This event was rejected</code></div>}
     {event && !edit && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
@@ -144,7 +147,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DESCRIPTION */}
       <Divider line />
-      <div className={classname(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={info} width="16" height="16" />
         </div>
@@ -163,7 +166,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DATE */}
       <Divider line />
-      <div className={classname(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={clock} width="16" height="16" />
         </div>
@@ -255,7 +258,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* PLACE */}
       <Divider line />
-      <div className={classname(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={pin} width="16" height="16" />
         </div>
@@ -277,7 +280,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* EVENT TARGET */}
       {edit && <Divider line />}
-      {edit && <div className={classname(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      {edit && <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={jump} width="16" height="16" />
         </div>
@@ -292,13 +295,13 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* ATTENDEES */}
       <Divider line />
       <div className="EventDetail__Detail">
-        <div className={classname(['EventDetail__Detail__Icon', event.total_attendees > 0 && 'center'])}>
+        <div className={TokenList.join(['EventDetail__Detail__Icon', event.total_attendees > 0 && 'center'])}>
           <img src={friends} width="16x" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
           {(event.latest_attendees || []).slice(0, EVENTS_LIST).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
-          {attendeesDiff > 0 && <div className={classname([
+          {attendeesDiff > 0 && <div className={TokenList.join([
             "EventDetail__Detail__ShowAttendees",
             attendeesDiff >= 10 && 'MoreThan10',
             attendeesDiff >= 100 && 'MoreThan100',
@@ -312,7 +315,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* CONTACT */}
       {!event.approved && canSeeDetails && <Divider line />}
-      {!event.approved && canSeeDetails && <div className={classname(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
+      {!event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={extra} width="16" height="16" />
         </div>
@@ -331,7 +334,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DETAILS */}
       {!event.approved && canSeeDetails && <Divider line />}
-      {!event.approved && canSeeDetails && <div className={classname(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
+      {!event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
         <div className="EventDetail__Detail__Icon">
           <img src={extra} width="16" height="16" />
         </div>
@@ -348,7 +351,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* SOCIAL */}
       <Divider line />
       <div className="EventDetail__Actions">
-        {!edit && event.approved && <AttendingButtons event={event} onShareFallback={() => navigate(url.toEventShare(location, event.id))} />}
+        {!edit && event.approved && <AttendingButtons event={event} onShareFallback={handleShare} />}
         {!edit && !event.approved && <EditButtons event={event} loading={state.loading} />}
         {!!edit && <EditButtons event={event} loading={state.loading} onSave={handleSave} />}
       </div>

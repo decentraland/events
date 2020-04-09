@@ -1,9 +1,9 @@
 import React from "react";
 import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Button";
-import classname from "decentraland-gatsby/dist/utils/classname";
+import TokenList from "decentraland-gatsby/dist/utils/TokenList";
+import { EventAttributes } from "../../entities/Event/types";
 
 import './JumpInButton.css'
-import { EventAttributes } from "../../entities/Event/types";
 
 const jumpIn = require('../../images/jump-in.svg')
 
@@ -21,7 +21,7 @@ export default function JumpInButton({ primary, secondary, inverted, event, href
       props.onClick(e, data)
     }
   }
-  return <Button size="small" target="_blank" {...props} onClick={handleClick} href={to} basic className={classname(['JumpInButton', props.className])} >
+  return <Button size="small" target="_blank" {...props} onClick={handleClick} href={to} basic className={TokenList.join(['JumpInButton', props.className])} >
     {props.children ?? 'JUMP IN'}
     <img src={jumpIn} width="16" height="16" />
   </Button>

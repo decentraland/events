@@ -1,14 +1,14 @@
 import React from 'react'
 import { Link } from 'gatsby-plugin-intl'
 import { GatsbyLinkProps } from 'gatsby'
-import classname from 'decentraland-gatsby/dist/utils/classname'
+import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 
 import './BackButton.css'
 
 const back = require('../../images/back.svg')
 
 export default function BackButton(props: GatsbyLinkProps<any>) {
-  return <Link {...props as any} className={classname(['BackButton', props.className])}>
+  return <Link {...props as any} className={TokenList.join(['BackButton', props.className])}>
     <img src={back} />
   </Link>
 }
