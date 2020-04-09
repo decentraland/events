@@ -54,7 +54,7 @@ export default function EventShare(props: EventShareProps) {
       params.set('text', location.origin + url.toEvent(location, props.event.id))
     }
 
-    params.set('hashtags', 'builder,virtualworld,gaming')
+    params.set('hashtags', 'decentraland,socialworld,virtualgames')
 
     share('https://twitter.com/intent/tweet?' + params.toString())
   }
