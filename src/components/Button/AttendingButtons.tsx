@@ -6,9 +6,9 @@ import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import { EventAttributes, PublicEventAttributes } from '../../entities/Event/types'
 import Events from '../../api/Events'
-import stores from '../../store'
+import stores from '../../utils/store'
 import { useLocation } from '@reach/router'
-import url from '../../url'
+import url from '../../utils/url'
 
 const share = require('../../images/share.svg')
 

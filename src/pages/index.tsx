@@ -1,47 +1,46 @@
+
 import React, { useMemo, useEffect, useState } from "react"
+import { useLocation } from "@reach/router"
 import { Link } from "gatsby-plugin-intl"
 import { navigate } from "gatsby"
+
+import Layout from "../components/Layout/Layout"
 import Responsive from 'semantic-ui-react/dist/commonjs/addons/Responsive/Responsive'
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { Card } from "decentraland-ui/dist/components/Card/Card"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import useEntityStore from "decentraland-gatsby/dist/hooks/useEntityStore"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { useLocation } from "@reach/router"
-import url from '../url'
-
-import stores from '../store'
-import Layout from "../components/Layout/Layout"
-import SEO from "../components/seo"
-import Events from "../api/Events"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { HeaderMenu } from "decentraland-ui/dist/components/HeaderMenu/HeaderMenu"
-
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import track from 'decentraland-gatsby/dist/components/Segment/track'
-import EventModal from "../components/Event/EventModal/EventModal"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+
+import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
-
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
-
-import './index.css'
 import { EventAttributes } from "../entities/Event/types"
 import { toMonthName } from "../components/Date/utils"
 import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
+import SEO from "../components/seo"
+import Events from "../api/Events"
+import url from '../utils/url'
+import stores from '../utils/store'
+import * as segment from '../utils/segment'
+
+import './index.css'
 
 const primaryAdd = require('../images/primary-add.svg')
 
 export default function IndexPage(props: any) {
   const [profile, actions] = useProfile()
   const location = useLocation()
-  const isMobile = useMobileDetector()
   const now = Date.now()
   const searchParams = new URLSearchParams(location.search)
   const eventId = location && searchParams.get('event') || null
@@ -66,7 +65,7 @@ export default function IndexPage(props: any) {
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
   useEffect(() => track((analytics) => {
-    const name = currentEvent ? 'Event' : 'Home'
+    const name = currentEvent ? segment.Page.Event : segment.Page.Home
     analytics.page(name, { title, path })
   }), [path])
 

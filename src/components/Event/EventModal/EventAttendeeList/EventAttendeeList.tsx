@@ -11,7 +11,7 @@ import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import { navigate } from 'gatsby'
-import url from '../../../../url'
+import url from '../../../../utils/url'
 
 const back = require('../../../../images/back.svg')
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'

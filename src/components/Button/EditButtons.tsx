@@ -5,7 +5,7 @@ import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import Events, { UpdateEvent } from '../../api/Events'
-import stores from '../../store'
+import stores from '../../utils/store'
 
 import './EditButtons.css'
 

@@ -8,7 +8,7 @@ import { EventAttributes } from '../../../entities/Event/types'
 import JumpInButton from '../../Button/JumpInButton'
 import { toMonthName } from '../../Date/utils'
 
-import url from '../../../url'
+import url from '../../../utils/url'
 
 import './EventCardMini.css'
 
