@@ -1,10 +1,13 @@
 import React from "react";
 import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Button";
 import TokenList from "decentraland-gatsby/dist/utils/TokenList"
+import useProfile from "decentraland-gatsby/dist/hooks/useProfile";
+import track from "decentraland-gatsby/dist/components/Segment/track";
 
 import { EventAttributes } from "../../entities/Event/types";
 import { jumpTo } from "./JumpInButton";
 import { toCalendarDate } from "../Date/utils";
+import * as segment from '../../utils/segment'
 
 import './AddToCalendarButton.css'
 
@@ -13,8 +16,18 @@ export type AddToCalendarButtonProps = ButtonProps & {
 }
 
 export default function AddToCalendarButton({ href, event, ...props }: AddToCalendarButtonProps) {
+  const [profile] = useProfile()
   const to = href || getGoogleCalendar(event) || '#'
-  return <Button size="small" target="_blank" {...props} href={to} basic className={TokenList.join(['AddToCalendarButton', props.className])} >
+  const ethAddress = profile?.address.toString() || null
+
+  function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
+    track((analytics) => analytics.track(segment.Track.AddToCalendar, { ethAddress, event: event?.id }))
+    if (props.onClick) {
+      props.onClick(e, data)
+    }
+  }
+
+  return <Button size="small" target="_blank" {...props} onClick={handleClick} href={to} basic className={TokenList.join(['AddToCalendarButton', props.className])} >
     {props.children || 'ADD TO CALENDAR'}
   </Button>
 }

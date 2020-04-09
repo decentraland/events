@@ -19,7 +19,7 @@ export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
 
 export default function EventModal({ event, attendees, share, edit, className, onClose, onEdit, ...props }: EventModalProps) {
 
-  return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', !event?.approved || 'pending', className])} onClose={onClose} >
+  return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', (!event || !event.approved) && 'pending', className])} onClose={onClose} >
     {event && !attendees && !share && <div className="EventModal__Action" onClick={onClose}>
       <img src={close} width="14" height="14" />
       <div className="EventModal__Action__Background" />

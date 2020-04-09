@@ -4,11 +4,13 @@ import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import track from 'decentraland-gatsby/dist/components/Segment/track'
 import { EventAttributes, PublicEventAttributes } from '../../entities/Event/types'
 import Events from '../../api/Events'
 import stores from '../../utils/store'
 import { useLocation } from '@reach/router'
 import url from '../../utils/url'
+import * as segment from '../../utils/segment'
 
 const share = require('../../images/share.svg')
 
@@ -44,6 +46,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     Promise.resolve(profile || actions.connect())
       .then(async (profile) => {
         if (profile) {
+          const ethAddress = profile.address.toString() || null
           const newAttendees = await Events.get().setEventAttendee(event.id, !event.attending)
           const attendees = newAttendees.map(attendee => attendee.user)
           const newEvent = {
@@ -53,6 +56,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             latest_attendees: attendees.slice(0, 10)
           }
           stores.event.setEntity(newEvent as any)
+
+          track((analytics) => analytics.track(segment.Track.Going, { ethAddress }))
         }
       })
       .then(() => patchState({ loading: false }))
@@ -63,16 +68,20 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   }
 
   function handleShare(e: React.MouseEvent<any>) {
+    const ethAddress = profile?.address.toString() || null
     if (typeof navigator !== 'undefined' && (navigator as any).share) {
       (navigator as any).share({
         title: event.name,
         text: event.description,
         url: location.origin + url.toEvent(location, event.id),
       })
+        .then(() => track((analytics) => analytics.track(segment.Track.Share, { ethAddress, medium: 'native' })))
+
     } else if (props.onShareFallback) {
       e.preventDefault()
       e.stopPropagation()
       props.onShareFallback(e, props.event)
+      track((analytics) => analytics.track(segment.Track.ShareFallback, { ethAddress }))
     }
   }
 

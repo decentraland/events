@@ -1,12 +1,17 @@
 import React from 'react'
-import { EventAttributes } from '../../../../entities/Event/types'
 
-import './EventShare.css'
 import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
-import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
-import url from '../../../../utils/url'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
+import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
+import track from 'decentraland-gatsby/dist/components/Segment/track'
+import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
+
+import { EventAttributes } from '../../../../entities/Event/types'
+import url from '../../../../utils/url'
+import * as segment from '../../../../utils/segment'
+
+import './EventShare.css'
 
 const back = require('../../../../images/back.svg')
 
@@ -17,6 +22,9 @@ export type EventShareProps = {
 export default function EventShare(props: EventShareProps) {
 
   const location = useLocation()
+  const [profile] = useProfile()
+
+  const ethAddress = profile?.address.toString() || null
 
   function share(url: string) {
     const width = 600
@@ -40,6 +48,7 @@ export default function EventShare(props: EventShareProps) {
       params.set('description', props.event.description)
     }
 
+    track((analytics) => analytics.track(segment.Track.Share, { ethAddress, medium: 'facebook' }))
     share('https://www.facebook.com/sharer/sharer.php?' + params.toString())
   }
 
@@ -56,6 +65,7 @@ export default function EventShare(props: EventShareProps) {
 
     params.set('hashtags', 'decentraland,socialworld,virtualgames')
 
+    track((analytics) => analytics.track(segment.Track.Share, { ethAddress, medium: 'twitter' }))
     share('https://twitter.com/intent/tweet?' + params.toString())
   }
 
