@@ -23,6 +23,7 @@ import DateBox from '../../../Date/DateBox'
 import url from '../../../../utils/url'
 import useEventEditor from '../../../../hooks/useEventEditor'
 import stores from '../../../../utils/store'
+import * as segment from '../../../../utils/segment'
 
 import './EventDetail.css'
 
@@ -106,7 +107,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         stores.event.setEntity(updatedEvent)
         navigate(url.toEvent(location, event.id))
         setState({ loading: false })
-        track((analytics) => analytics.track('Edit Event', { event: updatedEvent }))
+        track((analytics) => analytics.track(segment.Track.EditEvent, { event: updatedEvent }))
       })
       .catch((error) => {
         console.log(error)
@@ -117,7 +118,6 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   function handleShare(e: React.MouseEvent<any>, event: EventAttributes) {
     e.preventDefault()
     e.stopPropagation()
-    track((analytics) => analytics.track('Share Fallback'))
     navigate(url.toEventShare(location, event.id))
   }
 

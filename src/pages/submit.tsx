@@ -63,7 +63,7 @@ export default function SubmitPage(props: any) {
     setState({ loading: true })
     eventActions.create()
       .then((event) => {
-        track((analytics) => analytics.track('New Event', { event }))
+        track((analytics) => analytics.track(segment.Track.NewEvent, { event }))
         const newLocation = { ...location, pathname: location.pathname.replace('/submit', '') }
         const target = event && event.id ? url.toEvent(newLocation, event.id) : url.toHome(newLocation)
         window.location = target as any

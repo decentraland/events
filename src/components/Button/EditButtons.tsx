@@ -6,6 +6,7 @@ import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import Events, { UpdateEvent } from '../../api/Events'
 import stores from '../../utils/store'
+import * as segment from '../../utils/segment'
 
 import './EditButtons.css'
 
@@ -33,7 +34,7 @@ export default function EditButtons(props: EditButtonsProps) {
         if (profile) {
           const newEvent = await Events.get().updateEvent(update)
           stores.event.setEntity(newEvent)
-          track((analytics) => analytics.track('Edit Event', { event: newEvent }))
+          track((analytics) => analytics.track(segment.Track.EditEvent, { event: newEvent }))
         }
       })
       .then(() => patchState({ loading: false }))

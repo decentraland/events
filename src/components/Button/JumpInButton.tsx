@@ -1,7 +1,10 @@
 import React from "react";
 import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Button";
 import TokenList from "decentraland-gatsby/dist/utils/TokenList";
+import track from "decentraland-gatsby/dist/components/Segment/track";
+import useProfile from "decentraland-gatsby/dist/hooks/useProfile";
 import { EventAttributes } from "../../entities/Event/types";
+import * as segment from "../../utils/segment"
 
 import './JumpInButton.css'
 
@@ -14,13 +17,18 @@ export type JumpInButtonProps = ButtonProps & {
 }
 
 export default function JumpInButton({ primary, secondary, inverted, event, href, ...props }: JumpInButtonProps) {
+  const [profile] = useProfile()
   const to = href || jumpTo(event) || '#'
-  function handleClick(e: React.MouseEvent<any>, data: any) {
+  const ethAddress = profile?.address.toString()
+
+  function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
     e.stopPropagation()
+    track((analytics) => analytics.track(segment.Track.JumpIn, { ethAddress, event: event?.id }))
     if (props.onClick) {
       props.onClick(e, data)
     }
   }
+
   return <Button size="small" target="_blank" {...props} onClick={handleClick} href={to} basic className={TokenList.join(['JumpInButton', props.className])} >
     {props.children ?? 'JUMP IN'}
     <img src={jumpIn} width="16" height="16" />
