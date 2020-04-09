@@ -180,6 +180,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             <input type="time" name="finish_time" value={actions.getFinishTime()} onChange={actions.handleChange} style={{ width: '125px' }} />
             <code>{' UTC'}</code>
           </div>
+          {edited.errors['start_at'] && <div><Paragraph className="error" >{edited.errors['finish_at']}</Paragraph></div>}
+          {edited.errors['finish_at'] && <div><Paragraph className="error" >{edited.errors['finish_at']}</Paragraph></div>}
         </div>}
         {!edit && duration < DAY && <div className="EventDetail__Detail__Item">
           <Paragraph >

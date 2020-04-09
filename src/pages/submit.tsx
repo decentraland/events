@@ -109,23 +109,23 @@ export default function SubmitPage(props: any) {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_date']} message={errors['start_date']} value={eventActions.getStartDate()} min={toInputDate(new Date())} onChange={eventActions.handleChange} />
+                    <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={eventActions.getStartDate()} min={toInputDate(new Date())} onChange={eventActions.handleChange} />
                   </Grid.Column>
-                  <Grid.Column mobile="2">
-                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_time']} message={errors['start_time']} value={eventActions.getStartTime()} onChange={eventActions.handleChange} />
+                  <Grid.Column mobile="3">
+                    <Field label="Start time" name="start_time" type="time" error={!!errors['start_at'] || !!errors['start_time']} message={errors['start_time']} value={eventActions.getStartTime()} onChange={eventActions.handleChange} />
                   </Grid.Column>
-                  <Grid.Column mobile="2">
+                  <Grid.Column mobile="1">
                     <Paragraph className="FieldNote">UTC</Paragraph>
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="4">
-                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_date']} message={errors['finish_date']} value={eventActions.getFinishDate()} min={toInputDate(event.start_at)} onChange={eventActions.handleChange} />
+                    <Field label="End date" name="finish_date" type="date" error={!!errors['finish_at'] || !!errors['finish_date']} message={errors['finish_at'] || errors['finish_date']} value={eventActions.getFinishDate()} min={toInputDate(event.start_at)} onChange={eventActions.handleChange} />
                   </Grid.Column>
-                  <Grid.Column mobile="2">
-                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_time']} message={errors['finish_time']} value={eventActions.getFinishTime()} onChange={eventActions.handleChange} />
+                  <Grid.Column mobile="3">
+                    <Field label="End time" name="finish_time" type="time" error={!!errors['finish_at'] || !!errors['finish_time']} message={errors['finish_time']} value={eventActions.getFinishTime()} onChange={eventActions.handleChange} />
                   </Grid.Column>
-                  <Grid.Column mobile="2">
+                  <Grid.Column mobile="1">
                     <Paragraph className="FieldNote">UTC</Paragraph>
                   </Grid.Column>
                 </Grid.Row>

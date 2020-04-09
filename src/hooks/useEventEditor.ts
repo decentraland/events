@@ -112,6 +112,10 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     const finish_at = fromUTCInputDate(value || '', event.finish_at)
     if (finish_at !== event.finish_at) {
       setValue('finish_at', finish_at)
+
+      if (finish_at.getTime() < event.start_at.getTime()) {
+        setError('finish_at', 'Event must not end before it begins')
+      }
     }
   }
 
@@ -119,6 +123,10 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     const finish_at = fromUTCInputTime(value || '', event.finish_at)
     if (finish_at !== event.finish_at) {
       setValue('finish_at', finish_at)
+
+      if (finish_at.getTime() < event.start_at.getTime()) {
+        setError('finish_at', 'Event must not end before it begins')
+      }
     }
   }
 
@@ -180,7 +188,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     }
 
     if (Object.values(errors).filter(Boolean).length) {
-      setErrors(errors)
+      setErrors({ ...event.errors, ...errors })
       return false
     }
 
