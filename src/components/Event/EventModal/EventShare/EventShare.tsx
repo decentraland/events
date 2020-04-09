@@ -5,7 +5,7 @@ import './EventShare.css'
 import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
-import url from '../../../../url'
+import url from '../../../../utils/url'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
 
 const back = require('../../../../images/back.svg')

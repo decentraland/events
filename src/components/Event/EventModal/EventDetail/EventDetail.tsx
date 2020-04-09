@@ -20,9 +20,9 @@ import EditButtons from '../../../Button/EditButtons'
 import JumpInButton from '../../../Button/JumpInButton'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
 import DateBox from '../../../Date/DateBox'
-import url from '../../../../url'
+import url from '../../../../utils/url'
 import useEventEditor from '../../../../hooks/useEventEditor'
-import stores from '../../../../store'
+import stores from '../../../../utils/store'
 
 import './EventDetail.css'
 
@@ -117,6 +117,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   function handleShare(e: React.MouseEvent<any>, event: EventAttributes) {
     e.preventDefault()
     e.stopPropagation()
+    track((analytics) => analytics.track('Share Fallback'))
     navigate(url.toEventShare(location, event.id))
   }
 

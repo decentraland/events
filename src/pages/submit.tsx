@@ -15,9 +15,10 @@ import Layout from "../components/Layout/Layout"
 import SEO from "../components/seo"
 import useEventEditor from "../hooks/useEventEditor"
 import BackButton from "../components/Button/BackButton"
-import { toInputDate, toInputTime } from "../components/Date/utils"
+import { toInputDate } from "../components/Date/utils"
 import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
-import url from '../url'
+import url from '../utils/url'
+import * as segment from '../utils/segment'
 
 import './submit.css'
 
@@ -42,7 +43,7 @@ export default function SubmitPage(props: any) {
     }
   }, [profileActions.error, profileActions.error && profileActions.error.code])
 
-  useEffect(() => track((analytics) => analytics.page('Submit')), [])
+  useEffect(() => track((analytics) => analytics.page(segment.Page.Submit)), [])
 
   function handleBack(event: React.MouseEvent<any>) {
     event.stopPropagation()
