@@ -126,6 +126,12 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     updatedAttributes.user_name = userProfile.name
   }
 
+  const [x, y] = updatedAttributes.coordinates
+  const content = await Land.get().getMapContent([x, y], [x, y])
+  const state = content.assets.estates[0]
+  const parcel = content.assets.parcels[0]
+  updatedAttributes.scene_name = state?.data?.name || parcel?.data?.name || updatedAttributes.scene_name
+
   await Event.update(updatedAttributes, { id: event.id })
 
   const updatedEvent = { ...event, ...updatedAttributes }
