@@ -29,7 +29,7 @@ export default class Event extends Model<EventAttributes> {
       description: {
         type: ['string', 'null'],
         minLength: 0,
-        maxLength: 500,
+        maxLength: 5000,
       },
       approved: {
         type: 'boolean'
