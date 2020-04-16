@@ -6,6 +6,7 @@ import { Button } from 'decentraland-ui/dist/components/Button/Button'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
+import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
@@ -157,10 +158,10 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             <textarea name="description" placeholder="Event description" className={edited.errors['description'] && 'error'} defaultValue={edited.description} rows={10} onChange={actions.handleChange} />
             {edited.errors['description'] && <Paragraph className="error" >{edited.errors['description']}</Paragraph>}
           </>}
-          {!edit && event.description && <Paragraph>{event.description}</Paragraph>}
           {!edit && !event.description && <Paragraph secondary={!event.description} >
             <Italic>No description</Italic>
           </Paragraph>}
+          {!edit && event.description && <Markdown source={event.description} />}
         </div>
         <div className="EventDetail__Detail__Action"></div>
       </div>
