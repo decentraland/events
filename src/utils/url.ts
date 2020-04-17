@@ -67,16 +67,4 @@ export default {
     const targetSearchParams = new URLSearchParams(location.search)
     return targetSearchParams.has('event') && targetSearchParams.get('view') === 'attendees'
   },
-
-  toEventShare(location: WindowLocation, eventId: string) {
-    const targetSearchParams = new URLSearchParams(location.search)
-    targetSearchParams.set('event', eventId)
-    targetSearchParams.set('view', 'share')
-    return this.toUrl(location.pathname, targetSearchParams.toString())
-  },
-
-  isEventShare(location: WindowLocation) {
-    const targetSearchParams = new URLSearchParams(location.search)
-    return targetSearchParams.has('event') && targetSearchParams.get('view') === 'share'
-  },
 }

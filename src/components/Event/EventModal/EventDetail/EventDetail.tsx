@@ -116,12 +116,6 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       })
   }
 
-  function handleShare(e: React.MouseEvent<any>, event: EventAttributes) {
-    e.preventDefault()
-    e.stopPropagation()
-    navigate(url.toEventShare(location, event.id))
-  }
-
   return <>
     {event && <ImgFixed src={edited.image} dimension="wide" />}
     {event && !edit && event.rejected && <div className="EventError"><code>This event was rejected</code></div>}
@@ -353,7 +347,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* SOCIAL */}
       <Divider line />
       <div className="EventDetail__Actions">
-        {!edit && event.approved && <AttendingButtons event={event} onShareFallback={handleShare} />}
+        {!edit && event.approved && <AttendingButtons event={event} />}
         {!edit && !event.approved && <EditButtons event={event} loading={state.loading} />}
         {!!edit && <EditButtons event={event} loading={state.loading} onSave={handleSave} />}
       </div>

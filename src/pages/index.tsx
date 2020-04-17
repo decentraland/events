@@ -44,7 +44,6 @@ export default function IndexPage(props: any) {
   const now = Date.now()
   const searchParams = new URLSearchParams(location.search)
   const eventId = location && searchParams.get('event') || null
-  const isSharing = location && searchParams.get('view') === 'share' || false
   const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
   const isEditing = location && searchParams.get('view') === 'edit' || false
   const state = useEntityStore(stores.event)
@@ -79,7 +78,7 @@ export default function IndexPage(props: any) {
     <Layout {...props}>
       <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
-      <EventModal event={currentEvent} share={isSharing} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
+      <EventModal event={currentEvent} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
       <Container style={{ paddingTop: "110px" }}>
         <HeaderMenu>
           <HeaderMenu.Left>
