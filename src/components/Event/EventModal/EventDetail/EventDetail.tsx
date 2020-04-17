@@ -38,7 +38,7 @@ const friends = require('../../../../images/secondary-friends.svg')
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
-const EVENTS_LIST = 11
+const ATTENDEES_PREVIEW_LIMIT = 12
 
 export type EventDetailProps = {
   event: EventAttributes,
@@ -55,7 +55,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const { start_at, finish_at } = event || { start_at: now, finish_at: now }
   const duration = finish_at.getTime() - start_at.getTime()
   const position = (event?.coordinates || [0, 0]).join()
-  const attendeesDiff = event.total_attendees - EVENTS_LIST
+  const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const location = useLocation()
   const [profile] = useProfile()
   const [state, setState] = useState<EventDetailState>({})
@@ -295,7 +295,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <img src={friends} width="16x" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {(event.latest_attendees || []).slice(0, EVENTS_LIST).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
+          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
           {attendeesDiff > 0 && <div className={TokenList.join([
             "EventDetail__Detail__ShowAttendees",
