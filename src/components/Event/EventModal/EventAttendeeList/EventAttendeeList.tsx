@@ -13,7 +13,8 @@ import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import { navigate } from 'gatsby'
 import url from '../../../../utils/url'
 
-const back = require('../../../../images/back.svg')
+const back = require('../../../../images/popup-back.svg')
+const close = require('../../../../images/popup-close.svg')
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 
 const attendees = new Map<string, EventAttendeeAttributes[]>()
@@ -38,7 +39,8 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
 
   return <div className="EventAttendeeList">
     <div className="EventAttendeeList__Header">
-      <img src={back} width="8" height="16" onClick={() => navigate(url.toEvent(location, props.event.id))} />
+      <img src={back} width="8" height="14" className="EventAttendeeList__Header__Back" onClick={() => navigate(url.toEvent(location, props.event.id))} />
+      <img src={close} width="14" height="14" className="EventAttendeeList__Header__Close" onClick={() => navigate(url.toHome(location))} />
       <SubTitle>People going</SubTitle>
     </div>
     {!list && <Loader size="massive" />}
