@@ -1,24 +1,41 @@
 .EventAttendeeList {
   position: relative;
   min-height: 400px;
-  padding: 16px 24px;
+  padding: 24px;
 }
 
 .EventAttendeeList .EventAttendeeList__Header {
   text-align: center;
-  padding: 5px 0;
   align-items: center;
-  display: relative;
+  position: relative;
+  padding-bottom: 24px;
 }
 
 .EventAttendeeList .EventAttendeeList__Header img {
   display: block;
   position: absolute;
-  left: 24px;
-  top: 18px;
-  padding: 8px;
   cursor: pointer;
   box-sizing: content-box;
+}
+
+.EventAttendeeList
+  .EventAttendeeList__Header
+  img.EventAttendeeList__Header__Back {
+  width: 8px;
+  height: 14px;
+  padding: 29px 35px 29px 29px;
+  left: -24px;
+  top: -24px;
+}
+
+.EventAttendeeList
+  .EventAttendeeList__Header
+  img.EventAttendeeList__Header__Close {
+  width: 14px;
+  height: 14px;
+  padding: 29px;
+  right: -24px;
+  top: -24px;
 }
 
 .EventAttendeeList .EventAttendeeList__Header .SubTitle {
