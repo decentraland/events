@@ -42,8 +42,8 @@
   right: 64px;
 }
 
-.EventModal .EventModal__Action .EventModal__Action__Content {
-  padding: 0 1em;
+.EventModal .EventModal__Action img {
+  position: relative;
 }
 
 .EventModal .EventModal__Action .EventModal__Action__Background {
@@ -53,7 +53,6 @@
   background-color: #16141a;
   border-radius: 16px;
   position: absolute;
-  border: 1px solid white;
   top: 0;
   left: 0;
 }

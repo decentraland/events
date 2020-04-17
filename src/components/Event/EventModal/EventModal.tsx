@@ -21,8 +21,8 @@ export default function EventModal({ event, attendees, share, edit, className, o
 
   return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', (!event || !event.approved) && 'pending', className])} onClose={onClose} >
     {event && !attendees && !share && <div className="EventModal__Action" onClick={onClose}>
-      <img src={close} width="14" height="14" />
       <div className="EventModal__Action__Background" />
+      <img src={close} width="14" height="14" />
     </div>}
     {event && !attendees && !share && <EventDetail event={event} edit={edit} />}
     {event && attendees && !share && <EventAttendeeList event={event} />}
