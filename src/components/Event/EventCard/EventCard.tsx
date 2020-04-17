@@ -32,12 +32,6 @@ export default function EventCard(props: EventCardProps) {
     navigate(url.toEvent(location, event.id))
   }
 
-  function handleShare(e: React.MouseEvent<any>) {
-    e.preventDefault()
-    e.stopPropagation()
-    navigate(url.toEventShare(location, event.id))
-  }
-
   return (
     <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
@@ -57,7 +51,7 @@ export default function EventCard(props: EventCardProps) {
 
         <Card.Header>{event.name}</Card.Header>
         <Card.Description>
-          <AttendingButtons event={event} onShareFallback={handleShare} />
+          <AttendingButtons event={event} />
         </Card.Description>
       </Card.Content>
     </Card>)
