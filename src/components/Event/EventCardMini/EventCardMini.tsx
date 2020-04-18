@@ -4,9 +4,9 @@ import { useLocation } from '@reach/router'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import { toMonthName } from 'decentraland-gatsby/dist/components/Date/utils'
 import { EventAttributes } from '../../../entities/Event/types'
 import JumpInButton from '../../Button/JumpInButton'
-import { toMonthName } from '../../Date/utils'
 
 import url from '../../../utils/url'
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Events, { NewEvent, UpdateEvent } from "../api/Events";
-import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime } from "../components/Date/utils";
+import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime } from "decentraland-gatsby/dist/components/Date/utils";
 import isURL from "validator/lib/isURL";
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60

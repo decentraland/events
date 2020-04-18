@@ -19,6 +19,7 @@ import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import { toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -26,7 +27,6 @@ import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import { EventAttributes } from "../entities/Event/types"
-import { toMonthName } from "../components/Date/utils"
 import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 import SEO from "../components/seo"
 import Events from "../api/Events"

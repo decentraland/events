@@ -3,10 +3,10 @@ import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Butt
 import TokenList from "decentraland-gatsby/dist/utils/TokenList"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile";
 import track from "decentraland-gatsby/dist/components/Segment/track";
+import { toCalendarDate } from "decentraland-gatsby/dist/components/Date/utils";
 
 import { EventAttributes } from "../../entities/Event/types";
 import { jumpTo } from "./JumpInButton";
-import { toCalendarDate } from "../Date/utils";
 import * as segment from '../../utils/segment'
 
 import './AddToCalendarButton.css'

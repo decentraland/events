@@ -14,13 +14,13 @@ import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
+import { toMonthName, toDayName } from 'decentraland-gatsby/dist/components/Date/utils'
 import { EventAttributes } from '../../../../entities/Event/types'
-import { toMonthName, toDayName, toTimezoneName } from '../../../Date/utils'
 import AttendingButtons from '../../../Button/AttendingButtons'
 import EditButtons from '../../../Button/EditButtons'
 import JumpInButton from '../../../Button/JumpInButton'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
-import DateBox from '../../../Date/DateBox'
 import url from '../../../../utils/url'
 import useEventEditor from '../../../../hooks/useEventEditor'
 import stores from '../../../../utils/store'
@@ -188,29 +188,27 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {', '}
             {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
             {' '}
-            {start_at.getDate()}
+            {start_at.getUTCDate()}
             {duration === 0 && <>
               {' '}
-              {start_at.getHours()}
-              {start_at.getMinutes() > 0 && ':'}
-              {start_at.getMinutes() > 0 && start_at.getMinutes()}
-              {start_at.getHours() > 12 ? 'pm' : 'am'}
+              {start_at.getUTCHours()}
+              {start_at.getUTCMinutes() > 0 && ':'}
+              {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
+              {start_at.getUTCHours() > 12 ? 'pm' : 'am'}
             </>}
             {duration > 0 && <>
               {' from '}
-              {start_at.getHours()}
-              {start_at.getMinutes() > 0 && ':'}
-              {start_at.getMinutes() > 0 && start_at.getMinutes()}
-              {start_at.getHours() > 12 ? 'pm' : 'am'}
+              {start_at.getUTCHours()}
+              {start_at.getUTCMinutes() > 0 && ':'}
+              {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
+              {start_at.getUTCHours() > 12 ? 'pm' : 'am'}
               {' to '}
-              {finish_at.getHours()}
-              {finish_at.getMinutes() > 0 && ':'}
-              {finish_at.getMinutes() > 0 && finish_at.getMinutes()}
-              {finish_at.getHours() > 12 ? 'pm' : 'am'}
+              {finish_at.getUTCHours()}
+              {finish_at.getUTCMinutes() > 0 && ':'}
+              {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
+              {finish_at.getUTCHours() > 12 ? 'pm' : 'am'}
             </>}
-            {' ('}
-            {toTimezoneName(start_at)}
-            {')'}
+            {' UTC'}
           </Paragraph>
         </div>}
         {!edit && duration >= DAY && <div className="EventDetail__Detail__Item">
@@ -220,15 +218,13 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {', '}
             {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
             {' '}
-            {start_at.getDate()}
+            {start_at.getUTCDate()}
             {' '}
-            {start_at.getHours()}
-            {start_at.getMinutes() > 0 && ':'}
-            {start_at.getMinutes() > 0 && start_at.getMinutes()}
-            {start_at.getHours() > 12 ? 'pm' : 'am'}
-            {' ('}
-            {toTimezoneName(start_at)}
-            {')'}
+            {start_at.getUTCHours()}
+            {start_at.getUTCMinutes() > 0 && ':'}
+            {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
+            {start_at.getUTCHours() > 12 ? 'pm' : 'am'}
+            {' UTC'}
           </Paragraph>
           <Paragraph >
             <code>{'  TO: '}</code>
@@ -236,15 +232,13 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {', '}
             {toMonthName(finish_at, { short: true, capitalized: true })}
             {' '}
-            {finish_at.getDate()}
+            {finish_at.getUTCDate()}
             {' '}
-            {finish_at.getHours()}
-            {finish_at.getMinutes() > 0 && ':'}
-            {finish_at.getMinutes() > 0 && finish_at.getMinutes()}
-            {finish_at.getHours() > 12 ? 'pm' : 'am'}
-            {' ('}
-            {toTimezoneName(start_at)}
-            {')'}
+            {finish_at.getUTCHours()}
+            {finish_at.getUTCMinutes() > 0 && ':'}
+            {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
+            {finish_at.getUTCHours() > 12 ? 'pm' : 'am'}
+            {' UTC'}
           </Paragraph>
         </div>}
         {!edit && <div className="EventDetail__Detail__Action">

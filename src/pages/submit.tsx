@@ -9,13 +9,13 @@ import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import { Field } from 'decentraland-ui/dist/components/Field/Field'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { toInputDate } from "decentraland-gatsby/dist/components/Date/utils"
 import track from "decentraland-gatsby/dist/components/Segment/track"
 
 import Layout from "../components/Layout/Layout"
 import SEO from "../components/seo"
 import useEventEditor from "../hooks/useEventEditor"
 import BackButton from "../components/Button/BackButton"
-import { toInputDate } from "../components/Date/utils"
 import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 import url from '../utils/url'
 import * as segment from '../utils/segment'
