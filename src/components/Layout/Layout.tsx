@@ -46,6 +46,7 @@ export default function Layout({ children, ...props }: any) {
   return (
     <>
       <Navbar
+        activePage="events"
         className={isScrolled ? "" : "initial"}
         rightMenu={(actions.provider || !isMobile) && <>
           {!profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.connect()}>Sign in</Button>}
