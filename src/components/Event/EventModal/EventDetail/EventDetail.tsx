@@ -191,22 +191,22 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {start_at.getUTCDate()}
             {duration === 0 && <>
               {' '}
-              {start_at.getUTCHours()}
+              {start_at.getUTCHours() % 12 || 12}
               {start_at.getUTCMinutes() > 0 && ':'}
               {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-              {start_at.getUTCHours() > 12 ? 'pm' : 'am'}
+              {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
             </>}
             {duration > 0 && <>
               {' from '}
-              {start_at.getUTCHours()}
+              {start_at.getUTCHours() % 12 || 12}
               {start_at.getUTCMinutes() > 0 && ':'}
               {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-              {start_at.getUTCHours() > 12 ? 'pm' : 'am'}
+              {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
               {' to '}
-              {finish_at.getUTCHours()}
+              {finish_at.getUTCHours() % 12 || 12}
               {finish_at.getUTCMinutes() > 0 && ':'}
               {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
-              {finish_at.getUTCHours() > 12 ? 'pm' : 'am'}
+              {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
             </>}
             {' UTC'}
           </Paragraph>
@@ -220,10 +220,10 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {' '}
             {start_at.getUTCDate()}
             {' '}
-            {start_at.getUTCHours()}
+            {start_at.getUTCHours() % 12 || 12}
             {start_at.getUTCMinutes() > 0 && ':'}
             {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-            {start_at.getUTCHours() > 12 ? 'pm' : 'am'}
+            {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
             {' UTC'}
           </Paragraph>
           <Paragraph >
@@ -234,10 +234,10 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {' '}
             {finish_at.getUTCDate()}
             {' '}
-            {finish_at.getUTCHours()}
+            {finish_at.getUTCHours() % 12 || 12}
             {finish_at.getUTCMinutes() > 0 && ':'}
             {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
-            {finish_at.getUTCHours() > 12 ? 'pm' : 'am'}
+            {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
             {' UTC'}
           </Paragraph>
         </div>}
