@@ -1,9 +1,8 @@
 FROM node:12-alpine
 
-
-RUN apk update && \
-  apk --no-cache upgrade && \
-  apk --no-cache add git && \
+RUN apk add --update-cache --virtual native-deps \
+  g++ gcc libgcc libstdc++ linux-headers make python && \
+  apk del native-deps && \
   rm -rf /var/cache/apk/*
 
 WORKDIR /app
@@ -21,6 +20,7 @@ COPY ./gatsby-node.js    /app/gatsby-node.js
 COPY ./gatsby-ssr.js     /app/gatsby-ssr.js
 COPY ./gatsby-ssr.js     /app/gatsby-ssr.js
 COPY ./tsconfig.json     /app/tsconfig.json
+COPY ./.env.*            /app/
 
 RUN npm run build
 
