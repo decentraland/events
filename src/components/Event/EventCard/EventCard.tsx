@@ -13,6 +13,8 @@ import url from '../../../utils/url'
 
 import './EventCard.css'
 
+const info = require('../../../images/primary-info.svg')
+
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const EVENTS_LIST = 3
 
@@ -22,7 +24,10 @@ export type EventCardProps = {
 
 export default function EventCard(props: EventCardProps) {
   const event = props.event
+  const now = Date.now()
   const startAt = new Date(Date.parse(event.start_at.toString()))
+  const finishAt = new Date(Date.parse(event.finish_at.toString()))
+  const rightNow = now >= startAt.getTime() && now <= finishAt.getTime()
   const location = useLocation()
 
   function handleOpen(e: React.MouseEvent<any>) {
@@ -33,6 +38,9 @@ export default function EventCard(props: EventCardProps) {
 
   return (
     <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
+      {rightNow && <div className="EventCard__Now">
+        <span>NOW</span>
+      </div>}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">

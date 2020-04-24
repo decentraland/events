@@ -51,7 +51,6 @@ export default function IndexPage(props: any) {
   const eventsByMonth = useListEventsByMonth(events)
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [state])
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
-  const happeningEvents = useMemo(() => events.filter(event => event.approved && !event.rejected && event.start_at.getTime() <= now && event.finish_at.getTime() >= now), [state])
   const currentEvent = eventId && state.data[eventId] || null
 
   const [requireWallet, setRequireWallet] = useState(false)
@@ -121,11 +120,6 @@ export default function IndexPage(props: any) {
           <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
           <Card.Group>
             {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} />)}
-          </Card.Group></>}
-        {!state.loading && events.length > 0 && happeningEvents.length > 0 && <>
-          <div className="GroupTitle"><SubTitle>AT THIS MOMENT</SubTitle></div>
-          <Card.Group>
-            {happeningEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
           </Card.Group></>}
         {!state.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <>
           <div className="GroupTitle">

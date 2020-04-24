@@ -1,3 +1,8 @@
+.ui.card.EventCard {
+  position: relative;
+  overflow: hidden;
+}
+
 .ui.card.EventCard .date {
   font-size: 13px;
   font-weight: 600;
@@ -37,4 +42,20 @@
   box-sizing: content-box;
   top: 2px;
   position: relative;
+}
+
+.ui.card.EventCard .EventCard__Now {
+  background: var(--primary);
+  color: white;
+  text-transform: uppercase;
+  padding: 50px 50px 0.5em;
+  box-shadow: 0 0 1em rgba(0, 0, 0, 1);
+  position: absolute;
+  border-bottom: 2px solid white;
+  cursor: pointer;
+  transform: rotate(-45deg) translate(-20px, -60px);
+}
+
+.ui.card.EventCard .EventCard__Now span {
+  display: block;
 }
