@@ -4,8 +4,12 @@
   </a>
 </p>
 <h1 align="center">
-  Decentraland's community events
+  Community Events
 </h1>
+
+This website hosts a dApp used to upload and see what others are organizing inside the Decentraland virtual world.
+
+![Screenshot of events.decentraland.org taken in April 2020](events.screenshot.2020.04.24.png)
 
 ## License
 
