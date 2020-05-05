@@ -73,7 +73,7 @@ export async function notifyEditedEvent(event: EventAttributes) {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `:pencil2: user ${event.user_name} just edited his event: *<${url(event)}|${event.name}>*`
+          "text": `:pencil2: user ${event.user_name || 'Guest'} just edited his event: *<${url(event)}|${event.name}>*`
         }
       }
     ]
