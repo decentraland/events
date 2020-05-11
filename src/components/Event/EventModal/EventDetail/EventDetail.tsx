@@ -62,7 +62,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const editable = (event as any).editable
   const owner = event.user.toLowerCase() === profile?.address.toString().toLowerCase()
   const canSeeDetails = editable || owner
-  const edit = editable && props.edit
+  const edit = (editable || owner) && props.edit
   const editDetails = owner && props.edit
 
   const [edited, actions] = useEventEditor({
@@ -135,7 +135,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           {!edit && <SubTitle>{event.name}</SubTitle>}
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
         </div>
-        {editable && <div className="EventDetail__Header__Actions">
+        {(editable || owner) && <div className="EventDetail__Header__Actions">
           {edit && <Button basic onClick={handleCancel}> CANCEL </Button>}
           {!edit && <Button basic onClick={handleEdit}> EDIT </Button>}
         </div>}
@@ -342,7 +342,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       <Divider line />
       <div className="EventDetail__Actions">
         {!edit && event.approved && <AttendingButtons event={event} />}
-        {!edit && !event.approved && <EditButtons event={event} loading={state.loading} />}
+        {!edit && !event.approved && editable && <EditButtons event={event} loading={state.loading} />}
         {!!edit && <EditButtons event={event} loading={state.loading} onSave={handleSave} />}
       </div>
     </div>
