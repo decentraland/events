@@ -20,6 +20,7 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
+import API from "decentraland-gatsby/dist/utils/api/API"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -41,7 +42,6 @@ const primaryAdd = require('../images/primary-add.svg')
 export default function IndexPage(props: any) {
   const [profile, actions] = useProfile()
   const location = useLocation()
-  const now = Date.now()
   const searchParams = new URLSearchParams(location.search)
   const eventId = location && searchParams.get('event') || null
   const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
@@ -69,8 +69,18 @@ export default function IndexPage(props: any) {
 
   useAsyncEffect(async () => {
     stores.event.setLoading()
-    const events = await Events.get().getEvents()
-    stores.event.setEntities(events)
+    const [events, event] = await Promise.all([
+      API.catch(Events.get().getEvents()),
+      eventId && API.catch(Events.get().getEventById(eventId))
+    ])
+
+    if (events) {
+      stores.event.setEntities(events)
+    }
+
+    if (event) {
+      stores.event.setEntity(event)
+    }
   }, [profile])
 
   return (
