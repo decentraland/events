@@ -11,7 +11,8 @@ export default function useListEventsByMonth(events?: EventAttributes[] | null) 
     if (events && events.length) {
       for (const event of events) {
         if (event.finish_at.getTime() > now) {
-          const groupDate = new Date(event.start_at.getFullYear(), event.start_at.getMonth())
+          const start_at = event.finish_at.getTime() > now ? new Date(now) : event.start_at;
+          const groupDate = new Date(start_at.getFullYear(), start_at.getMonth())
           const groupKey = groupDate.toJSON()
 
           if (!group.has(groupKey)) {
