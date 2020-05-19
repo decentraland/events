@@ -45,7 +45,7 @@ export async function listEvents(req: WithAuth) {
 export async function getEvent(req: WithAuth<WithEvent>) {
   let attending = false
   if (req.auth) {
-    attending = (await EventAttendee.count({ user: req.auth })) > 0
+    attending = (await EventAttendee.count({ user: req.auth, event_id: req.event.id })) > 0
   }
 
   return { ...Event.toPublic(req.event, req.auth), attending }
