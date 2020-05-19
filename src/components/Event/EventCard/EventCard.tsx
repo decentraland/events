@@ -7,6 +7,7 @@ import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import { toMonthName } from 'decentraland-gatsby/dist/components/Date/utils'
 import { EventAttributes } from '../../../entities/Event/types'
+import Live from '../../Badge/Live'
 import JumpInButton from '../../Button/JumpInButton'
 import AttendingButtons from '../../Button/AttendingButtons'
 import url from '../../../utils/url'
@@ -27,7 +28,7 @@ export default function EventCard(props: EventCardProps) {
   const now = Date.now()
   const startAt = new Date(Date.parse(event.start_at.toString()))
   const finishAt = new Date(Date.parse(event.finish_at.toString()))
-  const rightNow = now >= startAt.getTime() && now <= finishAt.getTime()
+  const live = now >= startAt.getTime() && now <= finishAt.getTime()
   const location = useLocation()
 
   function handleOpen(e: React.MouseEvent<any>) {
@@ -38,9 +39,8 @@ export default function EventCard(props: EventCardProps) {
 
   return (
     <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
-      {rightNow && <div className="EventCard__Now">
-        <span>NOW</span>
-      </div>}
+      <div />
+      {live && <Live />}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
