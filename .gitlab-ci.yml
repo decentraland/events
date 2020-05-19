@@ -6,4 +6,4 @@ deploy:
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" > /dev/null
     - unzip awscliv2.zip > /dev/null
     - ./aws/install > /dev/null
-    - /usr/local/bin/aws s3 sync --acl=public-read public s3://events-decentraland-io-contentbucket-368b432/
+    - /usr/local/bin/aws s3 sync --acl=public-read public s3://events-decentraland-io-contentbucket-0dce4ae/
