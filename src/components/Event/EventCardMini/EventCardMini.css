@@ -61,12 +61,11 @@
   display: inline-block;
   min-width: 20px;
   height: 20px;
-  background: #37333d;
-  color: white;
+  background: white;
+  color: #37333d;
   font-weight: 600;
   border-radius: 10px;
   padding: 0 0.4em;
   box-sizing: content-box;
   line-height: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
 }
