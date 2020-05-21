@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal";
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList';
-import { EventAttributes } from "../../../entities/Event/types";
+import { SessionEventAttributes } from "../../../entities/Event/types";
 import EventAttendeeList from './EventAttendeeList/EventAttendeeList';
 import EventDetail from './EventDetail/EventDetail';
 
@@ -10,7 +10,7 @@ import './EventModal.css'
 const close = require('../../../images/remove.svg')
 
 export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
-  event?: EventAttributes | null
+  event?: SessionEventAttributes | null
   attendees?: boolean
   onEdit?: () => void
 }

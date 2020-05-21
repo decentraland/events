@@ -1,12 +1,68 @@
-.ui.button.JumpInButton {
-  padding: 0;
-  line-height: 13px;
-  display: inherit;
+.JumpInButton {
+  display: inline-block;
+  display: flex;
+  flex-wrap: nowrap;
+  position: relative;
 }
 
-.JumpInButton img {
-  margin-left: 6px;
+.JumpInButton .JumpInButton__Position {
+  padding: 4px 8px 4px 5px;
+  border-radius: 4px;
+  display: block;
+  background-color: var(--secondary);
+  margin-right: 2px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: 24px;
+}
+
+.JumpInButton.JumpInButton--compact .JumpInButton__Position {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 100%;
+  z-index: 1000;
+}
+
+.JumpInButton.JumpInButton--compact:hover .JumpInButton__Position {
+  display: flex;
+}
+
+.JumpInButton .JumpInButton__Position img {
   width: 16px;
+  margin-right: 4px;
+  display: block;
+}
+
+.JumpInButton .JumpInButton__Position span {
+  font-size: 13px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 16px;
+  display: block;
+  color: #736e7d;
+}
+
+.JumpInButton .JumpInButton__Icon {
+  padding: 5px;
+  border-radius: 4px;
+  display: block;
+  background-color: var(--primary);
+  width: 24px;
+  height: 24px;
+}
+
+.JumpInButton .JumpInButton__Icon img {
+  width: 14px;
   height: auto;
-  vertical-align: text-top;
+  display: block;
+}
+
+.ui.card .JumpInButton .JumpInButton__Icon img,
+.ui.card .JumpInButton .JumpInButton__Position img,
+.ui.cards > .card .JumpInButton .JumpInButton__Icon img,
+.ui.cards > .card .JumpInButton .JumpInButton__Position img {
+  vertical-align: super;
 }

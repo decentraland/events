@@ -16,7 +16,7 @@ import track from 'decentraland-gatsby/dist/components/Segment/track'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
 import { toMonthName, toDayName } from 'decentraland-gatsby/dist/components/Date/utils'
-import { EventAttributes } from '../../../../entities/Event/types'
+import { SessionEventAttributes } from '../../../../entities/Event/types'
 import AttendingButtons from '../../../Button/AttendingButtons'
 import EditButtons from '../../../Button/EditButtons'
 import JumpInButton from '../../../Button/JumpInButton'
@@ -41,7 +41,7 @@ const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const ATTENDEES_PREVIEW_LIMIT = 12
 
 export type EventDetailProps = {
-  event: EventAttributes,
+  event: SessionEventAttributes,
   edit?: boolean
 }
 
@@ -57,10 +57,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const position = (event?.coordinates || [0, 0]).join()
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const location = useLocation()
-  const [profile] = useProfile()
   const [state, setState] = useState<EventDetailState>({})
   const editable = (event as any).editable
-  const owner = event.user.toLowerCase() === profile?.address.toString().toLowerCase()
+  const owner = event.owned
   const canSeeDetails = editable || owner
   const edit = (editable || owner) && props.edit
   const editDetails = owner && props.edit
@@ -264,7 +263,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           </Paragraph>
         </div>}
         {!edit && <div className="EventDetail__Detail__Action">
-          <JumpInButton size="small" event={event} />
+          <JumpInButton event={event} />
         </div>}
       </div>
 
@@ -310,7 +309,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <img src={extra} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {editDetails && <input name="contact" placeholder="Contact" defaultValue={edited.details} onChange={actions.handleChange} />}
+          {editDetails && <input name="contact" placeholder="Contact" defaultValue={edited.details || ''} onChange={actions.handleChange} />}
           {!editDetails && event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
           {!editDetails && event.contact && isEmail(event.contact) && <Paragraph>
             <Link href={'mailto:' + event.contact} target="_blank">{event.contact}</Link>
@@ -329,7 +328,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <img src={extra} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {editDetails && <textarea name="details" placeholder="Event details" defaultValue={edited.details} rows={10} onChange={actions.handleChange} />}
+          {editDetails && <textarea name="details" placeholder="Event details" defaultValue={edited.details || ''} rows={10} onChange={actions.handleChange} />}
           {!editDetails && event.details && <Paragraph>{event.details}</Paragraph>}
           {!editDetails && !event.details && <Paragraph secondary={!event.details} >
             <Italic>No details</Italic>

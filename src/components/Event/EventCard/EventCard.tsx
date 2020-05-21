@@ -6,21 +6,20 @@ import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import { toMonthName } from 'decentraland-gatsby/dist/components/Date/utils'
-import { EventAttributes } from '../../../entities/Event/types'
+import { SessionEventAttributes } from '../../../entities/Event/types'
 import Live from '../../Badge/Live'
 import JumpInButton from '../../Button/JumpInButton'
 import AttendingButtons from '../../Button/AttendingButtons'
 import url from '../../../utils/url'
 
 import './EventCard.css'
-
-const info = require('../../../images/primary-info.svg')
+import EventDate from '../EventDate/EventDate'
 
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const EVENTS_LIST = 3
 
 export type EventCardProps = {
-  event: EventAttributes
+  event: SessionEventAttributes
 }
 
 export default function EventCard(props: EventCardProps) {
@@ -40,7 +39,7 @@ export default function EventCard(props: EventCardProps) {
   return (
     <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
       <div />
-      {live && <Live />}
+      {live && <Live primary={event.approved} />}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
@@ -50,9 +49,9 @@ export default function EventCard(props: EventCardProps) {
       <ImgFixed src={event.image} dimension="wide" />
       <Card.Content>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div className="date">{toMonthName(startAt, { utc: true })}{' '}{startAt.getUTCDate()}</div>
+          <EventDate event={event} />
           <div>
-            <JumpInButton size="small" event={event} />
+            <JumpInButton event={event} />
           </div>
         </div>
 

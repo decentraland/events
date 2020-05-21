@@ -1,7 +1,7 @@
 import API from 'decentraland-gatsby/dist/utils/api/API'
 import env from 'decentraland-gatsby/dist/utils/env'
 import Options from './Options'
-import { EventAttributes } from '../entities/Event/types'
+import { EventAttributes, SessionEventAttributes } from '../entities/Event/types'
 import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 
@@ -26,14 +26,17 @@ export default class Events extends API {
     return this.from(env('EVENTS_URL', this.Url))
   }
 
-  static parse(event: Record<string, any>): EventAttributes {
+  static parse(event: Record<string, any>): SessionEventAttributes {
     return {
       ...event,
       start_at: event.start_at && new Date(Date.parse(event.start_at.toString())),
       finish_at: event.finish_at && new Date(Date.parse(event.finish_at.toString())),
       created_at: event.created_at && new Date(Date.parse(event.created_at.toString())),
       updated_at: event.updated_at && new Date(Date.parse(event.updated_at.toString())),
-    } as EventAttributes
+      attending: Boolean(event.attending),
+      editable: Boolean(event.editable),
+      owned: Boolean(event.owned),
+    } as SessionEventAttributes
   }
 
   options(options: RequestOptions = {}) {

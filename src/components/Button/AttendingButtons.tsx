@@ -5,7 +5,7 @@ import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
-import { EventAttributes, PublicEventAttributes } from '../../entities/Event/types'
+import { EventAttributes, SessionEventAttributes } from '../../entities/Event/types'
 import Events from '../../api/Events'
 import stores from '../../utils/store'
 import { useLocation } from '@reach/router'
@@ -25,20 +25,18 @@ type AttendingButtonsState = {
 }
 
 export type AttendingButtonsProps = {
-  event: EventAttributes,
-  onShareFallback?: (e: React.MouseEvent<any>, event: EventAttributes) => void
+  event: SessionEventAttributes,
+  onShareFallback?: (e: React.MouseEvent<any>, event: SessionEventAttributes) => void
 }
 
 export default function AttendingButtons(props: AttendingButtonsProps) {
 
-  const event: PublicEventAttributes = props.event as any
+  const event: SessionEventAttributes = props.event
   const [state, patchState] = usePatchState<AttendingButtonsState>({ loading: false, sharing: false })
   const [profile, actions] = useProfile()
   const location = useLocation()
   const isMobile = useMobileDetector()
   const loading = actions.loading || state.loading
-
-
   const ethAddress = profile?.address.toString() || null
 
   function handleFallbackShare(url: string) {
