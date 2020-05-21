@@ -43,3 +43,8 @@
   top: 12px;
   left: 12px;
 }
+
+.ui.card.EventCard > .content > .header:not(.ui),
+.ui.cards > .card.EventCard > .content > .header:not(.ui) {
+  margin-top: 0;
+}
