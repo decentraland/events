@@ -14,15 +14,16 @@ export type EventAttributes = {
   rejected: boolean
   created_at: Date
   updated_at: Date
-  contact: string,
-  details: string,
+  contact: string | null,
+  details: string | null,
   total_attendees: number,
   latest_attendees: string[]
 }
 
-export type PublicEventAttributes = Omit<EventAttributes, 'contact' | 'details'> & {
+export type SessionEventAttributes = EventAttributes & {
   attending: boolean
   editable: boolean
+  owned: boolean
 }
 
 export type EventListOptions = {

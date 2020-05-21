@@ -1,5 +1,5 @@
 
-import React, { useMemo, useEffect, useState } from "react"
+import React, { useMemo, useEffect, useState, Fragment } from "react"
 import { useLocation } from "@reach/router"
 import { Link } from "gatsby-plugin-intl"
 import { navigate } from "gatsby"
@@ -52,6 +52,7 @@ export default function IndexPage(props: any) {
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [state])
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
   const currentEvent = eventId && state.data[eventId] || null
+  const loading = actions.loading || state.loading
 
   const [requireWallet, setRequireWallet] = useState(false)
   useEffect(() => {
@@ -68,20 +69,24 @@ export default function IndexPage(props: any) {
   }), [path])
 
   useAsyncEffect(async () => {
-    stores.event.setLoading()
-    const [events, event] = await Promise.all([
-      API.catch(Events.get().getEvents()),
-      eventId && API.catch(Events.get().getEventById(eventId))
-    ])
+    if (!actions.loading) {
+      stores.event.setLoading()
+      stores.event.clear()
 
-    if (events) {
+      const [events, event] = await Promise.all([
+        API.catch(Events.get().getEvents()),
+        eventId && API.catch(Events.get().getEventById(eventId))
+      ])
+
+      const newEvents = events || []
+
+      if (event) {
+        newEvents.pus(event)
+      }
+
       stores.event.setEntities(events)
     }
-
-    if (event) {
-      stores.event.setEntity(event)
-    }
-  }, [profile])
+  }, [profile, actions.loading])
 
   return (
     <Layout {...props}>
@@ -111,34 +116,34 @@ export default function IndexPage(props: any) {
             </Responsive>}
           </HeaderMenu.Right>
         </HeaderMenu>
-        {state.loading && <>
+        {loading && <>
           <Divider />
           <Loader active size="massive" style={{ position: 'relative' }} />
           <Divider />
         </>}
-        {!state.loading && events.length === 0 && <>
+        {!loading && events.length === 0 && <>
           <Divider />
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </>}
-        {!state.loading && events.length > 0 && attendingEvents.length > 0 && <>
+        {!loading && events.length > 0 && attendingEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
             {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
           </Card.Group></>}
-        {!state.loading && events.length > 0 && myEvents.length > 0 && <>
+        {!loading && events.length > 0 && myEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
           <Card.Group>
             {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} />)}
           </Card.Group></>}
-        {!state.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <>
+        {!loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
             <SubTitle>{toMonthName(date, { utc: true })}</SubTitle>
           </div>
           <Card.Group>
             {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
           </Card.Group>
-        </>)}
+        </Fragment>)}
       </Container>
     </Layout>
   )

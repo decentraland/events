@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
-import { EventAttributes, PublicEventAttributes } from '../../entities/Event/types'
+import { SessionEventAttributes } from '../../entities/Event/types'
 import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
@@ -15,14 +15,14 @@ type EditButtonsState = {
 }
 
 export type EditButtonsProps = {
-  event: EventAttributes,
+  event: SessionEventAttributes,
   loading?: boolean,
-  onSave?: (e: React.MouseEvent<any>, event: EventAttributes) => void
+  onSave?: (e: React.MouseEvent<any>, event: SessionEventAttributes) => void
 }
 
 export default function EditButtons(props: EditButtonsProps) {
 
-  const event: PublicEventAttributes = props.event as any
+  const event = props.event
   const [state, patchState] = usePatchState<EditButtonsState>({ loading: false })
   const [profile, actions] = useProfile()
   const loading = actions.loading || state.loading || props.loading

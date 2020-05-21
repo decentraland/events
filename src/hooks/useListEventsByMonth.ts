@@ -1,12 +1,12 @@
-import { EventAttributes } from "../entities/Event/types";
+import { SessionEventAttributes } from "../entities/Event/types";
 import { useMemo } from "react";
 
-export type EventGroup = [Date, EventAttributes[]]
+export type EventGroup = [Date, SessionEventAttributes[]]
 
-export default function useListEventsByMonth(events?: EventAttributes[] | null) {
+export default function useListEventsByMonth(events?: SessionEventAttributes[] | null) {
   return useMemo<EventGroup[]>(() => {
     const now = Date.now()
-    const group = new Map<string, EventAttributes[]>()
+    const group = new Map<string, SessionEventAttributes[]>()
 
     if (events && events.length) {
       for (const event of events) {

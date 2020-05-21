@@ -2,7 +2,7 @@
 import { Model, SQL, raw } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
-import { EventAttributes, PublicEventAttributes, EventListOptions } from './types'
+import { EventAttributes, SessionEventAttributes, EventListOptions } from './types'
 import { Address } from 'web3x/address'
 import EventAttendee from '../EventAttendee/model'
 import schema from '../Schema'
@@ -138,8 +138,9 @@ export default class Event extends Model<EventAttributes> {
     return this.validator(event) as boolean
   }
 
-  static toPublic(event: EventAttributes, user?: string | null): PublicEventAttributes | EventAttributes {
+  static toPublic(event: EventAttributes, user?: string | null): SessionEventAttributes | EventAttributes {
     const editable = isAdmin(user)
+    const owned = Boolean(user && event.user && event.user === user)
 
     if (event.user !== user && !editable) {
       event = utils.omit(event, ['contact', 'details'])
@@ -147,7 +148,8 @@ export default class Event extends Model<EventAttributes> {
 
     return {
       ...event,
-      editable
+      editable,
+      owned
     }
   }
 }

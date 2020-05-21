@@ -3,12 +3,6 @@
   background: #eee;
 }
 
-.ui.card.EventCardMini .date {
-  font-size: 13px;
-  font-weight: 600;
-  color: #736e7d;
-}
-
 .ui.card.EventCardMini .content {
   padding: 14px 14px 0;
 }
@@ -35,8 +29,8 @@
   border: 1px solid white;
   margin: 0;
   border-radius: 100%;
-  top: 74px;
-  right: 6px;
+  top: 15px;
+  right: 15px;
 }
 
 .ui.card.EventCardMini .JumpInButton img {
@@ -68,4 +62,10 @@
   padding: 0 0.4em;
   box-sizing: content-box;
   line-height: 20px;
+}
+
+.ui.card.EventCardMini:hover
+  .JumpInButton.JumpInButton--compact
+  .JumpInButton__Position {
+  display: flex;
 }
