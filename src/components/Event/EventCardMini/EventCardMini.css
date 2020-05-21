@@ -69,3 +69,8 @@
   .JumpInButton__Position {
   display: flex;
 }
+
+.ui.card.EventCardMini > .content > .header:not(.ui),
+.ui.cards > .card.EventCardMini > .content > .header:not(.ui) {
+  margin-top: 0;
+}
