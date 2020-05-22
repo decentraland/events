@@ -27,7 +27,7 @@ export default function JumpInButton({ event, href, compact, ...props }: JumpInB
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.stopPropagation()
-    track((analytics) => analytics.track(segment.Track.JumpIn, { ethAddress, event: event?.id }))
+    track((analytics) => analytics.track(segment.Track.JumpIn, { ethAddress, event: event?.id || null }))
     if (props.onClick) {
       props.onClick(e)
     }

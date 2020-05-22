@@ -63,7 +63,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       params.set('description', props.event.description)
     }
 
-    track((analytics) => analytics.track(segment.Track.Share, { ethAddress, medium: 'facebook' }))
+    track((analytics) => analytics.track(segment.Track.Share, { ethAddress, event: event?.id || null, medium: 'facebook' }))
     handleFallbackShare(`https://www.facebook.com/sharer/sharer.php?` + params.toString())
   }
 
@@ -81,7 +81,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       params.set('text', location.origin + url.toEvent(location, props.event.id))
     }
 
-    track((analytics) => analytics.track(segment.Track.Share, { ethAddress, medium: 'twitter' }))
+    track((analytics) => analytics.track(segment.Track.Share, { ethAddress, event: event?.id || null, medium: 'twitter' }))
     handleFallbackShare('https://twitter.com/intent/tweet?' + params.toString())
   }
 
@@ -108,7 +108,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           }
           stores.event.setEntity(newEvent as any)
 
-          track((analytics) => analytics.track(segment.Track.Going, { ethAddress }))
+          track((analytics) => analytics.track(segment.Track.Going, { ethAddress, event: event?.id || null }))
         }
       })
       .then(() => patchState({ loading: false }))
@@ -126,13 +126,13 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         text: event.description,
         url: location.origin + url.toEvent(location, event.id),
       })
-        .then(() => track((analytics) => analytics.track(segment.Track.Share, { ethAddress, medium: 'native' })))
+        .then(() => track((analytics) => analytics.track(segment.Track.Share, { ethAddress, event: event?.id || null, medium: 'native' })))
         .catch((err: Error) => console.error(err))
 
     } else {
       e.preventDefault()
       e.stopPropagation()
-      track((analytics) => analytics.track(segment.Track.ShareFallback, { ethAddress }))
+      track((analytics) => analytics.track(segment.Track.ShareFallback, { ethAddress, event: event?.id || null }))
       patchState({ sharing: true })
     }
   }
