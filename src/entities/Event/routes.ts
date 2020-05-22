@@ -7,13 +7,16 @@ import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { auth, WithAuth } from '../Auth/middleware';
-import { EventAttributes, adminPatchAttributes, patchAttributes } from './types';
+import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions } from './types';
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
+import { bool } from 'decentraland-gatsby/dist/entities/Route/param';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
+import { Request } from 'express';
+import Context from 'decentraland-gatsby/dist/entities/Route/context';
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
@@ -32,12 +35,17 @@ export default routes((router) => {
   router.patch(BASE_PATH, withAuth, withEventOwner, handle(updateEvent))
 })
 
-export async function listEvents(req: WithAuth) {
-  const options = {
+export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
+  const options: Partial<EventListOptions> = {
     user: req.auth,
     offset: Number(req.query['offset']),
     limit: Number(req.query['limit']),
   }
+
+  if (ctx.param('onlyAttendee', { defaultValue: false, parser: bool })) {
+    options.onlyAttendee = true
+  }
+
   const events = await Event.getEvents(options)
   return events.map((event) => Event.toPublic(event, req.auth))
 }

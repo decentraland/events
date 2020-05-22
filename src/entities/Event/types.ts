@@ -30,6 +30,7 @@ export type EventListOptions = {
   user: string | null | undefined,
   limit: number | null | undefined,
   offset: number | null | undefined,
+  onlyAttendee: boolean
 }
 
 export const patchAttributes: (keyof EventAttributes)[] = [

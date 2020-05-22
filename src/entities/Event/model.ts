@@ -80,22 +80,23 @@ export default class Event extends Model<EventAttributes> {
     }
   })
 
-  static async getEvents({ user, limit: limitValue, offset: offsetValue }: Partial<EventListOptions> = {}) {
+  static async getEvents(options: Partial<EventListOptions> = {}) {
 
     const query = SQL`
       SELECT 
         e.*
-        ${conditional(!!user, SQL`, a.user is not null as attending`)}
+        ${conditional(!!options.user, SQL`, a.user is not null as attending`)}
       FROM ${table(Event)} e
-        ${conditional(!!user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${user}`)}
+        ${conditional(!!options.user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${options.user}`)}
       WHERE
         e.finish_at > now()
         AND e.rejected IS FALSE
-        ${conditional(!user, SQL`AND e.approved IS TRUE`)}
-        ${conditional(!!user && !isAdmin(user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${user})`)}
+        ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
+        ${conditional(!!options.user && !isAdmin(options.user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`)}
+        ${conditional(!!options.onlyAttendee && !isAdmin(options.user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`)}
       ORDER BY start_at ASC
-      ${limit(limitValue)}
-      ${offset(offsetValue)}
+      ${limit(options.limit)}
+      ${offset(options.offset)}
     `
 
     return Event.query<EventAttributes>(query)

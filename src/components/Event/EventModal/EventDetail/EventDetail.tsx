@@ -21,6 +21,7 @@ import AttendingButtons from '../../../Button/AttendingButtons'
 import EditButtons from '../../../Button/EditButtons'
 import JumpInButton from '../../../Button/JumpInButton'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
+import Live from '../../../Badge/Live'
 import url from '../../../../utils/url'
 import useEventEditor from '../../../../hooks/useEventEditor'
 import stores from '../../../../utils/store'
@@ -54,6 +55,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const now = new Date()
   const { start_at, finish_at } = event || { start_at: now, finish_at: now }
   const duration = finish_at.getTime() - start_at.getTime()
+  const live = now.getTime() >= start_at.getTime() && now.getTime() < finish_at.getTime()
   const position = (event?.coordinates || [0, 0]).join()
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const location = useLocation()
@@ -241,7 +243,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           </Paragraph>
         </div>}
         {!edit && <div className="EventDetail__Detail__Action">
-          <AddToCalendarButton event={event} />
+          {!live && <AddToCalendarButton event={event} />}
+          {live && <Live primary />}
         </div>}
       </div>
 
