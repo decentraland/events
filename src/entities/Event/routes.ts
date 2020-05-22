@@ -69,6 +69,10 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const userProfile = req.authProfile!
   const data = req.body as EventAttributes
 
+  if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+    new RequestError('Empty event data', RequestError.BadRequest, { body: data })
+  }
+
   if (!data.url) {
     data.url = `${DECENTRALAND_URL}/?position=${(data.coordinates || [0, 0]).join(',')}`
   }

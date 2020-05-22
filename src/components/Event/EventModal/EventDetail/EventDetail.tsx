@@ -114,6 +114,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       .catch((error) => {
         console.log(error)
         setState({ loading: false, error: error.message })
+        track((analytics) => analytics.track(segment.Track.Error, { error: error.message, post: event, ...error }))
       })
   }
 

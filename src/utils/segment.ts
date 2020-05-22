@@ -11,5 +11,6 @@ export enum Track {
   ShareFallback = 'Share Fallback',
   Going = 'Going',
   AddToCalendar = 'Add To Calendar',
-  JumpIn = 'Jump In'
+  JumpIn = 'Jump In',
+  Error = 'Error',
 }
