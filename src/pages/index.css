@@ -1,3 +1,23 @@
+.dcl.tabs {
+  position: relative;
+}
+
+.dcl.tabs .ui.container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.dcl.tabs .ui.button {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+}
+
+.dcl.tabs .ui.container .ui.button {
+  bottom: 11px;
+}
+
 .dcl.header-menu {
   margin: 0;
 }

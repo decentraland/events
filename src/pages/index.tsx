@@ -5,16 +5,14 @@ import { Link } from "gatsby-plugin-intl"
 import { navigate } from "gatsby"
 
 import Layout from "../components/Layout/Layout"
-import Responsive from 'semantic-ui-react/dist/commonjs/addons/Responsive/Responsive'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
+import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import useEntityStore from "decentraland-gatsby/dist/hooks/useEntityStore"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
-import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import { HeaderMenu } from "decentraland-ui/dist/components/HeaderMenu/HeaderMenu"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import track from 'decentraland-gatsby/dist/components/Segment/track'
@@ -27,7 +25,7 @@ import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
-import { EventAttributes } from "../entities/Event/types"
+import { EventAttributes, SessionEventAttributes } from "../entities/Event/types"
 import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
 import SEO from "../components/seo"
 import Events from "../api/Events"
@@ -37,7 +35,7 @@ import * as segment from '../utils/segment'
 
 import './index.css'
 
-const primaryAdd = require('../images/primary-add.svg')
+const invertedAdd = require('../images/inverted-add.svg')
 
 export default function IndexPage(props: any) {
   const [profile, actions] = useProfile()
@@ -78,10 +76,10 @@ export default function IndexPage(props: any) {
         eventId && API.catch(Events.get().getEventById(eventId))
       ])
 
-      const newEvents = events || []
+      const newEvents: SessionEventAttributes[] = events || []
 
       if (event) {
-        newEvents.pus(event)
+        newEvents.push(event)
       }
 
       stores.event.setEntities(events)
@@ -93,29 +91,17 @@ export default function IndexPage(props: any) {
       <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EventModal event={currentEvent} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
-      <Container style={{ paddingTop: "110px" }}>
-        <HeaderMenu>
-          <HeaderMenu.Left>
-            <Title small>World Events</Title>
-          </HeaderMenu.Left>
-          <HeaderMenu.Right>
-            <Responsive
-              minWidth={Responsive.onlyTablet.minWidth}
-            >
-              <Button primary size="small" as={Link} to="/submit">
-                <img src={primaryAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
-                  SUBMIT EVENT
-            </Button>
-            </Responsive>
-            {actions.provider && <Responsive
-              maxWidth={Responsive.onlyMobile.maxWidth}
-            >
-              <Button basic size="small" as={Link} to="/submit">
-                SUBMIT EVENT
-            </Button>
-            </Responsive>}
-          </HeaderMenu.Right>
-        </HeaderMenu>
+      <div style={{ paddingTop: "75px" }} />
+      <Tabs>
+        <Tabs.Tab active>World Events</Tabs.Tab>
+        {/* <Tabs.Tab>My Assets</Tabs.Tab> */}
+        {/* <div style={{ flex: 1 }} /> */}
+        <Button basic size="small" as={Link} to="/submit">
+          <img src={invertedAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
+          SUBMIT EVENT
+        </Button>
+      </Tabs>
+      <Container>
         {loading && <>
           <Divider />
           <Loader active size="massive" style={{ position: 'relative' }} />
