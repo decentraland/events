@@ -70,7 +70,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const data = req.body as EventAttributes
 
   if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
-    new RequestError('Empty event data', RequestError.BadRequest, { body: data })
+    throw new RequestError('Empty event data', RequestError.BadRequest, { body: data })
   }
 
   if (!data.url) {
