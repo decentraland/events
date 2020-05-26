@@ -104,6 +104,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     scene_name: state?.data?.name || parcel?.data?.name || null,
     approved: false,
     rejected: false,
+    highlighted: false,
     total_attendees: 0,
     latest_attendees: [],
     created_at: now

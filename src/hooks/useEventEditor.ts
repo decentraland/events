@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { eventSchema } from "../entities/Event/types";
 import Events, { NewEvent, UpdateEvent } from "../api/Events";
 import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime } from "decentraland-gatsby/dist/components/Date/utils";
 import isURL from "validator/lib/isURL";
@@ -148,6 +149,8 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
       case 'description':
       case 'details':
       case 'contact':
+        return setValue(name, String(value || '').slice(0, eventSchema.properties[name].maxLength))
+
       case 'image':
       case 'url':
         return setValue(name, value)
