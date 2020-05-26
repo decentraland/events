@@ -2,7 +2,7 @@
 import { Model, SQL, raw } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
-import { EventAttributes, SessionEventAttributes, EventListOptions } from './types'
+import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema } from './types'
 import { Address } from 'web3x/address'
 import EventAttendee from '../EventAttendee/model'
 import schema from '../Schema'
@@ -11,74 +11,7 @@ import isAdmin from '../Auth/isAdmin';
 export default class Event extends Model<EventAttributes> {
   static tableName = 'events'
 
-  static validator = schema.compile({
-    type: 'object',
-    additionalProperties: false,
-    required: [
-      'name',
-      'start_at',
-      'finish_at',
-      'coordinates'
-    ],
-    properties: {
-      name: {
-        type: 'string',
-        minLength: 0,
-        maxLength: 100,
-      },
-      description: {
-        type: ['string', 'null'],
-        minLength: 0,
-        maxLength: 5000,
-      },
-      approved: {
-        type: 'boolean'
-      },
-      rejected: {
-        type: 'boolean'
-      },
-      image: {
-        type: ['string', 'null'],
-        format: 'url',
-        optional: true,
-      },
-      start_at: {
-        type: 'string',
-        format: 'date-time'
-      },
-      finish_at: {
-        type: 'string',
-        format: 'date-time'
-      },
-      coordinates: {
-        type: 'array',
-        minItems: 2,
-        maxItems: 2,
-        items: {
-          type: 'number',
-          maximum: 150,
-          minimum: -150,
-        }
-      },
-      contact: {
-        type: ['string', 'null'],
-      },
-      details: {
-        type: ['string', 'null'],
-        minLength: 0,
-        maxLength: 500,
-      },
-      url: {
-        type: 'string',
-        format: 'url',
-      },
-      scene_name: {
-        type: ['string', 'null'],
-        minLength: 0,
-        maxLength: 500,
-      }
-    }
-  })
+  static validator = schema.compile(eventSchema)
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
 
