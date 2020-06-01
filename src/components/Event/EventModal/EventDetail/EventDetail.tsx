@@ -11,7 +11,6 @@ import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
-import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
@@ -42,8 +41,8 @@ const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const ATTENDEES_PREVIEW_LIMIT = 12
 
 export type EventDetailProps = {
-  event: SessionEventAttributes,
-  edit?: boolean
+  event: SessionEventAttributes
+  onEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
 }
 
 export type EventDetailState = {
@@ -63,8 +62,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const editable = (event as any).editable
   const owner = event.owned
   const canSeeDetails = editable || owner
-  const edit = (editable || owner) && props.edit
-  const editDetails = owner && props.edit
+  const edit = (editable || owner) && false //props.edit
+  const editDetails = owner && false // props.edit
 
   const [edited, actions] = useEventEditor({
     name: event.name,
@@ -87,11 +86,13 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       url: event.url,
     })
 
-    navigate(url.toEvent(location, event.id))
+    // navigate(url.toEvent(location, event.id))
   }
 
-  function handleEdit() {
-    navigate(url.toEventEdit(location, event.id))
+  function handleEdit(e: React.MouseEvent<HTMLButtonElement>) {
+    if (props.onEdit) {
+      props.onEdit(e, event)
+    }
   }
 
   function handleSave() {
@@ -138,8 +139,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
         </div>
         {(editable || owner) && <div className="EventDetail__Header__Actions">
-          {edit && <Button basic onClick={handleCancel}> CANCEL </Button>}
-          {!edit && <Button basic onClick={handleEdit}> EDIT </Button>}
+          {props.onEdit && <Button basic onClick={handleEdit}> EDIT </Button>}
         </div>}
       </div>
 

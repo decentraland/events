@@ -94,11 +94,12 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const content = await Land.get().getMapContent([x, y], [x, y])
   const state = content.assets.estates[0]
   const parcel = content.assets.parcels[0]
+  const image = data.image || (state ? Land.get().getEstateImage(state.id) : Land.get().getParcelImage([x, y]))
 
   const event: EventAttributes = {
     ...data,
     id: event_id,
-    image: state ? Land.get().getEstateImage(state.id) : Land.get().getParcelImage([x, y]),
+    image,
     user: user.toLowerCase(),
     user_name: userProfile.name || null,
     scene_name: state?.data?.name || parcel?.data?.name || null,

@@ -70,5 +70,6 @@ yarn-error.log
 
 lib
 public
+tmp
 node_modules
 tsconfig.tsbuildinfo

@@ -1,6 +1,4 @@
 import React from 'react'
-import { navigate } from 'gatsby'
-import { useLocation } from '@reach/router'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
@@ -8,23 +6,23 @@ import { SessionEventAttributes } from '../../../entities/Event/types'
 import JumpInButton from '../../Button/JumpInButton'
 import EventDate from '../EventDate/EventDate'
 
-import url from '../../../utils/url'
-
 import './EventCardMini.css'
 
 export type EventCardMiniProps = {
-  event: SessionEventAttributes
+  event: SessionEventAttributes,
+  href?: string,
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
 
 export default function EventCardMini(props: EventCardMiniProps) {
   const event = props.event
-  const location = useLocation()
-  function handleOpenEvent(e: React.MouseEvent<any>) {
-    e.preventDefault()
-    navigate(url.toEvent(location, event.id))
+  function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (props.onClick) {
+      props.onClick(e, props.event)
+    }
   }
 
-  return <Card key={'attending:' + event.id} className={TokenList.join(['EventCardMini', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpenEvent}>
+  return <Card key={'attending:' + event.id} className={TokenList.join(['EventCardMini', !event.approved && 'pending'])} href={props.href} onClick={handleClick}>
     <JumpInButton event={event} compact />
     <div style={{ display: 'flex' }}>
       <div style={{ flex: '0 0 96px', position: 'relative' }}>

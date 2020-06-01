@@ -1,16 +1,12 @@
 import React from 'react'
-import { navigate } from 'gatsby'
-import { useLocation } from '@reach/router'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
-import { toMonthName } from 'decentraland-gatsby/dist/components/Date/utils'
 import { SessionEventAttributes } from '../../../entities/Event/types'
 import Live from '../../Badge/Live'
 import JumpInButton from '../../Button/JumpInButton'
 import AttendingButtons from '../../Button/AttendingButtons'
-import url from '../../../utils/url'
 
 import './EventCard.css'
 import EventDate from '../EventDate/EventDate'
@@ -19,7 +15,9 @@ const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const EVENTS_LIST = 3
 
 export type EventCardProps = {
-  event: SessionEventAttributes
+  event: SessionEventAttributes,
+  href?: string,
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
 
 export default function EventCard(props: EventCardProps) {
@@ -28,16 +26,15 @@ export default function EventCard(props: EventCardProps) {
   const startAt = new Date(Date.parse(event.start_at.toString()))
   const finishAt = new Date(Date.parse(event.finish_at.toString()))
   const live = now >= startAt.getTime() && now <= finishAt.getTime()
-  const location = useLocation()
 
-  function handleOpen(e: React.MouseEvent<any>) {
-    e.preventDefault()
-    e.stopPropagation()
-    navigate(url.toEvent(location, event.id))
+  function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (props.onClick) {
+      props.onClick(e, props.event)
+    }
   }
 
   return (
-    <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={url.toEvent(location, event.id)} onClick={handleOpen} >
+    <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={props.href} onClick={handleClick} >
       <div />
       {live && <Live primary={event.approved} />}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
