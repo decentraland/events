@@ -1,6 +1,6 @@
 import React from 'react'
-import './Live.css'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import './Live.css'
 
 export type LiveProps = {
   primary?: boolean,

@@ -84,6 +84,9 @@ export const eventSchema = {
     rejected: {
       type: 'boolean'
     },
+    highlighted: {
+      type: 'boolean'
+    },
     image: {
       type: ['string', 'null'],
       format: 'url',

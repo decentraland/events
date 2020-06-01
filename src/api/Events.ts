@@ -4,6 +4,7 @@ import Options from './Options'
 import { EventAttributes, SessionEventAttributes } from '../entities/Event/types'
 import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
+import { PosterAttributes } from '../entities/Poster/types'
 
 export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'coordinates' | 'url' | 'start_at' | 'finish_at' | 'image'>
 export type UpdateEvent = Pick<EventAttributes, 'id'> & Partial<Omit<EventAttributes, 'id'>>
@@ -123,5 +124,11 @@ export default class Events extends API {
 
   async getEventById(eventId: string) {
     return this.fetchOne(`/events/${eventId}`, this.options().authorization())
+  }
+
+  async uploadPoster(file: File): Promise<PosterAttributes> {
+    const body = new FormData()
+    body.append('poster', file)
+    return this.fetch(`/poster`, this.options({ method: 'POST', body }).authorization())
   }
 }

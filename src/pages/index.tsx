@@ -1,8 +1,7 @@
 
 import React, { useMemo, useEffect, useState, Fragment } from "react"
 import { useLocation } from "@reach/router"
-import { Link } from "gatsby-plugin-intl"
-import { navigate } from "gatsby"
+import { navigate } from "gatsby-plugin-intl"
 
 import Layout from "../components/Layout/Layout"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
@@ -10,15 +9,11 @@ import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
-import useEntityStore from "decentraland-gatsby/dist/hooks/useEntityStore"
-import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import track from 'decentraland-gatsby/dist/components/Segment/track'
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
-import API from "decentraland-gatsby/dist/utils/api/API"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -30,74 +25,74 @@ import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequire
 import SEO from "../components/seo"
 import Events from "../api/Events"
 import url from '../utils/url'
-import stores from '../utils/store'
+import useSiteStore from '../hooks/useSiteStore'
 import * as segment from '../utils/segment'
 
 import './index.css'
+import useAnalytics from "../hooks/useAnalytics"
 
 const invertedAdd = require('../images/inverted-add.svg')
 
 export default function IndexPage(props: any) {
-  const [profile, actions] = useProfile()
+  const [profile, profileActions] = useProfile()
   const location = useLocation()
-  const searchParams = new URLSearchParams(location.search)
-  const eventId = location && searchParams.get('event') || null
-  const isListingAttendees = location && searchParams.get('view') === 'attendees' || false
-  const isEditing = location && searchParams.get('view') === 'edit' || false
-  const state = useEntityStore(stores.event)
+  const eventId = url.getEventId(location)
+  const isListingAttendees = url.isEventAttendees(location)
+  const siteStore = useSiteStore(props.location)
+  const state = siteStore.events.getState()
   const events = useListEvents(state.data)
   const eventsByMonth = useListEventsByMonth(events)
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [state])
   const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [state])
   const currentEvent = eventId && state.data[eventId] || null
-  const loading = actions.loading || state.loading
+  const loading = profileActions.loading || state.loading
 
   const [requireWallet, setRequireWallet] = useState(false)
   useEffect(() => {
-    if (Boolean(actions.error && actions.error.code === 'CONNECT_ERROR')) {
+    if (Boolean(profileActions.error && profileActions.error.code === 'CONNECT_ERROR')) {
       setRequireWallet(true)
     }
-  }, [actions.error, actions.error && actions.error.code])
+  }, [profileActions.error, profileActions.error && profileActions.error.code])
 
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
-  useEffect(() => track((analytics) => {
+
+  useAnalytics((analytics) => {
     const name = currentEvent ? segment.Page.Event : segment.Page.Home
     analytics.page(name, { title, path })
-  }), [path])
+  }, [path])
 
-  useAsyncEffect(async () => {
-    if (!actions.loading) {
-      stores.event.setLoading()
-      stores.event.clear()
+  function handleSubmit(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    navigate(url.toSubmit(location), siteStore.getNavigationState())
+  }
 
-      const [events, event] = await Promise.all([
-        API.catch(Events.get().getEvents()),
-        eventId && API.catch(Events.get().getEventById(eventId))
-      ])
+  function handleCloseModal(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    navigate(url.toHome(location), siteStore.getNavigationState())
+  }
 
-      const newEvents: SessionEventAttributes[] = events || []
+  function handleOpenModal(event: React.MouseEvent<any>, data: SessionEventAttributes) {
+    event.preventDefault()
+    navigate(url.toEvent(location, data.id), siteStore.getNavigationState())
+  }
 
-      if (event) {
-        newEvents.push(event)
-      }
-
-      stores.event.setEntities(events)
-    }
-  }, [profile, actions.loading])
+  function handleEdit(event: React.MouseEvent<any>, data: SessionEventAttributes) {
+    event.preventDefault()
+    navigate(url.toEventEdit(location, data.id), siteStore.getNavigationState())
+  }
 
   return (
     <Layout {...props}>
       <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
-      <EventModal event={currentEvent} attendees={isListingAttendees} edit={isEditing} onClose={() => navigate(url.toHome(location))} />
+      <EventModal event={currentEvent} attendees={isListingAttendees} onClose={handleCloseModal} onEdit={handleEdit} />
       <div style={{ paddingTop: "75px" }} />
       <Tabs>
         <Tabs.Tab active>World Events</Tabs.Tab>
         {/* <Tabs.Tab>My Assets</Tabs.Tab> */}
-        {/* <div style={{ flex: 1 }} /> */}
-        <Button basic size="small" as={Link} to="/submit">
-          <img src={invertedAdd} style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} width="16" height="16" />
+        <Button basic size="small" onClick={handleSubmit}>
+          <img src={invertedAdd} width="16" height="16" style={{ width: '16px', height: 'auto', verticalAlign: 'text-bottom', marginRight: '1rem' }} />
           SUBMIT EVENT
         </Button>
       </Tabs>
@@ -115,19 +110,19 @@ export default function IndexPage(props: any) {
         {!loading && events.length > 0 && attendingEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
-            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} />)}
+            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
           </Card.Group></>}
         {!loading && events.length > 0 && myEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
           <Card.Group>
-            {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} />)}
+            {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
           </Card.Group></>}
         {!loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
             <SubTitle>{toMonthName(date, { utc: true })}</SubTitle>
           </div>
           <Card.Group>
-            {events.map((event) => <EventCard key={'event:' + event.id} event={event} />)}
+            {events.map((event) => <EventCard key={'event:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
           </Card.Group>
         </Fragment>)}
       </Container>

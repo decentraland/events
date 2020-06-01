@@ -12,7 +12,7 @@ const close = require('../../../images/remove.svg')
 export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: SessionEventAttributes | null
   attendees?: boolean
-  onEdit?: () => void
+  onEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
 }
 
 export default function EventModal({ event, attendees, edit, className, onClose, onEdit, ...props }: EventModalProps) {
@@ -22,7 +22,7 @@ export default function EventModal({ event, attendees, edit, className, onClose,
       <div className="EventModal__Action__Background" />
       <img src={close} width="14" height="14" />
     </div>}
-    {event && !attendees && <EventDetail event={event} edit={edit} />}
+    {event && !attendees && <EventDetail event={event} onEdit={onEdit} />}
     {event && attendees && <EventAttendeeList event={event} />}
   </Modal>
 }
