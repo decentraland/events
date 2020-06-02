@@ -2,8 +2,8 @@
 import { Model, SQL, raw } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
+import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema } from './types'
-import { Address } from 'web3x/address'
 import EventAttendee from '../EventAttendee/model'
 import schema from '../Schema'
 import isAdmin from '../Auth/isAdmin';
@@ -36,7 +36,7 @@ export default class Event extends Model<EventAttributes> {
   }
 
   static async getAttending(user?: string | null) {
-    if (!Address.isAddress(user || '')) {
+    if (!isEthereumAddress(user || '')) {
       return []
     }
 

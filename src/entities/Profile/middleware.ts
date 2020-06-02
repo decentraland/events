@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { Address } from "web3x/address";
+import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import Katalyst, { Avatar } from "decentraland-gatsby/dist/utils/api/Katalyst";
 import API from "decentraland-gatsby/dist/utils/api/API";
 import { middleware } from "decentraland-gatsby/dist/entities/Route/handle";
@@ -20,7 +20,7 @@ export type WithProfileOptions = {
 }
 
 export function getUserParam(req: Request) {
-  return param(req, 'user', Address.isAddress)
+  return param(req, 'user', isEthereumAddress)
 }
 
 export function withProfile(options: WithProfileOptions = {}) {
