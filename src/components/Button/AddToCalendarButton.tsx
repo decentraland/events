@@ -6,10 +6,10 @@ import track from "decentraland-gatsby/dist/components/Segment/track";
 import { toCalendarDate } from "decentraland-gatsby/dist/components/Date/utils";
 
 import { EventAttributes } from "../../entities/Event/types";
-import { jumpTo } from "./JumpInButton";
 import * as segment from '../../utils/segment'
 
 import './AddToCalendarButton.css'
+import { eventUrl } from "../../entities/Event/utils";
 
 export type AddToCalendarButtonProps = ButtonProps & {
   event?: EventAttributes
@@ -38,7 +38,7 @@ function getGoogleCalendar(event?: EventAttributes | null) {
   }
 
   const { start_at, finish_at } = event
-  const url = jumpTo(event);
+  const url = eventUrl(event);
   const params = new URLSearchParams()
   params.set('text', event.name)
 

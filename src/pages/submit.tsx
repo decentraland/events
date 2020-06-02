@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import { useLocation } from '@reach/router'
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
@@ -7,6 +7,7 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import { Field } from 'decentraland-ui/dist/components/Field/Field'
+import { SelectField } from 'decentraland-ui/dist/components/SelectField/SelectField'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
@@ -57,6 +58,20 @@ export default function SubmitPage(props: any) {
   const siteStore = useSiteStore(props.location, { loading: !!eventId })
   const siteState = siteStore.events.getState()
   const [event, eventActions] = useEventEditor()
+  const realmOptions = useMemo(() => {
+    const result: { key: string, value: string, text: string }[] = [
+      { key: 'default', value: '', text: 'any realm' }
+    ]
+    const realms = siteStore.realms.getList() || []
+    for (let realm of realms) {
+      for (let layer of realm.layers) {
+        const key = `${realm.id}-${layer}`
+        result.push({ key, text: key, value: key })
+      }
+    }
+
+    return result
+  }, [siteStore.realms.getState()])
 
   useEffect(() => {
     if (Boolean(profileActions.error && profileActions.error.code === 'CONNECT_ERROR')) {
@@ -71,11 +86,12 @@ export default function SubmitPage(props: any) {
       const original = siteStore.events.getEntity(eventId)
 
       if (original) {
-        console.log(original)
         eventActions.setValues({
           name: original.name,
           description: original.description,
-          coordinates: original.coordinates,
+          x: original.x,
+          y: original.y,
+          realm: original.realm,
           start_at: original.start_at,
           finish_at: original.finish_at,
           image: original.image,
@@ -84,8 +100,6 @@ export default function SubmitPage(props: any) {
       }
     }
   }, [siteState.loading])
-
-  console.log(event)
 
   function handlePoster(file: File) {
     if (state.uploadingPoster) {
@@ -124,7 +138,7 @@ export default function SubmitPage(props: any) {
         navigate(url.toEvent(location, event.id), siteStore.getNavigationState())
       })
       .catch((error) => {
-        console.log(error)
+        console.error(error)
         patchState({ loading: false, error: error.message })
         track((analytics) => analytics.track(segment.Track.Error, { error: error.message, post: event, ...error }))
       })
@@ -192,7 +206,7 @@ export default function SubmitPage(props: any) {
                 <Grid stackable style={{ paddingTop: '48px' }}>
                   <Grid.Row>
                     <Grid.Column mobile="16">
-                      <ImageInput label="Event Cover" value={event.image} onFileChange={handlePoster} loading={state.uploadingPoster} error={coverError} message={
+                      <ImageInput label="Event Cover" value={event.image || ''} onFileChange={handlePoster} loading={state.uploadingPoster} error={coverError} message={
                         state.errorImageSize && <>This image is too heavy (more than 500Kb), try with <a href="https://imagecompressor.com/" target="_blank"><strong>optimizilla</strong></a></> ||
                         state.errorImageFormat && <>This file format is not supported, try with <strong>jpg</strong>, <strong>png</strong> or <strong>gif</strong></> ||
                         state.errorImageServer || ''}>
@@ -241,8 +255,14 @@ export default function SubmitPage(props: any) {
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row>
+                    <Grid.Column mobile="4">
+                      <Field label="Latitud" type="number" name="x" min="-150" max="150" error={!!errors['x']} message={errors['x']} value={event.x || 0} onChange={eventActions.handleChange} />
+                    </Grid.Column>
+                    <Grid.Column mobile="4">
+                      <Field label="Longitud" type="number" name="y" min="-150" max="150" error={!!errors['y']} message={errors['y']} value={event.y || 0} onChange={eventActions.handleChange} />
+                    </Grid.Column>
                     <Grid.Column mobile="8">
-                      <Field label="Decentraland coordinates" name="coordinates" error={!!errors['coordinates']} message={errors['coordinates']} value={event.coordinates.join(',')} onChange={eventActions.handleChange} />
+                      <SelectField label="Realm" placeholder="any realm" name="realm" error={!!errors['realm']} message={errors['realm']} options={realmOptions} value={event.realm || ''} onChange={eventActions.handleChange} />
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row>

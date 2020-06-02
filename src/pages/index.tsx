@@ -82,11 +82,16 @@ export default function IndexPage(props: any) {
     navigate(url.toEventEdit(location, data.id), siteStore.getNavigationState())
   }
 
+  function handleAttendees(event: React.MouseEvent<any>, data: SessionEventAttributes) {
+    event.preventDefault()
+    navigate(url.toEventAttendees(location, data.id), siteStore.getNavigationState())
+  }
+
   return (
     <Layout {...props}>
       <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
-      <EventModal event={currentEvent} attendees={isListingAttendees} onClose={handleCloseModal} onEdit={handleEdit} />
+      <EventModal event={currentEvent} attendees={isListingAttendees} onClose={handleCloseModal} onClickEdit={handleEdit} onClickAttendees={handleAttendees} />
       <div style={{ paddingTop: "75px" }} />
       <Tabs>
         <Tabs.Tab active>World Events</Tabs.Tab>

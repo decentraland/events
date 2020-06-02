@@ -7,13 +7,16 @@ import url from "../utils/url"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import Events from "../api/Events"
+import { Realm } from "../entities/Realm/types"
 
 export type SiteStore = {
   events?: EntityStore<SessionEventAttributes>
+  realms?: EntityStore<Realm>
 }
 
 export type SiteState = {
   events?: Partial<EntityStoreState<SessionEventAttributes>>
+  realms?: Partial<EntityStoreState<Realm>>
 }
 
 export type SiteLocationState = {
@@ -28,8 +31,8 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}, i
   const eventId = url.getEventId(location)
   const [profile, profileActions] = useProfile()
   const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events || INITIAL_STATE)
+  const realms = useStore<Realm>(siteInitialState?.state?.realms || INITIAL_STATE)
   const eventsState = events.getState()
-
 
   useAsyncEffect(async () => {
     if (!profileActions.loading && eventsState.loading) {
@@ -49,10 +52,18 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}, i
     }
   }, [profile, profileActions.loading])
 
+  useAsyncEffect(async () => {
+    if (realms.getList() === null) {
+      const newRealms = await Events.get().getRealms()
+      realms.setEntities(newRealms)
+    }
+  }, [])
+
   function getNavigationState(extraState: Record<string, any> = {}, replace: boolean = false): SiteLocationState {
     return {
       state: {
         events: events.getState(),
+        realms: realms.getState(),
         ...extraState,
       },
       replace
@@ -61,6 +72,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}, i
 
   return {
     events,
+    realms,
     getNavigationState
   }
 }

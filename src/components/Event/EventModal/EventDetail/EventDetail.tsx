@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
 import isEmail from 'validator/lib/isEmail'
@@ -11,7 +11,6 @@ import Divider from 'decentraland-gatsby/dist/components/Text/Divider'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
-import track from 'decentraland-gatsby/dist/components/Segment/track'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
 import { toMonthName, toDayName } from 'decentraland-gatsby/dist/components/Date/utils'
@@ -22,9 +21,6 @@ import JumpInButton from '../../../Button/JumpInButton'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
 import Live from '../../../Badge/Live'
 import url from '../../../../utils/url'
-import useEventEditor from '../../../../hooks/useEventEditor'
-import stores from '../../../../utils/store'
-import * as segment from '../../../../utils/segment'
 
 import './EventDetail.css'
 
@@ -32,9 +28,7 @@ const extra = require('../../../../images/info.svg')
 const info = require('../../../../images/secondary-info.svg')
 const clock = require('../../../../images/secondary-clock.svg')
 const pin = require('../../../../images/secondary-pin.svg')
-const jump = require('../../../../images/secondary-jump-in.svg')
 const friends = require('../../../../images/secondary-friends.svg')
-
 
 const DAY = 1000 * 60 * 60 * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
@@ -42,12 +36,8 @@ const ATTENDEES_PREVIEW_LIMIT = 12
 
 export type EventDetailProps = {
   event: SessionEventAttributes
-  onEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
-}
-
-export type EventDetailState = {
-  loading?: boolean,
-  error?: string | null
+  onClickEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
+  onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
 }
 
 export default function EventDetail({ event, ...props }: EventDetailProps) {
@@ -55,136 +45,61 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const { start_at, finish_at } = event || { start_at: now, finish_at: now }
   const duration = finish_at.getTime() - start_at.getTime()
   const live = now.getTime() >= start_at.getTime() && now.getTime() < finish_at.getTime()
-  const position = (event?.coordinates || [0, 0]).join()
+  const position = `${event.x},${event.y}`
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const location = useLocation()
-  const [state, setState] = useState<EventDetailState>({})
-  const editable = (event as any).editable
-  const owner = event.owned
-  const canSeeDetails = editable || owner
-  const edit = (editable || owner) && false //props.edit
-  const editDetails = owner && false // props.edit
-
-  const [edited, actions] = useEventEditor({
-    name: event.name,
-    description: event.description,
-    coordinates: event.coordinates,
-    start_at: event.start_at,
-    finish_at: event.finish_at,
-    image: event.image,
-    url: event.url,
-  })
-
-  function handleCancel() {
-    actions.setValues({
-      name: event.name,
-      description: event.description,
-      coordinates: event.coordinates,
-      start_at: event.start_at,
-      finish_at: event.finish_at,
-      image: event.image,
-      url: event.url,
-    })
-
-    // navigate(url.toEvent(location, event.id))
-  }
+  const advance = event.editable || event.owned
 
   function handleEdit(e: React.MouseEvent<HTMLButtonElement>) {
-    if (props.onEdit) {
-      props.onEdit(e, event)
+    if (props.onClickEdit) {
+      props.onClickEdit(e, event)
     }
   }
 
-  function handleSave() {
-    if (state.loading) {
-      return
+  function handleAttendees(e: React.MouseEvent<HTMLDivElement>) {
+    if (props.onClickAttendees) {
+      props.onClickAttendees(e, event)
     }
-
-    if (!actions.validate()) {
-      return
-    }
-
-    setState({ loading: true })
-    actions.update(event.id)
-      .then((updatedEvent) => {
-        stores.event.setEntity(updatedEvent)
-        navigate(url.toEvent(location, event.id))
-        setState({ loading: false })
-        track((analytics) => analytics.track(segment.Track.EditEvent, { event: updatedEvent }))
-      })
-      .catch((error) => {
-        console.log(error)
-        setState({ loading: false, error: error.message })
-        track((analytics) => analytics.track(segment.Track.Error, { error: error.message, post: event, ...error }))
-      })
   }
 
   return <>
-    {event && <ImgFixed src={edited.image} dimension="wide" />}
-    {event && !edit && event.rejected && <div className="EventError"><code>This event was rejected</code></div>}
-    {event && !edit && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
+    {event && <ImgFixed src={event.image || ''} dimension="wide" />}
+    {event && event.rejected && <div className="EventError"><code>This event was rejected</code></div>}
+    {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
-      {edit && <div className="EventInput">
-        < input name="image" className={edited.errors['image'] && 'error'} defaultValue={edited.image || ''} onChange={actions.handleChange} />
-        {edited.errors['image'] && <Paragraph className="error" >{edited.errors['image']}</Paragraph>}
-      </div>}
       <div className="EventDetail__Header">
         <DateBox date={start_at} />
         <div className="EventDetail__Header__Event">
-          {edit && <>
-            <input name="name" className={edited.errors['name'] && 'error'} placeholder="Event name" defaultValue={edited.name} onChange={actions.handleChange} />
-            {edited.errors['name'] && <Paragraph className="error" >{edited.errors['name']}</Paragraph>}
-          </>}
-          {!edit && <SubTitle>{event.name}</SubTitle>}
+          <SubTitle>{event.name}</SubTitle>
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
         </div>
-        {(editable || owner) && <div className="EventDetail__Header__Actions">
-          {props.onEdit && <Button basic onClick={handleEdit}> EDIT </Button>}
+        {advance && <div className="EventDetail__Header__Actions">
+          {props.onClickEdit && <Button basic onClick={handleEdit}> EDIT </Button>}
         </div>}
       </div>
 
       {/* DESCRIPTION */}
       <Divider line />
-      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      <div className="EventDetail__Detail">
         <div className="EventDetail__Detail__Icon">
           <img src={info} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {edit && <>
-            <textarea name="description" placeholder="Event description" className={edited.errors['description'] && 'error'} defaultValue={edited.description} rows={10} onChange={actions.handleChange} />
-            {edited.errors['description'] && <Paragraph className="error" >{edited.errors['description']}</Paragraph>}
-          </>}
-          {!edit && !event.description && <Paragraph secondary={!event.description} >
+          {!event.description && <Paragraph secondary={!event.description} >
             <Italic>No description</Italic>
           </Paragraph>}
-          {!edit && event.description && <Markdown source={event.description} />}
+          {event.description && <Markdown source={event.description} />}
         </div>
         <div className="EventDetail__Detail__Action"></div>
       </div>
 
       {/* DATE */}
       <Divider line />
-      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      <div className="EventDetail__Detail">
         <div className="EventDetail__Detail__Icon">
           <img src={clock} width="16" height="16" />
         </div>
-        {edit && <div className="EventDetail__Detail__Item">
-          <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '.5em' }}>
-            <code>{'FROM: '}</code>
-            <input type="date" name="start_date" value={actions.getStartDate()} onChange={actions.handleChange} style={{ width: '200px' }} />
-            <input type="time" name="start_time" value={actions.getStartTime()} onChange={actions.handleChange} style={{ width: '125px' }} />
-            <code>{' UTC'}</code>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', paddingBottom: '.5em' }}>
-            <code>{'  TO: '}</code>
-            <input type="date" name="finish_date" value={actions.getFinishDate()} onChange={actions.handleChange} style={{ width: '200px' }} />
-            <input type="time" name="finish_time" value={actions.getFinishTime()} onChange={actions.handleChange} style={{ width: '125px' }} />
-            <code>{' UTC'}</code>
-          </div>
-          {edited.errors['start_at'] && <div><Paragraph className="error" >{edited.errors['finish_at']}</Paragraph></div>}
-          {edited.errors['finish_at'] && <div><Paragraph className="error" >{edited.errors['finish_at']}</Paragraph></div>}
-        </div>}
-        {!edit && duration < DAY && <div className="EventDetail__Detail__Item">
+        {duration < DAY && <div className="EventDetail__Detail__Item">
           <Paragraph >
             {toDayName(start_at, { capitalized: true, utc: true })}
             {', '}
@@ -213,7 +128,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {' UTC'}
           </Paragraph>
         </div>}
-        {!edit && duration >= DAY && <div className="EventDetail__Detail__Item">
+        {duration >= DAY && <div className="EventDetail__Detail__Item">
           <Paragraph >
             <code>{'FROM: '}</code>
             {toDayName(start_at, { capitalized: true, utc: true })}
@@ -243,7 +158,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {' UTC'}
           </Paragraph>
         </div>}
-        {!edit && <div className="EventDetail__Detail__Action">
+        {<div className="EventDetail__Detail__Action">
           {!live && <AddToCalendarButton event={event} />}
           {live && <Live primary />}
         </div>}
@@ -251,39 +166,20 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* PLACE */}
       <Divider line />
-      <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
+      <div className="EventDetail__Detail">
         <div className="EventDetail__Detail__Icon">
           <img src={pin} width="16" height="16" />
         </div>
-        {edit && <div className="EventDetail__Detail__Item">
-          <code>{'POSITION: '}</code>
-          <input name="coordinates" className={edited.errors['coordinates'] && 'error'} defaultValue={(edited.coordinates || []).join(',')} onChange={actions.handleChange} style={{ width: '125px' }} />
-          {edited.errors['coordinates'] && <Paragraph className="error" >{edited.errors['coordinates']}</Paragraph>}
-        </div>}
-        {!edit && <div className="EventDetail__Detail__Item">
+        <div className="EventDetail__Detail__Item">
           <Paragraph>
             {event.scene_name || 'Decentraland'}
             {position !== '0,0' && ` (${position})`}
           </Paragraph>
-        </div>}
-        {!edit && <div className="EventDetail__Detail__Action">
+        </div>
+        <div className="EventDetail__Detail__Action">
           <JumpInButton event={event} />
-        </div>}
+        </div>
       </div>
-
-      {/* EVENT TARGET */}
-      {edit && <Divider line />}
-      {edit && <div className={TokenList.join(['EventDetail__Detail', edit && 'EventDetail__Detail--edit'])}>
-        <div className="EventDetail__Detail__Icon">
-          <img src={jump} width="16" height="16" />
-        </div>
-        <div className="EventDetail__Detail__Item">
-          <code>{'JUMP IN: '}</code>
-          <input name="url" className={edited.errors['url'] && 'error'} defaultValue={edited.url || ''} onChange={actions.handleChange} style={{ width: 'calc(100% - 75px)' }} />
-          {edited.errors['url'] && <Paragraph className="error" >{edited.errors['url']}</Paragraph>}
-        </div>
-      </div>}
-
 
       {/* ATTENDEES */}
       <Divider line />
@@ -299,7 +195,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             attendeesDiff >= 10 && 'MoreThan10',
             attendeesDiff >= 100 && 'MoreThan100',
             attendeesDiff >= 1000 && 'MoreThan1000',
-          ])} onClick={() => navigate(url.toEventAttendees(location, event.id))}>
+          ])} onClick={handleAttendees}>
             {`+${attendeesDiff}`}
           </div>}
         </div>
@@ -307,18 +203,17 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </div>
 
       {/* CONTACT */}
-      {!event.approved && canSeeDetails && <Divider line />}
-      {!event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
+      {!event.approved && advance && <Divider line />}
+      {!event.approved && advance && <div className="EventDetail__Detail extra">
         <div className="EventDetail__Detail__Icon">
           <img src={extra} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {editDetails && <input name="contact" placeholder="Contact" defaultValue={edited.details || ''} onChange={actions.handleChange} />}
-          {!editDetails && event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
-          {!editDetails && event.contact && isEmail(event.contact) && <Paragraph>
+          {event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
+          {event.contact && isEmail(event.contact) && <Paragraph>
             <Link href={'mailto:' + event.contact} target="_blank">{event.contact}</Link>
           </Paragraph>}
-          {!editDetails && !event.contact && <Paragraph secondary={!event.contact} >
+          {!event.contact && <Paragraph secondary={!event.contact} >
             <Italic>No contact</Italic>
           </Paragraph>}
         </div>
@@ -326,15 +221,14 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </div>}
 
       {/* DETAILS */}
-      {!event.approved && canSeeDetails && <Divider line />}
-      {!event.approved && canSeeDetails && <div className={TokenList.join(['EventDetail__Detail', 'extra', edit && 'EventDetail__Detail--edit'])}>
+      {!event.approved && advance && <Divider line />}
+      {!event.approved && advance && <div className="EventDetail__Detail extra">
         <div className="EventDetail__Detail__Icon">
           <img src={extra} width="16" height="16" />
         </div>
         <div className="EventDetail__Detail__Item">
-          {editDetails && <textarea name="details" placeholder="Event details" defaultValue={edited.details || ''} rows={10} onChange={actions.handleChange} />}
-          {!editDetails && event.details && <Paragraph>{event.details}</Paragraph>}
-          {!editDetails && !event.details && <Paragraph secondary={!event.details} >
+          {event.details && <Paragraph>{event.details}</Paragraph>}
+          {!event.details && <Paragraph secondary={!event.details} >
             <Italic>No details</Italic>
           </Paragraph>}
         </div>
@@ -342,12 +236,16 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </div>}
 
       {/* SOCIAL */}
-      <Divider line />
-      <div className="EventDetail__Actions">
-        {!edit && event.approved && <AttendingButtons event={event} />}
-        {!edit && !event.approved && editable && <EditButtons event={event} loading={state.loading} />}
-        {!!edit && <EditButtons event={event} loading={state.loading} onSave={handleSave} />}
-      </div>
+      {event.approved && <Divider line />}
+      {event.approved && <div className="EventDetail__Actions">
+        <AttendingButtons event={event} />
+      </div>}
+
+      {/* APPROVE */}
+      {!event.approved && event.editable && <Divider line />}
+      {!event.approved && event.editable && <div className="EventDetail__Actions">
+        <EditButtons event={event} />
+      </div>}
     </div>
     }
   </>

@@ -8,6 +8,7 @@ import attendees from './entities/EventAttendee/routes'
 import profiles from './entities/Profile/routes'
 import social from './entities/Social/routes'
 import poster from './entities/Poster/routes'
+import realms from './entities/Realm/routes'
 
 const app = express()
 
@@ -20,7 +21,8 @@ app.use('/api', [
   events,
   poster,
   attendees,
-  profiles
+  profiles,
+  realms
 ])
 
 app.use(express.static('public'))

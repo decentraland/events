@@ -3,12 +3,12 @@ import { Model, SQL, raw } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema } from './types'
+import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes } from './types'
 import EventAttendee from '../EventAttendee/model'
 import schema from '../Schema'
 import isAdmin from '../Auth/isAdmin';
 
-export default class Event extends Model<EventAttributes> {
+export default class Event extends Model<DeprecatedEventAttributes> {
   static tableName = 'events'
 
   static validator = schema.compile(eventSchema)
@@ -32,7 +32,7 @@ export default class Event extends Model<EventAttributes> {
       ${offset(options.offset)}
     `
 
-    return Event.query<EventAttributes>(query)
+    return Event.query<DeprecatedEventAttributes>(query)
   }
 
   static async getAttending(user?: string | null) {
@@ -40,7 +40,7 @@ export default class Event extends Model<EventAttributes> {
       return []
     }
 
-    return Event.query<EventAttributes>(SQL`
+    return Event.query<DeprecatedEventAttributes>(SQL`
       SELECT e.*, a.user is not null as attending
       FROM ${table(Event)} e
       LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}
@@ -72,7 +72,7 @@ export default class Event extends Model<EventAttributes> {
     return this.validator(event) as boolean
   }
 
-  static toPublic(event: EventAttributes, user?: string | null): SessionEventAttributes | EventAttributes {
+  static toPublic(event: DeprecatedEventAttributes & { attending?: boolean }, user?: string | null): SessionEventAttributes {
     const editable = isAdmin(user)
     const owned = Boolean(user && event.user && event.user === user)
 
@@ -80,8 +80,17 @@ export default class Event extends Model<EventAttributes> {
       event = utils.omit(event, ['contact', 'details'])
     }
 
+    const x = event.x === event.coordinates[0] ? event.x : event.coordinates[0];
+    const y = event.y === event.coordinates[1] ? event.y : event.coordinates[1];
+
     return {
       ...event,
+      estate_name: event.estate_name || event.scene_name,
+      x,
+      y,
+      attending: !!event.attending,
+      position: [x, y],
+      coordinates: [x, y],
       editable,
       owned
     }

@@ -12,17 +12,18 @@ const close = require('../../../images/remove.svg')
 export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: SessionEventAttributes | null
   attendees?: boolean
-  onEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
+  onClickEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
+  onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
 }
 
-export default function EventModal({ event, attendees, edit, className, onClose, onEdit, ...props }: EventModalProps) {
+export default function EventModal({ event, attendees, edit, className, onClose, onClickEdit, onClickAttendees, ...props }: EventModalProps) {
 
   return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', (!event || !event.approved) && 'pending', className])} onClose={onClose} >
     {event && !attendees && <div className="EventModal__Action" onClick={onClose}>
       <div className="EventModal__Action__Background" />
       <img src={close} width="14" height="14" />
     </div>}
-    {event && !attendees && <EventDetail event={event} onEdit={onEdit} />}
+    {event && !attendees && <EventDetail event={event} onClickEdit={onClickEdit} onClickAttendees={onClickAttendees} />}
     {event && attendees && <EventAttendeeList event={event} />}
   </Modal>
 }

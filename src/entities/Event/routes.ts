@@ -3,11 +3,12 @@ import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
 import { v4 as uuid } from 'uuid';
 import Event from './model';
+import { eventUrl } from './utils'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { auth, WithAuth } from '../Auth/middleware';
-import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions } from './types';
+import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes } from './types';
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
@@ -73,12 +74,16 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     throw new RequestError('Empty event data', RequestError.BadRequest, { body: data })
   }
 
-  if (!data.url) {
-    data.url = `${DECENTRALAND_URL}/?position=${(data.coordinates || [0, 0]).join(',')}`
+  if (!data.image) {
+    data.image = null
   }
 
-  if (!data.image) {
-    (data as any).image = null
+  if (!data.realm) {
+    data.realm = null
+  }
+
+  if (!data.url) {
+    data.url = eventUrl(data)
   }
 
   const errors = Event.validate(data)
@@ -90,19 +95,25 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
 
   const now = new Date()
   const event_id = uuid()
-  const [x, y] = data.coordinates
+  const x = data.x
+  const y = data.y
   const content = await Land.get().getMapContent([x, y], [x, y])
-  const state = content.assets.estates[0]
-  const parcel = content.assets.parcels[0]
-  const image = data.image || (state ? Land.get().getEstateImage(state.id) : Land.get().getParcelImage([x, y]))
+  const estate = content.assets.estates[0]
+  const image = data.image || (estate ? Land.get().getEstateImage(estate.id) : Land.get().getParcelImage([x, y]))
+  const user_name = userProfile.name || null;
+  const estate_id = estate?.id || null;
+  const estate_name = estate?.data?.name || null;
 
-  const event: EventAttributes = {
+  const event: DeprecatedEventAttributes = {
     ...data,
     id: event_id,
     image,
     user: user.toLowerCase(),
-    user_name: userProfile.name || null,
-    scene_name: state?.data?.name || parcel?.data?.name || null,
+    user_name,
+    estate_id,
+    estate_name,
+    coordinates: [x, y],
+    scene_name: estate_name,
     approved: false,
     rejected: false,
     highlighted: false,
@@ -124,10 +135,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   let updatedAttributes = {
     ...utils.pick(event, attributes),
     ...utils.pick(req.body, attributes),
-  } as EventAttributes
+  } as DeprecatedEventAttributes
 
   if (!updatedAttributes.url || updatedAttributes.url.startsWith(DECENTRALAND_URL)) {
-    updatedAttributes.url = `${DECENTRALAND_URL}/?position=${(updatedAttributes.coordinates || [0, 0]).join(',')}`
+    updatedAttributes.url = eventUrl(updatedAttributes)
   }
 
   const errors = Event.validate(updatedAttributes)
@@ -140,11 +151,14 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     updatedAttributes.user_name = userProfile.name
   }
 
-  const [x, y] = updatedAttributes.coordinates
+  const x = updatedAttributes.x
+  const y = updatedAttributes.y
   const content = await Land.get().getMapContent([x, y], [x, y])
-  const state = content.assets.estates[0]
-  const parcel = content.assets.parcels[0]
-  updatedAttributes.scene_name = state?.data?.name || parcel?.data?.name || updatedAttributes.scene_name
+  const estate = content.assets.estates[0]
+  updatedAttributes.estate_id = estate?.id || updatedAttributes.estate_id
+  updatedAttributes.estate_name = estate?.data?.name || updatedAttributes.estate_name
+  updatedAttributes.scene_name = updatedAttributes.estate_name
+  updatedAttributes.coordinates = [x, y]
 
   await Event.update(updatedAttributes, { id: event.id })
 

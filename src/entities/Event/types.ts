@@ -1,14 +1,17 @@
 export type EventAttributes = {
   id: string // primary key
   name: string
-  image: string
+  image: string | null,
   description: string
   start_at: Date
   finish_at: Date
-  coordinates: [number, number]
+  x: number,
+  y: number,
+  realm: string | null
   url: string | null
   user: string
-  scene_name: string | null
+  estate_id: string | null
+  estate_name: string | null
   user_name: string | null
   approved: boolean
   rejected: boolean
@@ -21,10 +24,16 @@ export type EventAttributes = {
   latest_attendees: string[]
 }
 
-export type SessionEventAttributes = EventAttributes & {
+export type DeprecatedEventAttributes = EventAttributes & {
+  scene_name: string | null,
+  coordinates: [number, number]
+}
+
+export type SessionEventAttributes = DeprecatedEventAttributes & {
   attending: boolean
   editable: boolean
   owned: boolean
+  position: [number, number]
 }
 
 export type EventListOptions = {
@@ -39,7 +48,9 @@ export const patchAttributes: (keyof EventAttributes)[] = [
   'description',
   'start_at',
   'finish_at',
-  'coordinates',
+  'x',
+  'y',
+  'realm',
   'contact',
   'details',
 ]
@@ -53,9 +64,10 @@ export const adminPatchAttributes: (keyof EventAttributes)[] = [
   'description',
   'start_at',
   'finish_at',
+  'x',
+  'y',
+  'realm',
   'url',
-  'scene_name',
-  'coordinates',
 ]
 
 export const eventSchema = {
@@ -65,7 +77,8 @@ export const eventSchema = {
     'name',
     'start_at',
     'finish_at',
-    'coordinates'
+    'x',
+    'y',
   ],
   properties: {
     name: {
@@ -100,15 +113,18 @@ export const eventSchema = {
       type: 'string',
       format: 'date-time'
     },
-    coordinates: {
-      type: 'array',
-      minItems: 2,
-      maxItems: 2,
-      items: {
-        type: 'number',
-        maximum: 150,
-        minimum: -150,
-      }
+    x: {
+      type: 'number',
+      maximum: 150,
+      minimum: -150,
+    },
+    y: {
+      type: 'number',
+      maximum: 150,
+      minimum: -150,
+    },
+    realm: {
+      type: ['string', 'null'],
     },
     contact: {
       type: ['string', 'null'],
@@ -123,11 +139,6 @@ export const eventSchema = {
     url: {
       type: 'string',
       format: 'url',
-    },
-    scene_name: {
-      type: ['string', 'null'],
-      minLength: 0,
-      maxLength: 500,
     }
   }
 }
