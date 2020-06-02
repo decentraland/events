@@ -30,8 +30,8 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}, i
   const location = useLocation()
   const eventId = url.getEventId(location)
   const [profile, profileActions] = useProfile()
-  const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events || INITIAL_STATE)
-  const realms = useStore<Realm>(siteInitialState?.state?.realms || INITIAL_STATE)
+  const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events || initialState)
+  const realms = useStore<Realm>(siteInitialState?.state?.realms || initialState)
   const eventsState = events.getState()
 
   useAsyncEffect(async () => {
