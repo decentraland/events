@@ -43,7 +43,7 @@ export default function EventCard(props: EventCardProps) {
           <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
         </div>}
       </div>}
-      <ImgFixed src={event.image} dimension="wide" />
+      <ImgFixed src={event.image || ''} dimension="wide" />
       <Card.Content>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <EventDate event={event} />

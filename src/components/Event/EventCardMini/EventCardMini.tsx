@@ -26,7 +26,7 @@ export default function EventCardMini(props: EventCardMiniProps) {
     <JumpInButton event={event} compact />
     <div style={{ display: 'flex' }}>
       <div style={{ flex: '0 0 96px', position: 'relative' }}>
-        <ImgFixed src={event.image} dimension="square" />
+        <ImgFixed src={event.image || ''} dimension="square" />
         <div className="EventCardMini__Attendees">
           <div className="EventCardMini__Attendees__More">
             +{event.total_attendees}
