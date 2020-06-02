@@ -1,9 +1,9 @@
 import env from 'decentraland-gatsby/dist/utils/env'
-import { Address } from 'web3x/address'
+import isEthereumAddress from 'validator/lib/isEthereumAddress'
 
 const adminAddresses = new Set((env('ADMIN_ADDRESSES', '') || '')
   .split(',')
-  .filter(Address.isAddress)
+  .filter(isEthereumAddress)
   .map(address => address.toLowerCase()))
 
 adminAddresses.forEach(address => console.log('admin address: ', address))

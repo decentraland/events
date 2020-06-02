@@ -1,11 +1,11 @@
 import Ajv from 'ajv'
-import { Address } from 'web3x/address'
+import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import isEmail from 'validator/lib/isEmail'
 import isUUID from 'validator/lib/isUUID'
 import isURL from 'validator/lib/isURL'
 
 export default new Ajv()
-  .addFormat('address', Address.isAddress)
+  .addFormat('address', isEthereumAddress)
   .addFormat('email', isEmail)
   .addFormat('uuid', isUUID)
   .addFormat('url', (url) => isURL(url, {
