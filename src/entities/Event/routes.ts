@@ -35,7 +35,7 @@ export default routes((router) => {
   router.get(BASE_PATH, withOptionalAuth, withEventExists, handle(getEvent))
   router.patch(BASE_PATH, withAuth, withEventOwner, handle(updateEvent))
 })
-
+em
 export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
   const options: Partial<EventListOptions> = {
     user: req.auth,
@@ -71,7 +71,8 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const data = req.body as EventAttributes
 
   if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
-    throw new RequestError('Empty event data', RequestError.BadRequest, { body: data })
+    const { authorization, ...headers } = req.headers
+    throw new RequestError('Empty event data', RequestError.BadRequest, { body: data, headers, user })
   }
 
   if (!data.image) {
