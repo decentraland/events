@@ -1,7 +1,10 @@
-.dcl.field {
+.dcl.field,
+.dcl.select-field {
   min-width: auto;
 }
-.dcl.field .ui.sub.header {
+
+.dcl.field .ui.sub.header,
+.dcl.select-field .ui.sub.header {
   text-transform: none;
   font-size: 15px;
 }

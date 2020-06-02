@@ -5,8 +5,9 @@ import { EventAttributes, SessionEventAttributes } from '../entities/Event/types
 import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 import { PosterAttributes } from '../entities/Poster/types'
+import { Realm } from '../entities/Realm/types'
 
-export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'coordinates' | 'url' | 'start_at' | 'finish_at' | 'image'>
+export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'x' | 'y' | 'realm' | 'url' | 'start_at' | 'finish_at' | 'image'>
 export type UpdateEvent = Pick<EventAttributes, 'id'> & Partial<Omit<EventAttributes, 'id'>>
 
 export default class Events extends API {
@@ -57,6 +58,10 @@ export default class Events extends API {
   async fetchMany(url: string, options: Options = new Options({})) {
     const result = await this.fetch(url, options) as any
     return (result || []).map(Events.parse)
+  }
+
+  async getRealms() {
+    return this.fetch<Realm[]>('/realms')
   }
 
   async getEvents() {

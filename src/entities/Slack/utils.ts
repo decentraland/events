@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch'
-import { EventAttributes } from '../Event/types';
+import { DeprecatedEventAttributes } from '../Event/types';
 import isURL from 'validator/lib/isURL';
 import env from 'decentraland-gatsby/dist/utils/env';
 import { resolve } from 'url'
@@ -14,7 +14,7 @@ if (!isURL(SLACK_WEBHOOK)) {
   console.log(`missing config SLACK_WEBHOOK`)
 }
 
-export async function notifyNewEvent(event: EventAttributes) {
+export async function notifyNewEvent(event: DeprecatedEventAttributes) {
   console.log(`sending new event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
@@ -33,7 +33,7 @@ export async function notifyNewEvent(event: EventAttributes) {
             `*<${url(event)}|${event.name}>* by ${event.user_name || 'Guest'}`,
             `_${event.description || 'No description'}_`,
             '',
-            event.url && event.url.startsWith(DECENTRALAND_URL) && `at <${event.url}|${event.scene_name || 'Decentraland'} (${event.coordinates.join(',')})>`,
+            event.url && event.url.startsWith(DECENTRALAND_URL) && `at <${event.url}|${event.estate_name || event.scene_name || 'Decentraland'} (${event.coordinates.join(',')})>`,
             (!event.url || !event.url.startsWith(DECENTRALAND_URL)) && `at ${event.url}`
           ].filter(Boolean).join('\n')
         },
@@ -48,7 +48,7 @@ export async function notifyNewEvent(event: EventAttributes) {
   )
 }
 
-export async function notifyApprovedEvent(event: EventAttributes) {
+export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
   console.log(`sending approved event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
@@ -65,7 +65,7 @@ export async function notifyApprovedEvent(event: EventAttributes) {
 }
 
 
-export async function notifyEditedEvent(event: EventAttributes) {
+export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
   console.log(`sending edited event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
@@ -105,7 +105,7 @@ export async function notifyEventError(user: Avatar, error: RequestError) {
   }
 }
 
-function url(event: EventAttributes) {
+function url(event: DeprecatedEventAttributes) {
   return resolve(EVENTS_URL, `/en/?event=${event.id}`)
 }
 

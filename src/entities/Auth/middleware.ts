@@ -35,7 +35,7 @@ export function auth(options: AuthOptions = {}) {
       const data = fromBase64(token)
       identity = JSON.parse(data) as AuthIdentity
     } catch (error) {
-      console.log(error)
+      console.error(error)
 
       if (options.allowInvalid) {
         return

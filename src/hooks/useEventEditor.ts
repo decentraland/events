@@ -20,7 +20,9 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     contact: defaultEvent.contact || '',
     details: defaultEvent.details || '',
     image: defaultEvent.image || '',
-    coordinates: defaultEvent.coordinates || [0, 0],
+    x: defaultEvent.x || 0,
+    y: defaultEvent.x || 0,
+    realm: defaultEvent.realm || null,
     url: defaultEvent.url || '',
     start_at: start_at,
     finish_at: finish_at,
@@ -131,12 +133,12 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     }
   }
 
-  function handleChangeCoordinates(value?: string) {
-    let [x, y] = (value || '').split(',').map(Number)
-    if (x <= 150 && x >= -150 && y <= 150 && y >= -150) {
-      setValue('coordinates', [x, y])
+  function handleChangePosition(name: 'x' | 'y', value?: string) {
+    const position = Number(value)
+    if (position <= 150 && position >= -150) {
+      setValue(name, position)
     } else {
-      setError('coordinates', 'Invalid coordinates')
+      setError(name, 'Invalid coordinates')
     }
   }
 
@@ -153,10 +155,12 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
 
       case 'image':
       case 'url':
+      case 'realm':
         return setValue(name, value)
 
-      case 'coordinates':
-        return handleChangeCoordinates(value)
+      case 'x':
+      case 'y':
+        return handleChangePosition(name, value)
 
       case 'start_date':
         return handleChangeStartDate(value)
@@ -208,7 +212,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
 
   }
 
-  async function update(eventId: string, props: (keyof UpdateEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'coordinates', 'url', 'start_at', 'finish_at']) {
+  async function update(eventId: string, props: (keyof UpdateEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'x', 'y', 'realm', 'url', 'start_at', 'finish_at']) {
     const data: UpdateEvent = {
       id: eventId
     }
