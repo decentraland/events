@@ -8,6 +8,7 @@ import { auth, WithAuth } from '../Auth/middleware';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES, PosterAttributes, extension } from './types'
+import { withAuthProfile } from '../Profile/middleware'
 
 let BUCKET_CHECKED = false;
 let BUCKET_CHECKED_JOB: Promise<void> | null = null
@@ -32,7 +33,7 @@ export default routes((router) => {
       throw new RequestError(`File size limit has been reached`, RequestError.PayloadTooLarge)
     })
   })
-  router.post('/poster', withAuth, withFile, handle(uploadPoster))
+  router.post('/poster', withAuth, withAuthProfile(), withFile, handle(uploadPoster))
 })
 
 export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
@@ -54,23 +55,28 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
     throw new RequestError(`Invalid file type ${type}`, RequestError.BadRequest)
   }
 
+  const initial = Date.now()
   const auth = req.auth as string
   const size = poster.size
   const ext = extension(type)
-  const time = Math.floor(Date.now() / 1000).toString(16).toLowerCase()
-  const user = auth.slice(-8).toLowerCase()
-  const filename = BUCKET_DIR + '/' + user + time + ext
+  const timeHash = Math.floor(initial / 1000).toString(16).toLowerCase()
+  const userHash = auth.slice(-8).toLowerCase()
+  const filename = BUCKET_DIR + '/' + userHash + timeHash + ext
   await ensure()
 
   const params = { Bucket: BUCKET_NAME, Key: filename, Body: createReadStream(poster.tempFilePath), ACL: 'public-read' } as AWS.S3.Types.PutObjectRequest
   await new Promise((resolve, reject) => s3.upload(params, (err: Error | null | undefined, data?: any) => err ? reject(err) : resolve(data)))
 
-  return {
+  const time = ((Date.now() - initial) / 1000).toFixed(3)
+  const result = {
     filename,
     url: BUCKET_URL + '/' + filename,
     size,
     type,
   }
+
+  console.log(`new poster created: ${JSON.stringify(result)} (time: ${time}s)`)
+  return result
 }
 
 async function ensure() {
