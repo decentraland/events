@@ -135,7 +135,9 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
 
   function handleChangePosition(name: 'x' | 'y', value?: string) {
     const position = Number(value)
-    if (position <= 150 && position >= -150) {
+    if (value === '') {
+      setValue(name, value as any)
+    } else if (position <= 150 && position >= -150) {
       setValue(name, position)
     } else {
       setError(name, 'Invalid coordinates')
@@ -192,6 +194,14 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
 
     if (event.image && !isURL(event.image)) {
       errors['image'] = 'Event image is invalid'
+    }
+
+    if (event.x as any === '') {
+      errors['x'] = 'Latitude is required'
+    }
+
+    if (event.y as any === '') {
+      errors['y'] = 'Longitude is required'
     }
 
     if (Object.values(errors).filter(Boolean).length) {

@@ -129,8 +129,8 @@ export default function SubmitPage(props: any) {
     }
 
     patchState({ loading: true, error: null })
-    const submit = eventId ? eventActions.update(eventId) : eventActions.create()
 
+    const submit = eventId ? eventActions.update(eventId) : eventActions.create()
     submit
       .then((event) => {
         track((analytics) => analytics.track(segment.Track.NewEvent, { event }))
@@ -256,10 +256,10 @@ export default function SubmitPage(props: any) {
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="4">
-                      <Field label="Latitud" type="number" name="x" min="-150" max="150" error={!!errors['x']} message={errors['x']} value={event.x || 0} onChange={eventActions.handleChange} />
+                      <Field label="Latitude" type="number" name="x" min="-150" max="150" error={!!errors['x']} message={errors['x']} value={event.x} onChange={eventActions.handleChange} />
                     </Grid.Column>
                     <Grid.Column mobile="4">
-                      <Field label="Longitud" type="number" name="y" min="-150" max="150" error={!!errors['y']} message={errors['y']} value={event.y || 0} onChange={eventActions.handleChange} />
+                      <Field label="Longitude" type="number" name="y" min="-150" max="150" error={!!errors['y']} message={errors['y']} value={event.y} onChange={eventActions.handleChange} />
                     </Grid.Column>
                     <Grid.Column mobile="8">
                       <SelectField label="Realm" placeholder="any realm" name="realm" error={!!errors['realm']} message={errors['realm']} options={realmOptions} value={event.realm || ''} onChange={eventActions.handleChange} />
