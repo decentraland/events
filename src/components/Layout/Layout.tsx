@@ -54,7 +54,7 @@ export default function Layout({ children, ...props }: any) {
           {profile && <ImgAvatar size="small" profile={profile} style={{ margin: ' 0 0 0 .5rem' }} />}
         </>}
       />
-      {children}
+      <div>{children}</div>
       <Footer
         locale={language}
         locales={languages}
