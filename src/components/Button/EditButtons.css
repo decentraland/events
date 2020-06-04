@@ -1,10 +1,10 @@
-.EditButtons.pending {
+.EditButtons {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-.EditButtons.pending .ui.button {
+.EditButtons .ui.button {
   width: 49%;
   margin: 0;
 }
