@@ -22,7 +22,7 @@ export default function EventCardMini(props: EventCardMiniProps) {
     }
   }
 
-  return <Card key={'attending:' + event.id} className={TokenList.join(['EventCardMini', !event.approved && 'pending'])} href={props.href} onClick={handleClick}>
+  return <Card className={TokenList.join(['EventCardMini', !event.approved && 'pending'])} href={props.href} onClick={handleClick}>
     <JumpInButton event={event} compact />
     <div style={{ display: 'flex' }}>
       <div style={{ flex: '0 0 96px', position: 'relative' }}>
