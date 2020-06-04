@@ -1,16 +1,37 @@
 import { useState } from "react";
 import { eventSchema } from "../entities/Event/types";
-import Events, { NewEvent, UpdateEvent } from "../api/Events";
+import { EditEvent } from "../api/Events";
 import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime } from "decentraland-gatsby/dist/components/Date/utils";
 import isURL from "validator/lib/isURL";
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
 
-type EventEditorState = NewEvent & {
+type EventEditorState = EditEvent & {
   errors: Record<string, string>
 }
 
-export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
+
+function getName(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any): string {
+  return props && props.name || event.target.name
+}
+
+
+function getValue(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any) {
+  if (props) {
+    switch (props.type) {
+      case 'radio':
+        return props.checked
+
+      default:
+        return props.value || ''
+    }
+
+  } else {
+    return event.target.value
+  }
+}
+
+export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   const currentDate = date({ seconds: 0, milliseconds: 0 })
   const start_at = defaultEvent.start_at || currentDate
   const finish_at = defaultEvent.finish_at && defaultEvent.finish_at.getTime() > start_at.getDate() ? defaultEvent.finish_at : new Date(start_at.getTime() + DEFAULT_EVENT_DURATION)
@@ -26,6 +47,9 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     url: defaultEvent.url || '',
     start_at: start_at,
     finish_at: finish_at,
+    approved: false,
+    rejected: false,
+    highlighted: false,
     errors: {}
   })
 
@@ -66,7 +90,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     })
   }
 
-  function setValue<K extends keyof NewEvent>(key: K, value: NewEvent[K]) {
+  function setValue<K extends keyof EditEvent>(key: K, value: EditEvent[K]) {
     setEvent((current) => {
       const errors = { ...current.errors }
       delete errors[key]
@@ -79,7 +103,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     })
   }
 
-  function setValues(event: Partial<NewEvent>) {
+  function setValues(event: Partial<EditEvent>) {
     setEvent((current) => {
       const errors = { ...current.errors }
 
@@ -144,9 +168,11 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     }
   }
 
-  function handleChange(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string } | any) {
-    const name: keyof NewEvent | 'start_time' | 'start_date' | 'finish_time' | 'finish_date' = props && props.name || event.target.name
-    const value = props && props.value || event.target.value
+  function handleChange(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any) {
+    const name = getName(event, props)
+    const value = getValue(event, props)
+
+    console.log(name, value)
 
     switch (name) {
       case 'name':
@@ -159,6 +185,11 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
       case 'url':
       case 'realm':
         return setValue(name, value)
+
+      case 'highlighted':
+      case 'rejected':
+      case 'approved':
+        return setValue(name, !!value)
 
       case 'x':
       case 'y':
@@ -216,22 +247,14 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     return true
   }
 
-  async function create() {
-    const { errors, ...data } = event
-    return Events.get().createEvent(data)
-
-  }
-
-  async function update(eventId: string, props: (keyof UpdateEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'x', 'y', 'realm', 'url', 'start_at', 'finish_at']) {
-    const data: UpdateEvent = {
-      id: eventId
-    }
+  function toObject(props: (keyof EditEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'x', 'y', 'realm', 'url', 'start_at', 'finish_at']) {
+    const data: Partial<EditEvent> = {}
 
     for (const prop of props) {
       (data as any)[prop] = (event as any)[prop]
     }
 
-    return Events.get().updateEvent(data)
+    return data
   }
 
   const actions = {
@@ -245,8 +268,7 @@ export default function useEventEditor(defaultEvent: Partial<NewEvent> = {}) {
     setErrors,
     handleChange,
     validate,
-    create,
-    update
+    toObject
   }
 
   return [event, actions] as const

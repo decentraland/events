@@ -17,7 +17,9 @@ const EVENTS_LIST = 3
 export type EventCardProps = {
   event: SessionEventAttributes,
   href?: string,
+  updating?: boolean,
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
+  onChangeEvent?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
 
 export default function EventCard(props: EventCardProps) {
@@ -54,7 +56,7 @@ export default function EventCard(props: EventCardProps) {
 
         <Card.Header>{event.name}</Card.Header>
         <Card.Description>
-          <AttendingButtons event={event} />
+          <AttendingButtons event={event} loading={props.updating} onChangeEvent={props.onChangeEvent} />
         </Card.Description>
       </Card.Content>
     </Card>)

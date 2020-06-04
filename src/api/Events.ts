@@ -7,8 +7,22 @@ import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 import { PosterAttributes } from '../entities/Poster/types'
 import { Realm } from '../entities/Realm/types'
 
-export type NewEvent = Pick<EventAttributes, 'name' | 'description' | 'contact' | 'details' | 'x' | 'y' | 'realm' | 'url' | 'start_at' | 'finish_at' | 'image'>
-export type UpdateEvent = Pick<EventAttributes, 'id'> & Partial<Omit<EventAttributes, 'id'>>
+export type EditEvent = Pick<EventAttributes,
+  'name' |
+  'image' |
+  'description' |
+  'start_at' |
+  'finish_at' |
+  'x' |
+  'y' |
+  'realm' |
+  'url' |
+  'approved' |
+  'rejected' |
+  'highlighted' |
+  'contact' |
+  'details'
+>
 
 export default class Events extends API {
 
@@ -50,12 +64,12 @@ export default class Events extends API {
     return result.data
   }
 
-  async fetchOne(url: string, options: Options = new Options({})) {
+  async fetchOne(url: string, options: Options = new Options({})): Promise<SessionEventAttributes> {
     const result = await this.fetch(url, options) as any
     return Events.parse(result)
   }
 
-  async fetchMany(url: string, options: Options = new Options({})) {
+  async fetchMany(url: string, options: Options = new Options({})): Promise<SessionEventAttributes[]> {
     const result = await this.fetch(url, options) as any
     return (result || []).map(Events.parse)
   }
@@ -76,7 +90,7 @@ export default class Events extends API {
     return this.fetch<EventAttendeeAttributes[]>(`/events/${eventId}/attendees`)
   }
 
-  async createEvent(event: NewEvent) {
+  async createEvent(event: EditEvent) {
     return this.fetchOne(
       '/events',
       this.options()
@@ -86,9 +100,9 @@ export default class Events extends API {
     )
   }
 
-  async updateEvent(event: UpdateEvent) {
+  async updateEvent(eventId: string, event: Partial<EditEvent>) {
     return this.fetchOne(
-      `/events/${event.id}`,
+      `/events/${eventId}`,
       this.options({ method: 'PATCH' })
         .authorization()
         .json(event)

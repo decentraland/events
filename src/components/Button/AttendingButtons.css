@@ -1,6 +1,7 @@
 .AttendingButtons {
   display: flex;
   justify-content: space-between;
+  width: 100%;
 }
 
 .AttendingButtons .ui.button.attending-status,

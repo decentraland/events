@@ -35,7 +35,7 @@ export default routes((router) => {
   router.get(BASE_PATH, withOptionalAuth, withEventExists, handle(getEvent))
   router.patch(BASE_PATH, withAuth, withEventOwner, handle(updateEvent))
 })
-em
+
 export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
   const options: Partial<EventListOptions> = {
     user: req.auth,

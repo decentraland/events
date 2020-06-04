@@ -1,6 +1,6 @@
+import AWS from 'aws-sdk'
 import { createReadStream } from 'fs'
 import { promisify } from 'util'
-import AWS from 'aws-sdk'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import { requiredEnv } from 'decentraland-gatsby/dist/utils/env'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
