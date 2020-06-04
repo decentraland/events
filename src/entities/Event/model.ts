@@ -27,6 +27,9 @@ export default class Event extends Model<DeprecatedEventAttributes> {
         ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
         ${conditional(!!options.user && !isAdmin(options.user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`)}
         ${conditional(!!options.onlyAttendee && !isAdmin(options.user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`)}
+        ${conditional(Number.isFinite(options.x as number), SQL`AND e.x = ${options.x}`)}
+        ${conditional(Number.isFinite(options.y as number), SQL`AND e.y = ${options.y}`)}
+        ${conditional(!!options.estateId, SQL`AND e.estate_id = ${options.estateId}`)}
       ORDER BY start_at ASC
       ${limit(options.limit)}
       ${offset(options.offset)}

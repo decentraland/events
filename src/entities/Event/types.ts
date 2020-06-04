@@ -40,6 +40,9 @@ export type EventListOptions = {
   user: string | null | undefined,
   limit: number | null | undefined,
   offset: number | null | undefined,
+  x: number | null | undefined,
+  y: number | null | undefined,
+  estateId: string | null | undefined,
   onlyAttendee: boolean
 }
 

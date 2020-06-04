@@ -12,7 +12,7 @@ import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOption
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
-import { bool } from 'decentraland-gatsby/dist/entities/Route/param';
+import { bool, integer } from 'decentraland-gatsby/dist/entities/Route/param';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
@@ -39,8 +39,35 @@ export default routes((router) => {
 export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
   const options: Partial<EventListOptions> = {
     user: req.auth,
-    offset: Number(req.query['offset']),
-    limit: Number(req.query['limit']),
+    offset: integer(req.query['offset']) ?? 0,
+    limit: integer(req.query['limit']) ?? 500,
+  }
+
+  if (req.query['position']) {
+    const [x, y] = String(req.query['position']).split(',').slice(0, 2).map(integer)
+    if (
+      x !== null && y !== null &&
+      x >= -150 && x <= 150 &&
+      y >= -150 && y <= 150
+    ) {
+      options.x = x
+      options.y = y
+    } else {
+
+      // out of bound
+      return []
+    }
+  }
+
+  if (req.query['estate_id']) {
+    const estateId = integer(req.query['estate_id'])
+    if (estateId !== null && Number.isFinite(estateId)) {
+      options.estateId = String(estateId)
+    } else {
+
+      // out of bound
+      return []
+    }
   }
 
   if (ctx.param('onlyAttendee', { defaultValue: false, parser: bool })) {
