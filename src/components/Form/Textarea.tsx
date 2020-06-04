@@ -11,7 +11,7 @@ export type TextareaProps = Omit<FieldProps, 'onAction'> & {
   maxHeight?: number
 }
 
-export default function Textarea(props: TextareaProps) {
+export default function Textarea({ minHeight, maxHeight, ...props }: TextareaProps) {
 
   const ref = useRef<HTMLTextAreaElement | null>(null)
 
@@ -23,12 +23,12 @@ export default function Textarea(props: TextareaProps) {
     const textarea = ref.current
     textarea.style.height = 0 + 'px'
     let height = textarea.scrollHeight
-    if (props.minHeight !== undefined && height < props.minHeight) {
-      height = props.minHeight
+    if (minHeight !== undefined && height < minHeight) {
+      height = minHeight
     }
 
-    if (props.maxHeight !== undefined && height > props.maxHeight) {
-      height = props.maxHeight
+    if (maxHeight !== undefined && height > maxHeight) {
+      height = maxHeight
     }
 
     textarea.style.height = height + 2 + 'px'
