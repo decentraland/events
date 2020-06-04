@@ -36,7 +36,7 @@ export default function EventCard(props: EventCardProps) {
   }
 
   return (
-    <Card key={event.id} link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={props.href} onClick={handleClick} >
+    <Card link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={props.href} onClick={handleClick} >
       <div />
       {live && <Live primary={event.approved} />}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
