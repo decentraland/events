@@ -47,7 +47,8 @@ export default function IndexPage(props: any) {
   const events = useListEvents(siteStore.events.getState().data)
   const eventsByMonth = useListEventsByMonth(events)
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [siteStore.events.getState()])
-  const attendingEvents = useMemo(() => events.filter((event: any) => !!event.attending), [siteStore.events.getState()])
+  const attendingEvents = useMemo(() => events.filter((event) => !!event.attending), [siteStore.events.getState()])
+  const trendingEvents = useMemo(() => events.filter((event) => !!event.highlighted), [siteStore.events.getState()])
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
 
   const [requireWallet, setRequireWallet] = useState(false)
@@ -109,8 +110,11 @@ export default function IndexPage(props: any) {
       .then(async () => {
         const { approved, rejected } = data
         if (
-          event.approved !== approved ||
-          event.rejected !== rejected
+          event.editable &&
+          (
+            event.approved !== approved ||
+            event.rejected !== rejected
+          )
         ) {
           await siteStore.updateEvent(event.id, { approved, rejected })
         }
@@ -152,6 +156,11 @@ export default function IndexPage(props: any) {
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </>}
+        {!siteStore.loading && events.length > 0 && trendingEvents.length > 0 && <>
+          <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
+          <Card.Group>
+            {trendingEvents.map(event => <EventCardMini key={'trending:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
+          </Card.Group></>}
         {!siteStore.loading && events.length > 0 && attendingEvents.length > 0 && <>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
