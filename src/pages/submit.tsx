@@ -206,7 +206,7 @@ export default function SubmitPage(props: any) {
               <Grid.Column mobile="15" style={{ maxWidth: '580px' }}>
                 <Title style={{ fontSize: '34px', lineHeight: '42px' }}>Submit event</Title>
                 <Paragraph secondary>Be sure to fill in as many details as possible to generate interest in your event.</Paragraph>
-                <Grid stackable style={{ paddingTop: '48px' }}>
+                <Grid stackable>
                   <Grid.Row>
                     <Grid.Column mobile="16">
                       <ImageInput label="Event Cover" value={editing.image || ''} onFileChange={handlePoster} loading={state.uploadingPoster} error={coverError} message={
@@ -222,13 +222,18 @@ export default function SubmitPage(props: any) {
                       </ImageInput>
                     </Grid.Column>
                   </Grid.Row>
+                  {siteStore.event && siteStore.event.editable && <Grid.Row>
+                    <Grid.Column mobile="16">
+                      <Label style={{ marginBottom: '1em' }}>Advance</Label>
+                    </Grid.Column>
+                    <Grid.Column mobile="4">
+                      <Radio toggle name="highlighted" label="TRENDING" checked={editing.highlighted} onChange={editActions.handleChange} style={{ marginBottom: '1em' }} />
+                    </Grid.Column>
+                  </Grid.Row>}
                   <Grid.Row>
                     <Grid.Column mobile="16">
                       <Field label="Event Name" placeholder="Be as descriptive as you can" style={{ width: '100%' }} name="name" error={!!errors['name']} message={errors['name']} value={editing.name} onChange={editActions.handleChange} />
                     </Grid.Column>
-                    {/* {siteStore.event && siteStore.event.editable && <Grid.Column mobile="16">
-                      <Radio toggle name="highlighted" label="HIGHLIGHT" checked={editing.highlighted} onChange={editActions.handleChange} style={{ marginBottom: '1em' }} />
-                    </Grid.Column>} */}
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="16">
