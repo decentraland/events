@@ -34,13 +34,13 @@ export default function EventModal({ event, attendees, edit, className, onClose,
     {/* SOCIAL */}
     {event && event.approved && <EventSection.Divider />}
     {event && event.approved && <EventSection>
-      <AttendingButtons loading={props.updating} event={event} onChangeEvent={props.onChangeEvent} />
+      <AttendingButtons loading={props.updating} event={event} onChangeEvent={onChangeEvent} />
     </EventSection>}
 
     {/* APPROVE */}
     {event && !event.approved && event.editable && <EventSection.Divider />}
     {event && !event.approved && event.editable && <EventSection>
-      <EditButtons loading={props.updating} event={event} onChange={props.onChangeEvent} />
+      <EditButtons loading={props.updating} event={event} onChangeEvent={onChangeEvent} />
     </EventSection>}
   </Modal>
 }
