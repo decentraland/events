@@ -172,8 +172,6 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const name = getName(event, props)
     const value = getValue(event, props)
 
-    console.log(name, value)
-
     switch (name) {
       case 'name':
       case 'description':
@@ -247,13 +245,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     return true
   }
 
-  function toObject(props: (keyof EditEvent)[] = ['name', 'description', 'image', 'contact', 'details', 'x', 'y', 'realm', 'url', 'start_at', 'finish_at']) {
-    const data: Partial<EditEvent> = {}
-
-    for (const prop of props) {
-      (data as any)[prop] = (event as any)[prop]
-    }
-
+  function toObject() {
+    const { errors, ...data } = event
     return data
   }
 
