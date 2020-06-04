@@ -30,11 +30,9 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
   const location = useLocation()
 
   useAsyncEffect(async () => {
-    if (!list) {
-      const result = await Events.get().getEventAttending(props.event.id)
-      attendees.set(props.event.id, result)
-      setList(result)
-    }
+    const result = await Events.get().getEventAttending(props.event.id)
+    attendees.set(props.event.id, result)
+    setList(result)
   }, [props.event.id])
 
   return <div className="EventAttendeeList">

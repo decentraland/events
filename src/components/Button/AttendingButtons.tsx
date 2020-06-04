@@ -5,9 +5,8 @@ import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
-import { EventAttributes, SessionEventAttributes } from '../../entities/Event/types'
+import { SessionEventAttributes } from '../../entities/Event/types'
 import Events from '../../api/Events'
-import stores from '../../utils/store'
 import { useLocation } from '@reach/router'
 import url from '../../utils/url'
 import * as segment from '../../utils/segment'
@@ -20,24 +19,25 @@ const twitter = require('../../images/icon-twitter.svg')
 import './AttendingButtons.css'
 
 type AttendingButtonsState = {
-  loading: boolean
   sharing: boolean
 }
 
 export type AttendingButtonsProps = {
+  loading?: boolean,
   event: SessionEventAttributes,
+  onChangeEvent?: (e: React.MouseEvent<any>, event: SessionEventAttributes) => void
   onShareFallback?: (e: React.MouseEvent<any>, event: SessionEventAttributes) => void
 }
 
 export default function AttendingButtons(props: AttendingButtonsProps) {
 
   const event: SessionEventAttributes = props.event
-  const [state, patchState] = usePatchState<AttendingButtonsState>({ loading: false, sharing: false })
+  const [state, patchState] = usePatchState<AttendingButtonsState>({ sharing: false })
   const [profile, actions] = useProfile()
   const location = useLocation()
   const isMobile = useMobileDetector()
-  const loading = actions.loading || state.loading
   const ethAddress = profile?.address.toString() || null
+  const loading = props.loading
 
   function handleFallbackShare(url: string) {
     const width = 600
@@ -89,33 +89,11 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     e.preventDefault()
     e.stopPropagation()
 
-    if (loading) {
+    if (props.loading || !props.onChangeEvent) {
       return
     }
 
-    patchState({ loading: true })
-    Promise.resolve(profile || actions.connect())
-      .then(async (profile) => {
-        if (profile) {
-          const ethAddress = profile.address.toString() || null
-          const newAttendees = await Events.get().setEventAttendee(event.id, !event.attending)
-          const attendees = newAttendees.map(attendee => attendee.user)
-          const newEvent = {
-            ...event,
-            attending: !event.attending,
-            total_attendees: attendees.length,
-            latest_attendees: attendees.slice(0, 10)
-          }
-          stores.event.setEntity(newEvent as any)
-
-          track((analytics) => analytics.track(segment.Track.Going, { ethAddress, event: event?.id || null }))
-        }
-      })
-      .then(() => patchState({ loading: false }))
-      .catch((err) => {
-        console.error(err)
-        patchState({ loading: false })
-      })
+    props.onChangeEvent(e, { ...event, attending: !event.attending })
   }
 
   function handleShare(e: React.MouseEvent<any>) {

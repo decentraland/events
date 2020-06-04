@@ -5,6 +5,8 @@ import { FieldProps } from 'decentraland-ui/dist/components/Field/Field'
 import './Textarea.css'
 
 export type TextareaProps = Omit<FieldProps, 'onAction'> & {
+  disabled?: boolean
+  readOnly?: boolean
   minHeight?: number
   maxHeight?: number
 }
@@ -41,11 +43,13 @@ export default function Textarea(props: TextareaProps) {
 
   useEffect(() => handleRowChange(), [])
 
-  return <div className={TokenList.join(['dcl field', props.error && 'error', 'Textarea'])}>
+  const { error, label, message, ...extra } = props
+
+  return <div className={TokenList.join(['dcl field', props.error && 'error', props.disabled && 'disabled', 'Textarea'])}>
     <div className="ui sub header">{props.label}</div>
     <div className="ui input">
       {props.error && <i aria-hidden="true" className="warning circle icon" />}
-      <textarea ref={ref} placeholder={props.placeholder} name={props.name} value={props.value} defaultValue={props.defaultValue} onChange={handleChange} />
+      <textarea {...extra} ref={ref} onChange={handleChange} />
     </div>
     <p className="message">{props.message}</p>
   </div>

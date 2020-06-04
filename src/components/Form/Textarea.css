@@ -36,3 +36,7 @@
   border-color: var(--error);
   padding-right: 2.67142857em !important;
 }
+
+.Textarea.disabled textarea {
+  opacity: 0.5;
+}

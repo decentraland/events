@@ -1,0 +1,41 @@
+.dg.Divider.EventSection__Divider {
+  opacity: 0.24;
+  border-color: #736e7d;
+  margin: 0 24px;
+  border-bottom: 0;
+}
+
+.EventSection {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 18px 24px;
+}
+
+.EventSection.EventSection--highlight {
+  background-color: #ffeed6;
+}
+
+.EventSection .EventSection__Icon {
+  flex: 0 0 28px;
+}
+
+.EventSection .EventSection__Icon.EventSection__Icon--center {
+  display: flex;
+  align-items: center;
+}
+
+.EventSection .EventSection__Detail {
+  flex: 1 1 auto;
+  max-width: 90%;
+}
+
+.EventSection .EventSection__Detail .dg.ImgAvatar {
+  margin-right: 8px;
+}
+
+@media only screen and (max-width: 767px) {
+  .EventSection {
+    justify-content: flex-end;
+  }
+}
