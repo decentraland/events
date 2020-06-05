@@ -11,7 +11,8 @@ import Events, { EditEvent } from "../api/Events"
 import { Realm } from "../entities/Realm/types"
 import track from "decentraland-gatsby/dist/components/Segment/track"
 import * as segment from '../utils/segment'
-import { Profile } from "decentraland-gatsby/dist/utils/auth/types"
+import { useEffect } from "react"
+
 
 export type SiteStore = {
   events?: EntityStore<SessionEventAttributes>
@@ -38,6 +39,12 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events, [siteInitialState?.state?.events])
   const event = eventId && isUUID(eventId) && events.getEntity(eventId) || null
   const realms = useStore<Realm>(siteInitialState?.state?.realms, [siteInitialState?.state?.events])
+
+  useEffect(() => {
+    if (window.history) {
+      window.history.replaceState(getNavigationState(), document.title)
+    }
+  }, [events.getState().data, realms.getState().data])
 
   useAsyncEffect(async () => {
     if (actions.loading || events.isLoading() || events.getList()) {
