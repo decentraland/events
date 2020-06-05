@@ -1,7 +1,6 @@
 import React from 'react'
 import isEmail from 'validator/lib/isEmail'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
-import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
@@ -25,12 +24,20 @@ const clock = require('../../../../images/secondary-clock.svg')
 const pin = require('../../../../images/secondary-pin.svg')
 const friends = require('../../../../images/secondary-friends.svg')
 
-const DAY = 1000 * 60 * 60 * 24
+const MINUTE = 1000 * 60
+const HOUR = MINUTE * 60
+const DAY = HOUR * 24
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const ATTENDEES_PREVIEW_LIMIT = 12
 
 export type EventDetailProps = {
   event: SessionEventAttributes
+  showDescription?: boolean
+  showDate?: boolean
+  showPlace?: boolean
+  showAttendees?: boolean
+  showContact?: boolean
+  showDetails?: boolean
   onClickEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
   onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
 }
@@ -40,6 +47,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const { start_at, finish_at } = event || { start_at: now, finish_at: now }
   const duration = finish_at.getTime() - start_at.getTime()
   const live = now.getTime() >= start_at.getTime() && now.getTime() < finish_at.getTime()
+  const liveSince = now.getTime() - start_at.getTime()
   const position = `${event.x},${event.y}`
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const advance = event.editable || event.owned
@@ -57,7 +65,6 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   }
 
   return <>
-    {event && <ImgFixed src={event.image || ''} dimension="wide" />}
     {event && event.rejected && <div className="EventError EventError--error"><code>This event was rejected</code></div>}
     {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
@@ -73,8 +80,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </div>
 
       {/* DESCRIPTION */}
-      <EventSection.Divider />
-      <EventSection>
+      {props.showDescription !== false && <EventSection.Divider />}
+      {props.showDescription !== false && <EventSection>
         <EventSection.Icon src={info} width="16" height="16" />
         <EventSection.Detail>
           {!event.description && <Paragraph secondary={!event.description} >
@@ -83,13 +90,22 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           {event.description && <Markdown source={event.description} />}
         </EventSection.Detail>
         <EventSection.Action />
-      </EventSection>
+      </EventSection>}
 
       {/* DATE */}
-      <EventSection.Divider />
-      <EventSection>
+      {props.showDate !== false && <EventSection.Divider />}
+      {props.showDate !== false && <EventSection>
         <EventSection.Icon src={clock} width="16" height="16" />
-        {duration < DAY && <EventSection.Detail>
+        {live && <EventSection.Detail>
+          {liveSince < MINUTE && <Paragraph>Started: Less than a minute ago</Paragraph>}
+          {liveSince > MINUTE && liveSince <= MINUTE * 2 && <Paragraph>Started: {Math.floor(liveSince / MINUTE)} minute ago</Paragraph>}
+          {liveSince > MINUTE * 2 && liveSince <= HOUR && <Paragraph>Started: {Math.floor(liveSince / MINUTE)} minutes ago</Paragraph>}
+          {liveSince > HOUR && liveSince <= HOUR * 2 && <Paragraph>Started: {Math.floor(liveSince / HOUR)} hour ago</Paragraph>}
+          {liveSince > HOUR * 2 && liveSince <= DAY && <Paragraph>Started: {Math.floor(liveSince / HOUR)} hours ago</Paragraph>}
+          {liveSince > DAY && liveSince <= DAY * 2 && <Paragraph>Started: {Math.floor(liveSince / DAY)} day ago</Paragraph>}
+          {liveSince > DAY * 2 && <Paragraph>Started: {Math.floor(liveSince / DAY)} days ago</Paragraph>}
+        </EventSection.Detail>}
+        {!live && duration < DAY && <EventSection.Detail>
           <Paragraph >
             {toDayName(start_at, { capitalized: true, utc: true })}
             {', '}
@@ -118,7 +134,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {' UTC'}
           </Paragraph>
         </EventSection.Detail>}
-        {duration >= DAY && <EventSection.Detail>
+        {!live && duration >= DAY && <EventSection.Detail>
           <Paragraph >
             <code>{'FROM: '}</code>
             {toDayName(start_at, { capitalized: true, utc: true })}
@@ -152,15 +168,14 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           {!live && <AddToCalendarButton event={event} />}
           {live && <Live primary />}
         </EventSection.Action>
-      </EventSection>
+      </EventSection>}
 
       {/* PLACE */}
-      <EventSection.Divider />
-      <EventSection>
+      {props.showPlace !== false && <EventSection.Divider />}
+      {props.showPlace !== false && <EventSection>
         <EventSection.Icon src={pin} width="16" height="16" />
         <EventSection.Detail>
-
-          <Paragraph>
+          <Paragraph bold>
             {event.scene_name || 'Decentraland'}
             {position !== '0,0' && ` (${position})`}
           </Paragraph>
@@ -168,11 +183,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         <EventSection.Action>
           <JumpInButton event={event} />
         </EventSection.Action>
-      </EventSection>
+      </EventSection>}
 
       {/* ATTENDEES */}
-      <EventSection.Divider />
-      <EventSection>
+      {props.showAttendees !== false && <EventSection.Divider />}
+      {props.showAttendees !== false && <EventSection>
         <EventSection.Icon src={friends} width="16x" height="16" center />
         <EventSection.Detail>
           {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
@@ -187,11 +202,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           </div>}
         </EventSection.Detail>
         <EventSection.Action />
-      </EventSection>
+      </EventSection>}
 
       {/* CONTACT */}
-      {event.approved && advance && <EventSection.Divider />}
-      {event.approved && advance && <EventSection highlight>
+      {props.showContact !== false && !event.approved && advance && <EventSection.Divider />}
+      {props.showContact !== false && !event.approved && advance && <EventSection highlight>
         <EventSection.Icon src={extra} width="16" height="16" />
         <EventSection.Detail>
           {event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
@@ -206,8 +221,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       </EventSection>}
 
       {/* DETAILS */}
-      {event.approved && advance && <EventSection.Divider />}
-      {event.approved && advance && <EventSection highlight>
+      {props.showContact !== false && !event.approved && advance && <EventSection.Divider />}
+      {props.showContact !== false && !event.approved && advance && <EventSection highlight>
         <EventSection.Icon src={extra} width="16" height="16" />
         <EventSection.Detail>
           {event.details && <Paragraph>{event.details}</Paragraph>}

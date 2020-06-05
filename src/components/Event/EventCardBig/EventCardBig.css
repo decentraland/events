@@ -1,0 +1,65 @@
+.ui.card.EventCardBig,
+.ui.cards > .card.EventCardBig {
+  width: 100%;
+}
+
+.ui.card.EventCardBig.pending {
+  opacity: 0.7;
+  background: #eee;
+}
+
+.ui.card.EventCardBig .content {
+  padding: 14px 14px 0;
+}
+
+.ui.card.EventCardBig .header {
+  font-size: 17px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.53;
+  letter-spacing: -0.2px;
+  color: #16141a;
+  max-height: 3em;
+  overflow: hidden;
+}
+
+.ui.card.EventCardBig .dg.ImgFixed {
+  border-radius: 8px 0 0 8px;
+}
+
+.ui.card.EventCardBig .EventCardBig__Attendees {
+  position: absolute;
+  z-index: 10;
+  top: 6px;
+  right: 6px;
+}
+
+.ui.card.EventCardBig .EventCardBig__Attendees .dg.ImgAvatar {
+  margin-right: -10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.ui.card.EventCardBig .EventCardBig__Attendees .EventCardBig__Attendees__More {
+  display: inline-block;
+  min-width: 20px;
+  height: 20px;
+  background: white;
+  color: #37333d;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0 0.4em;
+  box-sizing: content-box;
+  line-height: 20px;
+}
+
+.ui.card.EventCardBig:hover
+  .JumpInButton.JumpInButton--compact
+  .JumpInButton__Position {
+  display: flex;
+}
+
+.ui.card.EventCardBig > .content > .header:not(.ui),
+.ui.cards > .card.EventCardBig > .content > .header:not(.ui) {
+  margin-top: 0;
+}

@@ -18,6 +18,8 @@ import { toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
+import EventCardBig from "../components/Event/EventCardBig/EventCardBig"
+import Carousel from "../components/Carousel/Carousel"
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import { EventAttributes, SessionEventAttributes } from "../entities/Event/types"
@@ -38,6 +40,7 @@ export type IndexPageState = {
 }
 
 export default function IndexPage(props: any) {
+  const now = Date.now()
   const [state, patchState] = usePatchState<IndexPageState>({ updating: {} })
   const [profile, profileActions] = useProfile()
   const location = useLocation()
@@ -49,6 +52,7 @@ export default function IndexPage(props: any) {
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [siteStore.events.getState()])
   const attendingEvents = useMemo(() => events.filter((event) => !!event.attending), [siteStore.events.getState()])
   const trendingEvents = useMemo(() => events.filter((event) => !!event.highlighted), [siteStore.events.getState()])
+  const liveEvents = useMemo(() => events.filter((event) => event.approved && now >= event.start_at.getTime() && now < event.finish_at.getTime()), [siteStore.events.getState()])
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
 
   const [requireWallet, setRequireWallet] = useState(false)
@@ -127,15 +131,15 @@ export default function IndexPage(props: any) {
     <Layout {...props}>
       <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
-      {currentEvent && <EventModal
+      <EventModal
         event={currentEvent}
         attendees={isListingAttendees}
-        updating={state.updating[currentEvent.id]}
+        updating={!!(currentEvent && state.updating[currentEvent.id])}
         onClose={handleCloseModal}
         onClickEdit={handleOpenEdit}
         onClickAttendees={handleOpenAttendees}
         onChangeEvent={handleChangeEvent}
-      />}
+      />
       <div style={{ paddingTop: "75px" }} />
       <Tabs>
         <Tabs.Tab active>World Events</Tabs.Tab>
@@ -146,31 +150,42 @@ export default function IndexPage(props: any) {
         </Button>
       </Tabs>
       <Container>
-        {siteStore.loading && <>
+        {siteStore.loading && <div>
           <Divider />
           <Loader active size="massive" style={{ position: 'relative' }} />
           <Divider />
-        </>}
-        {!siteStore.loading && events.length === 0 && <>
+        </div>}
+        {!siteStore.loading && events.length === 0 && <div>
           <Divider />
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
-        </>}
-        {!siteStore.loading && events.length > 0 && trendingEvents.length > 0 && <>
+        </div>}
+        {!siteStore.loading && events.length > 0 && liveEvents.length > 0 && <div><Carousel>
+          {liveEvents.map(event => <EventCardBig
+            key={'live:' + event.id}
+            event={event}
+            updating={state.updating[event.id]}
+            href={url.toEvent(location, event.id)}
+            onChangeEvent={handleChangeEvent}
+            onClickEdit={handleOpenEdit}
+            onClick={handleOpenModal}
+          />)}
+        </Carousel></div>}
+        {!siteStore.loading && events.length > 0 && trendingEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
           <Card.Group>
             {trendingEvents.map(event => <EventCardMini key={'trending:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
-          </Card.Group></>}
-        {!siteStore.loading && events.length > 0 && attendingEvents.length > 0 && <>
+          </Card.Group></div>}
+        {!siteStore.loading && events.length > 0 && attendingEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           <Card.Group>
             {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
-          </Card.Group></>}
-        {!siteStore.loading && events.length > 0 && myEvents.length > 0 && <>
+          </Card.Group></div>}
+        {!siteStore.loading && events.length > 0 && myEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>MY EVENTS</SubTitle></div>
           <Card.Group>
             {myEvents.map(event => <EventCardMini key={'my:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
-          </Card.Group></>}
+          </Card.Group></div>}
         {!siteStore.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
             <SubTitle>{toMonthName(date, { utc: true })}</SubTitle>
@@ -178,8 +193,8 @@ export default function IndexPage(props: any) {
           <Card.Group>
             {events.map((event) => <EventCard
               key={'event:' + event.id}
-              updating={state.updating[event.id]}
               event={event}
+              updating={state.updating[event.id]}
               href={url.toEvent(location, event.id)}
               onChangeEvent={handleChangeEvent}
               onClick={handleOpenModal}
