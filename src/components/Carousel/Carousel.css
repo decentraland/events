@@ -83,3 +83,27 @@
 .Carousel .Carousel__Next {
   left: 100%;
 }
+
+@media only screen and (max-width: 767px) {
+  .Carousel .Carousel__Items {
+    overflow: hidden;
+  }
+  .Carousel .Carousel__List {
+    padding: 6px;
+  }
+
+  .Carousel .Carousel__List > div {
+    padding: 6px 12px;
+  }
+
+  .Carousel .Carousel__List > div > div {
+    width: 20px;
+    height: 20px;
+  }
+
+  .Carousel .Carousel__Prev,
+  .Carousel .Carousel__Next,
+  .Carousel .JumpInButton__Position {
+    display: none;
+  }
+}

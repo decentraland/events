@@ -27,7 +27,7 @@ export default function EventCardBig(props: EventCardBigProps) {
   }
 
   return <Card className={TokenList.join(['EventCardBig', !event.approved && 'pending'])} href={props.href} onClick={handleClick}>
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
+    <div className="EventCardBig__Container">
       <div style={{ flex: '0 0 58%', position: 'relative' }}>
         <ImgFixed src={event.image || ''} dimension="wide" />
       </div>
