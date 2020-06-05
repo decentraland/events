@@ -9,6 +9,7 @@ import EditButtons from '../../Button/EditButtons';
 import EventSection from '../EventSection';
 
 import './EventModal.css'
+import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed';
 
 const close = require('../../../images/remove.svg')
 
@@ -28,6 +29,7 @@ export default function EventModal({ event, attendees, edit, className, onClose,
       <div className="EventModal__Action__Background" />
       <img src={close} width="14" height="14" />
     </div>}
+    {event && <ImgFixed src={event.image || ''} dimension="wide" />}
     {event && !attendees && <EventDetail event={event} onClickEdit={onClickEdit} onClickAttendees={onClickAttendees} />}
     {event && attendees && <EventAttendeeList event={event} />}
 

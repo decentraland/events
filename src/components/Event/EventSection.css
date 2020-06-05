@@ -16,8 +16,31 @@
   background-color: #ffeed6;
 }
 
+.EventSection .dg.Paragraph {
+  font-size: 15px;
+  line-height: 16px;
+  font-weight: normal;
+  margin: 0 0 0.5em;
+}
+
+.EventSection .dg.Paragraph--secondary {
+  font-size: 15px;
+  line-height: 16px;
+  font-weight: 300;
+}
+
+.EventSection .dg.Paragraph.error {
+  color: #ff0000;
+  text-align: right;
+  margin-top: 0.1em;
+}
+
 .EventSection .EventSection__Icon {
   flex: 0 0 28px;
+}
+
+.EventSection .EventSection__Icon.EventSection__Icon img {
+  vertical-align: initial;
 }
 
 .EventSection .EventSection__Icon.EventSection__Icon--center {
