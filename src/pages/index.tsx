@@ -52,7 +52,7 @@ export default function IndexPage(props: any) {
   const myEvents = useMemo(() => events.filter((event: EventAttributes) => profile && event.user === profile.address.toString()), [siteStore.events.getState()])
   const attendingEvents = useMemo(() => events.filter((event) => !!event.attending), [siteStore.events.getState()])
   const trendingEvents = useMemo(() => events.filter((event) => !!event.highlighted), [siteStore.events.getState()])
-  const liveEvents = useMemo(() => events.filter((event) => event.approved && now >= event.start_at.getTime() && now < event.finish_at.getTime()), [siteStore.events.getState()])
+  const liveEvents = useMemo(() => events.filter((event) => event.approved && now >= event.start_at.getTime() && now < event.finish_at.getTime()).reverse(), [siteStore.events.getState()])
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
 
   const [requireWallet, setRequireWallet] = useState(false)
