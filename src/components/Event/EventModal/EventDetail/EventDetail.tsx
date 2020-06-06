@@ -9,6 +9,7 @@ import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
+import Bold from 'decentraland-gatsby/dist/components/Text/Bold'
 import { toMonthName, toDayName } from 'decentraland-gatsby/dist/components/Date/utils'
 import { SessionEventAttributes } from '../../../../entities/Event/types'
 import JumpInButton from '../../../Button/JumpInButton'
@@ -48,7 +49,6 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const duration = finish_at.getTime() - start_at.getTime()
   const live = now.getTime() >= start_at.getTime() && now.getTime() < finish_at.getTime()
   const liveSince = now.getTime() - start_at.getTime()
-  const position = `${event.x},${event.y}`
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const advance = event.editable || event.owned
 
@@ -107,61 +107,76 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         </EventSection.Detail>}
         {!live && duration < DAY && <EventSection.Detail>
           <Paragraph >
-            {toDayName(start_at, { capitalized: true, utc: true })}
-            {', '}
-            {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
-            {' '}
-            {start_at.getUTCDate()}
+            <Bold>
+              {toDayName(start_at, { capitalized: true, utc: true })}
+              {', '}
+              {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
+              {' '}
+              {start_at.getUTCDate()}
+            </Bold>
             {duration === 0 && <>
               {' '}
-              {start_at.getUTCHours() % 12 || 12}
-              {start_at.getUTCMinutes() > 0 && ':'}
-              {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-              {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              <Bold>
+                {start_at.getUTCHours() % 12 || 12}
+                {start_at.getUTCMinutes() > 0 && ':'}
+                {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
+                {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              </Bold>
             </>}
             {duration > 0 && <>
               {' from '}
-              {start_at.getUTCHours() % 12 || 12}
-              {start_at.getUTCMinutes() > 0 && ':'}
-              {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-              {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              <Bold>
+                {start_at.getUTCHours() % 12 || 12}
+                {start_at.getUTCMinutes() > 0 && ':'}
+                {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
+                {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              </Bold>
               {' to '}
-              {finish_at.getUTCHours() % 12 || 12}
-              {finish_at.getUTCMinutes() > 0 && ':'}
-              {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
-              {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              <Bold>
+                {finish_at.getUTCHours() % 12 || 12}
+                {finish_at.getUTCMinutes() > 0 && ':'}
+                {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
+                {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              </Bold>
             </>}
             {' UTC'}
           </Paragraph>
         </EventSection.Detail>}
         {!live && duration >= DAY && <EventSection.Detail>
           <Paragraph >
-            <code>{'FROM: '}</code>
-            {toDayName(start_at, { capitalized: true, utc: true })}
-            {', '}
-            {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
-            {' '}
-            {start_at.getUTCDate()}
-            {' '}
-            {start_at.getUTCHours() % 12 || 12}
-            {start_at.getUTCMinutes() > 0 && ':'}
-            {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-            {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-            {' UTC'}
+            <span style={{ width: '3.5em', display: 'inline-block' }}>{'From: '}</span>
+            <Bold>{toDayName(start_at, { capitalized: true, utc: true })}
+              {', '}
+              {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
+              {' '}
+              {start_at.getUTCDate()}
+            </Bold>
+            {' at '}
+            <Bold>
+              {start_at.getUTCHours() % 12 || 12}
+              {start_at.getUTCMinutes() > 0 && ':'}
+              {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
+              {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              {' UTC'}
+            </Bold>
           </Paragraph>
           <Paragraph >
-            <code>{'  TO: '}</code>
-            {toDayName(finish_at, { capitalized: true })}
-            {', '}
-            {toMonthName(finish_at, { short: true, capitalized: true })}
-            {' '}
-            {finish_at.getUTCDate()}
-            {' '}
-            {finish_at.getUTCHours() % 12 || 12}
-            {finish_at.getUTCMinutes() > 0 && ':'}
-            {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
-            {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-            {' UTC'}
+            <span style={{ width: '3.5em', display: 'inline-block' }}>{'To: '}</span>
+            <Bold>
+              {toDayName(finish_at, { capitalized: true })}
+              {', '}
+              {toMonthName(finish_at, { short: true, capitalized: true })}
+              {' '}
+              {finish_at.getUTCDate()}
+            </Bold>
+            {' at '}
+            <Bold>
+              {finish_at.getUTCHours() % 12 || 12}
+              {finish_at.getUTCMinutes() > 0 && ':'}
+              {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
+              {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
+              {' UTC'}
+            </Bold>
           </Paragraph>
         </EventSection.Detail>}
         <EventSection.Action>
@@ -177,7 +192,6 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         <EventSection.Detail>
           <Paragraph bold>
             {event.scene_name || 'Decentraland'}
-            {position !== '0,0' && ` (${position})`}
           </Paragraph>
         </EventSection.Detail>
         <EventSection.Action>
@@ -232,6 +246,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         </EventSection.Detail>
         <EventSection.Action />
       </EventSection>}
-    </div>}
+    </div>
+    }
   </>
 }

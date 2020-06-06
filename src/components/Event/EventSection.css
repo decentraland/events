@@ -19,20 +19,18 @@
 .EventSection .dg.Paragraph {
   font-size: 15px;
   line-height: 16px;
-  font-weight: normal;
   margin: 0 0 0.5em;
-}
-
-.EventSection .dg.Paragraph--secondary {
-  font-size: 15px;
-  line-height: 16px;
-  font-weight: 300;
 }
 
 .EventSection .dg.Paragraph.error {
   color: #ff0000;
   text-align: right;
   margin-top: 0.1em;
+}
+
+.EventSection .dg.Paragraph .dg.Bold,
+.EventSection .dg.Paragraph.Paragraph--bold {
+  font-weight: 500;
 }
 
 .EventSection .EventSection__Icon {
