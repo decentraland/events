@@ -25,7 +25,7 @@ app.use('/api', [
   realms
 ])
 
-app.use(express.static('public'))
+app.use(express.static('public', { maxAge: 1000 * 60 * 60 }))
 
 Promise.resolve()
   .then(() => database.connect())
