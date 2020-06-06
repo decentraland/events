@@ -9,7 +9,11 @@
 }
 
 .ui.card.EventCardBig .content {
-  padding: 14px 14px 0;
+  padding: 0;
+  flex: 1;
+  justify-content: space-between;
+  flex-direction: column;
+  display: flex;
 }
 
 .ui.card.EventCardBig .header {
@@ -22,6 +26,12 @@
   color: #16141a;
   max-height: 3em;
   overflow: hidden;
+}
+
+.ui.card.EventCardBig .EventCardBig__Cover {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 60%;
 }
 
 .ui.card.EventCardBig .EventCardBig__Container {
