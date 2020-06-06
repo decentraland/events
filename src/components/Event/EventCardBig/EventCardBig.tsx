@@ -28,10 +28,10 @@ export default function EventCardBig(props: EventCardBigProps) {
 
   return <Card className={TokenList.join(['EventCardBig', !event.approved && 'pending'])} href={props.href} onClick={handleClick}>
     <div className="EventCardBig__Container">
-      <div style={{ flex: '0 0 58%', position: 'relative' }}>
+      <div className="EventCardBig__Cover">
         <ImgFixed src={event.image || ''} dimension="wide" />
       </div>
-      <Card.Content style={{ flex: 1 }}>
+      <Card.Content>
         <EventDetail
           event={event}
           showDescription={false}
@@ -40,8 +40,7 @@ export default function EventCardBig(props: EventCardBigProps) {
           showDetails={false}
           onClickEdit={props.onClickEdit}
         />
-        <EventSection.Divider />
-        <EventSection style={{ paddingTop: '28px' }}>
+        <EventSection>
           <AttendingButtons loading={props.updating} event={event} onChangeEvent={props.onChangeEvent} />
         </EventSection>
       </Card.Content>
