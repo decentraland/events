@@ -10,6 +10,7 @@ import { resolve } from 'url'
 const EVENTS_URL = env('EVENTS_URL', 'https://events.centraland.org/api')
 
 export default routes((router) => {
+  router.use('/', withSocialUserAgent() as any, injectSocialTag as any)
   router.use('/:lang(en|es|fr|ja|zh|ko)', withSocialUserAgent() as any, injectSocialTag as any)
 })
 
