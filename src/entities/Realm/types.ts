@@ -34,3 +34,17 @@ export type Realm = {
   url: string,
   layers: string[]
 }
+
+export type CatalystNode = {
+  domain: string
+}
+
+export type GraphResponse = {
+  data: {
+    nfts: {
+      ens: {
+        subdomain: string
+      }
+    }[]
+  }
+}
