@@ -147,8 +147,15 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     }
   }
 
+  function connect() {
+    return actions.connect()
+  }
+
   return {
     profile,
+    connect,
+    connectError: actions.error && actions.error.code,
+
 
     event,
     events,

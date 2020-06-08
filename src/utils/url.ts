@@ -21,6 +21,14 @@ export default {
     return pathname + params + hash
   },
 
+  toMyEvents(location: WindowLocation) {
+    return this.toUrl('/me')
+  },
+
+  toSubmit(location: WindowLocation) {
+    return this.toUrl('/submit')
+  },
+
   toHome(location: WindowLocation) {
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.delete('event')
@@ -33,11 +41,12 @@ export default {
     return !targetSearchParams.has('event') && !targetSearchParams.has('view')
   },
 
-  toEvent(location: WindowLocation, eventId: string) {
+  toEvent(location: WindowLocation, eventId: string, myEvents: boolean = false) {
+    const path = myEvents ? '/me/' : '/'
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set('event', eventId)
     targetSearchParams.delete('view')
-    return this.toUrl('/', targetSearchParams.toString())
+    return this.toUrl(path, targetSearchParams.toString())
   },
 
   isEvent(location: WindowLocation) {
@@ -74,19 +83,16 @@ export default {
     return targetSearchParams.has('event') && targetSearchParams.get('view') === 'clone'
   },
 
-  toEventAttendees(location: WindowLocation, eventId: string) {
+  toEventAttendees(location: WindowLocation, eventId: string, myEvents: boolean = false) {
+    const path = myEvents ? '/me/' : '/'
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set('event', eventId)
     targetSearchParams.set('view', 'attendees')
-    return this.toUrl('/', targetSearchParams.toString())
+    return this.toUrl(path, targetSearchParams.toString())
   },
 
   isEventAttendees(location: WindowLocation) {
     const targetSearchParams = new URLSearchParams(location.search)
     return targetSearchParams.has('event') && targetSearchParams.get('view') === 'attendees'
   },
-
-  toSubmit(location: WindowLocation) {
-    return this.toUrl('/submit')
-  }
 }
