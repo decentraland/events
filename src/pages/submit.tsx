@@ -93,6 +93,7 @@ export default function SubmitPage(props: any) {
           realm: original.realm,
           start_at: original.start_at,
           finish_at: original.finish_at,
+          all_day: original.all_day,
           url: original.url,
           highlighted: original.highlighted,
           rejected: original.rejected,
@@ -243,26 +244,32 @@ export default function SubmitPage(props: any) {
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row>
-                    <Grid.Column mobile="8">
-                      <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={editActions.getStartDate()} min={toInputDate(new Date())} onChange={editActions.handleChange} />
-                    </Grid.Column>
-                    <Grid.Column mobile="6">
-                      <Field label="Start time" name="start_time" type="time" error={!!errors['start_at'] || !!errors['start_time']} message={errors['start_time']} value={editActions.getStartTime()} onChange={editActions.handleChange} />
-                    </Grid.Column>
-                    <Grid.Column mobile="2">
-                      <Paragraph className="FieldNote">UTC</Paragraph>
+                    <Grid.Column mobile="16">
+                      <Label style={{ cursor: 'pointer' }}>
+                        All day event?
+                      <Radio toggle name="all_day" checked={editing.all_day} onChange={editActions.handleChange} style={{ marginLeft: '1em', verticalAlign: 'bottom' }} />
+                      </Label>
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="8">
+                      <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={editActions.getStartDate()} min={toInputDate(new Date())} onChange={editActions.handleChange} />
+                    </Grid.Column>
+                    {!editing.all_day && <Grid.Column mobile="6">
+                      <Field label="Start time" name="start_time" type="time" error={!!errors['start_at'] || !!errors['start_time']} message={errors['start_time']} value={editActions.getStartTime()} onChange={editActions.handleChange} />
+                    </Grid.Column>}
+                    {!editing.all_day && <Grid.Column mobile="2">
+                      <Paragraph className="FieldNote">UTC</Paragraph>
+                    </Grid.Column>}
+                    <Grid.Column mobile="8">
                       <Field label="End date" name="finish_date" type="date" error={!!errors['finish_at'] || !!errors['finish_date']} message={errors['finish_at'] || errors['finish_date']} value={editActions.getFinishDate()} min={toInputDate(editing.start_at)} onChange={editActions.handleChange} />
                     </Grid.Column>
-                    <Grid.Column mobile="6">
+                    {!editing.all_day && <Grid.Column mobile="6">
                       <Field label="End time" name="finish_time" type="time" error={!!errors['finish_at'] || !!errors['finish_time']} message={errors['finish_time']} value={editActions.getFinishTime()} onChange={editActions.handleChange} />
-                    </Grid.Column>
-                    <Grid.Column mobile="2">
+                    </Grid.Column>}
+                    {!editing.all_day && <Grid.Column mobile="2">
                       <Paragraph className="FieldNote">UTC</Paragraph>
-                    </Grid.Column>
+                    </Grid.Column>}
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="4">

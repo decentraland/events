@@ -47,6 +47,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     url: defaultEvent.url || '',
     start_at: start_at,
     finish_at: finish_at,
+    all_day: defaultEvent.all_day || false,
     approved: false,
     rejected: false,
     highlighted: false,
@@ -157,6 +158,30 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     }
   }
 
+
+  function handleChangeAllDay(value?: boolean) {
+    if (!value) {
+      setValue('all_day', false)
+    } else {
+      const start_at = fromUTCInputTime('00:00', event.start_at)
+      const finish_at = fromUTCInputTime('00:00', event.finish_at)
+
+      if (finish_at.getTime() < event.finish_at.getTime()) {
+        finish_at.setUTCDate(finish_at.getUTCDate() + 1)
+      }
+
+      if (finish_at.getTime() <= start_at.getTime()) {
+        finish_at.setUTCDate(start_at.getUTCDate() + 1)
+      }
+
+      setValues({
+        finish_at,
+        start_at,
+        all_day: true,
+      })
+    }
+  }
+
   function handleChangePosition(name: 'x' | 'y', value?: string) {
     const position = Number(value)
     if (value === '') {
@@ -167,6 +192,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       setError(name, 'Invalid coordinates')
     }
   }
+
 
   function handleChange(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any) {
     const name = getName(event, props)
@@ -204,6 +230,9 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
       case 'finish_time':
         return handleChangeFinishTime(value)
+
+      case 'all_day':
+        return handleChangeAllDay(value)
 
       default:
       // ignore change

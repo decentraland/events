@@ -1,12 +1,13 @@
 export type EventAttributes = {
   id: string // primary key
   name: string
-  image: string | null,
+  image: string | null
   description: string
   start_at: Date
   finish_at: Date
-  x: number,
-  y: number,
+  all_day: boolean
+  x: number
+  y: number
   realm: string | null
   url: string | null
   user: string
@@ -18,14 +19,14 @@ export type EventAttributes = {
   highlighted: boolean
   created_at: Date
   updated_at: Date
-  contact: string | null,
-  details: string | null,
-  total_attendees: number,
+  contact: string | null
+  details: string | null
+  total_attendees: number
   latest_attendees: string[]
 }
 
 export type DeprecatedEventAttributes = EventAttributes & {
-  scene_name: string | null,
+  scene_name: string | null
   coordinates: [number, number]
 }
 
@@ -51,6 +52,7 @@ export const patchAttributes: (keyof EventAttributes)[] = [
   'description',
   'start_at',
   'finish_at',
+  'all_day',
   'x',
   'y',
   'realm',
@@ -67,6 +69,7 @@ export const adminPatchAttributes: (keyof EventAttributes)[] = [
   'description',
   'start_at',
   'finish_at',
+  'all_day',
   'x',
   'y',
   'realm',
@@ -115,6 +118,9 @@ export const eventSchema = {
     finish_at: {
       type: 'string',
       format: 'date-time'
+    },
+    all_day: {
+      type: 'boolean'
     },
     x: {
       type: 'number',

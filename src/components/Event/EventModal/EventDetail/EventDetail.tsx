@@ -142,7 +142,27 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {' UTC'}
           </Paragraph>
         </EventSection.Detail>}
-        {!live && duration >= DAY && <EventSection.Detail>
+        {!live && duration >= DAY && event.all_day && <EventSection.Detail>
+          <Paragraph >
+            {'From '}
+            <Bold>{toDayName(start_at, { capitalized: true, utc: true })}
+              {', '}
+              {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
+              {' '}
+              {start_at.getUTCDate()}
+            </Bold>
+            {' to '}
+            <Bold>
+              {toDayName(finish_at, { capitalized: true, utc: true })}
+              {', '}
+              {toMonthName(finish_at, { short: true, capitalized: true, utc: true })}
+              {' '}
+              {finish_at.getUTCDate()}
+            </Bold>
+            {' UTC'}
+          </Paragraph>
+        </EventSection.Detail>}
+        {!live && duration >= DAY && !event.all_day && <EventSection.Detail>
           <Paragraph >
             <span style={{ width: '3.5em', display: 'inline-block' }}>{'From: '}</span>
             <Bold>{toDayName(start_at, { capitalized: true, utc: true })}
@@ -163,9 +183,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <Paragraph >
             <span style={{ width: '3.5em', display: 'inline-block' }}>{'To: '}</span>
             <Bold>
-              {toDayName(finish_at, { capitalized: true })}
+              {toDayName(finish_at, { capitalized: true, utc: true })}
               {', '}
-              {toMonthName(finish_at, { short: true, capitalized: true })}
+              {toMonthName(finish_at, { short: true, capitalized: true, utc: true })}
               {' '}
               {finish_at.getUTCDate()}
             </Bold>
