@@ -6,9 +6,9 @@ import { parse } from 'url'
 import { Address } from 'web3x/address';
 import { Eth } from 'web3x/eth';
 import { HttpProvider, WebsocketProvider } from 'web3x/providers';
-import { Configuration, CommStatus, Realm, CatalystNode } from './types';
-import dao from '../Contracts/DAO/CatalystAbi'
 import { Contract } from 'web3x/contract';
+import { CommStatus, Realm, CatalystNode } from './types';
+import dao from '../Contracts/DAO/CatalystAbi'
 
 const CONFIGURATION_ENDPOINT = 'https://explorer-config.decentraland.org/configuration.json'
 const CATALYST_CONTRACT_ADDRESS = '0x4a2f10076101650f40342885b99b6b101d83c486'
@@ -45,6 +45,10 @@ export async function getRealms(): Promise<Realm[]> {
 
   return comms
     .filter(comm => {
+      if (!comm.ready) {
+        return false
+      }
+
       if (realms.has(comm.name)) {
         return false
       }

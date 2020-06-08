@@ -64,8 +64,9 @@ export default function SubmitPage(props: any) {
     const realms = siteStore.realms.getList() || []
     for (let realm of realms) {
       for (let layer of realm.layers) {
-        const key = `${realm.id}-${layer} (${realm.url})`
-        result.push({ key, text: key, value: key })
+        const value = `${realm.id}-${layer}`
+        const key = `${value}-${realm.url}`
+        result.push({ key, value, text: value })
       }
     }
 
