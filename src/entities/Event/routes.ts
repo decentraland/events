@@ -18,6 +18,7 @@ import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
 import { Request } from 'express';
 import Context from 'decentraland-gatsby/dist/entities/Route/context';
+import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
@@ -38,7 +39,7 @@ export default routes((router) => {
 
 export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
   const options: Partial<EventListOptions> = {
-    user: req.auth,
+    currentUser: req.auth,
     offset: integer(req.query['offset']) ?? 0,
     limit: integer(req.query['limit']) ?? 500,
   }
@@ -66,6 +67,16 @@ export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
     } else {
 
       // out of bound
+      return []
+    }
+  }
+
+  if (req.query['user']) {
+    if (isEthereumAddress(req.query['user'])) {
+      options.user = String(req.query['user']).toLowerCase()
+    } else {
+
+      // invalid user address
       return []
     }
   }

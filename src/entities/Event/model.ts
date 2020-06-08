@@ -18,15 +18,16 @@ export default class Event extends Model<DeprecatedEventAttributes> {
     const query = SQL`
       SELECT 
         e.*
-        ${conditional(!!options.user, SQL`, a.user is not null as attending`)}
+        ${conditional(!!options.currentUser, SQL`, a.user is not null as attending`)}
       FROM ${table(Event)} e
-        ${conditional(!!options.user, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${options.user}`)}
+        ${conditional(!!options.currentUser, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${options.currentUser}`)}
       WHERE
         e.finish_at > now()
         AND e.rejected IS FALSE
-        ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
-        ${conditional(!!options.user && !isAdmin(options.user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`)}
-        ${conditional(!!options.onlyAttendee && !isAdmin(options.user), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`)}
+        ${conditional(!!options.user, SQL`AND e.user = ${options.user}`)}
+        ${conditional(!options.currentUser, SQL`AND e.approved IS TRUE`)}
+        ${conditional(!!options.currentUser && !isAdmin(options.currentUser), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`)}
+        ${conditional(!!options.onlyAttendee && !isAdmin(options.currentUser), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`)}
         ${conditional(Number.isFinite(options.x as number), SQL`AND e.x = ${options.x}`)}
         ${conditional(Number.isFinite(options.y as number), SQL`AND e.y = ${options.y}`)}
         ${conditional(!!options.estateId, SQL`AND e.estate_id = ${options.estateId}`)}
