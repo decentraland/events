@@ -50,6 +50,8 @@ export default class Events extends API {
       finish_at: event.finish_at && new Date(Date.parse(event.finish_at.toString())),
       created_at: event.created_at && new Date(Date.parse(event.created_at.toString())),
       updated_at: event.updated_at && new Date(Date.parse(event.updated_at.toString())),
+      active_until: event.updated_at && new Date(Date.parse(event.active_until.toString())),
+      recurrent: Boolean(event.recurrent),
       attending: Boolean(event.attending),
       editable: Boolean(event.editable),
       owned: Boolean(event.owned),

@@ -19,6 +19,14 @@ export type EventAttributes = {
   highlighted: boolean
   created_at: Date
   updated_at: Date
+  recurrent: boolean,
+  recurrent_frequency: string | null,
+  recurrent_weekday_mask: number,
+  recurrent_month_mask: number,
+  recurrent_interval: number
+  recurrent_count: number | null
+  recurrent_until: Date | null
+  active_until: Date
   contact: string | null
   details: string | null
   total_attendees: number
