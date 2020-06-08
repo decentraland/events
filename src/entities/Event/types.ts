@@ -38,6 +38,7 @@ export type SessionEventAttributes = DeprecatedEventAttributes & {
 }
 
 export type EventListOptions = {
+  currentUser: string | null | undefined,
   user: string | null | undefined,
   limit: number | null | undefined,
   offset: number | null | undefined,
