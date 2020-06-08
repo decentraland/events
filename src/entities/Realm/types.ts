@@ -17,6 +17,7 @@ export type CommStatus = {
   "name": string,
   "version": string,
   "currenTime": number,
+  "ready": boolean,
   "env": {
     "secure": boolean,
     "commitHash": string
