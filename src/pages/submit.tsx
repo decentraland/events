@@ -35,6 +35,8 @@ import './submit.css'
 
 const info = require('../images/info.svg')
 
+let GLOBAL_LOADING = false;
+
 type SubmitPageState = {
   dragging?: boolean,
   loading?: boolean,
@@ -70,6 +72,8 @@ export default function SubmitPage(props: any) {
 
     return result
   }, [siteStore.realms.getState()])
+
+  useEffect(() => { GLOBAL_LOADING = false }, [])
 
   useEffect(() => {
     if (siteStore.connectError === 'CONNECT_ERROR') {
@@ -124,21 +128,33 @@ export default function SubmitPage(props: any) {
   }
 
   function handleSubmit() {
+
+    if (GLOBAL_LOADING) {
+      return null
+    }
+
     if (state.loading) {
-      return
+      return null
     }
 
     if (!editActions.validate()) {
-      return
+      return null
     }
 
+    GLOBAL_LOADING = true
     patchState({ loading: true, error: null })
 
     const data = editActions.toObject()
     const submit = eventId ? siteStore.updateEvent(eventId, data) : siteStore.createEvent(data as EditEvent)
     submit
-      .then((event) => navigate(url.toEvent(location, event.id), siteStore.getNavigationState()))
-      .catch((error) => patchState({ loading: false, error: error.message }))
+      .then((event) => {
+        GLOBAL_LOADING = false
+        navigate(url.toEvent(location, event.id), siteStore.getNavigationState())
+      })
+      .catch((error) => {
+        GLOBAL_LOADING = false
+        patchState({ loading: false, error: error.message })
+      })
   }
 
   function handleDragStart(event: React.DragEvent<any>) {
