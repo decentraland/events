@@ -1,5 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import { createReadStream } from 'fs'
 import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
 import { status, logger } from 'decentraland-gatsby/dist/entities/Route/routes'
 import database from './entities/Database/index'
@@ -26,6 +27,7 @@ app.use('/api', [
 ])
 
 app.use(express.static('public', { maxAge: 1000 * 60 * 60 }))
+app.use((_, res) => createReadStream(process.cwd() + '/public/404.html').pipe(res))
 
 Promise.resolve()
   .then(() => database.connect())
