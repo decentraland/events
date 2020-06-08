@@ -17,31 +17,33 @@ export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: SessionEventAttributes | null
   attendees?: boolean
   updating?: boolean
-  onClickEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
-  onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
-  onChangeEvent?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
+  onClickEdit?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
+  onClickAttendees?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
+  onClickDetails?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
+  onChangeEvent?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
 }
 
-export default function EventModal({ event, attendees, edit, className, onClose, onClickEdit, onClickAttendees, onChangeEvent, ...props }: EventModalProps) {
+export default function EventModal({ event, attendees, edit, className, onClose, onClickEdit, onClickAttendees, onChangeEvent, onClickDetails, ...props }: EventModalProps) {
 
   return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', (!event || !event.approved) && 'pending', className])} onClose={onClose} >
+    {event && attendees && <EventAttendeeList event={event} onBack={onClickDetails} onClose={onClose} />}
+
     {event && !attendees && <div className="EventModal__Action" onClick={onClose}>
       <div className="EventModal__Action__Background" />
       <img src={close} width="14" height="14" />
     </div>}
-    {event && <ImgFixed src={event.image || ''} dimension="wide" />}
+    {event && !attendees && <ImgFixed src={event.image || ''} dimension="wide" />}
     {event && !attendees && <EventDetail event={event} onClickEdit={onClickEdit} onClickAttendees={onClickAttendees} />}
-    {event && attendees && <EventAttendeeList event={event} />}
 
     {/* SOCIAL */}
-    {event && event.approved && <EventSection.Divider />}
-    {event && event.approved && <EventSection>
+    {event && !attendees && event.approved && <EventSection.Divider />}
+    {event && !attendees && event.approved && <EventSection>
       <AttendingButtons loading={props.updating} event={event} onChangeEvent={onChangeEvent} />
     </EventSection>}
 
     {/* APPROVE */}
-    {event && !event.approved && event.editable && <EventSection.Divider />}
-    {event && !event.approved && event.editable && <EventSection>
+    {event && !attendees && !event.approved && event.editable && <EventSection.Divider />}
+    {event && !attendees && !event.approved && event.editable && <EventSection>
       <EditButtons loading={props.updating} event={event} onChangeEvent={onChangeEvent} />
     </EventSection>}
   </Modal>
