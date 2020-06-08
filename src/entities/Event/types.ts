@@ -56,7 +56,9 @@ export type EventListOptions = {
   onlyAttendee: boolean
 }
 
-export const patchAttributes: (keyof EventAttributes)[] = [
+export const editableAttributes: (keyof EventAttributes)[] = [
+  'image',
+  'rejected',
   'name',
   'description',
   'start_at',
@@ -65,25 +67,18 @@ export const patchAttributes: (keyof EventAttributes)[] = [
   'x',
   'y',
   'realm',
-  'contact',
-  'details',
 ]
 
-export const adminPatchAttributes: (keyof EventAttributes)[] = [
-  'image',
+export const patchAttributes: (keyof EventAttributes)[] = editableAttributes.concat([
+  'contact',
+  'details',
+])
+
+export const adminPatchAttributes: (keyof EventAttributes)[] = editableAttributes.concat([
   'approved',
-  'rejected',
   'highlighted',
-  'name',
-  'description',
-  'start_at',
-  'finish_at',
-  'all_day',
-  'x',
-  'y',
-  'realm',
   'url',
-]
+])
 
 export const eventSchema = {
   type: 'object',
