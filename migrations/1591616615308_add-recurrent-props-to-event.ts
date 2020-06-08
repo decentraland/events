@@ -34,11 +34,11 @@ const columns: ColumnDefinitions = {
     default: null
   },
   recurrent_until: {
-    type: 'DATE',
+    type: 'TIMESTAMP',
     default: null
   },
   active_until: {
-    type: 'DATE',
+    type: 'TIMESTAMP',
     notNull: true,
     default: 'now()'
   }
