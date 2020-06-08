@@ -156,6 +156,8 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     approved: false,
     rejected: false,
     highlighted: false,
+    recurrent: false,
+    active_until: data.finish_at,
     total_attendees: 0,
     latest_attendees: [],
     created_at: now
