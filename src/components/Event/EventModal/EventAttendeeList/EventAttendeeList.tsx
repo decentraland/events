@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useLocation } from "@reach/router"
 import { EventAttendeeAttributes } from '../../../../entities/EventAttendee/types'
-import { EventAttributes } from '../../../../entities/Event/types'
+import { EventAttributes, SessionEventAttributes } from '../../../../entities/Event/types'
 import useAsyncEffect from 'decentraland-gatsby/dist/hooks/useAsyncEffect'
 import Events from '../../../../api/Events'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
@@ -20,14 +20,14 @@ const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const attendees = new Map<string, EventAttendeeAttributes[]>()
 
 export type EventAttendeeListProps = {
-  event: EventAttributes,
-  onBack?: (e: React.EventHandler<any>) => void
+  event: SessionEventAttributes,
+  onBack?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
+  onClose?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
 }
 
 export default function EventAttendeeList(props: EventAttendeeListProps) {
 
   const [list, setList] = useState(attendees.get(props.event.id))
-  const location = useLocation()
 
   useAsyncEffect(async () => {
     const result = await Events.get().getEventAttending(props.event.id)
@@ -35,10 +35,22 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
     setList(result)
   }, [props.event.id])
 
+  function handleBack(e: React.MouseEvent<HTMLElement>) {
+    if (props.onBack) {
+      props.onBack(e, props.event)
+    }
+  }
+
+  function handleClose(e: React.MouseEvent<HTMLElement>) {
+    if (props.onClose) {
+      props.onClose(e, props.event)
+    }
+  }
+
   return <div className="EventAttendeeList">
     <div className="EventAttendeeList__Header">
-      <img src={back} width="8" height="14" className="EventAttendeeList__Header__Back" onClick={() => navigate(url.toEvent(location, props.event.id))} />
-      <img src={close} width="14" height="14" className="EventAttendeeList__Header__Close" onClick={() => navigate(url.toHome(location))} />
+      {props.onBack && <img src={back} width="8" height="14" className="EventAttendeeList__Header__Back" onClick={handleBack} />}
+      {props.onClose && <img src={close} width="14" height="14" className="EventAttendeeList__Header__Close" onClick={handleClose} />}
       <SubTitle>People going</SubTitle>
     </div>
     {!list && <Loader size="massive" />}

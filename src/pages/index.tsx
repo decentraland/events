@@ -82,14 +82,14 @@ export default function IndexPage(props: any) {
     navigate(url.toHome(location), siteStore.getNavigationState())
   }
 
-  function handleOpenModal(event: React.MouseEvent<any>, data: SessionEventAttributes) {
-    event.preventDefault()
-    navigate(url.toEvent(location, data.id), siteStore.getNavigationState())
-  }
-
   function handleOpenEdit(event: React.MouseEvent<any>, data: SessionEventAttributes) {
     event.preventDefault()
     navigate(url.toEventEdit(location, data.id), siteStore.getNavigationState())
+  }
+
+  function handleOpenEventDetail(event: React.MouseEvent<any>, data: SessionEventAttributes) {
+    event.preventDefault()
+    navigate(url.toEvent(location, data.id), siteStore.getNavigationState())
   }
 
   function handleOpenAttendees(event: React.MouseEvent<any>, data: SessionEventAttributes) {
@@ -139,6 +139,7 @@ export default function IndexPage(props: any) {
         updating={!!(currentEvent && state.updating[currentEvent.id])}
         onClose={handleCloseModal}
         onClickEdit={handleOpenEdit}
+        onClickDetails={handleOpenEventDetail}
         onClickAttendees={handleOpenAttendees}
         onChangeEvent={handleChangeEvent}
       />
@@ -167,13 +168,13 @@ export default function IndexPage(props: any) {
             href={url.toEvent(location, event.id)}
             onChangeEvent={handleChangeEvent}
             onClickEdit={handleOpenEdit}
-            onClick={handleOpenModal}
+            onClick={handleOpenEventDetail}
           />)}
         </Carousel></div>}
         {!siteStore.loading && events.length > 0 && trendingEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
           <Card.Group>
-            {trendingEvents.map(event => <EventCardMini key={'trending:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
+            {trendingEvents.map(event => <EventCardMini key={'trending:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenEventDetail} />)}
           </Card.Group></div>}
         {!siteStore.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
@@ -186,7 +187,7 @@ export default function IndexPage(props: any) {
               updating={state.updating[event.id]}
               href={url.toEvent(location, event.id)}
               onChangeEvent={handleChangeEvent}
-              onClick={handleOpenModal}
+              onClick={handleOpenEventDetail}
             />)}
           </Card.Group>
         </Fragment>)}

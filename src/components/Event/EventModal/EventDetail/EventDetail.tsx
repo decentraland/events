@@ -223,19 +223,15 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {props.showAttendees !== false && <EventSection.Divider />}
       {props.showAttendees !== false && <EventSection>
         <EventSection.Icon src={friends} width="16x" height="16" center />
-        <EventSection.Detail>
+        <EventSection.Detail style={{ display: 'flex', justifyContent: attendeesDiff > 0 ? 'space-around' : '' }}>
           {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
-          {attendeesDiff > 0 && <div className={TokenList.join([
-            "EventDetail__Detail__ShowAttendees",
-            attendeesDiff >= 10 && 'MoreThan10',
-            attendeesDiff >= 100 && 'MoreThan100',
-            attendeesDiff >= 1000 && 'MoreThan1000',
-          ])} onClick={handleAttendees}>
+        </EventSection.Detail>
+        <EventSection.Action>
+          {attendeesDiff > 0 && <div className="EventDetail__Detail__ShowAttendees" onClick={handleAttendees}>
             {`+${attendeesDiff}`}
           </div>}
-        </EventSection.Detail>
-        <EventSection.Action />
+        </EventSection.Action>
       </EventSection>}
 
       {/* CONTACT */}

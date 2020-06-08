@@ -74,7 +74,7 @@ export default function IndexPage(props: any) {
     navigate(url.toMyEvents(location), siteStore.getNavigationState())
   }
 
-  function handleOpenModal(event: React.MouseEvent<any>, data: SessionEventAttributes) {
+  function handleOpenEventDetail(event: React.MouseEvent<any>, data: SessionEventAttributes) {
     event.preventDefault()
     navigate(url.toEvent(location, data.id, true), siteStore.getNavigationState())
   }
@@ -132,6 +132,7 @@ export default function IndexPage(props: any) {
         onClose={handleCloseModal}
         onClickEdit={handleOpenEdit}
         onClickAttendees={handleOpenAttendees}
+        onClickDetails={handleOpenEventDetail}
         onChangeEvent={handleChangeEvent}
       />
       <div style={{ paddingTop: "75px" }} />
@@ -164,7 +165,7 @@ export default function IndexPage(props: any) {
             <Divider size="mini" />
           </div>}
           {attendingEvents.length > 0 && <Card.Group>
-            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenModal} />)}
+            {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenEventDetail} />)}
           </Card.Group>}
         </div>}
         {!siteStore.loading && siteStore.profile && events.length > 0 && <div>
@@ -181,7 +182,7 @@ export default function IndexPage(props: any) {
               updating={state.updating[event.id]}
               href={url.toEvent(location, event.id)}
               onChangeEvent={handleChangeEvent}
-              onClick={handleOpenModal}
+              onClick={handleOpenEventDetail}
             />)}
           </Card.Group>}
         </div>}
