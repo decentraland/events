@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from "react"
 import { useLocation } from '@reach/router'
-import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
@@ -51,7 +50,6 @@ type SubmitPageState = {
 export default function SubmitPage(props: any) {
 
   const location = useLocation()
-  const [profile, profileActions] = useProfile()
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const eventId = url.getEventId(location)
   const siteStore = useSiteStore(props.location)
@@ -74,10 +72,10 @@ export default function SubmitPage(props: any) {
   }, [siteStore.realms.getState()])
 
   useEffect(() => {
-    if (Boolean(profileActions.error && profileActions.error.code === 'CONNECT_ERROR')) {
+    if (siteStore.connectError === 'CONNECT_ERROR') {
       patchState({ requireWallet: true })
     }
-  }, [profileActions.error, profileActions.error && profileActions.error.code])
+  }, [siteStore.connectError])
 
   useAnalytics((analytics) => analytics.page(segment.Page.Submit))
 
@@ -195,7 +193,7 @@ export default function SubmitPage(props: any) {
           {!siteStore.loading && !siteStore.profile && <Grid stackable>
             <Grid.Row centered>
               <Grid.Column mobile="16" textAlign="center" style={{ paddingTop: '30vh', paddingBottom: '30vh' }}>
-                <Paragraph secondary>You need to <Link onClick={() => profileActions.connect()}>sign in</Link> before to submit an event</Paragraph>
+                <Paragraph secondary>You need to <Link onClick={() => siteStore.connect()}>sign in</Link> before to submit an event</Paragraph>
               </Grid.Column>
             </Grid.Row>
           </Grid>}
