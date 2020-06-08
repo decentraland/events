@@ -201,6 +201,12 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   updatedAttributes.scene_name = updatedAttributes.estate_name
   updatedAttributes.coordinates = [x, y]
 
+  if (updatedAttributes.rejected) {
+    updatedAttributes.rejected = true
+    updatedAttributes.approved = false
+    updatedAttributes.highlighted = false
+  }
+
   await Event.update(updatedAttributes, { id: event.id })
 
   const updatedEvent = { ...event, ...updatedAttributes }

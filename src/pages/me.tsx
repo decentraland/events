@@ -18,7 +18,7 @@ import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import useListEvents from '../hooks/useListEvents'
 import { SessionEventAttributes } from "../entities/Event/types"
-import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
+import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import SEO from "../components/seo"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'

@@ -20,7 +20,8 @@ import SEO from "../components/seo"
 import useEventEditor from "../hooks/useEventEditor"
 import BackButton from "../components/Button/BackButton"
 import AddCoverButton from "../components/Button/AddCoverButton"
-import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
+import ConfirmModal from "../components/Modal/ConfirmModal"
+import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
 import useAnalytics from '../hooks/useAnalytics'
@@ -32,6 +33,7 @@ import Label from "../components/Form/Label"
 import Events, { EditEvent } from "../api/Events"
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
 import './submit.css'
+import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 
 const info = require('../images/info.svg')
 
@@ -42,6 +44,7 @@ type SubmitPageState = {
   loading?: boolean,
   uploadingPoster?: boolean,
   requireWallet?: boolean,
+  requireConfirmation?: boolean,
   previewingDescription?: boolean,
   errorImageSize?: boolean,
   errorImageFormat?: boolean,
@@ -53,7 +56,7 @@ export default function SubmitPage(props: any) {
 
   const location = useLocation()
   const [state, patchState] = usePatchState<SubmitPageState>({})
-  const eventId = url.getEventId(location)
+  const eventId = url.getEventId(location) || null
   const siteStore = useSiteStore(props.location)
   const siteState = siteStore.events.getState()
   const [editing, editActions] = useEventEditor()
@@ -127,8 +130,8 @@ export default function SubmitPage(props: any) {
     }
   }
 
-  function handleSubmit() {
-
+  function handleSubmit(event: React.MouseEvent<any>) {
+    event.preventDefault()
     if (GLOBAL_LOADING) {
       return null
     }
@@ -155,6 +158,30 @@ export default function SubmitPage(props: any) {
         GLOBAL_LOADING = false
         patchState({ loading: false, error: error.message })
       })
+  }
+
+  function handleReject(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    if (eventId) {
+      patchState({ requireConfirmation: true, error: null })
+    }
+  }
+
+  function handleConfirmReject(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    if (eventId) {
+      GLOBAL_LOADING = true
+      patchState({ loading: true, error: null })
+      siteStore.updateEvent(eventId, { rejected: true })
+        .then(() => {
+          GLOBAL_LOADING = false
+          navigate(url.toHome(location), siteStore.getNavigationState())
+        })
+        .catch((err) => {
+          GLOBAL_LOADING = false
+          patchState({ loading: false, error: err.message })
+        })
+    }
   }
 
   function handleDragStart(event: React.DragEvent<any>) {
@@ -193,10 +220,17 @@ export default function SubmitPage(props: any) {
 
   const errors = editing.errors
   const coverError = state.errorImageSize || state.errorImageFormat || !!state.errorImageServer
+  const event = eventId && siteStore.events.getEntity(eventId) || null
 
   return (
     <Layout {...props} >
       <SEO title="Submit event" />
+      <ConfirmModal open={state.requireConfirmation} onClose={() => patchState({ requireConfirmation: false })}>
+        <Title>Are you absolutely sure?</Title>
+        <Paragraph>This action <Bold>cannot</Bold> be undone. This will permanently delete the <Bold>{event ? event.name : 'this'}</Bold> event</Paragraph>
+        {state.error && <Paragraph primary>{state.error}</Paragraph>}
+        <Button primary onClick={handleConfirmReject} loading={state.loading} style={{ marginTop: '28px' }}>YES, DELETE THIS EVENT</Button>
+      </ConfirmModal>
       <div onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop} >
         <Container style={{ paddingTop: '110px' }}>
           <WalletRequiredModal open={!!state.requireWallet} onClose={() => patchState({ requireWallet: false })} />
@@ -310,9 +344,16 @@ export default function SubmitPage(props: any) {
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="6">
-                      <Button primary loading={state.loading} disabled={state.loading} style={{ width: '100%' }} onClick={handleSubmit}>SUBMIT</Button>
+                      <Button primary loading={state.loading} disabled={state.loading} style={{ width: '100%' }} onClick={handleSubmit}>
+                        {event && 'SAVE'}
+                        {!event && 'SUBMIT'}
+                      </Button>
                     </Grid.Column>
-                    <Grid.Column mobile="10"></Grid.Column>
+                    <Grid.Column mobile="6">
+                      {event && (event.owned || event.editable) && <Button basic loading={state.loading} disabled={state.loading} style={{ width: '100%' }} onClick={handleReject}>
+                        DELETE
+                      </Button>}
+                    </Grid.Column>
                   </Grid.Row>
                   {state.error && <Grid.Row>
                     <Grid.Column mobile="16">

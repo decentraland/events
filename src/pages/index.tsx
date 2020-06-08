@@ -24,7 +24,7 @@ import SubmitButton from "../components/Button/SubmitButton"
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import { EventAttributes, SessionEventAttributes } from "../entities/Event/types"
-import WalletRequiredModal from "../components/WalletRequiredModal/WalletRequiredModal"
+import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import SEO from "../components/seo"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
