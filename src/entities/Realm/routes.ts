@@ -41,13 +41,24 @@ export async function getRealms(): Promise<Realm[]> {
     nodes.map(node => fetch(node.domain + '/comms/status?includeLayers=true').then((response) => response.json()))
   )
 
-  return comms.map((comm, i) => {
-    return {
-      id: comm.name,
-      url: nodes[i].domain,
-      layers: comm.layers.map(layer => layer.name)
-    }
-  })
+  const realms = new Set<string>()
+
+  return comms
+    .filter(comm => {
+      if (realms.has(comm.name)) {
+        return false
+      }
+
+      realms.add(comm.name)
+      return true
+    })
+    .map((comm, i) => {
+      return {
+        id: comm.name,
+        url: nodes[i].domain,
+        layers: comm.layers.map(layer => layer.name)
+      }
+    })
 }
 
 export async function fetchCatalystNodes(): Promise<CatalystNode[]> {
@@ -58,7 +69,6 @@ export async function fetchCatalystNodes(): Promise<CatalystNode[]> {
 
   const count = Number.parseInt(await contract.methods.catalystCount().call(), 10)
 
-  console.log(count)
   const nodes: CatalystNode[] = await Promise.all(Array.from(Array(count), async (_, i) => {
     const ids = await contract.methods.catalystIds(i).call()
     return contract.methods.catalystById(ids).call()
