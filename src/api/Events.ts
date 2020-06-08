@@ -13,6 +13,7 @@ export type EditEvent = Pick<EventAttributes,
   'description' |
   'start_at' |
   'finish_at' |
+  'all_day' |
   'x' |
   'y' |
   'realm' |
