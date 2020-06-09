@@ -22,8 +22,9 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       FROM ${table(Event)} e
         ${conditional(!!options.currentUser, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${options.currentUser}`)}
       WHERE
-        e.finish_at > now()
-        AND e.rejected IS FALSE
+        e.rejected IS FALSE
+        AND e.finish_at > now()
+        ${conditional(!!options.onlyUpcoming, SQL`AND e.start_at > now()`)}
         ${conditional(!!options.user, SQL`AND e.user = ${options.user}`)}
         ${conditional(!options.currentUser, SQL`AND e.approved IS TRUE`)}
         ${conditional(!!options.currentUser && !isAdmin(options.currentUser), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`)}
