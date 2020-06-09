@@ -54,6 +54,7 @@ export type EventListOptions = {
   y: number | null | undefined,
   estateId: string | null | undefined,
   onlyAttendee: boolean
+  onlyUpcoming: boolean
 }
 
 export const editableAttributes: (keyof EventAttributes)[] = [

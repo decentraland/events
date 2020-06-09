@@ -82,7 +82,17 @@ export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
   }
 
   if (ctx.param('onlyAttendee', { defaultValue: false, parser: bool })) {
-    options.onlyAttendee = true
+    if (req.auth) {
+      options.onlyAttendee = true
+    } else {
+
+      // attendee without user
+      return []
+    }
+  }
+
+  if (ctx.param('onlyUpcoming', { defaultValue: false, parser: bool })) {
+    options.onlyUpcoming = true
   }
 
   const events = await Event.getEvents(options)
