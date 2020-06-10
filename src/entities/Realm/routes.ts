@@ -37,15 +37,21 @@ export async function getRealms(): Promise<Realm[]> {
   // console.log(await fetchCatalystNodes())
   const nodes = await fetchCatalystNodes()
   // const config: Configuration = await fetch(CONFIGURATION_ENDPOINT).then((response) => response.json())
-  const comms: CommStatus[] = await Promise.all(
-    nodes.map(node => fetch(node.domain + '/comms/status?includeLayers=true').then((response) => response.json()))
+  const comms: (CommStatus | null)[] = await Promise.all(
+    nodes.map(node => fetch(node.domain + '/comms/status?includeLayers=true')
+      .then((response) => response.json())
+      .catch((err: Error) => {
+        console.error(err)
+        return null
+      })
+    )
   )
 
   const realms = new Set<string>()
 
   return comms
     .filter(comm => {
-      if (!comm.ready) {
+      if (!comm || !comm.ready) {
         return false
       }
 
@@ -57,10 +63,11 @@ export async function getRealms(): Promise<Realm[]> {
       return true
     })
     .map((comm, i) => {
+      const c = comm as CommStatus
       return {
-        id: comm.name,
+        id: c.name,
         url: nodes[i].domain,
-        layers: comm.layers.map(layer => layer.name)
+        layers: c.layers.map(layer => layer.name)
       }
     })
 }
