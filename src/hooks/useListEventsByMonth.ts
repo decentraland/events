@@ -10,9 +10,9 @@ export default function useListEventsByMonth(events?: SessionEventAttributes[] |
 
     if (events && events.length) {
       for (const event of events) {
-        if (event.start_at.getTime() > now) {
-          const start_at = event.start_at.getTime() < now ? new Date(now) : event.start_at;
-          const groupDate = new Date(start_at.getFullYear(), start_at.getMonth())
+        if (event.next_start_at.getTime() > now) {
+          const next_start_at = event.next_start_at.getTime() < now ? new Date(now) : event.next_start_at;
+          const groupDate = new Date(next_start_at.getFullYear(), next_start_at.getMonth())
           const groupKey = groupDate.toJSON()
 
           if (!group.has(groupKey)) {
@@ -27,7 +27,7 @@ export default function useListEventsByMonth(events?: SessionEventAttributes[] |
     const list = [] as EventGroup[]
 
     for (const [date, events] of group.entries()) {
-      list.push([new Date(Date.parse(date)), events])
+      list.push([new Date(Date.parse(date)), events.sort((a, b) => a.next_start_at.getTime() - b.next_start_at.getTime())])
     }
 
     return list

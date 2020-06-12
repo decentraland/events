@@ -19,6 +19,6 @@ export default function useListEvents(events?: Record<string, SessionEventAttrib
 
         return true
       })
-      .sort((a, b) => a.start_at.getTime() - b.start_at.getTime())
+      .sort((a, b) => a.next_start_at.getTime() - b.next_start_at.getTime())
   }, [events])
 }

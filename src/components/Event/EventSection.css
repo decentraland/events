@@ -10,6 +10,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   padding: 18px 24px;
+  overflow: auto;
 }
 
 .EventSection.EventSection--highlight {
@@ -49,6 +50,7 @@
 .EventSection .EventSection__Detail {
   flex: 1 1 auto;
   max-width: 90%;
+  overflow: auto;
 }
 
 .EventSection .EventSection__Detail .dg.ImgAvatar {

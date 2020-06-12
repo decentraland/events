@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from "react"
+import { RRule, Options as RRuleOptions } from 'rrule'
 import { useLocation } from '@reach/router'
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
@@ -10,9 +11,11 @@ import { SelectField } from 'decentraland-ui/dist/components/SelectField/SelectF
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
-import { toInputDate } from "decentraland-gatsby/dist/components/Date/utils"
+import { toInputDate, toDayName, toUTCInputDate, toMonthName, fromInputDate } from "decentraland-gatsby/dist/components/Date/utils"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
+import Bold from "decentraland-gatsby/dist/components/Text/Bold"
+import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { navigate } from 'gatsby-plugin-intl'
 
 import Layout from "../components/Layout/Layout"
@@ -22,18 +25,21 @@ import BackButton from "../components/Button/BackButton"
 import AddCoverButton from "../components/Button/AddCoverButton"
 import ConfirmModal from "../components/Modal/ConfirmModal"
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
-import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
 import useAnalytics from '../hooks/useAnalytics'
 import * as segment from '../utils/segment'
+import url from '../utils/url'
 
 import ImageInput from "../components/Form/ImageInput"
 import Textarea from "../components/Form/Textarea"
 import Label from "../components/Form/Label"
+import RadioGroup from "../components/Form/RadioGroup"
 import Events, { EditEvent } from "../api/Events"
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
+import { Frequency, WeekdayMask, Position, Weekdays, MAX_EVENT_RECURRENT } from "../entities/Event/types"
+import { isLatestRecurrentSetpos, toRecurrentSetposName, toRRuleWeekdays, toRRuleMonths, toRRuleDates } from "../entities/Event/utils"
+
 import './submit.css'
-import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 
 const info = require('../images/info.svg')
 
@@ -76,6 +82,40 @@ export default function SubmitPage(props: any) {
     return result
   }, [siteStore.realms.getState()])
 
+  const recurrentOptions = useMemo(() => {
+    return [
+      { value: false, text: 'Does not repeat' },
+      { value: true, text: 'Repeat every' }
+    ]
+  }, [])
+
+  const recurrentFrequencyOptions = useMemo(() => {
+    const moreThanOne = editing.recurrent_interval > 1
+    return [
+      { value: Frequency.DAILY, text: moreThanOne ? 'days' : 'day' },
+      { value: Frequency.WEEKLY, text: moreThanOne ? 'weeks' : 'week' },
+      { value: Frequency.MONTHLY, text: moreThanOne ? 'month' : 'month' }
+    ]
+  }, [editing.recurrent_interval])
+
+  const recurrentEndsOptions = useMemo(() => [
+    { value: 'count', text: 'After' },
+    { value: 'until', text: 'On' },
+  ], [])
+
+  const recurrent_date = useMemo(() => toRRuleDates(editing, (_, i) => i < MAX_EVENT_RECURRENT), [
+    editing.start_at,
+    editing.recurrent,
+    editing.recurrent_count,
+    editing.recurrent_until,
+    editing.recurrent_frequency,
+    editing.recurrent_interval,
+    editing.recurrent_month_mask,
+    editing.recurrent_weekday_mask,
+    editing.recurrent_setpos,
+    editing.recurrent_monthday
+  ])
+
   useEffect(() => { GLOBAL_LOADING = false }, [])
 
   useEffect(() => {
@@ -99,7 +139,7 @@ export default function SubmitPage(props: any) {
           y: original.y,
           realm: original.realm,
           start_at: original.start_at,
-          finish_at: original.finish_at,
+          duration: original.duration,
           all_day: original.all_day,
           url: original.url,
           highlighted: original.highlighted,
@@ -107,6 +147,15 @@ export default function SubmitPage(props: any) {
           approved: original.approved,
           contact: original.contact,
           details: original.details,
+          recurrent: original.recurrent,
+          recurrent_count: original.recurrent_count,
+          recurrent_until: original.recurrent_until,
+          recurrent_frequency: original.recurrent_frequency,
+          recurrent_interval: original.recurrent_interval,
+          recurrent_month_mask: original.recurrent_month_mask,
+          recurrent_weekday_mask: original.recurrent_weekday_mask,
+          recurrent_setpos: original.recurrent_setpos,
+          recurrent_monthday: original.recurrent_monthday,
         })
       }
     }
@@ -221,6 +270,7 @@ export default function SubmitPage(props: any) {
   const errors = editing.errors
   const coverError = state.errorImageSize || state.errorImageFormat || !!state.errorImageServer
   const event = eventId && siteStore.events.getEntity(eventId) || null
+  const now = Date.now()
 
   return (
     <Layout {...props} >
@@ -277,7 +327,7 @@ export default function SubmitPage(props: any) {
                       <Label style={{ marginBottom: '1em' }}>Advance</Label>
                     </Grid.Column>
                     <Grid.Column mobile="4">
-                      <Radio toggle name="highlighted" label="TRENDING" checked={editing.highlighted} onChange={editActions.handleChange} style={{ marginBottom: '1em' }} />
+                      <Radio name="highlighted" label="TRENDING" checked={editing.highlighted} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !editing.highlighted })} />
                     </Grid.Column>
                   </Grid.Row>}
                   <Grid.Row>
@@ -295,9 +345,14 @@ export default function SubmitPage(props: any) {
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="16">
+                      <Divider size="tiny" />
+                    </Grid.Column>
+                  </Grid.Row>
+                  <Grid.Row>
+                    <Grid.Column mobile="16">
                       <Label style={{ cursor: 'pointer' }}>
-                        All day event?
-                      <Radio toggle name="all_day" checked={editing.all_day} onChange={editActions.handleChange} style={{ marginLeft: '1em', verticalAlign: 'bottom' }} />
+                        All day event ?
+                        <Radio toggle name="all_day" checked={editing.all_day} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !editing.all_day })} style={{ marginLeft: '1em', verticalAlign: 'bottom' }} />
                       </Label>
                     </Grid.Column>
                   </Grid.Row>
@@ -312,7 +367,7 @@ export default function SubmitPage(props: any) {
                       <Paragraph className="FieldNote">UTC</Paragraph>
                     </Grid.Column>}
                     <Grid.Column mobile="8">
-                      <Field label="End date" name="finish_date" type="date" error={!!errors['finish_at'] || !!errors['finish_date']} message={errors['finish_at'] || errors['finish_date']} value={editActions.getFinishDate()} min={toInputDate(editing.start_at)} onChange={editActions.handleChange} />
+                      <Field label="End date" name="finish_date" type="date" error={!!errors['finish_at'] || !!errors['finish_date']} message={errors['finish_at'] || errors['finish_date']} value={editActions.getFinishDate()} min={editActions.getStartDate()} onChange={editActions.handleChange} />
                     </Grid.Column>
                     {!editing.all_day && <Grid.Column mobile="6">
                       <Field label="End time" name="finish_time" type="time" error={!!errors['finish_at'] || !!errors['finish_time']} message={errors['finish_time']} value={editActions.getFinishTime()} onChange={editActions.handleChange} />
@@ -320,7 +375,77 @@ export default function SubmitPage(props: any) {
                     {!editing.all_day && <Grid.Column mobile="2">
                       <Paragraph className="FieldNote">UTC</Paragraph>
                     </Grid.Column>}
+                    <Grid.Column mobile="8">
+                      <SelectField label="Repeat" search={false} placeholder="Does not repeat" name="recurrent" error={!!errors['recurrent']} message={errors['recurrent']} options={recurrentOptions} value={!!editing.recurrent} onChange={editActions.handleChange} />
+                    </Grid.Column>
+                    {editing.recurrent && <Grid.Column mobile="4">
+                      <Field label="&nbsp;" type="number" name="recurrent_interval" error={!!errors['recurrent_interval']} message={errors['recurrent_interval']} value={editing.recurrent_interval} onChange={editActions.handleChange} />
+                    </Grid.Column>}
+                    {editing.recurrent && <Grid.Column mobile="4">
+                      <SelectField label="&nbsp;" search={false} name="recurrent_frequency" error={!!errors['recurrent_frequency']} message={errors['recurrent_frequency']} options={recurrentFrequencyOptions} value={editing.recurrent_frequency || Frequency.DAILY} onChange={editActions.handleChange} />
+                    </Grid.Column>}
+                    {editing.recurrent && editing.recurrent_frequency === Frequency.WEEKLY && <Grid.Column mobile="16">
+                      <RadioGroup label="Repeat on">
+                        <Radio label="SUN" name="recurrent_weekday_mask[SUNDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.SUNDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.SUNDAY) })} />
+                        <Radio label="MON" name="recurrent_weekday_mask[MONDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.MONDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.MONDAY) })} />
+                        <Radio label="TUE" name="recurrent_weekday_mask[TUESDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.TUESDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.TUESDAY) })} />
+                        <Radio label="WED" name="recurrent_weekday_mask[WEDNESDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.WEDNESDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.WEDNESDAY) })} />
+                        <Radio label="THU" name="recurrent_weekday_mask[THURSDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.THURSDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.THURSDAY) })} />
+                        <Radio label="FRI" name="recurrent_weekday_mask[FRIDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.FRIDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.FRIDAY) })} />
+                        <Radio label="SAT" name="recurrent_weekday_mask[SATURDAY]" checked={Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.SATURDAY)} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !Boolean((editing.recurrent_weekday_mask || 0) & WeekdayMask.SATURDAY) })} />
+                      </RadioGroup>
+                    </Grid.Column>}
+                    {editing.recurrent && editing.recurrent_frequency === Frequency.MONTHLY && <Grid.Column mobile="16">
+                      <RadioGroup label="Repeat on">
+                        <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
+                          <Radio label={`Monthly on day ${editing.start_at.getUTCDate()}`} name="recurrent_monthday[current]" checked={editing.recurrent_monthday !== null} onClick={editActions.handleChange} />
+                        </div>
+                        <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
+                          <Radio label={`Monthly on the ${toRecurrentSetposName(editing.start_at)} ${toDayName(editing.start_at, { utc: true, capitalized: true })}`} name="recurrent_setpos[current]" checked={editing.recurrent_setpos !== null && editing.recurrent_setpos !== Position.LAST} onChange={editActions.handleChange} />
+                        </div>
+                        {isLatestRecurrentSetpos(editing.start_at) && <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
+                          <Radio label={`Monthly on the last ${toDayName(editing.start_at, { utc: true, capitalized: true })}`} name="recurrent_setpos[last]" checked={editing.recurrent_setpos === Position.LAST} onChange={editActions.handleChange} />
+                        </div>}
+                      </RadioGroup>
+                    </Grid.Column>}
+                    {editing.recurrent && <Grid.Column mobile="8">
+                      <SelectField label="Ends" name="recurrent_end" search={false} error={!!errors['recurrent']} message={errors['recurrent']} value={editing.recurrent_count != null && 'count' || editing.recurrent_until !== null && 'until' || undefined} options={recurrentEndsOptions} onChange={editActions.handleChange} />
+                    </Grid.Column>}
+                    {editing.recurrent && editing.recurrent_count !== null && <Grid.Column mobile="3">
+                      <Field label="&nbsp;" name="recurrent_count" type="number" error={!!errors['recurrent_count']} message={errors['recurrent_count']} value={editing.recurrent_count} onChange={editActions.handleChange} />
+                    </Grid.Column>}
+                    {editing.recurrent && editing.recurrent_count !== null && <Grid.Column mobile="5"><Paragraph className="FieldNote">Occurrences</Paragraph></Grid.Column>}
+                    {editing.recurrent && editing.recurrent_until !== null && <Grid.Column mobile="8">
+                      <Field label="&nbsp;" name="recurrent_until" type="date" value={toUTCInputDate(editing.recurrent_until)} onChange={editActions.handleChange} min={toInputDate(editing.start_at)} />
+                    </Grid.Column>}
+                    {editing.recurrent && recurrent_date.length > 0 && <Grid.Column mobile="16">
+                      <Label>Dates ({recurrent_date.length}): </Label>
+                    </Grid.Column>}
+                    {editing.recurrent && recurrent_date.length > 0 && recurrent_date.map(date => <Grid.Column mobile="12" key={date.getTime()}>
+                      <Paragraph secondary={date.getTime() < now}>
+                        <span style={{ display: 'inline-block', minWidth: '8em', textAlign: 'right', marginRight: '.5em' }}>
+                          {toDayName(date, { capitalized: true, utc: true })}
+                          {', '}
+                        </span>
+                        <span style={{ display: 'inline-block', minWidth: '4em' }}>
+                          {date.getUTCDate()}
+                          {' '}
+                          {toMonthName(date, { capitalized: true, utc: true })}
+                          {' '}
+
+                        </span>
+
+                        {date.getUTCFullYear()}
+                      </Paragraph>
+                    </Grid.Column>)}
                   </Grid.Row>
+
+                  <Grid.Row>
+                    <Grid.Column mobile="16">
+                      <Divider size="tiny" />
+                    </Grid.Column>
+                  </Grid.Row>
+
                   <Grid.Row>
                     <Grid.Column mobile="4">
                       <Field label="Latitude (X)" type="number" name="x" min="-150" max="150" error={!!errors['x']} message={errors['x']} value={editing.x} onChange={editActions.handleChange} />
@@ -332,6 +457,13 @@ export default function SubmitPage(props: any) {
                       <SelectField label="Realm" placeholder="any realm" name="realm" error={!!errors['realm']} message={errors['realm']} options={realmOptions} value={editing.realm || ''} onChange={editActions.handleChange} />
                     </Grid.Column>
                   </Grid.Row>
+
+                  <Grid.Row>
+                    <Grid.Column mobile="16">
+                      <Divider size="tiny" />
+                    </Grid.Column>
+                  </Grid.Row>
+
                   <Grid.Row>
                     <Grid.Column mobile="16">
                       <Field disabled={!!siteStore.event && !siteStore.event.owned} label="Email or Discord username" placeholder="hello@decentraland.org" name="contact" error={!!errors['contact']} message={errors['contact']} value={editing.contact} onChange={editActions.handleChange} />

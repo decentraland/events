@@ -12,12 +12,13 @@ import './AddToCalendarButton.css'
 import { eventUrl } from "../../entities/Event/utils";
 
 export type AddToCalendarButtonProps = ButtonProps & {
-  event?: EventAttributes
+  event?: EventAttributes,
+  startAt?: Date,
 }
 
-export default function AddToCalendarButton({ href, event, ...props }: AddToCalendarButtonProps) {
+export default function AddToCalendarButton({ href, event, startAt, ...props }: AddToCalendarButtonProps) {
   const [profile] = useProfile()
-  const to = href || getGoogleCalendar(event) || '#'
+  const to = href || getGoogleCalendar(event, startAt) || '#'
   const ethAddress = profile?.address.toString() || null
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
@@ -32,12 +33,13 @@ export default function AddToCalendarButton({ href, event, ...props }: AddToCale
   </Button>
 }
 
-function getGoogleCalendar(event?: EventAttributes | null) {
+function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
   if (!event) {
     return null
   }
 
-  const { start_at, finish_at } = event
+  const start_at = startAt || event.start_at
+  const finish_at = new Date(start_at.getTime() + event.duration)
   const url = eventUrl(event);
   const params = new URLSearchParams()
   params.set('text', event.name)

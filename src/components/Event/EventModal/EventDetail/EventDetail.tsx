@@ -7,15 +7,11 @@ import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
-import Bold from 'decentraland-gatsby/dist/components/Text/Bold'
-import { toMonthName, toDayName } from 'decentraland-gatsby/dist/components/Date/utils'
 import { SessionEventAttributes } from '../../../../entities/Event/types'
 import JumpInButton from '../../../Button/JumpInButton'
-import AddToCalendarButton from '../../../Button/AddToCalendarButton'
-import Live from '../../../Badge/Live'
 import EventSection from '../../EventSection'
+import EventDateDetail from './EventDateDetail'
 
 import './EventDetail.css'
 
@@ -35,6 +31,7 @@ export type EventDetailProps = {
   event: SessionEventAttributes
   showDescription?: boolean
   showDate?: boolean
+  showAllDates?: boolean
   showPlace?: boolean
   showAttendees?: boolean
   showContact?: boolean
@@ -44,11 +41,10 @@ export type EventDetailProps = {
 }
 
 export default function EventDetail({ event, ...props }: EventDetailProps) {
-  const now = new Date()
-  const { start_at, finish_at } = event || { start_at: now, finish_at: now }
-  const duration = finish_at.getTime() - start_at.getTime()
-  const live = now.getTime() >= start_at.getTime() && now.getTime() < finish_at.getTime()
-  const liveSince = now.getTime() - start_at.getTime()
+  const now = Date.now()
+  const { next_start_at } = event || { next_start_at: new Date(now) }
+  const completed = event.finish_at.getTime() > now
+  const dates = completed ? event.recurrent_dates : event.recurrent_dates.filter((date) => date.getTime() + event.duration > now)
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const advance = event.editable || event.owned
 
@@ -69,7 +65,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
       <div className="EventDetail__Header">
-        <DateBox date={start_at} />
+        <DateBox date={next_start_at} />
         <div className="EventDetail__Header__Event">
           <SubTitle>{event.name}</SubTitle>
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
@@ -81,9 +77,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DESCRIPTION */}
       {props.showDescription !== false && <EventSection.Divider />}
-      {props.showDescription !== false && <EventSection>
+      {props.showDescription !== false && <EventSection maxHeight="500px">
         <EventSection.Icon src={info} width="16" height="16" />
-        <EventSection.Detail>
+        <EventSection.Detail >
           {!event.description && <Paragraph secondary={!event.description} >
             <Italic>No description</Italic>
           </Paragraph>}
@@ -94,116 +90,10 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DATE */}
       {props.showDate !== false && <EventSection.Divider />}
-      {props.showDate !== false && <EventSection>
-        <EventSection.Icon src={clock} width="16" height="16" />
-        {live && <EventSection.Detail>
-          {liveSince < MINUTE && <Paragraph>Started: Less than a minute ago</Paragraph>}
-          {liveSince > MINUTE && liveSince <= MINUTE * 2 && <Paragraph>Started: {Math.floor(liveSince / MINUTE)} minute ago</Paragraph>}
-          {liveSince > MINUTE * 2 && liveSince <= HOUR && <Paragraph>Started: {Math.floor(liveSince / MINUTE)} minutes ago</Paragraph>}
-          {liveSince > HOUR && liveSince <= HOUR * 2 && <Paragraph>Started: {Math.floor(liveSince / HOUR)} hour ago</Paragraph>}
-          {liveSince > HOUR * 2 && liveSince <= DAY && <Paragraph>Started: {Math.floor(liveSince / HOUR)} hours ago</Paragraph>}
-          {liveSince > DAY && liveSince <= DAY * 2 && <Paragraph>Started: {Math.floor(liveSince / DAY)} day ago</Paragraph>}
-          {liveSince > DAY * 2 && <Paragraph>Started: {Math.floor(liveSince / DAY)} days ago</Paragraph>}
-        </EventSection.Detail>}
-        {!live && duration < DAY && <EventSection.Detail>
-          <Paragraph >
-            <Bold>
-              {toDayName(start_at, { capitalized: true, utc: true })}
-              {', '}
-              {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
-              {' '}
-              {start_at.getUTCDate()}
-            </Bold>
-            {duration === 0 && <>
-              {' '}
-              <Bold>
-                {start_at.getUTCHours() % 12 || 12}
-                {start_at.getUTCMinutes() > 0 && ':'}
-                {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-                {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-              </Bold>
-            </>}
-            {duration > 0 && <>
-              {' from '}
-              <Bold>
-                {start_at.getUTCHours() % 12 || 12}
-                {start_at.getUTCMinutes() > 0 && ':'}
-                {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-                {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-              </Bold>
-              {' to '}
-              <Bold>
-                {finish_at.getUTCHours() % 12 || 12}
-                {finish_at.getUTCMinutes() > 0 && ':'}
-                {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
-                {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-              </Bold>
-            </>}
-            {' UTC'}
-          </Paragraph>
-        </EventSection.Detail>}
-        {!live && duration >= DAY && event.all_day && <EventSection.Detail>
-          <Paragraph >
-            {'From '}
-            <Bold>{toDayName(start_at, { capitalized: true, utc: true })}
-              {', '}
-              {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
-              {' '}
-              {start_at.getUTCDate()}
-            </Bold>
-            {' to '}
-            <Bold>
-              {toDayName(finish_at, { capitalized: true, utc: true })}
-              {', '}
-              {toMonthName(finish_at, { short: true, capitalized: true, utc: true })}
-              {' '}
-              {finish_at.getUTCDate()}
-            </Bold>
-            {' UTC'}
-          </Paragraph>
-        </EventSection.Detail>}
-        {!live && duration >= DAY && !event.all_day && <EventSection.Detail>
-          <Paragraph >
-            <span style={{ width: '3.5em', display: 'inline-block' }}>{'From: '}</span>
-            <Bold>{toDayName(start_at, { capitalized: true, utc: true })}
-              {', '}
-              {toMonthName(start_at, { short: true, capitalized: true, utc: true })}
-              {' '}
-              {start_at.getUTCDate()}
-            </Bold>
-            {' at '}
-            <Bold>
-              {start_at.getUTCHours() % 12 || 12}
-              {start_at.getUTCMinutes() > 0 && ':'}
-              {start_at.getUTCMinutes() > 0 && start_at.getUTCMinutes()}
-              {start_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-              {' UTC'}
-            </Bold>
-          </Paragraph>
-          <Paragraph >
-            <span style={{ width: '3.5em', display: 'inline-block' }}>{'To: '}</span>
-            <Bold>
-              {toDayName(finish_at, { capitalized: true, utc: true })}
-              {', '}
-              {toMonthName(finish_at, { short: true, capitalized: true, utc: true })}
-              {' '}
-              {finish_at.getUTCDate()}
-            </Bold>
-            {' at '}
-            <Bold>
-              {finish_at.getUTCHours() % 12 || 12}
-              {finish_at.getUTCMinutes() > 0 && ':'}
-              {finish_at.getUTCMinutes() > 0 && finish_at.getUTCMinutes()}
-              {finish_at.getUTCHours() >= 12 ? 'pm' : 'am'}
-              {' UTC'}
-            </Bold>
-          </Paragraph>
-        </EventSection.Detail>}
-        <EventSection.Action>
-          {!live && <AddToCalendarButton event={event} />}
-          {live && <Live primary />}
-        </EventSection.Action>
-      </EventSection>}
+      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} />}
+      {props.showDate !== false && props.showAllDates !== false && <div style={{ maxHeight: '500px' }}>
+        {dates.map((date, i) => <EventDateDetail key={date.getTime()} secondary={i > 0} event={event} startAt={date} />)}
+      </div>}
 
       {/* PLACE */}
       {props.showPlace !== false && <EventSection.Divider />}

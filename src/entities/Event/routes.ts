@@ -3,12 +3,12 @@ import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
 import { v4 as uuid } from 'uuid';
 import Event from './model';
-import { eventUrl } from './utils'
+import { eventUrl, toRRuleDates, calculateRecurrentProperties } from './utils'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { auth, WithAuth } from '../Auth/middleware';
-import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes } from './types';
+import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes, RecurrentEventAttributes, MAX_EVENT_RECURRENT } from './types';
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
@@ -142,6 +142,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     throw error
   }
 
+  const recurrent = calculateRecurrentProperties(data)
   const now = new Date()
   const event_id = uuid()
   const x = data.x
@@ -155,6 +156,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
 
   const event: DeprecatedEventAttributes = {
     ...data,
+    ...recurrent,
     id: event_id,
     image,
     user: user.toLowerCase(),
@@ -166,8 +168,6 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     approved: false,
     rejected: false,
     highlighted: false,
-    recurrent: false,
-    active_until: data.finish_at,
     total_attendees: 0,
     latest_attendees: [],
     created_at: now
@@ -211,6 +211,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   updatedAttributes.scene_name = updatedAttributes.estate_name
   updatedAttributes.coordinates = [x, y]
 
+  Object.assign(updatedAttributes, calculateRecurrentProperties(updatedAttributes))
+
   if (updatedAttributes.rejected) {
     updatedAttributes.rejected = true
     updatedAttributes.approved = false
@@ -218,7 +220,6 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   }
 
   await Event.update(updatedAttributes, { id: event.id })
-
   const updatedEvent = { ...event, ...updatedAttributes }
 
   if (!req.event.approved && updatedEvent.approved) {
