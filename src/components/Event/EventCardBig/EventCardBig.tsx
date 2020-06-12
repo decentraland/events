@@ -38,6 +38,7 @@ export default function EventCardBig(props: EventCardBigProps) {
           showAttendees={false}
           showContact={false}
           showDetails={false}
+          showAllDates={false}
           onClickEdit={props.onClickEdit}
         />
         <EventSection>

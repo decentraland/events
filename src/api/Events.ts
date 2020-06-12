@@ -12,7 +12,7 @@ export type EditEvent = Pick<EventAttributes,
   'image' |
   'description' |
   'start_at' |
-  'finish_at' |
+  'duration' |
   'all_day' |
   'x' |
   'y' |
@@ -21,6 +21,15 @@ export type EditEvent = Pick<EventAttributes,
   'approved' |
   'rejected' |
   'highlighted' |
+  'recurrent' |
+  'recurrent_count' |
+  'recurrent_frequency' |
+  'recurrent_interval' |
+  'recurrent_month_mask' |
+  'recurrent_weekday_mask' |
+  'recurrent_setpos' |
+  'recurrent_monthday' |
+  'recurrent_until' |
   'contact' |
   'details'
 >
@@ -44,17 +53,32 @@ export default class Events extends API {
   }
 
   static parse(event: Record<string, any>): SessionEventAttributes {
+
+    const start_at = event.start_at && new Date(Date.parse(event.start_at.toString()))
+    const next_start_at = event.next_start_at && new Date(Date.parse(event.next_start_at.toString()))
+    const finish_at = event.finish_at && new Date(Date.parse(event.finish_at.toString()))
+    const created_at = event.created_at && new Date(Date.parse(event.created_at.toString()))
+    const updated_at = event.updated_at && new Date(Date.parse(event.updated_at.toString()))
+    const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
+    const duration = event.duration || finish_at.getTime() - start_at.getTime()
+    const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
+      event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
+
     return {
       ...event,
-      start_at: event.start_at && new Date(Date.parse(event.start_at.toString())),
-      finish_at: event.finish_at && new Date(Date.parse(event.finish_at.toString())),
-      created_at: event.created_at && new Date(Date.parse(event.created_at.toString())),
-      updated_at: event.updated_at && new Date(Date.parse(event.updated_at.toString())),
-      active_until: event.updated_at && new Date(Date.parse(event.active_until.toString())),
+      start_at,
+      next_start_at,
+      finish_at,
+      created_at,
+      updated_at,
+      recurrent_until,
+      recurrent_dates,
+      duration,
       recurrent: Boolean(event.recurrent),
       attending: Boolean(event.attending),
       editable: Boolean(event.editable),
       owned: Boolean(event.owned),
+      live: Boolean(event.live),
     } as SessionEventAttributes
   }
 

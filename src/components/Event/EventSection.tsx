@@ -5,11 +5,12 @@ import DividerComponent from 'decentraland-gatsby/dist/components/Text/Divider'
 import './EventSection.css'
 
 export type EventSectionProps = React.HTMLProps<HTMLDivElement> & {
-  highlight?: boolean
+  highlight?: boolean,
+  maxHeight?: number | string
 }
 
-function EventSection({ highlight, ...props }: EventSectionProps) {
-  return <div {...props} className={TokenList.join(['EventSection', highlight && 'EventSection--highlight', props.className])} />
+function EventSection({ highlight, maxHeight, ...props }: EventSectionProps) {
+  return <div {...props} style={{ maxHeight: maxHeight, ...props.style }} className={TokenList.join(['EventSection', highlight && 'EventSection--highlight', props.className])} />
 }
 
 export type IconProps = Omit<React.HTMLProps<HTMLDivElement>, 'children'> & {
@@ -25,13 +26,17 @@ function Icon({ src, width, height, center, ...props }: IconProps) {
   </div>
 }
 
-export type SectionProps = React.HTMLProps<HTMLDivElement>
-
-function Detail(props: SectionProps) {
-  return <div {...props} className={TokenList.join(['EventSection__Detail', props.className])} />
+export type DetailProps = React.HTMLProps<HTMLDivElement> & {
+  maxHeight?: number | string
 }
 
-function Action(props: SectionProps) {
+function Detail(props: DetailProps) {
+  return <div {...props} style={{ maxHeight: props.maxHeight, ...props.style }} className={TokenList.join(['EventSection__Detail', props.className])} />
+}
+
+export type ActionProps = React.HTMLProps<HTMLDivElement>
+
+function Action(props: ActionProps) {
   return <div {...props} className={TokenList.join(['EventSection__Action', props.className])} />
 }
 

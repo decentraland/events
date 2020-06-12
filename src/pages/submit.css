@@ -1,5 +1,6 @@
 .dcl.field,
-.dcl.select-field {
+.dcl.select-field,
+.dcl.select-field .ui.selection.dropdown {
   min-width: auto;
 }
 

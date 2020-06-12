@@ -25,9 +25,9 @@ export type EventCardProps = {
 export default function EventCard(props: EventCardProps) {
   const event = props.event
   const now = Date.now()
-  const startAt = new Date(Date.parse(event.start_at.toString()))
-  const finishAt = new Date(Date.parse(event.finish_at.toString()))
-  const live = now >= startAt.getTime() && now <= finishAt.getTime()
+  const nextStartAt = new Date(Date.parse(event.next_start_at.toString()))
+  const finishAt = new Date(nextStartAt.getTime() + event.duration)
+  const live = now >= nextStartAt.getTime() && now <= finishAt.getTime()
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (props.onClick) {

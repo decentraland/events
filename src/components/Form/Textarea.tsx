@@ -51,6 +51,6 @@ export default function Textarea({ minHeight, maxHeight, ...props }: TextareaPro
       {props.error && <i aria-hidden="true" className="warning circle icon" />}
       <textarea {...extra} ref={ref} onChange={handleChange} />
     </div>
-    <p className="message">{props.message}</p>
+    <p className="message">{props.message}&nbsp;</p>
   </div>
 }

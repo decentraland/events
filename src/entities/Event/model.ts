@@ -1,5 +1,5 @@
 
-import { Model, SQL, raw } from 'decentraland-server'
+import { Model, SQL } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
@@ -60,10 +60,10 @@ export default class Event extends Model<DeprecatedEventAttributes> {
 
     const errors: string[] = []
     const start_at = new Date(Date.parse(event.start_at.toString()))
-    const finish_at = new Date(Date.parse(event.finish_at.toString()))
+    const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
 
-    if (start_at.getTime() > finish_at.getTime()) {
-      errors.push(`finish date must be greater than start date`)
+    if (recurrent_until && start_at.getTime() > recurrent_until.getTime()) {
+      errors.push(`recurrent must finish after the start date`)
     }
 
     if (errors.length) {
@@ -78,6 +78,7 @@ export default class Event extends Model<DeprecatedEventAttributes> {
   }
 
   static toPublic(event: DeprecatedEventAttributes & { attending?: boolean }, user?: string | null): SessionEventAttributes {
+    const now = Date.now()
     const editable = isAdmin(user)
     const owned = Boolean(user && event.user && event.user === user)
 
@@ -88,16 +89,28 @@ export default class Event extends Model<DeprecatedEventAttributes> {
     const x = event.x === event.coordinates[0] ? event.x : event.coordinates[0];
     const y = event.y === event.coordinates[1] ? event.y : event.coordinates[1];
 
+    const start_at = new Date(Date.parse(event.start_at.toString()))
+    const finish_at = new Date(Date.parse(event.finish_at.toString()))
+    const duration = event.duration || finish_at.getTime() - start_at.getTime()
+    const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
+      event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
+
+    const next_start_at = recurrent_dates.find((date) => (date.getTime() + event.duration) > now) || recurrent_dates[recurrent_dates.length - 1]
+    const live = now >= next_start_at.getTime() && now < (next_start_at.getTime() + event.duration)
+
     return {
       ...event,
       estate_name: event.estate_name || event.scene_name,
-      x,
-      y,
+      x, y,
       attending: !!event.attending,
+      next_start_at,
+      recurrent_dates: recurrent_dates.filter(date => date.getTime() > now),
+      duration,
       position: [x, y],
       coordinates: [x, y],
       editable,
-      owned
+      owned,
+      live,
     }
   }
 }
