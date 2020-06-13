@@ -46,7 +46,15 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
 export function toRRuleDates(options: RecurrentEventAttributes, iterator?: (d: Date, len: number) => boolean): Date[] {
   const rrule = toRRule(options)
   if (rrule) {
-    return rrule.all(iterator)
+    return rrule
+      .all(iterator)
+      .map(date => {
+        date.setUTCHours(options.start_at.getUTCHours())
+        date.setUTCMinutes(options.start_at.getUTCMinutes())
+        date.setUTCSeconds(options.start_at.getUTCSeconds())
+        date.setUTCMilliseconds(options.start_at.getUTCMilliseconds())
+        return date
+      })
   }
 
   return []
