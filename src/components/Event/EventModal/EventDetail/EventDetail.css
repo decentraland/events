@@ -111,6 +111,8 @@
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Item .dg.ImgAvatar {
   margin-right: 8px;
+  width: 32px;
+  height: 32px;
 }
 
 .EventDetail .EventDetail__Detail__ShowAttendees {
