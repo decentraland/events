@@ -430,7 +430,7 @@ export default function SubmitPage(props: any) {
                       <Label>Dates ({recurrent_date.length}): </Label>
                     </Grid.Column>}
                     {editing.recurrent && recurrent_date.length > 0 && recurrent_date.map(date => <Grid.Column mobile="12" key={date.getTime()}>
-                      <Paragraph secondary={date.getTime() < now}>
+                      <Paragraph secondary={date.getTime() + editing.duration < now}>
                         <span style={{ display: 'inline-block', minWidth: '8em', textAlign: 'right', marginRight: '.5em' }}>
                           {toDayName(date, { capitalized: true, utc: true })}
                           {', '}
@@ -440,9 +440,7 @@ export default function SubmitPage(props: any) {
                           {' '}
                           {toMonthName(date, { capitalized: true, utc: true })}
                           {' '}
-
                         </span>
-
                         {date.getUTCFullYear()}
                       </Paragraph>
                     </Grid.Column>)}
