@@ -62,7 +62,7 @@ export default class Event extends Model<DeprecatedEventAttributes> {
     const start_at = new Date(Date.parse(event.start_at.toString()))
     const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
 
-    if (recurrent_until && start_at.getTime() > recurrent_until.getTime()) {
+    if (recurrent_until && start_at.getTime() > recurrent_until.getTime() + 1000 * 60 * 60 * 24) {
       errors.push(`recurrent must finish after the start date`)
     }
 
