@@ -55,6 +55,8 @@
 
 .EventSection .EventSection__Detail .dg.ImgAvatar {
   margin-right: 8px;
+  width: 32px;
+  height: 32px;
 }
 
 @media only screen and (max-width: 767px) {
