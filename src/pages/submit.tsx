@@ -181,6 +181,7 @@ export default function SubmitPage(props: any) {
 
   function handleSubmit(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     if (GLOBAL_LOADING) {
       return null
     }
@@ -211,6 +212,7 @@ export default function SubmitPage(props: any) {
 
   function handleReject(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     if (eventId) {
       patchState({ requireConfirmation: true, error: null })
     }
@@ -218,6 +220,7 @@ export default function SubmitPage(props: any) {
 
   function handleConfirmReject(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     if (eventId) {
       GLOBAL_LOADING = true
       patchState({ loading: true, error: null })
@@ -234,21 +237,25 @@ export default function SubmitPage(props: any) {
   }
 
   function handleDragStart(event: React.DragEvent<any>) {
-    event.preventDefault();
+    event.preventDefault()
+    event.stopPropagation()
     patchState({ dragging: true })
   }
 
   function handleDragEnd(event: React.DragEvent<any>) {
-    event.preventDefault();
+    event.preventDefault()
+    event.stopPropagation()
     patchState({ dragging: false })
   }
 
   function handleDragOver(event: React.DragEvent<any>) {
-    event.preventDefault();
+    event.preventDefault()
+    event.stopPropagation()
   }
 
   function handleDrop(event: React.DragEvent<any>) {
-    event.preventDefault();
+    event.preventDefault()
+    event.stopPropagation()
     const files = event.dataTransfer?.files
     if (!files) {
       return
@@ -264,6 +271,7 @@ export default function SubmitPage(props: any) {
 
   function handleBack(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(eventId ? url.toEvent(location, eventId) : url.toHome(location), siteStore.getNavigationState())
   }
 
