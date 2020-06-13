@@ -454,7 +454,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       errors['recurrent_interval'] = 'Interval is invalid'
     }
 
-    if (event.recurrent_until === null && event.recurrent_count === null) {
+    if (event.recurrent && event.recurrent_until === null && event.recurrent_count === null) {
       errors['recurrent_end'] = 'Missing recurrent end'
     } else if (event.recurrent_count as any === '') {
       errors['recurrent_count'] = 'Invalid count'
