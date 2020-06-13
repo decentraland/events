@@ -69,36 +69,43 @@ export default function IndexPage(props: any) {
 
   function handleSubmit(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(url.toSubmit(location), siteStore.getNavigationState())
   }
 
   function handleMyEvents(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(url.toMyEvents(location), siteStore.getNavigationState())
   }
 
   function handleCloseModal(event: React.MouseEvent<any>) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(url.toHome(location), siteStore.getNavigationState())
   }
 
   function handleOpenEdit(event: React.MouseEvent<any>, data: SessionEventAttributes) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(url.toEventEdit(location, data.id), siteStore.getNavigationState())
   }
 
   function handleOpenEventDetail(event: React.MouseEvent<any>, data: SessionEventAttributes) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(url.toEvent(location, data.id), siteStore.getNavigationState())
   }
 
   function handleOpenAttendees(event: React.MouseEvent<any>, data: SessionEventAttributes) {
     event.preventDefault()
+    event.stopPropagation()
     navigate(url.toEventAttendees(location, data.id), siteStore.getNavigationState())
   }
 
   function handleChangeEvent(e: React.MouseEvent<any>, data: SessionEventAttributes) {
     e.preventDefault()
+    e.stopPropagation()
     const event = siteStore.events.getEntity(data.id)
 
     if (!event || state.updating[event.id]) {
