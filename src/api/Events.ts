@@ -60,7 +60,7 @@ export default class Events extends API {
     const created_at = event.created_at && new Date(Date.parse(event.created_at.toString()))
     const updated_at = event.updated_at && new Date(Date.parse(event.updated_at.toString()))
     const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
-    const duration = event.duration || finish_at.getTime() - start_at.getTime()
+    const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
     const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
       event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
 
