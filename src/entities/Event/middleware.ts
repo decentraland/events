@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import isUUID from 'validator/lib/isUUID';
 import param from 'decentraland-gatsby/dist/entities/Route/param';
-import { DeprecatedEventAttributes } from './types';
+import { DeprecatedEventAttributes, EventAttributes } from './types';
 import Event from './model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { middleware } from "decentraland-gatsby/dist/entities/Route/handle";
@@ -24,7 +24,7 @@ export function withEvent(options: WithEventOptions = {}) {
   return middleware(async (req) => {
     const event_id = getEventIdParam(req)
     const enforce = options.enforce || {}
-    const event = await Event.findOne<DeprecatedEventAttributes>({ id: event_id, ...enforce })
+    const event = Event.build(await Event.findOne<EventAttributes>({ id: event_id, ...enforce }))
 
     if (!event) {
       throw new RequestError(`Not found event "${event_id}"`, RequestError.NotFound)
