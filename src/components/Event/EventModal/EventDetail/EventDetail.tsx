@@ -43,7 +43,7 @@ export type EventDetailProps = {
 export default function EventDetail({ event, ...props }: EventDetailProps) {
   const now = Date.now()
   const { next_start_at } = event || { next_start_at: new Date(now) }
-  const completed = event.finish_at.getTime() > now
+  const completed = event.finish_at.getTime() < now
   const dates = completed ? event.recurrent_dates : event.recurrent_dates.filter((date) => date.getTime() + event.duration > now)
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const advance = event.editable || event.owned
@@ -92,7 +92,15 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {props.showDate !== false && <EventSection.Divider />}
       {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} />}
       {props.showDate !== false && props.showAllDates !== false && <div style={{ maxHeight: '500px' }}>
-        {dates.map((date, i) => <EventDateDetail key={date.getTime()} secondary={i > 0} event={event} startAt={date} />)}
+        {dates.map((date, i) => {
+          return <EventDateDetail
+            key={date.getTime()}
+            style={i > 0 ? { paddingTop: '0' } : {}}
+            secondary={i > 0 || date.getTime() + event.duration < now}
+            completed={date.getTime() + event.duration < now}
+            event={event}
+            startAt={date} />
+        })}
       </div>}
 
       {/* PLACE */}
