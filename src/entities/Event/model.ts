@@ -2,16 +2,40 @@
 import { Model, SQL } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
+import schema from 'decentraland-gatsby/dist/entities/Schema'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes } from './types'
 import EventAttendee from '../EventAttendee/model'
-import schema from '../Schema'
 import isAdmin from '../Auth/isAdmin';
 
 export default class Event extends Model<DeprecatedEventAttributes> {
   static tableName = 'events'
 
   static validator = schema.compile(eventSchema)
+
+  static build(event: EventAttributes | null | undefined): DeprecatedEventAttributes | null | undefined {
+    if (!event) {
+      return event
+    }
+
+    const start_at = new Date(Date.parse(event.start_at.toString()))
+    const finish_at = new Date(Date.parse(event.finish_at.toString()))
+    const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
+    const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
+      event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
+
+    return {
+      ...event,
+      duration,
+      recurrent_dates,
+      scene_name: event.estate_name,
+      coordinates: [event.x, event.y]
+    }
+  }
+
+  static buildAll(events: EventAttributes[]): DeprecatedEventAttributes[] {
+    return events.map(event => Event.build(event) as DeprecatedEventAttributes)
+  }
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
 
@@ -37,7 +61,7 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       ${offset(options.offset)}
     `
 
-    return Event.query<DeprecatedEventAttributes>(query)
+    return Event.buildAll(await Event.query<EventAttributes>(query))
   }
 
   static async getAttending(user?: string | null) {
@@ -45,12 +69,12 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       return []
     }
 
-    return Event.query<DeprecatedEventAttributes>(SQL`
+    return Event.buildAll(await Event.query<DeprecatedEventAttributes>(SQL`
       SELECT e.*, a.user is not null as attending
       FROM ${table(Event)} e
       LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}
       WHERE e.finish_at > now() AND e.rejected IS FALSE
-    `)
+    `))
   }
 
   static validate(event: EventAttributes): string[] | null {
@@ -86,28 +110,15 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       event = utils.omit(event, ['contact', 'details'])
     }
 
-    const x = event.x === event.coordinates[0] ? event.x : event.coordinates[0];
-    const y = event.y === event.coordinates[1] ? event.y : event.coordinates[1];
-
-    const start_at = new Date(Date.parse(event.start_at.toString()))
-    const finish_at = new Date(Date.parse(event.finish_at.toString()))
-    const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
-    const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
-      event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
-
-    const next_start_at = recurrent_dates.find((date) => (date.getTime() + event.duration) > now) || recurrent_dates[recurrent_dates.length - 1]
+    const next_start_at = event.recurrent_dates.find((date) => (date.getTime() + event.duration) > now) || event.recurrent_dates[event.recurrent_dates.length - 1]
     const live = now >= next_start_at.getTime() && now < (next_start_at.getTime() + event.duration)
 
     return {
       ...event,
       estate_name: event.estate_name || event.scene_name,
-      x, y,
       attending: !!event.attending,
       next_start_at,
-      recurrent_dates: recurrent_dates.filter(date => date.getTime() > now),
-      duration,
-      position: [x, y],
-      coordinates: [x, y],
+      position: [event.x, event.y],
       editable,
       owned,
       live,
