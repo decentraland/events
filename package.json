@@ -20,7 +20,7 @@
     "concurrently": "^5.1.0",
     "dcl-crypto": "^2.1.0",
     "decentraland-crypto": "0.0.2",
-    "decentraland-gatsby": "^2.30.0",
+    "decentraland-gatsby": "^2.32.0",
     "decentraland-server": "^2.11.6",
     "decentraland-ui": "^2.21.1",
     "dotenv": "^8.2.0",
