@@ -17,9 +17,10 @@ export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {
   event: SessionEventAttributes,
   startAt?: Date
   secondary?: boolean
+  completed?: boolean
 }
 
-export default function EventDateDetail({ event, startAt, secondary, ...props }: EventDateDetailProps) {
+export default function EventDateDetail({ event, startAt, secondary, completed, ...props }: EventDateDetailProps) {
 
   const now = Date.now()
   const duration = event.duration
@@ -28,7 +29,7 @@ export default function EventDateDetail({ event, startAt, secondary, ...props }:
   const live = now >= start_at.getTime() && now < (start_at.getTime() + event.duration)
   const liveSince = now - start_at.getTime()
 
-  return <EventSection {...props} style={secondary ? { paddingTop: '0' } : {}}>
+  return <EventSection {...props}>
     <EventSection.Icon src={secondary ? '' : clock} width="16" height="16" />
     {live && <EventSection.Detail>
       {liveSince < MINUTE && <Paragraph secondary={secondary}>Started: Less than a minute ago</Paragraph>}
@@ -135,7 +136,7 @@ export default function EventDateDetail({ event, startAt, secondary, ...props }:
     </EventSection.Detail>}
     <EventSection.Action>
       {live && <Live primary />}
-      {!live && <AddToCalendarButton event={event} startAt={start_at} style={secondary ? { opacity: .7 } : {}} />}
+      {!live && !completed && <AddToCalendarButton event={event} startAt={start_at} style={secondary ? { opacity: .7 } : {}} />}
     </EventSection.Action>
   </EventSection>
 }
