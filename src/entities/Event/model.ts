@@ -7,6 +7,7 @@ import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes } from './types'
 import EventAttendee from '../EventAttendee/model'
 import isAdmin from '../Auth/isAdmin';
+import { start } from 'repl';
 
 export default class Event extends Model<DeprecatedEventAttributes> {
   static tableName = 'events'
@@ -23,6 +24,10 @@ export default class Event extends Model<DeprecatedEventAttributes> {
     const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
     const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
       event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
+
+    if (event.recurrent_dates[0].getTime() !== start_at.getTime()) {
+      recurrent_dates.unshift(start_at)
+    }
 
     return {
       ...event,
