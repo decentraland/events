@@ -22,6 +22,8 @@ export default class Event extends Model<DeprecatedEventAttributes> {
     const start_at = new Date(Date.parse(event.start_at.toString()))
     const finish_at = new Date(Date.parse(event.finish_at.toString()))
     const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
+
+    event.recurrent_dates = event.recurrent_dates.filter(Boolean)
     const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
       event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
 
