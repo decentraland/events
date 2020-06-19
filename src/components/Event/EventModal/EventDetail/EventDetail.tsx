@@ -17,7 +17,6 @@ import './EventDetail.css'
 
 const extra = require('../../../../images/info.svg')
 const info = require('../../../../images/secondary-info.svg')
-const clock = require('../../../../images/secondary-clock.svg')
 const pin = require('../../../../images/secondary-pin.svg')
 const friends = require('../../../../images/secondary-friends.svg')
 
