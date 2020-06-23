@@ -143,6 +143,7 @@ export default function SubmitPage(props: any) {
           all_day: original.all_day,
           url: original.url,
           highlighted: original.highlighted,
+          trending: original.trending,
           rejected: original.rejected,
           approved: original.approved,
           contact: original.contact,
@@ -335,7 +336,10 @@ export default function SubmitPage(props: any) {
                       <Label style={{ marginBottom: '1em' }}>Advance</Label>
                     </Grid.Column>
                     <Grid.Column mobile="4">
-                      <Radio name="highlighted" label="TRENDING" checked={editing.highlighted} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !editing.highlighted })} />
+                      <Radio name="highlighted" label="HIGHLIGHT" checked={editing.highlighted} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !editing.highlighted })} />
+                    </Grid.Column>
+                    <Grid.Column mobile="4">
+                      <Radio name="trending" label="TRENDING" checked={editing.trending} onClick={(e, data) => editActions.handleChange(e, { ...data, checked: !editing.trending })} />
                     </Grid.Column>
                   </Grid.Row>}
                   <Grid.Row>

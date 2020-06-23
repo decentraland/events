@@ -48,8 +48,8 @@ export default function IndexPage(props: any) {
   const siteStore = useSiteStore(props.location)
   const events = useListEvents(siteStore.events.getState().data)
   const eventsByMonth = useListEventsByMonth(events)
-  const trendingEvents = useMemo(() => events.filter((event) => !!event.highlighted), [siteStore.events.getState()])
-  const liveEvents = useMemo(() => events.filter((event) => event.approved && now >= event.next_start_at.getTime() && now < event.next_start_at.getTime() + event.duration).reverse(), [siteStore.events.getState()])
+  const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [siteStore.events.getState()])
+  const mainEvents = useMemo(() => events.filter((event) => event.approved && !!event.highlighted && event.finish_at.getTime() > now).reverse(), [siteStore.events.getState()])
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
 
   const [requireWallet, setRequireWallet] = useState(false)
@@ -167,8 +167,8 @@ export default function IndexPage(props: any) {
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </div>}
-        {!siteStore.loading && events.length > 0 && liveEvents.length > 0 && <div><Carousel>
-          {liveEvents.map(event => <EventCardBig
+        {!siteStore.loading && events.length > 0 && mainEvents.length > 0 && <div><Carousel>
+          {mainEvents.map(event => <EventCardBig
             key={'live:' + event.id}
             event={event}
             updating={state.updating[event.id]}

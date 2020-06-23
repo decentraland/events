@@ -10,7 +10,7 @@ export default function useListEventsByMonth(events?: SessionEventAttributes[] |
 
     if (events && events.length) {
       for (const event of events) {
-        if (event.next_start_at.getTime() > now) {
+        if (!event.highlighted && event.next_start_at.getTime() + event.duration > now) {
           const next_start_at = event.next_start_at.getTime() < now ? new Date(now) : event.next_start_at;
           const groupDate = new Date(next_start_at.getFullYear(), next_start_at.getMonth())
           const groupKey = groupDate.toJSON()

@@ -8,7 +8,7 @@ import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema,
 import EventAttendee from '../EventAttendee/model'
 import isAdmin from '../Auth/isAdmin';
 
-export default class Event extends Model<DeprecatedEventAttributes> {
+export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = 'events'
 
   static validator = schema.compile(eventSchema)
@@ -38,7 +38,7 @@ export default class Event extends Model<DeprecatedEventAttributes> {
   }
 
   static buildAll(events: EventAttributes[]): DeprecatedEventAttributes[] {
-    return events.map(event => Event.build(event) as DeprecatedEventAttributes)
+    return events.map(event => EventModel.build(event) as DeprecatedEventAttributes)
   }
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
@@ -47,7 +47,7 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       SELECT 
         e.*
         ${conditional(!!options.currentUser, SQL`, a.user is not null as attending`)}
-      FROM ${table(Event)} e
+      FROM ${table(EventModel)} e
         ${conditional(!!options.currentUser, SQL`LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND lower(a.user) = ${options.currentUser}`)}
       WHERE
         e.rejected IS FALSE
@@ -65,7 +65,7 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       ${offset(options.offset)}
     `
 
-    return Event.buildAll(await Event.query<EventAttributes>(query))
+    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
   static async getAttending(user?: string | null) {
@@ -73,9 +73,9 @@ export default class Event extends Model<DeprecatedEventAttributes> {
       return []
     }
 
-    return Event.buildAll(await Event.query<DeprecatedEventAttributes>(SQL`
+    return EventModel.buildAll(await EventModel.query<DeprecatedEventAttributes>(SQL`
       SELECT e.*, a.user is not null as attending
-      FROM ${table(Event)} e
+      FROM ${table(EventModel)} e
       LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}
       WHERE e.finish_at > now() AND e.rejected IS FALSE
     `))
@@ -83,7 +83,9 @@ export default class Event extends Model<DeprecatedEventAttributes> {
 
   static validate(event: EventAttributes): string[] | null {
     if (!this.isValid(event) && this.validator.errors && this.validator.errors.length > 0) {
-      return this.validator.errors.slice().map((error) => error.message!).filter(Boolean)
+      return this.validator.errors
+        .map((error) => `${error.dataPath.slice(1)} ${error.message!}`)
+        .filter(Boolean)
     }
 
     const errors: string[] = []
@@ -102,7 +104,8 @@ export default class Event extends Model<DeprecatedEventAttributes> {
   }
 
   static isValid(event: Partial<EventAttributes>) {
-    return this.validator(event) as boolean
+    // return this.validator(event) as boolean
+    return this.validator(JSON.parse(JSON.stringify(event))) as boolean
   }
 
   static toPublic(event: DeprecatedEventAttributes & { attending?: boolean }, user?: string | null): SessionEventAttributes {
