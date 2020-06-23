@@ -21,6 +21,7 @@ export type EditEvent = Pick<EventAttributes,
   'approved' |
   'rejected' |
   'highlighted' |
+  'trending' |
   'recurrent' |
   'recurrent_count' |
   'recurrent_frequency' |

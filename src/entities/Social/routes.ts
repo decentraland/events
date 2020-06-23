@@ -1,7 +1,7 @@
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import { withSocialUserAgent, WithSocialUserAgent } from "./middleware";
 import { Response, NextFunction } from "express";
-import Event from "../Event/model";
+import EventModel from "../Event/model";
 import isUUID from "validator/lib/isUUID";
 import { EventAttributes } from "../Event/types";
 import env from "decentraland-gatsby/dist/utils/env";
@@ -19,7 +19,7 @@ export function injectSocialTag(req: WithSocialUserAgent, res: Response, next: N
     return next()
   }
 
-  Event.findOne<EventAttributes>({ id: req.query.event, rejected: false })
+  EventModel.findOne<EventAttributes>({ id: req.query.event, rejected: false })
     .then((event) => {
       if (!event) {
         return next()

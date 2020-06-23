@@ -134,7 +134,7 @@ export function calculateRecurrentProperties(event: Partial<RecurrentEventAttrib
   const start_at = new Date(Date.parse(event.start_at.toString()))
   const finish_at = new Date(start_at.getTime() + event.duration)
   const duration = Math.max(event.duration, 0)
-  const previous_recurrent_dates = (event.recurrent_dates || []).filter((date) => (date.getTime() + duration) <= now)
+  const previous_recurrent_dates = event.recurrent && (event.recurrent_dates || []).filter((date) => (date.getTime() + duration) <= now) || []
   const recurrent: RecurrentEventAttributes & Pick<EventAttributes, 'start_at' | 'duration' | 'finish_at' | 'recurrent_dates'> = {
     start_at,
     duration,

@@ -15,7 +15,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       primaryKey: true
     },
     created_at: {
-      type: 'timestamp',
+      type: 'TIMESTAMP',
     }
   }, {
     temporary: false
