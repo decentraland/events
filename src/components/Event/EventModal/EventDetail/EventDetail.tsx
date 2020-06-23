@@ -31,6 +31,7 @@ export type EventDetailProps = {
   showDescription?: boolean
   showDate?: boolean
   showAllDates?: boolean
+  showCountdownDate?: boolean
   showPlace?: boolean
   showAttendees?: boolean
   showContact?: boolean
@@ -89,7 +90,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DATE */}
       {props.showDate !== false && <EventSection.Divider />}
-      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} />}
+      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} countdown={!!props.showCountdownDate} />}
       {props.showDate !== false && props.showAllDates !== false && <div style={{ maxHeight: '500px', overflow: 'auto' }}>
         {dates.map((date, i) => {
           return <EventDateDetail

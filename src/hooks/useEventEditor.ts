@@ -52,6 +52,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     approved: false,
     rejected: false,
     highlighted: false,
+    trending: false,
 
     // recurrent
     recurrent: false,
@@ -351,6 +352,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         return setValue(name, value)
 
       case 'highlighted':
+      case 'trending':
       case 'rejected':
       case 'approved':
         return setValue(name, !!value)

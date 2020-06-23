@@ -103,6 +103,7 @@ export type EventAttributes = {
   approved: boolean
   rejected: boolean
   highlighted: boolean
+  trending: boolean
   created_at: Date
   updated_at: Date
   recurrent: boolean,
@@ -191,6 +192,7 @@ export const patchAttributes: (keyof EventAttributes)[] = editableAttributes.con
 export const adminPatchAttributes: (keyof EventAttributes)[] = editableAttributes.concat([
   'approved',
   'highlighted',
+  'trending',
   'url',
 ])
 
@@ -222,6 +224,9 @@ export const eventSchema = {
       type: 'boolean'
     },
     highlighted: {
+      type: 'boolean'
+    },
+    trending: {
       type: 'boolean'
     },
     image: {

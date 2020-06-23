@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Authenticator, AuthLinkType, AuthIdentity, AuthChain } from 'dcl-crypto'
+import { Authenticator, AuthIdentity } from 'dcl-crypto'
 import { fromBase64 } from 'decentraland-gatsby/dist/utils/base64'
 import { HttpProvider } from 'web3x/providers'
 import { middleware } from "decentraland-gatsby/dist/entities/Route/handle"
@@ -44,7 +44,7 @@ export function auth(options: AuthOptions = {}) {
       }
     }
 
-    const result = await await Authenticator.validateSignature(
+    const result = await Authenticator.validateSignature(
       identity.ephemeralIdentity.address,
       identity.authChain,
       new HttpProvider('https://mainnet.infura.io/v3/640777fe168f4b0091c93726b4f0463a')
@@ -56,17 +56,7 @@ export function auth(options: AuthOptions = {}) {
       throw new RequestError(result.message || 'Invalid authorization data', RequestError.Forbidden)
     }
 
-    const auth = getPayload(identity.authChain, AuthLinkType.SIGNER)
+    const auth = Authenticator.ownerAddress(identity.authChain).toLowerCase()
     Object.assign(req, { auth })
   })
-}
-
-function getPayload(authChain: AuthChain, type: AuthLinkType) {
-  for (const chain of authChain) {
-    if (chain.type === type) {
-      return chain.payload.toLowerCase()
-    }
-  }
-
-  return null
 }

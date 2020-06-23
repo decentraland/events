@@ -2,8 +2,8 @@ import { utils } from 'decentraland-commons';
 import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
 import { v4 as uuid } from 'uuid';
-import Event from './model';
-import { eventUrl, toRRuleDates, calculateRecurrentProperties } from './utils'
+import EventModel from './model';
+import { eventUrl, calculateRecurrentProperties } from './utils'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
@@ -95,8 +95,8 @@ export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
     options.onlyUpcoming = true
   }
 
-  const events = await Event.getEvents(options)
-  return events.map((event) => Event.toPublic(event, req.auth))
+  const events = await EventModel.getEvents(options)
+  return events.map((event) => EventModel.toPublic(event, req.auth))
 }
 
 export async function getEvent(req: WithAuth<WithEvent>) {
@@ -105,12 +105,12 @@ export async function getEvent(req: WithAuth<WithEvent>) {
     attending = (await EventAttendee.count({ user: req.auth, event_id: req.event.id })) > 0
   }
 
-  return { ...Event.toPublic(req.event, req.auth), attending }
+  return { ...EventModel.toPublic(req.event, req.auth), attending }
 }
 
 export async function getAttendingEvents(req: WithAuth) {
-  const events = await Event.getAttending(req.auth!)
-  return events.map((event) => Event.toPublic(event, req.auth))
+  const events = await EventModel.getAttending(req.auth!)
+  return events.map((event) => EventModel.toPublic(event, req.auth))
 }
 
 export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
@@ -135,7 +135,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     data.url = eventUrl(data)
   }
 
-  const errors = Event.validate(data)
+  const errors = EventModel.validate(data)
   if (errors) {
     const error = new RequestError('Invalid event data', RequestError.BadRequest, { errors, body: data })
     await notifyEventError(userProfile, error)
@@ -168,15 +168,16 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     approved: false,
     rejected: false,
     highlighted: false,
+    trending: false,
     total_attendees: 0,
     latest_attendees: [],
     created_at: now
   }
 
-  await Event.create(event)
+  await EventModel.create(event)
   await notifyNewEvent(event)
 
-  return Event.toPublic(event, user)
+  return EventModel.toPublic(event, user)
 }
 
 export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
@@ -192,7 +193,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     updatedAttributes.url = eventUrl(updatedAttributes)
   }
 
-  const errors = Event.validate(updatedAttributes)
+  const errors = EventModel.validate(updatedAttributes)
   if (errors) {
     throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, update: updatedAttributes, body: req.body })
   }
@@ -217,9 +218,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     updatedAttributes.rejected = true
     updatedAttributes.approved = false
     updatedAttributes.highlighted = false
+    updatedAttributes.trending = false
   }
 
-  await Event.update(updatedAttributes, { id: event.id })
+  await EventModel.update(updatedAttributes, { id: event.id })
   const updatedEvent = { ...event, ...updatedAttributes }
 
   if (!req.event.approved && updatedEvent.approved) {
@@ -228,5 +230,5 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     notifyEditedEvent(updatedEvent)
   }
 
-  return Event.toPublic(updatedEvent, user)
+  return EventModel.toPublic(updatedEvent, user)
 }

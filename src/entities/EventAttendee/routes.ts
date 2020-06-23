@@ -6,16 +6,14 @@ import { BASE_PATH } from '../Event/routes';
 import { getEventIdParam, withEvent, WithEvent } from "../Event/middleware";
 import { EventAttendeeAttributes } from './types';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
-import Event from '../Event/model';
+import EventModel from '../Event/model';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
 
 export default routes((router) => {
-
   const withAuth = auth({ optional: true })
   const withEventExists = withEvent()
   const withUserProfile = withAuthProfile({ optional: true })
-  // const withAuthOptional = auth({ optional: true })
 
   router.get(BASE_PATH + '/attendees', withEventExists, handle(getEventAttendees))
   router.post(BASE_PATH + '/attendees', withAuth, withUserProfile, withEventExists, handle(createEventAttendee))
@@ -36,7 +34,7 @@ export async function updateEventAttendees(req: WithEvent) {
     EventAttendee.latest(req.event.id)
   ])
 
-  return Event.update({ total_attendees, latest_attendees }, { id: req.event.id })
+  return EventModel.update({ total_attendees, latest_attendees }, { id: req.event.id })
 }
 
 export async function createEventAttendee(req: WithAuthProfile<WithEvent<WithAuth>>) {
