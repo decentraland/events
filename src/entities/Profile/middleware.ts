@@ -5,7 +5,7 @@ import API from "decentraland-gatsby/dist/utils/api/API";
 import { middleware } from "decentraland-gatsby/dist/entities/Route/handle";
 import RequestError from "decentraland-gatsby/dist/entities/Route/error";
 import param from "decentraland-gatsby/dist/entities/Route/param";
-import { WithAuth } from "../Auth/middleware";
+import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware";
 
 export type WithProfile<R extends Request = Request> = R & {
   profile?: Avatar

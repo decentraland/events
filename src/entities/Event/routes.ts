@@ -7,7 +7,7 @@ import { eventUrl, calculateRecurrentProperties } from './utils'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
-import { auth, WithAuth } from '../Auth/middleware';
+import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
 import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes, RecurrentEventAttributes, MAX_EVENT_RECURRENT } from './types';
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';

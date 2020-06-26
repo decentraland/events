@@ -1,10 +1,9 @@
 import AWS from 'aws-sdk'
-import { createReadStream } from 'fs'
 import { promisify } from 'util'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import { requiredEnv } from 'decentraland-gatsby/dist/utils/env'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
-import { auth, WithAuth } from '../Auth/middleware';
+import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES, PosterAttributes, extension } from './types'
