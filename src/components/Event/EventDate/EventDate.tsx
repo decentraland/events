@@ -11,7 +11,9 @@ export type EventDateProps = React.HTMLProps<HTMLDivElement> & {
 }
 
 export default function EventDate(props: EventDateProps) {
-  const startAt = props.event.start_at
+
+  const currentTime = Date.now()
+  const { next_start_at, duration } = props.event || { next_start_at: new Date(currentTime) }
   const startDay = new Date(props.event.start_at)
   startDay.setUTCHours(0)
   startDay.setUTCMinutes(0)
@@ -19,13 +21,12 @@ export default function EventDate(props: EventDateProps) {
   startDay.setUTCMilliseconds(0)
   const previousStartDay = new Date(startDay.getTime())
   previousStartDay.setUTCDate(previousStartDay.getUTCDate() - 1)
-  const finishAt = new Date(props.event.start_at.getTime() + props.event.duration)
-  const currentTime = Date.now()
+  const finishAt = new Date(next_start_at.getTime() + duration)
 
-  const isNow = currentTime >= startAt.getTime() && currentTime < finishAt.getTime()
-  const isToday = currentTime < startAt.getTime() && currentTime > startDay.getTime()
+  const isNow = currentTime >= next_start_at.getTime() && currentTime < finishAt.getTime()
+  const isToday = currentTime < next_start_at.getTime() && currentTime > startDay.getTime()
   const isTomorrow = currentTime < startDay.getTime() && currentTime > previousStartDay.getTime()
-  const date = toMonthName(startAt, { utc: true }) + ' ' + startAt.getUTCDate()
+  const date = toMonthName(next_start_at, { utc: true }) + ' ' + next_start_at.getUTCDate()
   return <div {...props} className={TokenList.join(['EventDate', props.className])}>
     {isNow && 'NOW'}
     {isToday && 'TODAY'}
