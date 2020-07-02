@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from "react"
-import { RRule, Options as RRuleOptions } from 'rrule'
 import { useLocation } from '@reach/router'
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
@@ -11,7 +10,7 @@ import { SelectField } from 'decentraland-ui/dist/components/SelectField/SelectF
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
-import { toInputDate, toDayName, toUTCInputDate, toMonthName, fromInputDate } from "decentraland-gatsby/dist/components/Date/utils"
+import { toInputDate, toDayName, toUTCInputDate, toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"

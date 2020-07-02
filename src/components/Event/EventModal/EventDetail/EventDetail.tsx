@@ -61,7 +61,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   }
 
   return <>
-    {event && event.rejected && <div className="EventError EventError--error"><code>This event was rejected</code></div>}
+    {event && event.rejected && <div className="EventNote EventNote--error"><code>This event was rejected</code></div>}
     {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
       <div className="EventDetail__Header">
