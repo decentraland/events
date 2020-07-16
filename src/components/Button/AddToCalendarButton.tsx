@@ -3,13 +3,13 @@ import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Butt
 import TokenList from "decentraland-gatsby/dist/utils/TokenList"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile";
 import track from "decentraland-gatsby/dist/components/Segment/track";
-import { toCalendarDate } from "decentraland-gatsby/dist/components/Date/utils";
+import Datetime from "decentraland-gatsby/dist/utils/Datetime";
 
 import { EventAttributes } from "../../entities/Event/types";
 import * as segment from '../../utils/segment'
 
-import './AddToCalendarButton.css'
 import { eventTargetUrl } from "../../entities/Event/utils";
+import './AddToCalendarButton.css'
 
 export type AddToCalendarButtonProps = ButtonProps & {
   event?: EventAttributes,
@@ -38,8 +38,8 @@ function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
     return null
   }
 
-  const start_at = startAt || event.start_at
-  const finish_at = new Date(start_at.getTime() + event.duration)
+  const start_at = Datetime.from(startAt || event.start_at)
+  const finish_at = Datetime.from(start_at.getTime() + event.duration)
   const url = eventTargetUrl(event);
   const params = new URLSearchParams()
   params.set('text', event.name)
@@ -54,10 +54,7 @@ function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
     params.set('details', `jump in: ${url}`)
   }
 
-  params.set('dates', [
-    toCalendarDate(start_at),
-    toCalendarDate(finish_at),
-  ].join('/'))
+  params.set('dates', [start_at.toGoogleCalendar(), finish_at.toGoogleCalendar()].join('/'))
 
   return `https://calendar.google.com/calendar/r/eventedit?${params.toString()}`
 }

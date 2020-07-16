@@ -17,13 +17,14 @@ export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: SessionEventAttributes | null
   attendees?: boolean
   updating?: boolean
+  utc?: boolean
   onClickEdit?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
   onClickAttendees?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
   onClickDetails?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
   onChangeEvent?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
 }
 
-export default function EventModal({ event, attendees, edit, className, onClose, onClickEdit, onClickAttendees, onChangeEvent, onClickDetails, ...props }: EventModalProps) {
+export default function EventModal({ event, attendees, edit, utc, className, onClose, onClickEdit, onClickAttendees, onChangeEvent, onClickDetails, ...props }: EventModalProps) {
 
   return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', (!event || !event.approved) && 'pending', className])} onClose={onClose} >
     {event && attendees && <EventAttendeeList event={event} onBack={onClickDetails} onClose={onClose} />}
@@ -33,7 +34,7 @@ export default function EventModal({ event, attendees, edit, className, onClose,
       <img src={close} width="14" height="14" />
     </div>}
     {event && !attendees && <ImgFixed src={event.image || ''} dimension="wide" />}
-    {event && !attendees && <EventDetail event={event} onClickEdit={onClickEdit} onClickAttendees={onClickAttendees} />}
+    {event && !attendees && <EventDetail event={event} utc={utc} onClickEdit={onClickEdit} onClickAttendees={onClickAttendees} />}
 
     {/* SOCIAL */}
     {event && !attendees && event.approved && <EventSection.Divider />}

@@ -46,6 +46,7 @@ export default function IndexPage(props: any) {
   const myEvents = useMemo(() => events.filter((event) => event.owned), [siteStore.events.getState()])
   const attendingEvents = useMemo(() => events.filter((event) => !!event.attending), [siteStore.events.getState()])
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
+  const utc = !siteStore.settings?.use_local_time
 
   const [requireWallet, setRequireWallet] = useState(false)
   useEffect(() => {
@@ -156,6 +157,7 @@ export default function IndexPage(props: any) {
       </EnabledNotificationModal>
       <EventModal
         event={currentEvent}
+        utc={utc}
         attendees={isListingAttendees}
         updating={!!(currentEvent && state.updating[currentEvent.id])}
         onClose={handleCloseModal}
@@ -203,6 +205,7 @@ export default function IndexPage(props: any) {
             {myEvents.map((event) => <EventCard
               key={'event:' + event.id}
               event={event}
+              utc={utc}
               updating={state.updating[event.id]}
               href={url.toEvent(location, event.id)}
               onChangeEvent={handleChangeEvent}

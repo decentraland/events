@@ -1,11 +1,9 @@
 import { useState, useMemo } from "react";
-import { RRule } from 'rrule'
-import { eventSchema, Frequency, WeekdayMask, MonthMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types";
-import { EditEvent } from "../api/Events";
-import { date, fromUTCInputTime, fromUTCInputDate, toUTCInputDate, toUTCInputTime, fromInputTime, fromInputDate } from "decentraland-gatsby/dist/components/Date/utils";
 import isURL from "validator/lib/isURL";
+import Datetime from "decentraland-gatsby/dist/utils/Datetime";
+import { eventSchema, Frequency, WeekdayMask, MonthMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types";
 import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils";
-import { start } from "repl";
+import { EditEvent } from "../api/Events";
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
 
@@ -33,9 +31,14 @@ function getValue(event: React.ChangeEvent<any>, props?: { name: string, value: 
 }
 
 export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
-  const currentDate = date({ seconds: 0, milliseconds: 0 })
-  const start_at = defaultEvent.start_at || currentDate
-  const duration = defaultEvent.duration || DEFAULT_EVENT_DURATION
+
+  const options = { utc: true }
+  const currentDate = useMemo(() => {
+    const datetime = Datetime.Now(options)
+    datetime.setSeconds(0, 0)
+    return datetime
+  }, [])
+
   const [event, setEvent] = useState<EventEditorState>({
     name: defaultEvent.name || '',
     description: defaultEvent.description || '',
@@ -46,8 +49,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     y: defaultEvent.x || 0,
     realm: defaultEvent.realm || null,
     url: defaultEvent.url || '',
-    start_at: start_at,
-    duration: duration,
+    start_at: defaultEvent.start_at || currentDate.date,
+    duration: defaultEvent.duration || DEFAULT_EVENT_DURATION,
     all_day: defaultEvent.all_day || false,
     approved: false,
     rejected: false,
@@ -68,22 +71,23 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     errors: {}
   })
 
-  const finish_at = useMemo(() => new Date(event.start_at.getTime() + event.duration), [event.start_at, event.duration])
+  const finish_at = useMemo(() => new Datetime(new Date(event.start_at.getTime() + event.duration), options), [event.start_at.getTime(), event.duration])
+  const start_at = useMemo(() => new Datetime(event.start_at, options), [event.start_at.getTime()])
 
   function getStartDate() {
-    return toUTCInputDate(event.start_at)
+    return start_at.toInputDate()
   }
 
   function getStartTime() {
-    return toUTCInputTime(event.start_at)
+    return start_at.toInputTime()
   }
 
   function getFinishDate() {
-    return toUTCInputDate(finish_at)
+    return finish_at.toInputDate()
   }
 
   function getFinishTime() {
-    return toUTCInputTime(finish_at)
+    return finish_at.toInputTime()
   }
 
   function setError(key: string, description: string) {
@@ -137,12 +141,16 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeStartDate(value?: string) {
-    const start_at = fromUTCInputDate(value || '', event.start_at)
-    if (start_at !== event.start_at) {
+    const start_at = Datetime.fromInputDate(value || '', event.start_at, options).date
+
+    if (start_at.getTime() !== event.start_at.getTime()) {
       let recurrent_until = event.recurrent_until
       if (recurrent_until !== null && recurrent_until.getTime() < start_at.getTime()) {
-        recurrent_until = fromInputTime('00:00', start_at)
+        recurrent_until = Datetime.fromInputTime('00:00', start_at, options).date
       }
+
+      console.log(Datetime.fromInputDate(value || '', event.start_at, options).date)
+
       setValues({
         start_at,
         recurrent_until,
@@ -153,14 +161,14 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeStartTime(value?: string) {
-    const start_at = fromUTCInputTime(value || '', event.start_at)
+    const start_at = Datetime.fromInputTime(value || '', event.start_at, options).date
     if (start_at !== event.start_at) {
       setValues({ start_at })
     }
   }
 
   function handleChangeFinishDate(value?: string) {
-    const finish_timestamp = fromUTCInputDate(value || '', finish_at).getTime()
+    const finish_timestamp = Datetime.fromInputTime(value || '', finish_at.date, options).date.getTime()
     const duration = Math.max(0, finish_timestamp - event.start_at.getTime())
     if (duration !== event.duration) {
       setValues({ duration })
@@ -168,7 +176,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeFinishTime(value?: string) {
-    const finish_timestamp = fromUTCInputTime(value || '', finish_at).getTime()
+    const finish_timestamp = Datetime.fromInputTime(value || '', finish_at.date, options).date.getTime()
     const duration = Math.max(0, finish_timestamp - event.start_at.getTime())
     if (duration !== event.duration) {
       setValues({ duration })
@@ -179,8 +187,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     if (!value) {
       setValue('all_day', false)
     } else {
-      const start_at = fromUTCInputTime('00:00', event.start_at)
-      const finish_at_tmp = fromUTCInputTime('00:00', finish_at)
+      const start_at = Datetime.fromInputTime('00:00', event.start_at, options).date
+      const finish_at_tmp = Datetime.fromInputTime('00:00', finish_at.date, options).date
 
       if (finish_at_tmp.getTime() < finish_at.getTime()) {
         finish_at_tmp.setUTCDate(finish_at_tmp.getUTCDate() + 1)
@@ -217,7 +225,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         recurrent_weekday_mask: 0,
         recurrent_setpos: null,
         recurrent_monthday: null,
-        recurrent_until: fromInputTime('00:00', event.start_at),
+        recurrent_until: Datetime.fromInputTime('00:00', event.start_at, options).date,
         recurrent_count: null,
       })
     } else {
@@ -307,7 +315,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     switch (value) {
       case 'until':
         return setValues({
-          recurrent_until: fromInputTime('00:00', event.start_at),
+          recurrent_until: Datetime.fromInputTime('00:00', event.start_at, options).date,
           recurrent_count: null,
         })
       case 'count':
@@ -331,7 +339,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeRecurrentUntil(value: string) {
-    const recurrent_until = fromInputDate(value, event.recurrent_until || event.start_at)
+    const recurrent_until = Datetime.fromInputDate(value, event.recurrent_until || event.start_at).date
     setValue('recurrent_until', recurrent_until)
   }
 

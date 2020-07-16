@@ -7,12 +7,10 @@ import Layout from "../components/Layout/Layout"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
-import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import { toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 
 import EventModal from "../components/Event/EventModal/EventModal"
@@ -23,7 +21,7 @@ import Carousel from "../components/Carousel/Carousel"
 import SubmitButton from "../components/Button/SubmitButton"
 import useListEvents from '../hooks/useListEvents'
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
-import { EventAttributes, SessionEventAttributes } from "../entities/Event/types"
+import { SessionEventAttributes } from "../entities/Event/types"
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import SEO from "../components/seo"
 import url from '../utils/url'
@@ -35,6 +33,7 @@ import './index.css'
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import Datetime from "decentraland-gatsby/dist/utils/Datetime"
 
 const invertedAdd = require('../images/inverted-add.svg')
 
@@ -65,6 +64,7 @@ export default function IndexPage(props: any) {
   const [enabledNotification, setEnabledNotification] = useState(false)
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
+  const utc = !siteStore.settings?.use_local_time
 
   useAnalytics((analytics) => {
     const name = currentEvent ? segment.Page.Event : segment.Page.Home
@@ -166,6 +166,7 @@ export default function IndexPage(props: any) {
       </EnabledNotificationModal>
       <EventModal
         event={currentEvent}
+        utc={utc}
         attendees={isListingAttendees}
         updating={!!(currentEvent && state.updating[currentEvent.id])}
         onClose={handleCloseModal}
@@ -195,6 +196,7 @@ export default function IndexPage(props: any) {
           {mainEvents.map(event => <EventCardBig
             key={'live:' + event.id}
             event={event}
+            utc={utc}
             updating={state.updating[event.id]}
             href={url.toEvent(location, event.id)}
             onChangeEvent={handleChangeEvent}
@@ -209,12 +211,13 @@ export default function IndexPage(props: any) {
           </Card.Group></div>}
         {!siteStore.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
-            <SubTitle>{toMonthName(date, { utc: true })}</SubTitle>
+            <SubTitle>{new Datetime(date, { utc }).getMonthName()}</SubTitle>
           </div>
           <Card.Group>
             {events.map((event) => <EventCard
               key={'event:' + event.id}
               event={event}
+              utc={utc}
               updating={state.updating[event.id]}
               href={url.toEvent(location, event.id)}
               onChangeEvent={handleChangeEvent}

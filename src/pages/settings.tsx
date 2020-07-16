@@ -228,7 +228,7 @@ export default function SettingsPage(props: any) {
                 </div>
                 <div className="SettingsToggle">
                   {state.updating.useLocalTime && <Loader size="mini" active />}
-                  {!state.updating.useLocalTime && <Radio toggle checked={state.settings.use_local_time} onClick={handleChangeUseLocalTime} />}
+                  {!state.updating.useLocalTime && <Radio toggle checked={!state.settings.use_local_time} onClick={handleChangeUseLocalTime} />}
                 </div>
               </div>
             </Grid.Column>

@@ -10,9 +10,9 @@ import { editableAttributes, ProfileSettingsAttributes, EmailSubscriptionStatus,
 import isEmail from 'validator/lib/isEmail';
 import { sendEmailVerification } from '../Notification/utils';
 import { requiredEnv } from 'decentraland-gatsby/dist/utils/env';
-import { Time } from 'decentraland-gatsby/dist/components/Date/utils';
 import ProfileSubscriptionModel from '../ProfileSubscription/model';
 import EventAttendeeModel from '../EventAttendee/model';
+import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
 
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
 const SIGN_SECRET = requiredEnv('SIGN_SECRET')
@@ -95,7 +95,7 @@ export async function updateProfileSettings(req: WithAuth) {
       action: 'verify',
       user: profile.user,
       email: newProfile.email!,
-      exp: Date.now() + 15 * Time.Minute
+      exp: Date.now() + 15 * Datetime.Minute
     }
 
     const verificationUrl = new URL(EVENTS_URL)

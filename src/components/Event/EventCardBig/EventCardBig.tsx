@@ -13,6 +13,7 @@ export type EventCardBigProps = {
   event: SessionEventAttributes,
   href?: string,
   updating?: boolean
+  utc?: boolean
   onClick?: (e: React.MouseEvent<any>, data: SessionEventAttributes) => void,
   onClickEdit?: (e: React.MouseEvent<any>, data: SessionEventAttributes) => void,
   onChangeEvent?: (event: React.MouseEvent<any>, data: SessionEventAttributes) => void
@@ -34,6 +35,7 @@ export default function EventCardBig(props: EventCardBigProps) {
       <Card.Content>
         <EventDetail
           event={event}
+          utc={props.utc}
           showDescription={false}
           showAttendees={false}
           showContact={false}

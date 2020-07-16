@@ -18,6 +18,7 @@ export type EventCardProps = {
   event: SessionEventAttributes,
   href?: string,
   updating?: boolean,
+  utc?: boolean,
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
   onChangeEvent?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
@@ -48,7 +49,7 @@ export default function EventCard(props: EventCardProps) {
       <ImgFixed src={event.image || ''} dimension="wide" />
       <Card.Content>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <EventDate event={event} />
+          <EventDate event={event} utc={props.utc} />
           <div>
             <JumpInButton event={event} />
           </div>

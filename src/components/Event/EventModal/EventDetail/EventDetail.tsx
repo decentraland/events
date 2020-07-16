@@ -36,6 +36,7 @@ export type EventDetailProps = {
   showAttendees?: boolean
   showContact?: boolean
   showDetails?: boolean
+  utc?: boolean
   onClickEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
   onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
 }
@@ -65,7 +66,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
       <div className="EventDetail__Header">
-        <DateBox date={next_start_at} />
+        <DateBox date={next_start_at} utc={props.utc} />
         <div className="EventDetail__Header__Event">
           <SubTitle>{event.name}</SubTitle>
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
@@ -90,11 +91,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DATE */}
       {props.showDate !== false && <EventSection.Divider />}
-      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} countdown={!!props.showCountdownDate} />}
+      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} utc={props.utc} countdown={!!props.showCountdownDate} />}
       {props.showDate !== false && props.showAllDates !== false && <div style={{ maxHeight: '500px', overflow: 'auto' }}>
         {dates.map((date, i) => {
           return <EventDateDetail
             key={date.getTime()}
+            utc={props.utc}
             style={i > 0 ? { paddingTop: '0' } : {}}
             secondary={i > 0 || date.getTime() + event.duration < now}
             completed={date.getTime() + event.duration < now}

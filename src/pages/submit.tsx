@@ -10,11 +10,11 @@ import { SelectField } from 'decentraland-ui/dist/components/SelectField/SelectF
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
-import { toInputDate, toDayName, toUTCInputDate, toMonthName } from "decentraland-gatsby/dist/components/Date/utils"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
+import Datetime from "decentraland-gatsby/dist/utils/Datetime"
 import { navigate } from 'gatsby-plugin-intl'
 
 import Layout from "../components/Layout/Layout"
@@ -35,8 +35,8 @@ import Label from "../components/Form/Label"
 import RadioGroup from "../components/Form/RadioGroup"
 import Events, { EditEvent } from "../api/Events"
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
-import { Frequency, WeekdayMask, Position, Weekdays, MAX_EVENT_RECURRENT } from "../entities/Event/types"
-import { isLatestRecurrentSetpos, toRecurrentSetposName, toRRuleWeekdays, toRRuleMonths, toRRuleDates } from "../entities/Event/utils"
+import { Frequency, WeekdayMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types"
+import { isLatestRecurrentSetpos, toRecurrentSetposName, toRRuleDates } from "../entities/Event/utils"
 
 import './submit.css'
 
@@ -58,6 +58,9 @@ type SubmitPageState = {
 }
 
 export default function SubmitPage(props: any) {
+  const options = { utc: true }
+  const capitalized = true
+  const short = true
   const location = useLocation()
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const eventId = url.getEventId(location) || null
@@ -374,7 +377,7 @@ export default function SubmitPage(props: any) {
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="8">
-                      <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={editActions.getStartDate()} min={toInputDate(new Date())} onChange={editActions.handleChange} />
+                      <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={editActions.getStartDate()} min={Datetime.Today(options).toInputDate()} onChange={editActions.handleChange} />
                     </Grid.Column>
                     {!editing.all_day && <Grid.Column mobile="6">
                       <Field label="Start time" name="start_time" type="time" error={!!errors['start_at'] || !!errors['start_time']} message={errors['start_time']} value={editActions.getStartTime()} onChange={editActions.handleChange} />
@@ -417,10 +420,10 @@ export default function SubmitPage(props: any) {
                           <Radio label={`Monthly on day ${editing.start_at.getUTCDate()}`} name="recurrent_monthday[current]" checked={editing.recurrent_monthday !== null} onClick={editActions.handleChange} />
                         </div>
                         <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
-                          <Radio label={`Monthly on the ${toRecurrentSetposName(editing.start_at)} ${toDayName(editing.start_at, { utc: true, capitalized: true })}`} name="recurrent_setpos[current]" checked={editing.recurrent_setpos !== null && editing.recurrent_setpos !== Position.LAST} onChange={editActions.handleChange} />
+                          <Radio label={`Monthly on the ${toRecurrentSetposName(editing.start_at)} ${new Datetime(editing.start_at, options).getDayName({ capitalized })}`} name="recurrent_setpos[current]" checked={editing.recurrent_setpos !== null && editing.recurrent_setpos !== Position.LAST} onChange={editActions.handleChange} />
                         </div>
                         {isLatestRecurrentSetpos(editing.start_at) && <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
-                          <Radio label={`Monthly on the last ${toDayName(editing.start_at, { utc: true, capitalized: true })}`} name="recurrent_setpos[last]" checked={editing.recurrent_setpos === Position.LAST} onChange={editActions.handleChange} />
+                          <Radio label={`Monthly on the last ${new Datetime(editing.start_at, options).getDayName({ capitalized })}`} name="recurrent_setpos[last]" checked={editing.recurrent_setpos === Position.LAST} onChange={editActions.handleChange} />
                         </div>}
                       </RadioGroup>
                     </Grid.Column>}
@@ -432,26 +435,29 @@ export default function SubmitPage(props: any) {
                     </Grid.Column>}
                     {editing.recurrent && editing.recurrent_count !== null && <Grid.Column mobile="5"><Paragraph className="FieldNote">Occurrences</Paragraph></Grid.Column>}
                     {editing.recurrent && editing.recurrent_until !== null && <Grid.Column mobile="8">
-                      <Field label="&nbsp;" name="recurrent_until" type="date" value={toUTCInputDate(editing.recurrent_until)} onChange={editActions.handleChange} min={toInputDate(editing.start_at)} />
+                      <Field label="&nbsp;" name="recurrent_until" type="date" value={new Datetime(editing.recurrent_until, options).toInputDate()} onChange={editActions.handleChange} min={Datetime.from() /*toInputDate(editing.start_at)*/} />
                     </Grid.Column>}
                     {editing.recurrent && recurrent_date.length > 0 && <Grid.Column mobile="16">
                       <Label>Dates ({recurrent_date.length}): </Label>
                     </Grid.Column>}
-                    {editing.recurrent && recurrent_date.length > 0 && recurrent_date.map(date => <Grid.Column mobile="12" key={date.getTime()}>
-                      <Paragraph secondary={date.getTime() + editing.duration < now}>
-                        <span style={{ display: 'inline-block', minWidth: '8em', textAlign: 'right', marginRight: '.5em' }}>
-                          {toDayName(date, { capitalized: true, utc: true })}
-                          {', '}
-                        </span>
-                        <span style={{ display: 'inline-block', minWidth: '4em' }}>
-                          {date.getUTCDate()}
-                          {' '}
-                          {toMonthName(date, { capitalized: true, utc: true })}
-                          {' '}
-                        </span>
-                        {date.getUTCFullYear()}
-                      </Paragraph>
-                    </Grid.Column>)}
+                    {editing.recurrent && recurrent_date.length > 0 && recurrent_date.map(date => {
+                      const datetime = new Datetime(date, options)
+                      return <Grid.Column mobile="12" key={date.getTime()}>
+                        <Paragraph secondary={date.getTime() + editing.duration < now}>
+                          <span style={{ display: 'inline-block', minWidth: '8em', textAlign: 'right', marginRight: '.5em' }}>
+                            {datetime.getDayName({ capitalized })}
+                            {', '}
+                          </span>
+                          <span style={{ display: 'inline-block', minWidth: '4em' }}>
+                            {datetime.getDatePadded()}
+                            {' '}
+                            {datetime.getMonthName({ capitalized })}
+                            {' '}
+                          </span>
+                          {date.getUTCFullYear()}
+                        </Paragraph>
+                      </Grid.Column>
+                    })}
                   </Grid.Row>
 
                   <Grid.Row>
