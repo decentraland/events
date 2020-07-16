@@ -5,7 +5,6 @@ import API from 'decentraland-gatsby/dist/utils/api/API'
 import { EventAttributes } from '../Event/types'
 import { eventUrl, eventFacebookUrl, eventTwitterUrl } from '../Event/utils'
 import { ProfileSettingsAttributes } from '../ProfileSettings/types'
-import { ProfileSubscriptionAttributes } from '../ProfileSubscription/types'
 
 export async function sendEmailVerification(email: string, address: string, verify_url: string) {
   const profile = await API.catch(Katalyst.get().getProfile(address))
