@@ -33,7 +33,8 @@
   position: relative;
 }
 
-.AddonField .ui.button.basic {
+.AddonField .ui.button.basic,
+.AddonField .ui.loading.loading.loading.loading.loading.loading.button.basic {
   position: absolute;
   right: 0;
   bottom: 40px;

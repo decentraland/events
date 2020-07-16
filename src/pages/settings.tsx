@@ -207,7 +207,7 @@ export default function SettingsPage(props: any) {
               <Paragraph small semiBold>Add you email address to receive notifications and our weekly digest</Paragraph>
               <div className="AddonField">
                 <Field label="Email address" placeholder="example@domain.com" value={currentEmail} onChange={handleChangeEmail} />
-                {currentEmailChanged && <Button small basic loading={state.updating.email} disabled={!currentEmailIsValid} onClick={handleSaveEmail}>SAVE</Button>}
+                {currentEmailChanged && <Button basic loading={state.updating.email} disabled={!currentEmailIsValid} onClick={handleSaveEmail}>SAVE</Button>}
                 {!currentEmailChanged && siteStore.settings && siteStore.settings.email && siteStore.settings.email_verified && <Button basic>Verified <img src={check} width={18} height={18} /></Button>}
                 {!currentEmailChanged && siteStore.settings && siteStore.settings.email && !siteStore.settings.email_verified && <Button basic disabled>Pending</Button>}
               </div>
