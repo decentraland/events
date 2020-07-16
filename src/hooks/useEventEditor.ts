@@ -223,7 +223,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     } else {
       setValues({
         recurrent: false,
-        recurrent_interval: 0,
+        recurrent_interval: 1,
         recurrent_frequency: null,
         recurrent_month_mask: 0,
         recurrent_weekday_mask: 0,
