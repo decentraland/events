@@ -5,6 +5,10 @@
   border-color: var(--divider);
 }
 
+.dcl.navbar .dcl.navbar-account {
+  align-items: flex-start;
+}
+
 .dcl.navbar.initial {
   background-color: transparent;
   border-color: transparent;
@@ -12,6 +16,31 @@
 
 .dcl.navbar .ui.menu .item {
   color: var(--text);
+}
+
+.dcl.navbar .dcl.profile {
+  position: relative;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid transparent;
+}
+
+.dcl.navbar .dcl.profile.active {
+  border-color: var(--primary);
+}
+
+.dcl.navbar .dcl.profile.notification::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+  background-color: var(--primary);
+  border: 2px solid #fff;
+  top: -2px;
+  right: -2px;
 }
 
 @media only screen and (min-width: 1200px) {

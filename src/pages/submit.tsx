@@ -58,7 +58,6 @@ type SubmitPageState = {
 }
 
 export default function SubmitPage(props: any) {
-
   const location = useLocation()
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const eventId = url.getEventId(location) || null
@@ -269,6 +268,12 @@ export default function SubmitPage(props: any) {
     handlePoster(file)
   }
 
+  function handleSettings(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    event.stopPropagation()
+    navigate(url.toSettings(location), siteStore.getNavigationState())
+  }
+
   function handleBack(event: React.MouseEvent<any>) {
     event.preventDefault()
     event.stopPropagation()
@@ -281,7 +286,7 @@ export default function SubmitPage(props: any) {
   const now = Date.now()
 
   return (
-    <Layout {...props} >
+    <Layout {...props} onOpenProfile={handleSettings}>
       <SEO title="Submit event" />
       <ConfirmModal open={state.requireConfirmation} onClose={() => patchState({ requireConfirmation: false })}>
         <Title>Are you absolutely sure?</Title>

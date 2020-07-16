@@ -4,10 +4,20 @@ module.exports = {
     description: `Decentraland Events`,
     author: `@decentraland`,
   },
-  proxy: {
-    prefix: `/api`,
-    url: `http://localhost:3001`,
-  },
+  proxy: [
+    {
+      url: `http://localhost:3001`,
+      prefix: `/api`,
+    },
+    {
+      url: `http://localhost:3001`,
+      prefix: `/verify`,
+    },
+    {
+      url: `http://localhost:3001`,
+      prefix: `/unsubscribe`,
+    },
+  ],
   plugins: [
     `gatsby-plugin-react-helmet`,
     {

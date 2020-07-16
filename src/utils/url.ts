@@ -29,6 +29,10 @@ export default {
     return this.toUrl('/submit')
   },
 
+  toSettings(location: WindowLocation) {
+    return this.toUrl('/settings')
+  },
+
   toHome(location: WindowLocation) {
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.delete('event')

@@ -1,0 +1,56 @@
+.SettingsPage .SettingsSection {
+  display: flex;
+  align-items: center;
+}
+
+.SettingsPage .SettingsSection .dg.Paragraph {
+  margin: 0;
+}
+
+.SettingsPage .SettingsSection .dg.Paragraph.Paragraph--tiny {
+  font-size: 15px;
+}
+
+.SettingsPage .SettingsSection .SettingsDetails {
+  flex: 1;
+}
+
+.SettingsPage .SettingsSection .SettingsDetails.SettingsDetails--disabled {
+  opacity: 0.5;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.SettingsPage .SettingsSection .SettingsToggle {
+  flex: 0;
+  position: relative;
+  min-width: 34px;
+}
+
+.AddonField {
+  position: relative;
+}
+
+.AddonField .ui.button.basic {
+  position: absolute;
+  right: 0;
+  bottom: 40px;
+  display: block;
+  min-width: 100px;
+  text-align: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.AddonField .ui.button.basic img {
+  vertical-align: text-bottom;
+}
+
+.AddonField .dcl.field .ui.input input {
+  padding-right: 100px;
+}

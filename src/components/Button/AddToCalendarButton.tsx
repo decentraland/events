@@ -9,7 +9,7 @@ import { EventAttributes } from "../../entities/Event/types";
 import * as segment from '../../utils/segment'
 
 import './AddToCalendarButton.css'
-import { eventUrl } from "../../entities/Event/utils";
+import { eventTargetUrl } from "../../entities/Event/utils";
 
 export type AddToCalendarButtonProps = ButtonProps & {
   event?: EventAttributes,
@@ -40,7 +40,7 @@ function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
 
   const start_at = startAt || event.start_at
   const finish_at = new Date(start_at.getTime() + event.duration)
-  const url = eventUrl(event);
+  const url = eventTargetUrl(event);
   const params = new URLSearchParams()
   params.set('text', event.name)
 

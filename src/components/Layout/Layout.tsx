@@ -24,6 +24,7 @@ import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 
 import "./Layout.css"
+import TokenList from "decentraland-gatsby/dist/utils/TokenList"
 
 export default function Layout({ children, ...props }: any) {
   const language: Locale = props?.pageContext?.intl?.language || 'en'
@@ -51,7 +52,7 @@ export default function Layout({ children, ...props }: any) {
         rightMenu={(actions.provider || !isMobile) && <>
           {!profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.connect()}>Sign in</Button>}
           {profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.disconnect()}>Logout</Button>}
-          {profile && <ImgAvatar size="small" profile={profile} style={{ margin: ' 0 0 0 .5rem' }} />}
+          {profile && <div onClick={props.onOpenProfile} className={TokenList.join(['dcl', 'profile', props.active && 'active'])}><ImgAvatar size="small" profile={profile} /></div>}
         </>}
       />
       <div>{children}</div>

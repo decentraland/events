@@ -2,17 +2,50 @@ import { EventAttributes, MonthMask, WeekdayMask, Weekdays, Months, Position, Re
 import { RRule, Weekday } from 'rrule'
 
 const DECENTRALAND_URL = process.env.GATSBY_DECENTRALAND_URL || process.env.DECENTRALAND_URL || 'https://play.decentraland.org'
+const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
 
 export function eventUrl(event: EventAttributes): string {
+  const target = new URL(EVENTS_URL)
+  target.pathname = ''
+  target.searchParams.set('event', event.id)
+  return target.toString()
+}
 
-  const params = new URLSearchParams()
-  params.set('position', [event.x || 0, event.y || 0].join(','))
+export function eventTargetUrl(event: EventAttributes): string {
+  const target = new URL(DECENTRALAND_URL)
+  target.pathname = ''
+  target.searchParams.set('position', [event.x || 0, event.y || 0].join(','))
 
   if (event.realm) {
-    params.set('realm', event.realm)
+    target.searchParams.set('realm', event.realm)
   }
 
-  return `${DECENTRALAND_URL}/?${params.toString()}`
+  return target.toString()
+}
+
+export function eventFacebookUrl(event: EventAttributes): string {
+  const target = new URL('https://www.facebook.com/sharer/sharer.php')
+  target.searchParams.set('u', eventUrl(event))
+
+  if (event.description) {
+    target.searchParams.set('description', event.description)
+  }
+
+  return target.toString()
+}
+
+export function eventTwitterUrl(event: EventAttributes): string {
+  const target = new URL('https://twitter.com/intent/tweet')
+  target.searchParams.set('hashtags', 'decentraland,socialworld,virtualgames')
+
+  const description: string[] = []
+  if (event.description) {
+    description.push(event.description)
+  }
+
+  description.push(eventUrl(event))
+  target.searchParams.set('text', description.join(' '))
+  return target.toString()
 }
 
 export function toMonthMask(date: Date | null | undefined) {
@@ -129,7 +162,6 @@ export function toRecurrentSetposName(date: Date) {
 
 
 export function calculateRecurrentProperties(event: Partial<RecurrentEventAttributes> & Partial<Pick<EventAttributes, 'recurrent_dates'>> & Pick<EventAttributes, 'start_at' | 'duration' | 'finish_at'>): RecurrentEventAttributes & Pick<EventAttributes, 'start_at' | 'duration' | 'finish_at' | 'recurrent_dates'> {
-
   const now = Date.now()
   const start_at = new Date(Date.parse(event.start_at.toString()))
   const finish_at = new Date(start_at.getTime() + event.duration)

@@ -28,6 +28,9 @@ import useAnalytics from "../hooks/useAnalytics"
 import './index.css'
 import SubmitButton from "../components/Button/SubmitButton"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
+import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
+import Title from "decentraland-gatsby/dist/components/Text/Title"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -51,6 +54,7 @@ export default function IndexPage(props: any) {
     }
   }, [siteStore.connectError])
 
+  const [enabledNotification, setEnabledNotification] = useState(false)
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
 
@@ -69,6 +73,12 @@ export default function IndexPage(props: any) {
     event.preventDefault()
     event.stopPropagation()
     navigate(url.toHome(location), siteStore.getNavigationState())
+  }
+
+  function handleSettings(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    event.stopPropagation()
+    navigate(url.toSettings(location), siteStore.getNavigationState())
   }
 
   function handleCloseModal(event: React.MouseEvent<any>) {
@@ -110,6 +120,13 @@ export default function IndexPage(props: any) {
       .then(async () => {
         if (event.attending !== data.attending) {
           await siteStore.attendEvent(event.id, data.attending)
+
+        } else if (event.notify !== data.notify) {
+          if (!siteStore.settings || (!siteStore.settings.email_verified && !siteStore.settings.notify_by_browser)) {
+            setEnabledNotification(true)
+          } else {
+            await siteStore.notifyEvent(event.id, data.notify)
+          }
         }
       })
       .then(async () => {
@@ -129,9 +146,14 @@ export default function IndexPage(props: any) {
   }
 
   return (
-    <Layout {...props}>
+    <Layout {...props} onOpenProfile={handleSettings}>
       <SEO title={title} />
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
+      <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)}>
+        <Title>Notifications</Title>
+        <Paragraph>Go to settings and setup your notifications preferences!</Paragraph>
+        <Button primary style={{ marginTop: '28px' }} onClick={handleSettings}>GO TO SETTINGS</Button>
+      </EnabledNotificationModal>
       <EventModal
         event={currentEvent}
         attendees={isListingAttendees}
@@ -159,12 +181,7 @@ export default function IndexPage(props: any) {
           <Paragraph secondary>You need to <Link onClick={() => siteStore.connect()}>sign in</Link> before to submit an event</Paragraph>
           <Divider />
         </div>}
-        {!siteStore.loading && siteStore.profile && events.length === 0 && <div>
-          <Divider />
-          <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
-          <Divider />
-        </div>}
-        {!siteStore.loading && siteStore.profile && events.length > 0 && <div>
+        {!siteStore.loading && siteStore.profile && <div>
           <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
           {attendingEvents.length === 0 && <div style={{ textAlign: 'center' }}>
             <Divider size="mini" />
@@ -175,7 +192,7 @@ export default function IndexPage(props: any) {
             {attendingEvents.map(event => <EventCardMini key={'going:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenEventDetail} />)}
           </Card.Group>}
         </div>}
-        {!siteStore.loading && siteStore.profile && events.length > 0 && <div>
+        {!siteStore.loading && siteStore.profile && <div>
           <div className="GroupTitle"><SubTitle>HOSTED BY ME</SubTitle></div>
           {myEvents.length === 0 && <div style={{ textAlign: 'center' }}>
             <Divider size="tiny" />

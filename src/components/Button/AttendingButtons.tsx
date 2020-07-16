@@ -6,7 +6,7 @@ import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import { SessionEventAttributes } from '../../entities/Event/types'
-import Events from '../../api/Events'
+import { eventTwitterUrl, eventFacebookUrl } from '../../entities/Event/utils'
 import { useLocation } from '@reach/router'
 import url from '../../utils/url'
 import * as segment from '../../utils/segment'
@@ -15,6 +15,8 @@ const share = require('../../images/share.svg')
 const close = require('../../images/popup-close.svg')
 const facebook = require('../../images/icon-facebook.svg')
 const twitter = require('../../images/icon-twitter.svg')
+const notificationDisabled = require('../../images/notification-disabled.svg')
+const notificationEnabled = require('../../images/notification-enabled.svg')
 
 import './AttendingButtons.css'
 
@@ -54,35 +56,15 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   function handleShareFacebook(e: React.MouseEvent<any>) {
     e.preventDefault()
     e.stopPropagation()
-
-    const params = new URLSearchParams([
-      ['u', location.origin + url.toEvent(location, props.event.id)]
-    ])
-
-    if (props.event.description) {
-      params.set('description', props.event.description)
-    }
-
     track((analytics) => analytics.track(segment.Track.Share, { ethAddress, event: event?.id || null, medium: 'facebook' }))
-    handleFallbackShare(`https://www.facebook.com/sharer/sharer.php?` + params.toString())
+    handleFallbackShare(eventFacebookUrl(event))
   }
 
   function handleShareTwitter(e: React.MouseEvent<any>) {
     e.preventDefault()
     e.stopPropagation()
-
-    const params = new URLSearchParams([
-      ['hashtags', 'decentraland,socialworld,virtualgames']
-    ])
-
-    if (props.event.description) {
-      params.set('text', props.event.description + ' ' + location.origin + url.toEvent(location, props.event.id))
-    } else {
-      params.set('text', location.origin + url.toEvent(location, props.event.id))
-    }
-
     track((analytics) => analytics.track(segment.Track.Share, { ethAddress, event: event?.id || null, medium: 'twitter' }))
-    handleFallbackShare('https://twitter.com/intent/tweet?' + params.toString())
+    handleFallbackShare(eventTwitterUrl(event))
   }
 
   function handleAttend(e: React.MouseEvent<any>) {
@@ -94,6 +76,17 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     }
 
     props.onChangeEvent(e, { ...event, attending: !event.attending })
+  }
+
+  function handleNotify(e: React.MouseEvent<any>) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (props.loading || !props.onChangeEvent) {
+      return
+    }
+
+    props.onChangeEvent(e, { ...event, notify: !event.notify })
   }
 
   function handleShare(e: React.MouseEvent<any>) {
@@ -138,6 +131,10 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       {(actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={TokenList.join(['attending-status', 'fluid', event.attending && 'attending'])}>
         {event.attending && 'GOING'}
         {!event.attending && 'WANT TO GO'}
+      </Button>}
+
+      {event.attending && (actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || !event.approved} onClick={handleNotify}>
+        <img src={event.notify && notificationEnabled || notificationDisabled} width="22" height="22" />
       </Button>}
 
       {(actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || !event.approved} onClick={handleShare}>
