@@ -12,6 +12,8 @@ COPY ./package.json      /app/package.json
 RUN npm install --unsafe-perm
 
 COPY ./migrations        /app/migrations
+COPY ./templates         /app/templates
+COPY ./static            /app/static
 COPY ./src               /app/src
 COPY ./entrypoint.sh     /app/entrypoint.sh
 COPY ./gatsby-browser.js /app/gatsby-browser.js

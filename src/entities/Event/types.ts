@@ -89,6 +89,7 @@ export type EventAttributes = {
   image: string | null
   description: string
   start_at: Date
+  next_start_at: Date
   finish_at: Date
   duration: number
   all_day: boolean
@@ -128,8 +129,8 @@ export type DeprecatedEventAttributes = EventAttributes & {
 }
 
 export type SessionEventAttributes = DeprecatedEventAttributes & {
-  next_start_at: Date
   attending: boolean
+  notify: boolean
   editable: boolean
   owned: boolean
   live: boolean
@@ -269,7 +270,7 @@ export const eventSchema = {
     },
     recurrent_interval: {
       type: 'number',
-      minimum: 1
+      minimum: 0
     },
     recurrent_count: {
       type: ['number', 'null']

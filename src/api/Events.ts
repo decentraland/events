@@ -6,6 +6,7 @@ import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 import { PosterAttributes } from '../entities/Poster/types'
 import { Realm } from '../entities/Realm/types'
+import { ProfileSettingsAttributes } from '../entities/ProfileSettings/types'
 
 export type EditEvent = Pick<EventAttributes,
   'name' |
@@ -77,6 +78,7 @@ export default class Events extends API {
       duration,
       recurrent: Boolean(event.recurrent),
       attending: Boolean(event.attending),
+      notify: Boolean(event.notify),
       editable: Boolean(event.editable),
       owned: Boolean(event.owned),
       live: Boolean(event.live),
@@ -100,6 +102,43 @@ export default class Events extends API {
   async fetchMany(url: string, options: Options = new Options({})): Promise<SessionEventAttributes[]> {
     const result = await this.fetch(url, options) as any
     return (result || []).map(Events.parse)
+  }
+
+  async createSubscription(subscription: { endpoint: string, p256dh: string, auth: string }) {
+    return this.fetch<{}>(
+      '/profile/subscription',
+      this.options()
+        .authorization()
+        .json(subscription)
+        .method('POST')
+    )
+  }
+
+  async removeSubscriptions() {
+    return this.fetch<{}>(
+      '/profile/subscription',
+      this.options()
+        .authorization()
+        .method('DELETE')
+    )
+  }
+
+  async getMyProfileSettings() {
+    return this.fetch<ProfileSettingsAttributes>(
+      '/profile/settings',
+      this.options()
+        .authorization()
+    )
+  }
+
+  async updateProfileSettings(settings: Partial<ProfileSettingsAttributes> = {}) {
+    return this.fetch<ProfileSettingsAttributes>(
+      '/profile/settings',
+      this.options()
+        .method('PATCH')
+        .authorization()
+        .json(settings)
+    )
   }
 
   async getRealms() {
@@ -157,6 +196,15 @@ export default class Events extends API {
     return this.fetch<EventAttendeeAttributes[]>(
       `/events/${eventId}/attendees`,
       this.options({ method: 'POST' })
+        .authorization()
+    )
+  }
+
+  async updateEventAttendee(eventId: string, attendee: Partial<Pick<EventAttendeeAttributes, 'notify'>> = {}) {
+    return this.fetch<EventAttendeeAttributes[]>(
+      `/events/${eventId}/attendees`,
+      this.options({ method: 'PATCH' })
+        .json(attendee)
         .authorization()
     )
   }

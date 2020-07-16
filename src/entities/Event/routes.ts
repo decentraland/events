@@ -3,7 +3,7 @@ import env from 'decentraland-gatsby/dist/utils/env'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
 import { v4 as uuid } from 'uuid';
 import EventModel from './model';
-import { eventUrl, calculateRecurrentProperties } from './utils'
+import { eventTargetUrl, calculateRecurrentProperties } from './utils'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
@@ -132,7 +132,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   if (!data.url) {
-    data.url = eventUrl(data)
+    data.url = eventTargetUrl(data)
   }
 
   const errors = EventModel.validate(data)
@@ -153,6 +153,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const user_name = userProfile.name || null;
   const estate_id = estate?.id || null;
   const estate_name = estate?.data?.name || null;
+  const next_start_at = EventModel.selectNextStartAt(recurrent.duration, recurrent.start_at, recurrent.recurrent_dates)
 
   const event: DeprecatedEventAttributes = {
     ...data,
@@ -160,6 +161,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
     id: event_id,
     image,
     user: user.toLowerCase(),
+    next_start_at,
     user_name,
     estate_id,
     estate_name,
@@ -190,7 +192,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   } as DeprecatedEventAttributes
 
   if (!updatedAttributes.url || updatedAttributes.url.startsWith(DECENTRALAND_URL)) {
-    updatedAttributes.url = eventUrl(updatedAttributes)
+    updatedAttributes.url = eventTargetUrl(updatedAttributes)
   }
 
   const errors = EventModel.validate(updatedAttributes)
@@ -213,6 +215,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   updatedAttributes.coordinates = [x, y]
 
   Object.assign(updatedAttributes, calculateRecurrentProperties(updatedAttributes))
+  updatedAttributes.next_start_at = EventModel.selectNextStartAt(updatedAttributes.duration, updatedAttributes.start_at, updatedAttributes.recurrent_dates)
 
   if (updatedAttributes.rejected) {
     updatedAttributes.rejected = true

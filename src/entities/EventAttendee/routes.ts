@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
@@ -8,6 +7,7 @@ import { EventAttendeeAttributes } from './types';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import EventModel from '../Event/model';
 import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
+import { getProfileSettings } from '../ProfileSettings/routes';
 
 export default routes((router) => {
   const withAuth = auth({ optional: true })
@@ -16,6 +16,7 @@ export default routes((router) => {
 
   router.get(BASE_PATH + '/attendees', withEventExists, handle(getEventAttendees))
   router.post(BASE_PATH + '/attendees', withAuth, withUserProfile, withEventExists, handle(createEventAttendee))
+  router.patch(BASE_PATH + '/attendees', withAuth, withEventExists, handle(updateEventAttendee))
   router.delete(BASE_PATH + '/attendees', withAuth, withEventExists, handle(deleteEventAttendee))
 })
 
@@ -39,8 +40,25 @@ export async function updateEventAttendees(req: WithEvent) {
 export async function createEventAttendee(req: WithAuthProfile<WithEvent<WithAuth>>) {
   const user = req.auth!
   const user_name = req.authProfile?.name || null
-  await EventAttendee.create<EventAttendeeAttributes>({ event_id: req.event.id, user, user_name, created_at: new Date() })
+  const settings = await getProfileSettings(user)
+  await EventAttendee.create<EventAttendeeAttributes>({
+    event_id: req.event.id,
+    user,
+    user_name,
+    notify: settings.notify_by_email,
+    notified: false,
+    created_at: new Date(),
+  })
+
   await updateEventAttendees(req)
+  return getEventAttendeeList(req.event.id)
+}
+
+export async function updateEventAttendee(req: WithEvent<WithAuth>) {
+  const user = req.auth!
+  const identify = { event_id: req.event.id, user }
+  const notify = Boolean(req.body && req.body.notify)
+  await EventAttendee.update({ notify }, identify)
   return getEventAttendeeList(req.event.id)
 }
 

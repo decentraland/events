@@ -11,7 +11,9 @@ import Events, { EditEvent } from "../api/Events"
 import { Realm } from "../entities/Realm/types"
 import track from "decentraland-gatsby/dist/components/Segment/track"
 import * as segment from '../utils/segment'
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
+import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 
 
 export type SiteStore = {
@@ -22,6 +24,7 @@ export type SiteStore = {
 export type SiteState = {
   loading?: boolean
   profile?: string | null,
+  settings?: ProfileSettingsAttributes | null
   events?: Partial<EntityStoreState<SessionEventAttributes>>
   realms?: Partial<EntityStoreState<Realm>>
 }
@@ -39,12 +42,22 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events, [siteInitialState?.state?.events])
   const event = eventId && isUUID(eventId) && events.getEntity(eventId) || null
   const realms = useStore<Realm>(siteInitialState?.state?.realms, [siteInitialState?.state?.events])
+  const [settings, setProfileSettings] = useState<ProfileSettingsAttributes | null>(siteInitialState?.state?.settings || null)
 
   useEffect(() => {
     if (window.history) {
       window.history.replaceState(getNavigationState(), document.title)
     }
   }, [events.getState().data, realms.getState().data])
+
+  useAsyncEffect(async () => {
+    if (!profile && settings) {
+      setProfileSettings(null)
+    } else if (profile && (!settings || profile.address.toString().toLowerCase() !== settings.user)) {
+      const newSettings = await API.catch(Events.get().getMyProfileSettings())
+      setProfileSettings(newSettings)
+    }
+  }, [profile, actions.loading])
 
   useAsyncEffect(async () => {
     if (actions.loading || events.isLoading() || events.getList()) {
@@ -83,6 +96,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   function getNavigationState(extraState: Record<string, any> = {}, replace: boolean = false): SiteLocationState {
     return {
       state: {
+        settings: settings,
         profile: profile ? profile.address.toString().toLowerCase() : null,
         events: events.getState(),
         realms: realms.getState(),
@@ -90,6 +104,26 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
       },
       replace
     }
+  }
+
+  async function updateSettings(settings: Partial<ProfileSettingsAttributes>) {
+    track((analytics) => analytics.track(segment.Track.Settings, { settings }))
+    const newSettings = await API.catch(Events.get().updateProfileSettings(settings))
+    if (newSettings) {
+      setProfileSettings(newSettings)
+    }
+    return newSettings
+  }
+
+  async function updateSubscription(options: { endpoint: string, p256dh: string, auth: string } | null) {
+    if (options) {
+      await API.catch(Events.get().createSubscription(options))
+    } else {
+      await API.catch(Events.get().removeSubscriptions())
+    }
+
+    const newSettings = await API.catch(Events.get().getMyProfileSettings())
+    setProfileSettings(newSettings)
   }
 
   async function createEvent(data: EditEvent) {
@@ -122,29 +156,47 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     }
   }
 
-  async function attendEvent(eventId: string, value: boolean = true) {
+  async function editAttendingEvent(eventId: string, edit: () => Promise<EventAttendeeAttributes[]>) {
     profile || await actions.connect()
     const event = events.getEntity(eventId)
 
     try {
-      const ethAddress = profile && profile.address.toString()
-      const newAttendees = await Events.get().setEventAttendee(eventId, value)
-      const attendees = newAttendees.map(attendee => attendee.user)
+      const newAttendees = await edit()
+      const ethAddress = profile && profile.address.toString().toLowerCase()
+      let newAttendee: EventAttendeeAttributes | null = null
+      const attendees: string[] = []
+      for (const attendee of newAttendees) {
+        attendees.push(attendee.user)
+        if (attendee.user === ethAddress) {
+          newAttendee = attendee
+        }
+      }
+
       const newEvent = {
         ...event,
-        attending: value,
+        attending: !!newAttendee,
+        notify: !!(newAttendee && newAttendee.notify),
         total_attendees: attendees.length,
         latest_attendees: attendees.slice(0, 10)
       }
+
       events.setEntity(newEvent as any)
       track((analytics) => analytics.track(segment.Track.Going, { ethAddress, event: event?.id || null }))
       return Promise.resolve(event)
 
     } catch (error) {
       console.error(error)
-      track((analytics) => analytics.track(segment.Track.Error, { error: error.message, eventId, value, ...error }))
+      track((analytics) => analytics.track(segment.Track.Error, { error: error.message, eventId, ...error }))
       return Promise.reject(error)
     }
+  }
+
+  async function attendEvent(eventId: string, value: boolean = true) {
+    return editAttendingEvent(eventId, () => Events.get().setEventAttendee(eventId, value))
+  }
+
+  async function notifyEvent(eventId: string, notify: boolean = true) {
+    return editAttendingEvent(eventId, () => Events.get().updateEventAttendee(eventId, { notify }))
   }
 
   function connect() {
@@ -153,6 +205,10 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
   return {
     profile,
+    settings,
+    updateSettings,
+    updateSubscription,
+
     connect,
     connectError: actions.error && actions.error.code,
 
@@ -162,6 +218,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     updateEvent,
     createEvent,
     attendEvent,
+    notifyEvent,
 
     realms,
 

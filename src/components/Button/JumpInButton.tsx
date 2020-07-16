@@ -6,7 +6,7 @@ import { EventAttributes } from "../../entities/Event/types";
 import * as segment from "../../utils/segment"
 
 import './JumpInButton.css'
-import { eventUrl } from "../../entities/Event/utils";
+import { eventTargetUrl } from "../../entities/Event/utils";
 
 const primaryJumpIn = require('../../images/primary-jump-in.svg')
 const secondaryPin = require('../../images/secondary-pin-small.svg')
@@ -18,7 +18,7 @@ export type JumpInButtonProps = React.HTMLProps<HTMLAnchorElement> & {
 
 export default function JumpInButton({ event, href, compact, ...props }: JumpInButtonProps) {
   const [profile] = useProfile()
-  const to = href || event && eventUrl(event) || '#'
+  const to = href || event && eventTargetUrl(event) || '#'
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : 'HTTP'
   const ethAddress = profile?.address.toString()

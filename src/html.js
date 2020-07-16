@@ -29,6 +29,12 @@ export default function HTML(props) {
           analyticsKey={process.env.GATSBY_SEGMENT_KEY}
           trackPage={false}
         />
+        <script
+          key={`serviceWorker`}
+          dangerouslySetInnerHTML={{
+            __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js') }) }`,
+          }}
+        />
       </body>
     </html>
   )
