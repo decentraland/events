@@ -34,7 +34,6 @@ function getCurrentProvider() {
 
 export async function getRealms(): Promise<Realm[]> {
 
-  // console.log(await fetchCatalystNodes())
   const nodes = await fetchCatalystNodes()
   // const config: Configuration = await fetch(CONFIGURATION_ENDPOINT).then((response) => response.json())
   const comms: (CommStatus | null)[] = await Promise.all(

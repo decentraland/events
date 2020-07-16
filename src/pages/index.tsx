@@ -130,7 +130,6 @@ export default function IndexPage(props: any) {
           await siteStore.attendEvent(event.id, data.attending)
 
         } else if (event.notify !== data.notify) {
-          console.log(siteStore.settings)
           if (!siteStore.settings || (!siteStore.settings.notify_by_email && !siteStore.settings.notify_by_browser)) {
             setEnabledNotification(true)
 

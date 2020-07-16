@@ -95,9 +95,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       ${offset(options.offset)}
     `
 
-    console.log(query.text)
-    console.log(query.values)
-
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
