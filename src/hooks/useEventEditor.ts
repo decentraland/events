@@ -168,7 +168,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeFinishDate(value?: string) {
-    const finish_timestamp = Datetime.fromInputTime(value || '', finish_at.date, options).date.getTime()
+    const finish_timestamp = Datetime.fromInputDate(value || '', finish_at.date, options).date.getTime()
     const duration = Math.max(0, finish_timestamp - event.start_at.getTime())
     if (duration !== event.duration) {
       setValues({ duration })
