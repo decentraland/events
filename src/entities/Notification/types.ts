@@ -12,6 +12,9 @@ export type Templates = {
     address: string
     verify_url: string
   },
+  validate_email_v2: {
+    verify_url: string
+  },
 }
 
 export type SendMailOptions<T extends keyof Templates> = SendOptions<T, Templates[T]>

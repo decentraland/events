@@ -101,7 +101,7 @@ export async function updateProfileSettings(req: WithAuth) {
     const verificationUrl = new URL(EVENTS_URL)
     verificationUrl.pathname = SUBSCRIPTION_PATH + '/'
     verificationUrl.searchParams.set(DATA_PARAM, sign(verificationData, SIGN_SECRET))
-    sendEmailVerification(newProfile.email!, user, verificationUrl.toString())
+    sendEmailVerification(newProfile.email!, verificationUrl.toString())
   }
 
   return newProfile

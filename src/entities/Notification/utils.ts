@@ -6,24 +6,18 @@ import { EventAttributes } from '../Event/types'
 import { eventUrl, eventFacebookUrl, eventTwitterUrl } from '../Event/utils'
 import { ProfileSettingsAttributes } from '../ProfileSettings/types'
 
-export async function sendEmailVerification(email: string, address: string, verify_url: string) {
-  const profile = await API.catch(Katalyst.get().getProfile(address))
-  const profile_name = profile?.name || 'Guest'
-  const options: SendMailOptions<'validate_email'> = {
-    template: "validate_email",
+export async function sendEmailVerification(email: string, verify_url: string) {
+  const options: SendMailOptions<'validate_email_v2'> = {
+    template: "validate_email_v2",
     destinations: [
       {
         email,
         replacement: {
-          address,
-          profile_name,
           verify_url
         }
       }
     ],
     defaultReplacement: {
-      address,
-      profile_name,
       verify_url
     }
   }
