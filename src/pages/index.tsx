@@ -51,7 +51,14 @@ export default function IndexPage(props: any) {
   const events = useListEvents(siteStore.events.getState().data)
   const eventsByMonth = useListEventsByMonth(events)
   const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [siteStore.events.getState()])
-  const mainEvents = useMemo(() => events.filter((event) => event.approved && !!event.highlighted && event.finish_at.getTime() > now).reverse(), [siteStore.events.getState()])
+  const mainEvents = useMemo(
+    () => events
+      .filter((event) => event.approved && (!!event.highlighted || !!event.trending) && event.finish_at.getTime() > now)
+      .sort((eventA, eventB) => {
+        return Math.abs(now - eventA.next_start_at.getTime()) - Math.abs(now - eventB.next_start_at.getTime())
+      }),
+    [siteStore.events.getState()]
+  )
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
 
   const [requireWallet, setRequireWallet] = useState(false)
