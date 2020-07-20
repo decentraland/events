@@ -8,7 +8,7 @@ import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
-import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes, RecurrentEventAttributes, MAX_EVENT_RECURRENT } from './types';
+import { EventAttributes, adminPatchAttributes, patchAttributes, EventListOptions, DeprecatedEventAttributes, RecurrentEventAttributes, MAX_EVENT_RECURRENT, SessionEventAttributes } from './types';
 import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
@@ -19,6 +19,8 @@ import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventErro
 import { Request } from 'express';
 import Context from 'decentraland-gatsby/dist/entities/Route/context';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
+import EventAttendeeModel from '../EventAttendee/model';
+import { EventAttendeeAttributes } from '../EventAttendee/types';
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
@@ -225,13 +227,22 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   }
 
   await EventModel.update(updatedAttributes, { id: event.id })
-  const updatedEvent = { ...event, ...updatedAttributes }
+
+  const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({ user })
+  const updatedEvent = {
+    ...event,
+    ...updatedAttributes,
+    attending: !!attendee,
+    notify: !!attendee?.notify
+  }
 
   if (!req.event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)
   } else if (!isAdmin(user)) {
     notifyEditedEvent(updatedEvent)
   }
+
+
 
   return EventModel.toPublic(updatedEvent, user)
 }

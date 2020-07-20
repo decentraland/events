@@ -4,8 +4,7 @@ import schema from 'decentraland-gatsby/dist/entities/Schema'
 import { ProfileSettingsAttributes, profileSettingsSchema } from './types'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import isEmail from 'validator/lib/isEmail'
-import { table } from 'console'
-import { values } from 'decentraland-gatsby/dist/entities/Database/utils'
+import { table, values } from 'decentraland-gatsby/dist/entities/Database/utils'
 
 export default class ProfileSettingsModel extends Model<ProfileSettingsAttributes> {
   static tableName = 'profile_settings'
@@ -18,7 +17,7 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
       return []
     }
 
-    const query = SQL`SELECT * FROM ${table(ProfileSettingsModel)} WHERE user IN ${values(users)}`
+    const query = SQL`SELECT * FROM ${table(ProfileSettingsModel)} WHERE "user" IN ${values(users)}`
     return this.query<ProfileSettingsAttributes>(query)
   }
 

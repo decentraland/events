@@ -17,7 +17,7 @@ export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionA
     }
 
     const endpoints = subscriptions.map(sub => sub.endpoint)
-    const query = SQL`DELETE FROM ${table(ProfileSubscriptionModel)} WHERE endpoint IN ${values(endpoints)}`
+    const query = SQL`DELETE FROM ${table(ProfileSubscriptionModel)} WHERE "endpoint" IN ${values(endpoints)}`
     return this.query<ProfileSubscriptionAttributes>(query)
   }
 
@@ -26,7 +26,7 @@ export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionA
       return []
     }
 
-    const query = SQL`SELECT * FROM ${table(ProfileSubscriptionModel)} WHERE user IN ${values(users)}`
+    const query = SQL`SELECT * FROM ${table(ProfileSubscriptionModel)} WHERE "user" IN ${values(users)}`
     return this.query<ProfileSubscriptionAttributes>(query)
   }
 

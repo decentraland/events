@@ -1,4 +1,4 @@
-import { Model, SQL, raw } from 'decentraland-server'
+import { Model, SQL } from 'decentraland-server'
 import isUUID from 'validator/lib/isUUID'
 import { EventAttendeeAttributes } from './types'
 import { table, conditional, values, join } from 'decentraland-gatsby/dist/entities/Database/utils'
@@ -21,9 +21,9 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
 
     const query = SQL`
       UPDATE ${table(EventAttendeeModel)}
-      SET notified = TRUE
+      SET "notified" = TRUE
       WHERE
-        ${join(attendees.map(attendee => SQL`(event_id = ${attendee.event_id} AND user = ${attendee.user} )`), SQL` OR `)}
+        ${join(attendees.map(attendee => SQL`("event_id" = ${attendee.event_id} AND "user" = ${attendee.user} )`), SQL` OR `)}
     `
 
     await this.query(query)
@@ -40,9 +40,9 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
       SELECT *
       FROM ${table(EventAttendeeModel)}
       WHERE
-        event_id IN ${values(events)}
-        AND notify = TRUE
-        AND notified = FALSE
+        "event_id" IN ${values(events)}
+        AND "notify" = TRUE
+        AND "notified" = FALSE
     `
 
     return EventAttendeeModel.query<EventAttendeeAttributes>(query)
@@ -56,7 +56,7 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     const query = SQL`
       SELECT *
       FROM ${table(EventAttendeeModel)}
-      WHERE event_id = ${eventId}
+      WHERE "event_id" = ${eventId}
       ORDER BY created_at DESC
       ${conditional(!!limit, SQL`LIMIT ${limit}`)}
     `

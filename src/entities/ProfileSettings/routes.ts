@@ -113,14 +113,14 @@ export async function updateProfileSettings(req: WithAuth) {
 async function checkSubscription(
   req: Request,
   res: Response,
-  redirectPath: string,
-  redirectParam: string,
+  param: string,
   execute: (subs: EmailSubscription) => Promise<boolean>
 ) {
   const result = (status: EmailSubscriptionStatus) => {
-    const params = new URLSearchParams([[redirectParam, String(status)]])
-    const target = [redirectPath, params.toString()].join('?')
-    res.redirect(302, target)
+    const target = new URL(EVENTS_URL)
+    target.pathname = '/confirm'
+    target.searchParams.set(param, String(status))
+    res.redirect(302, target.toString())
   }
 
   if (!req.query[DATA_PARAM]) {
@@ -146,7 +146,7 @@ async function checkSubscription(
 }
 
 export async function removeSubscription(req: Request, res: Response) {
-  return checkSubscription(req, res, '/confirm', 'unsubscribe', async (verification: EmailSubscription) => {
+  return checkSubscription(req, res, 'unsubscribe', async (verification: EmailSubscription) => {
     if (verification.action !== 'unsubscribe') {
       return false
     }
@@ -157,7 +157,7 @@ export async function removeSubscription(req: Request, res: Response) {
 }
 
 export async function verifySubscription(req: Request, res: Response) {
-  return checkSubscription(req, res, '/confirm', 'verify', async (verification: EmailSubscription) => {
+  return checkSubscription(req, res, 'verify', async (verification: EmailSubscription) => {
     if (verification.action !== 'verify') {
       return false
     }

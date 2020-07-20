@@ -64,8 +64,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       WHERE
         e.rejected IS FALSE
         AND e.approved IS TRUE
-        AND e.next_start_at > (now() - interval '10 minutes')
-        AND e.next_start_at < now()
+        AND e.next_start_at > now()
+        AND e.next_start_at < (now() + interval '10 minutes')
     `;
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))

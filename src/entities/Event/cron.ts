@@ -11,7 +11,7 @@ import { eventUrl } from "./utils";
 
 export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   const events = await EventModel.getUpcomingEvents()
-  ctx.log(`${events.length} events to notify`)
+  ctx.log(`[${new Date().toJSON()}] ${events.length} events to notify`)
 
   if (events.length === 0) {
     return
