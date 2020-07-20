@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import { AbortController } from 'abort-controller'
 import cache from 'apicache'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
@@ -9,6 +10,7 @@ import { HttpProvider, WebsocketProvider } from 'web3x/providers';
 import { Contract } from 'web3x/contract';
 import { CommStatus, Realm, CatalystNode } from './types';
 import dao from '../Contracts/DAO/CatalystAbi'
+import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
 
 const CONFIGURATION_ENDPOINT = 'https://explorer-config.decentraland.org/configuration.json'
 const CATALYST_CONTRACT_ADDRESS = '0x4a2f10076101650f40342885b99b6b101d83c486'
@@ -33,17 +35,31 @@ function getCurrentProvider() {
 }
 
 export async function getRealms(): Promise<Realm[]> {
-
   const nodes = await fetchCatalystNodes()
   // const config: Configuration = await fetch(CONFIGURATION_ENDPOINT).then((response) => response.json())
   const comms: (CommStatus | null)[] = await Promise.all(
-    nodes.map(node => fetch(node.domain + '/comms/status?includeLayers=true')
-      .then((response) => response.json())
-      .catch((err: Error) => {
-        console.error(err)
-        return null
+    nodes.map((node) => {
+      return new Promise<any>((resolve) => {
+        const controller = new AbortController
+        let completed = false
+        function complete(data: any, ...logs: any[]) {
+          if (!completed) {
+            completed = true
+            if (logs.length > 0) {
+              console.log(...logs)
+            }
+            resolve(data)
+          }
+        }
+
+        setTimeout(() => complete(null, `aborting fetch to "${node.domain}"`, node), 5 * Datetime.Second)
+
+        return fetch(node.domain + '/comms/status?includeLayers=true', { signal: controller.signal })
+          .then((response) => response.json())
+          .then((data) => complete(data))
+          .catch((err: Error) => complete(null, err, node))
       })
-    )
+    })
   )
 
   const realms = new Set<string>()
