@@ -71,7 +71,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     const loadedEvents = newEvents || []
     events.setEntities(loadedEvents)
 
-    if (eventId && isUUID(eventId) && !loadedEvents.find(event => event.id === eventId)) {
+    if (eventId && isUUID(eventId || '') && !loadedEvents.find(event => event.id === eventId)) {
       const event = await API.catch(Events.get().getEventById(eventId))
       if (event) {
         loadedEvents.push(event)

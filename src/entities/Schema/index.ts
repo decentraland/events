@@ -7,7 +7,7 @@ import isURL from 'validator/lib/isURL'
 export default new Ajv()
   .addFormat('address', isEthereumAddress)
   .addFormat('email', isEmail)
-  .addFormat('uuid', isUUID)
+  .addFormat('uuid', (uuid?: string) => isUUID(uuid || ''))
   .addFormat('url', (url) => isURL(url, {
     protocols: ['http', 'https'],
     require_tld: true,

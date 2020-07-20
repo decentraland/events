@@ -15,7 +15,7 @@ export default routes((router) => {
 })
 
 export function injectSocialTag(req: WithSocialUserAgent, res: Response, next: NextFunction) {
-  if (!req.isSocialUserAgent() || !isUUID(req.query.event)) {
+  if (!req.isSocialUserAgent() || !isUUID(req.query.event || '')) {
     return next()
   }
 

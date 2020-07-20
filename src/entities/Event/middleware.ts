@@ -8,7 +8,7 @@ import { middleware } from "decentraland-gatsby/dist/entities/Route/handle";
 import isAdmin from '../Auth/isAdmin';
 
 export function getEventIdParam(req: Request) {
-  return param(req, 'eventId', isUUID);
+  return param(req, 'eventId', (value?: string) => isUUID(value || ''));
 }
 
 export type WithEvent<R extends Request = Request> = R & {
