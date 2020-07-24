@@ -31,21 +31,15 @@ export default function EventDateDetail({ event, startAt, secondary, completed, 
   return <EventSection {...props}>
     <EventSection.Icon src={secondary ? '' : clock} width="16" height="16" />
     {live && <EventSection.Detail>
-      {time.days > 1 && <Paragraph secondary={secondary}>Started: {time.days} days ago</Paragraph>}
-      {time.days === 1 && <Paragraph secondary={secondary}>Started: {time.days} day ago</Paragraph>}
-      {time.days === 0 && time.hours > 1 && <Paragraph secondary={secondary}>Started: {time.hours} hours ago</Paragraph>}
-      {time.days === 0 && time.hours === 1 && <Paragraph secondary={secondary}>Started: {time.hours} hour ago</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes > 1 && <Paragraph secondary={secondary}>Started: {time.minutes} minutes ago</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes === 1 && <Paragraph secondary={secondary}>Started: {time.minutes} minute ago</Paragraph>}
+      {time.days > 0 && <Paragraph secondary={secondary}>Started: {time.days} {time.days === 1 ? 'day' : 'days'} ago</Paragraph>}
+      {time.days === 0 && time.hours > 0 && <Paragraph secondary={secondary}>Started: {time.hours} {time.hours === 1 ? 'hour' : 'hours'} ago</Paragraph>}
+      {time.days === 0 && time.hours === 0 && time.minutes > 0 && <Paragraph secondary={secondary}>Started: {time.minutes} {time.minutes === 1 ? 'minute' : 'minutes'} ago</Paragraph>}
       {time.days === 0 && time.hours === 0 && time.minutes === 0 && <Paragraph secondary={secondary}>Started: Less than a minute ago</Paragraph>}
     </EventSection.Detail>}
     {!live && countdown && <EventSection.Detail>
-      {time.days > 1 && <Paragraph secondary={secondary}>Starts in: {time.days} days</Paragraph>}
-      {time.days === 1 && <Paragraph secondary={secondary}>Starts in: {time.days} day</Paragraph>}
-      {time.days === 0 && time.hours > 1 && <Paragraph secondary={secondary}>Starts in: {time.hours} hours</Paragraph>}
-      {time.days === 0 && time.hours === 1 && <Paragraph secondary={secondary}>Starts in: {time.hours} hour</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes > 1 && <Paragraph secondary={secondary}>Starts in: {time.minutes} minutes</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes === 1 && <Paragraph secondary={secondary}>Starts in: {time.minutes} minute</Paragraph>}
+      {time.days > 0 && <Paragraph secondary={secondary}>Starts in: {time.days} {time.days === 1 ? 'day' : 'days'}</Paragraph>}
+      {time.days === 0 && time.hours > 0 && <Paragraph secondary={secondary}>Starts in: {time.hours} {time.hours === 1 ? 'hour' : 'hours'} {time.minutes} {time.minutes === 1 ? 'minute' : 'minutes'}</Paragraph>}
+      {time.days === 0 && time.hours === 0 && time.minutes > 0 && <Paragraph secondary={secondary}>Starts in: {time.minutes} {time.minutes === 1 ? 'minute' : 'minutes'}</Paragraph>}
       {time.days === 0 && time.hours === 0 && time.minutes === 0 && <Paragraph secondary={secondary}>Starts in: Less than a minute</Paragraph>}
     </EventSection.Detail>}
     {!live && !countdown && duration < Datetime.Day && <EventSection.Detail>
