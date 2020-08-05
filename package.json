@@ -73,7 +73,8 @@
     "clean": "gatsby clean",
     "migrate": "DOTENV_CONFIG_PATH=.env.development ts-node -r dotenv/config.js ./node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -d CONNECTION_STRING",
     "production": "NODE_ENV=production node lib/server.js",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "push": "git push origin master && git push gitlab master"
   },
   "repository": {
     "type": "git",
