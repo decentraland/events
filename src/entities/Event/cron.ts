@@ -8,6 +8,7 @@ import { sendEmailUpcomingEvent } from "../Notification/utils";
 import { ProfileSettingsAttributes } from "../ProfileSettings/types";
 import push from "../Notification/push";
 import { eventUrl } from "./utils";
+import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils";
 
 export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   const events = await EventModel.getUpcomingEvents()
@@ -72,6 +73,11 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
       })
 
     notifications.push(sendEmailUpcomingEvent(event, emailNotifications))
+
+    if (emailNotifications.length + browserNotifications.length) {
+      notifications.push(notifyBySlack(event, emailNotifications.length + browserNotifications.length))
+    }
+
     await Promise.all(notifications)
   }
 

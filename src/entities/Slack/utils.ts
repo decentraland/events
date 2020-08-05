@@ -81,6 +81,22 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
   )
 }
 
+export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, notifications: number) {
+  console.log(`sending upcoming event "${event.id}" to slack`)
+  await sendToSlack({
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": `:runner: event *<${url(event)}|${event.name}>* is about to start (${notifications} sent)`
+        }
+      }
+    ]
+  }
+  )
+}
+
 const SEND_CLOUD_DOWN = 1000 * 60 * 5
 let NEXT_ERROR_AT = 0
 export async function notifyEventError(user: Avatar, error: RequestError) {
