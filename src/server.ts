@@ -1,9 +1,8 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import { createReadStream } from 'fs'
 import Manager from 'decentraland-gatsby/dist/entities/Job/job'
 import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
-import { status, logger, file } from 'decentraland-gatsby/dist/entities/Route/routes'
+import { status, logger, file, ddos } from 'decentraland-gatsby/dist/entities/Route/routes'
 import database from './entities/Database/index'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
@@ -22,6 +21,7 @@ jobs.cron('0 * * * * *', notifyUpcomingEvents)
 const app = express()
 app.use(social)
 app.use('/api', [
+  ddos(),
   status(),
   logger(),
   bodyParser.json(),
