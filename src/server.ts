@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 import { createReadStream } from 'fs'
 import Manager from 'decentraland-gatsby/dist/entities/Job/job'
 import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
-import { status, logger } from 'decentraland-gatsby/dist/entities/Route/routes'
+import { status, logger, file } from 'decentraland-gatsby/dist/entities/Route/routes'
 import database from './entities/Database/index'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
@@ -38,7 +38,7 @@ app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
 app.use(express.static('public', { maxAge: 1000 * 60 * 60 }))
-app.use((_, res) => createReadStream(process.cwd() + '/public/404.html').pipe(res))
+app.use(file(process.cwd() + '/public/404.html', 404))
 
 Promise.resolve()
   .then(() => database.connect())
