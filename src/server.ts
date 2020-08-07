@@ -42,7 +42,6 @@ app.get(UNSUBSCRIBE_PATH, removeSubscription)
 const staticCache = cache.middleware(
   7 * Datetime.Day,
   (req: Request, res: Response) => {
-    console.log(req.path)
     return req.method === 'GET' && res.statusCode === 200
   }
 )
