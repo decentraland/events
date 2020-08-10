@@ -22,7 +22,7 @@
     "concurrently": "^5.1.0",
     "dcl-crypto": "^2.2.0",
     "decentraland-crypto": "0.0.2",
-    "decentraland-gatsby": "^2.61.4",
+    "decentraland-gatsby": "^2.62.5",
     "decentraland-server": "^2.11.6",
     "decentraland-ui": "^2.21.1",
     "devcert": "^1.1.2",
