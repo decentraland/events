@@ -16,6 +16,8 @@ import profileSubscription from './entities/ProfileSubscription/routes'
 import { SUBSCRIPTION_PATH, UNSUBSCRIBE_PATH } from './entities/ProfileSettings/types'
 import { notifyUpcomingEvents } from './entities/Event/cron'
 import Datetime from 'decentraland-gatsby/dist/utils/Datetime'
+import handle from 'decentraland-gatsby/dist/entities/Route/handle'
+import RequestError from 'decentraland-gatsby/dist/entities/Route/error'
 
 const jobs = new Manager({ concurrency: 10 })
 jobs.cron('0 * * * * *', notifyUpcomingEvents)
@@ -33,7 +35,10 @@ app.use('/api', [
   profiles,
   profileSettings,
   profileSubscription,
-  realms
+  realms,
+  handle(async () => {
+    throw new RequestError('NotFound', RequestError.NotFound)
+  })
 ])
 
 app.get(SUBSCRIPTION_PATH, verifySubscription)
@@ -43,7 +48,8 @@ const staticCache = cache.middleware(
   7 * Datetime.Day,
   (req: Request, res: Response) => {
     return req.method === 'GET' && res.statusCode === 200
-  }
+  },
+  {}
 )
 app.use(staticCache, express.static('public', { maxAge: 1000 * 60 * 60 }))
 app.use(file(process.cwd() + '/public/404.html', 404))
