@@ -34,6 +34,6 @@ docker-build:
     - echo "SES_SOURCE=$SES_SOURCE" >> .env.production
     - echo "WEB_PUSH_SECRET=$WEB_PUSH_SECRET" >> .env.production
     - cat .env.production
-    - docker build --pull --cache-from "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - DOCKER_BUILDKIT=1 docker build --pull --cache-from "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+    - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
     - echo "decentraland/events:$CI_COMMIT_SHA"
