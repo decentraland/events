@@ -48,8 +48,10 @@ export default function IndexPage(props: any) {
   const eventId = url.getEventId(location)
   const isListingAttendees = url.isEventAttendees(location)
   const siteStore = useSiteStore(props.location)
+  const utc = !siteStore.settings?.use_local_time
+
   const events = useListEvents(siteStore.events.getState().data)
-  const eventsByMonth = useListEventsByMonth(events)
+  const eventsByMonth = useListEventsByMonth(events, utc)
   const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [siteStore.events.getState()])
   const mainEvents = useMemo(
     () => events
@@ -71,7 +73,6 @@ export default function IndexPage(props: any) {
   const [enabledNotification, setEnabledNotification] = useState(false)
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
-  const utc = !siteStore.settings?.use_local_time
 
   useAnalytics((analytics) => {
     const name = currentEvent ? segment.Page.Event : segment.Page.Home
