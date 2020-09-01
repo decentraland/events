@@ -37,6 +37,7 @@
   position: relative;
 }
 
+.ui.card.EventCard .StartIn,
 .ui.card.EventCard .Live {
   position: absolute;
   z-index: 100;

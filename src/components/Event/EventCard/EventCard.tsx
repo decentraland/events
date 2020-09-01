@@ -10,6 +10,7 @@ import AttendingButtons from '../../Button/AttendingButtons'
 
 import './EventCard.css'
 import EventDate from '../EventDate/EventDate'
+import StartIn from '../../Badge/StartIn'
 
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const EVENTS_LIST = 3
@@ -28,7 +29,7 @@ export default function EventCard(props: EventCardProps) {
   const now = Date.now()
   const nextStartAt = new Date(Date.parse(event.next_start_at.toString()))
   const finishAt = new Date(nextStartAt.getTime() + event.duration)
-  const live = now >= nextStartAt.getTime() && now <= finishAt.getTime()
+  // const live = now >= nextStartAt.getTime() && now <= finishAt.getTime()
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (props.onClick) {
@@ -39,7 +40,8 @@ export default function EventCard(props: EventCardProps) {
   return (
     <Card link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={props.href} onClick={handleClick} >
       <div />
-      {live && <Live primary={event.approved} />}
+      <StartIn date={nextStartAt} />
+      {/* {live && <Live primary={event.approved} />} */}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
