@@ -13,12 +13,13 @@ import realms from './entities/Realm/routes'
 import profileSettings, { verifySubscription, removeSubscription } from './entities/ProfileSettings/routes'
 import profileSubscription from './entities/ProfileSubscription/routes'
 import { SUBSCRIPTION_PATH, UNSUBSCRIBE_PATH } from './entities/ProfileSettings/types'
-import { notifyUpcomingEvents } from './entities/Event/cron'
+import { notifyUpcomingEvents, updateNextStartAt } from './entities/Event/cron'
 import handle from 'decentraland-gatsby/dist/entities/Route/handle'
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error'
 
 const jobs = new Manager({ concurrency: 10 })
-jobs.cron('0 * * * * *', notifyUpcomingEvents)
+jobs.cron('@eachMinute', notifyUpcomingEvents)
+jobs.cron('@eachMinute', updateNextStartAt)
 
 const app = express()
 app.set('x-powered-by', false)

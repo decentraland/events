@@ -241,8 +241,6 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   } else if (!isAdmin(user)) {
     notifyEditedEvent(updatedEvent)
   }
-
-
-
+  
   return EventModel.toPublic(updatedEvent, user)
 }

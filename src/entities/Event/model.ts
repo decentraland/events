@@ -71,6 +71,21 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
+  static async getRecurrentFinishedEvents() {
+    const query = SQL`
+      SELECT *
+      FROM ${table(EventModel)} e
+      WHERE
+        e.rejected IS FALSE
+        AND e.approved IS TRUE
+        AND e.recurrent IS TRUE
+        AND e.finish_at > now()
+        AND (e.next_start_at + (e.duration * '1 millisecond'::interval)) < now()
+    `;
+
+    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+  }
+
   static async getEvents(options: Partial<EventListOptions> = {}) {
     const query = SQL`
       SELECT 
@@ -82,7 +97,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       WHERE
         e.rejected IS FALSE
         AND e.finish_at > now()
-        ${conditional(!!options.onlyUpcoming, SQL`AND e.start_at > now()`)}
+        ${conditional(!!options.onlyUpcoming, SQL`AND e.next_start_at > now()`)}
         ${conditional(!!options.user, SQL`AND e.user = ${options.user}`)}
         ${conditional(!options.currentUser, SQL`AND e.approved IS TRUE`)}
         ${conditional(!!options.currentUser && !isAdmin(options.currentUser), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`)}
@@ -90,7 +105,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${conditional(Number.isFinite(options.x as number), SQL`AND e.x = ${options.x}`)}
         ${conditional(Number.isFinite(options.y as number), SQL`AND e.y = ${options.y}`)}
         ${conditional(!!options.estateId, SQL`AND e.estate_id = ${options.estateId}`)}
-      ORDER BY start_at ASC
+      ORDER BY e.next_start_at ASC
       ${limit(options.limit)}
       ${offset(options.offset)}
     `

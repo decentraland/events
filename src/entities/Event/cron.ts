@@ -7,8 +7,23 @@ import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types";
 import { sendEmailUpcomingEvent } from "../Notification/utils";
 import { ProfileSettingsAttributes } from "../ProfileSettings/types";
 import push from "../Notification/push";
-import { eventUrl } from "./utils";
+import { eventUrl, calculateRecurrentProperties } from "./utils";
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils";
+import { EventAttributes } from "./types";
+
+export async function updateNextStartAt(ctx: JobContext<{}>) {
+  const events = await EventModel.getRecurrentFinishedEvents()
+  
+  for (const event of events) {
+    const update = {
+      ...calculateRecurrentProperties(event),
+      next_start_at: EventModel.selectNextStartAt(event.duration, event.start_at, event.recurrent_dates)
+    }
+
+    ctx.log(`updating next_start_at for event: "${event.id}"`)
+    EventModel.update<EventAttributes>(update, { id: event.id })
+  }
+}
 
 export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   const events = await EventModel.getUpcomingEvents()
