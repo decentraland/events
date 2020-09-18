@@ -9,7 +9,7 @@
 
 This website hosts a dApp used to upload and see what others are organizing inside the Decentraland virtual world.
 
-![Screenshot of events.decentraland.org taken in April 2020](events.screenshot.2020.04.24.png)
+![Screenshot of events.decentraland.org taken in Septembre 2020](events.screenshot.2020.09.18.png)
 
 ## License
 
