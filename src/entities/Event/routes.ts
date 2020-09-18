@@ -83,7 +83,21 @@ export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
     }
   }
 
-  if (ctx.param('onlyAttendee', { defaultValue: false, parser: bool })) {
+  if (req.query['start_in']) {
+    const startIn = integer(req.query['start_in'])
+    if (startIn !== null && Number.isFinite(startIn) && startIn > 0) {
+      options.startIn = startIn * 100
+    } else {
+
+      // out of bound
+      return []
+    }
+  }
+
+  if (
+    ctx.param('onlyAttendee', { defaultValue: false, parser: bool }) ||  // @deprecated
+    ctx.param('only_attendee', { defaultValue: false, parser: bool })
+    ) {
     if (req.auth) {
       options.onlyAttendee = true
     } else {
@@ -93,7 +107,10 @@ export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
     }
   }
 
-  if (ctx.param('onlyUpcoming', { defaultValue: false, parser: bool })) {
+  if (
+    ctx.param('onlyUpcoming', { defaultValue: false, parser: bool }) || // @deprecated
+    ctx.param('only_upcoming', { defaultValue: false, parser: bool })
+  ) {
     options.onlyUpcoming = true
   }
 

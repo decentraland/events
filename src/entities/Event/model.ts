@@ -102,7 +102,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${conditional(!options.currentUser, SQL`AND e.approved IS TRUE`)}
         ${conditional(!!options.currentUser && !isAdmin(options.currentUser), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`)}
         ${conditional(!!options.onlyAttendee && !isAdmin(options.currentUser), SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`)}
-        ${conditional(Number.isFinite(options.x as number), SQL`AND e.x = ${options.x}`)}
+        ${conditional(Number.isFinite(options.startIn as number) && (options.startIn as number) > 0, SQL`AND e.next_start_at < (now() + (${options.startIn} * '1 millisecond'::interval))`)}
+        ${conditional(Number.isFinite(options.y as number), SQL`AND e.y = ${options.y}`)}
         ${conditional(Number.isFinite(options.y as number), SQL`AND e.y = ${options.y}`)}
         ${conditional(!!options.estateId, SQL`AND e.estate_id = ${options.estateId}`)}
       ORDER BY e.next_start_at ASC

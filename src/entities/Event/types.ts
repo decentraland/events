@@ -158,6 +158,7 @@ export type EventListOptions = {
   offset: number | null | undefined,
   x: number | null | undefined,
   y: number | null | undefined,
+  startIn: number | null | undefined,
   estateId: string | null | undefined,
   onlyAttendee: boolean
   onlyUpcoming: boolean
