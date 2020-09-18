@@ -11,6 +11,7 @@ import './EventCardMini.css'
 export type EventCardMiniProps = {
   event: SessionEventAttributes,
   href?: string,
+  utc?: boolean
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
 
@@ -34,7 +35,7 @@ export default function EventCardMini(props: EventCardMiniProps) {
         </div>
       </div>
       <Card.Content>
-        <EventDate event={event} />
+        <EventDate event={event} utc={props.utc} />
         <Card.Header>{event.name}</Card.Header>
       </Card.Content>
     </div>

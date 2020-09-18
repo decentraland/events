@@ -215,7 +215,7 @@ export default function IndexPage(props: any) {
         {!siteStore.loading && events.length > 0 && trendingEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
           <Card.Group>
-            {trendingEvents.map(event => <EventCardMini key={'trending:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenEventDetail} />)}
+            {trendingEvents.map(event => <EventCardMini utc={utc} key={'trending:' + event.id} event={event} href={url.toEvent(location, event.id)} onClick={handleOpenEventDetail} />)}
           </Card.Group></div>}
         {!siteStore.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
