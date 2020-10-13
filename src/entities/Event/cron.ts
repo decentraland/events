@@ -88,12 +88,11 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
       })
 
     notifications.push(sendEmailUpcomingEvent(event, emailNotifications))
-
-    if (emailNotifications.length + browserNotifications.length) {
-      notifications.push(notifyBySlack(event, emailNotifications.length + browserNotifications.length))
-    }
-
     await Promise.all(notifications)
+    
+    if (emailNotifications.length + browserNotifications.length) {
+      await notifyBySlack(event, emailNotifications.length, browserNotifications.length)
+    }
   }
 
   await EventAttendeeModel.setNotified(attendees)

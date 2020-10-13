@@ -81,7 +81,7 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
   )
 }
 
-export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, notifications: number) {
+export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, emailNotifications: number, pushNotifications: number) {
   console.log(`sending upcoming event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
@@ -89,7 +89,7 @@ export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, noti
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `:runner: event *<${url(event)}|${event.name}>* is about to start (${notifications} sent)`
+          "text": `:runner: event *<${url(event)}|${event.name}>* is about to start (${emailNotifications} :email:, ${pushNotifications} :bell:)`
         }
       }
     ]
