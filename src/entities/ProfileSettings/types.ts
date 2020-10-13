@@ -2,6 +2,8 @@ export type ProfileSettingsAttributes = {
   user: string
   email: string | null
   email_verified: boolean,
+  email_verified_at: Date | null,
+  email_updated_at: Date | null,
   use_local_time: boolean,
   notify_by_email: boolean,
   notify_by_browser: boolean,

@@ -34,6 +34,8 @@ export async function getProfileSettings(user: string) {
     user,
     email: null,
     email_verified: false,
+    email_verified_at: null,
+    email_updated_at: null,
     use_local_time: false,
     notify_by_email: false,
     notify_by_browser: false
@@ -73,10 +75,15 @@ export async function updateProfileSettings(req: WithAuth) {
 
   if (!newProfile.email) {
     newProfile.notify_by_email = false
+    newProfile.email_updated_at = null
   }
 
   if (profile.email !== newProfile.email) {
     newProfile.email_verified = false
+
+    if (newProfile.email) {
+      newProfile.email_updated_at = new Date
+    }
 
     if (isEmail(newProfile.email || '')) {
       emailVerificationRequired = true

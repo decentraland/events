@@ -57,7 +57,7 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     }
 
     if (!profile.email_verified) {
-      await this.update<ProfileSettingsAttributes>({ email_verified: true, notify_by_email: true }, { user })
+      await this.update<ProfileSettingsAttributes>({ email_verified: true, notify_by_email: true, email_verified_at: new Date() }, { user })
     }
 
     return true
