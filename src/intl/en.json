@@ -1,1 +1,32 @@
-{}
+{
+  "general": {
+    "sign_in": "sign in"
+  },
+  "sign_in": {
+    "message": "You need to {action} before to submit an event"
+  },
+  "settings": {
+    "profile_section": {
+      "label": "Profile",
+      "email_title": "Email",
+      "email_description": "Add you email address to receive notifications and our weekly digest",
+      "email_save_action": "SAVE",
+      "email_verified": "Verified",
+      "email_verifying": "Pending",
+      "email_reverifying": "Send again",
+      "email_verifying_message":  "we sent you a verification email. try again in {seconds} {seconds, plural, one {second} other {seconds}}",
+      "email_reverifying_message": "didn't receive our email? try it again"
+    },
+    "event_section": {
+      "label": "Event settings",
+      "timezone_title": "Timezone",
+      "timezone_description": "Use UTC over local time",
+      "timezone_message": "Turn this off if you want to use your computers clock",
+      "notification_title": "Notifications",
+      "notification_by_email_description": "Receive Alerts via Email",
+      "notification_by_email_message": "10 Minutes before",
+      "notification_by_browser_description": "Receive Alerts via Browser",
+      "notification_by_browser_message": " "
+    }
+  }
+}

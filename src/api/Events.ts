@@ -54,8 +54,7 @@ export default class Events extends API {
     return this.from(env('EVENTS_URL', this.Url))
   }
 
-  static parse(event: Record<string, any>): SessionEventAttributes {
-
+  static parseEvent(event: Record<string, any>): SessionEventAttributes {
     const start_at = event.start_at && new Date(Date.parse(event.start_at.toString()))
     const next_start_at = event.next_start_at && new Date(Date.parse(event.next_start_at.toString()))
     const finish_at = event.finish_at && new Date(Date.parse(event.finish_at.toString()))
@@ -85,6 +84,17 @@ export default class Events extends API {
     } as SessionEventAttributes
   }
 
+  static parseSettings(settings: Record<string, any>): ProfileSettingsAttributes {
+    const email_verified_at = settings.email_verified_at && new Date(Date.parse(settings.email_verified_at.toString()))
+    const email_updated_at = settings.email_updated_at && new Date(Date.parse(settings.email_updated_at.toString()))
+
+    return {
+      ...settings,
+      email_verified_at,
+      email_updated_at,
+    } as ProfileSettingsAttributes
+  }
+
   options(options: RequestOptions = {}) {
     return new Options(options)
   }
@@ -96,12 +106,12 @@ export default class Events extends API {
 
   async fetchOne(url: string, options: Options = new Options({})): Promise<SessionEventAttributes> {
     const result = await this.fetch(url, options) as any
-    return Events.parse(result)
+    return Events.parseEvent(result)
   }
 
   async fetchMany(url: string, options: Options = new Options({})): Promise<SessionEventAttributes[]> {
     const result = await this.fetch(url, options) as any
-    return (result || []).map(Events.parse)
+    return (result || []).map(Events.parseEvent)
   }
 
   async createSubscription(subscription: { endpoint: string, p256dh: string, auth: string }) {
@@ -124,21 +134,25 @@ export default class Events extends API {
   }
 
   async getMyProfileSettings() {
-    return this.fetch<ProfileSettingsAttributes>(
+    const data = await this.fetch<ProfileSettingsAttributes>(
       '/profile/settings',
       this.options()
         .authorization()
     )
+
+    return Events.parseSettings(data)
   }
 
   async updateProfileSettings(settings: Partial<ProfileSettingsAttributes> = {}) {
-    return this.fetch<ProfileSettingsAttributes>(
+    const data = await this.fetch<ProfileSettingsAttributes>(
       '/profile/settings',
       this.options()
         .method('PATCH')
         .authorization()
         .json(settings)
     )
+
+    return Events.parseSettings(data)
   }
 
   async getRealms() {

@@ -106,9 +106,12 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     }
   }
 
-  async function updateSettings(settings: Partial<ProfileSettingsAttributes>) {
-    track((analytics) => analytics.track(segment.Track.Settings, { settings }))
-    const newSettings = await API.catch(Events.get().updateProfileSettings(settings))
+  async function updateSettings(updateSettings: Partial<ProfileSettingsAttributes>) {
+    track((analytics) => analytics.track(segment.Track.Settings, { settings: { 
+      ...settings,
+      ...updateSettings
+    }}))
+    const newSettings = await API.catch(Events.get().updateProfileSettings(updateSettings))
     if (newSettings) {
       setProfileSettings(newSettings)
     }
