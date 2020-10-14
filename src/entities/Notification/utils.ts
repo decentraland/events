@@ -1,7 +1,5 @@
 import sender from './sender'
 import { SendMailOptions } from './types'
-import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst'
-import API from 'decentraland-gatsby/dist/utils/api/API'
 import { EventAttributes } from '../Event/types'
 import { eventUrl, eventFacebookUrl, eventTwitterUrl, eventTargetUrl } from '../Event/utils'
 import { ProfileSettingsAttributes } from '../ProfileSettings/types'
