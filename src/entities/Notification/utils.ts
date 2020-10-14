@@ -3,7 +3,7 @@ import { SendMailOptions } from './types'
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst'
 import API from 'decentraland-gatsby/dist/utils/api/API'
 import { EventAttributes } from '../Event/types'
-import { eventUrl, eventFacebookUrl, eventTwitterUrl } from '../Event/utils'
+import { eventUrl, eventFacebookUrl, eventTwitterUrl, eventTargetUrl } from '../Event/utils'
 import { ProfileSettingsAttributes } from '../ProfileSettings/types'
 import Land from 'decentraland-gatsby/dist/utils/api/Land'
 
@@ -30,13 +30,14 @@ export async function sendEmailUpcomingEvent(event: EventAttributes, settings: P
   const replacement = {
     event_name: event.name,
     event_url: eventUrl(event),
+    event_target_url: eventTargetUrl(event),
     event_img: event.image || event.estate_id && Land.get().getEstateImage(event.estate_id) || Land.get().getParcelImage([event.x, event.y]),
     share_on_facebook: eventFacebookUrl(event),
     share_on_twitter: eventTwitterUrl(event)
   }
 
-  const options: SendMailOptions<'upcoming_event_v2'> = {
-    template: "upcoming_event_v2",
+  const options: SendMailOptions<'upcoming_event_v3'> = {
+    template: "upcoming_event_v3",
     destinations: settings
       .map(profile => ({
         email: profile.email!,
@@ -44,6 +45,8 @@ export async function sendEmailUpcomingEvent(event: EventAttributes, settings: P
       })),
     defaultReplacement: replacement
   }
+
+  console.log(options)
 
   return sender.send(options)
 }

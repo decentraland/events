@@ -14,6 +14,14 @@ export type Templates = {
     share_on_facebook: string
     share_on_twitter: string
   },
+  upcoming_event_v3: {
+    event_img: string
+    event_name: string
+    event_url: string
+    event_target_url: string
+    share_on_facebook: string
+    share_on_twitter: string
+  },
   validate_email: {
     profile_name: string
     address: string
