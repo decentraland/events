@@ -21,6 +21,9 @@ import Context from 'decentraland-gatsby/dist/entities/Route/context';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 import EventAttendeeModel from '../EventAttendee/model';
 import { EventAttendeeAttributes } from '../EventAttendee/types';
+import ProfileSettingsModel from '../ProfileSettings/model'
+import ProfileSubscriptionModel from '../ProfileSubscription/model'
+import { notify } from './cron';
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
@@ -35,8 +38,9 @@ export default routes((router) => {
   router.get('/events', withOptionalAuth, handle(listEvents))
   router.post('/events', withAuth, withAuthProfile(), handle(createNewEvent))
   router.get('/events/attending', withAuth, handle(getAttendingEvents))
-  router.get(BASE_PATH, withOptionalAuth, withEventExists, handle(getEvent))
-  router.patch(BASE_PATH, withAuth, withEventOwner, handle(updateEvent))
+  router.get('/events/:eventId', withOptionalAuth, withEventExists, handle(getEvent))
+  router.patch('/events/:eventId', withAuth, withEventOwner, handle(updateEvent))
+  router.post('/events/:eventId/notifications', withAuth, withAuthProfile(), withEventExists, handle(notifyEvent))
 })
 
 export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
@@ -260,4 +264,30 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   }
   
   return EventModel.toPublic(updatedEvent, user)
+}
+
+async function notifyEvent(req: WithEvent<WithAuthProfile<WithAuth>>) {
+  const user = req.auth!
+  const profile = req.authProfile!
+  const event = req.event!
+  if (!isAdmin(user)) {
+    return {}
+  }
+
+  
+  const attendee: EventAttendeeAttributes = {
+    event_id: event.id,
+    user: profile.ethAddress,
+    user_name: profile.name || 'Guest',
+    notify: true,
+    notified: true,
+    created_at: new Date
+  }
+
+  const profileSettings = await ProfileSettingsModel.findByUsers([ user ])
+  const profileSubscriptions = await ProfileSubscriptionModel.findByUsers([ user ])
+  const settings = Object.fromEntries(profileSettings.map(setting => [ setting.user, setting ] as const))
+  const subscriptions = Object.fromEntries(profileSubscriptions.map(subscription => [ subscription.user, subscription ] as const))
+  const notifications = await notify(event, [ attendee ], settings, subscriptions)
+  return notifications
 }

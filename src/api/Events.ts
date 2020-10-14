@@ -198,6 +198,14 @@ export default class Events extends API {
     )
   }
 
+  async notifyEvent(eventId: string) {
+    return this.fetch<{}>(
+      `/events/${eventId}/notifications`,
+      this.options({ method: 'POST' })
+        .authorization()
+    )
+  }
+
   async setEventAttendee(eventId: string, attending: boolean) {
     if (attending) {
       return this.creteEventAttendee(eventId)

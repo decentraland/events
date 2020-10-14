@@ -10,6 +10,7 @@ import push from "../Notification/push";
 import { eventUrl, calculateRecurrentProperties } from "./utils";
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils";
 import { EventAttributes } from "./types";
+import { EventAttendeeAttributes } from "../EventAttendee/types";
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()
@@ -47,54 +48,74 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
     ProfileSubscriptionModel.findByUsers(user),
   ])
 
-  const settingMap = new Map(settings.map(setting => [setting.user, setting] as const))
-  const subscriptionMap = new Map(subscriptions.map(subscription => [subscription.user, subscription] as const))
-  const expiredSubscriptions: ProfileSubscriptionAttributes[] = []
+  const settingMap = Object.fromEntries(settings.map(setting => [setting.user, setting] as const))
+  const subscriptionMap = Object.fromEntries(subscriptions.map(subscription => [subscription.user, subscription] as const))
+  let expiredSubscriptions: ProfileSubscriptionAttributes[] = []
 
   for (const event of events) {
     const eventAttendees = attendees.filter(attendee => attendee.event_id === event.id);
 
-    const emailNotifications: ProfileSettingsAttributes[] = []
-    const browserNotifications: ProfileSubscriptionAttributes[] = []
+    const result = await notify(event, eventAttendees, settingMap, subscriptionMap)
+    ctx.log(`Notified event ${event.id} (email: ${result.email.length}, web: ${result.browser.length})`)
+   
 
-    for (const attendee of eventAttendees) {
-      const settings = settingMap.get(attendee.user)
-      const subscription = subscriptionMap.get(attendee.user)
-
-      if (settings && settings.email_verified && settings.notify_by_email) {
-        emailNotifications.push(settings)
-      }
-
-      if (settings && settings.notify_by_browser && subscription) {
-        browserNotifications.push(subscription)
-      }
-    }
-
-    ctx.log(`Notifying event ${event.id} (email: ${emailNotifications.length}, web: ${browserNotifications.length})`)
-    const eventNotificationData = {
-      title: event.name,
-      href: eventUrl(event),
-      tag: event.id,
-      image: event.image!,
-    }
-
-    const notifications: Promise<any>[] = browserNotifications
-      .map(async (subscription) => {
-        return push(subscription, eventNotificationData)
-          .catch((error) => {
-            console.error(error)
-            error.statusCode === 410 && expiredSubscriptions.push(subscription)
-          })
-      })
-
-    notifications.push(sendEmailUpcomingEvent(event, emailNotifications))
-    await Promise.all(notifications)
-    
-    if (emailNotifications.length + browserNotifications.length) {
-      await notifyBySlack(event, emailNotifications.length, browserNotifications.length)
+    if (result.email.length + result.browser.length) {
+      await notifyBySlack(event, result.email.length, result.browser.length)
     }
   }
 
   await EventAttendeeModel.setNotified(attendees)
   await ProfileSubscriptionModel.deleteAll(expiredSubscriptions)
+}
+
+export async function notify(
+  event: EventAttributes,
+  attendees: EventAttendeeAttributes[],
+  settings: Record<string, ProfileSettingsAttributes> = {},
+  subscriptions: Record<string, ProfileSubscriptionAttributes> = {}
+) {
+
+  const email: ProfileSettingsAttributes[] = []
+  const browser: ProfileSubscriptionAttributes[] = []
+  const expired: ProfileSubscriptionAttributes[] = []
+
+  for (const attendee of attendees) {
+    const setting = settings[attendee.user]
+    const subscription = subscriptions[attendee.user]
+
+    if (setting && setting.email_verified && setting.notify_by_email) {
+      email.push(setting)
+    }
+
+    if (setting && setting.notify_by_browser && subscription) {
+      browser.push(subscription)
+    }
+  }
+
+  const data = {
+    title: event.name,
+    href: eventUrl(event),
+    tag: event.id,
+    image: event.image!,
+  }
+
+  const proms: Promise<any>[] = browser
+    .map(async (subscription) => {
+      return push(subscription, data)
+        .catch((error) => {
+          console.error(error)
+          error.statusCode === 410 && expired.push(subscription)
+        })
+    })
+
+  proms.push(sendEmailUpcomingEvent(event, email))
+  const notifications = await Promise.all(proms)
+
+  return {
+    data,
+    email,
+    browser,
+    expired,
+    notifications
+  }
 }

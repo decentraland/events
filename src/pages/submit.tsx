@@ -60,7 +60,7 @@ type SubmitPageState = {
 export default function SubmitPage(props: any) {
   const options = { utc: true }
   const capitalized = true
-  const short = true
+  // const short = true
   const location = useLocation()
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const eventId = url.getEventId(location) || null
@@ -217,6 +217,14 @@ export default function SubmitPage(props: any) {
     event.stopPropagation()
     if (eventId) {
       patchState({ requireConfirmation: true, error: null })
+    }
+  }
+
+  function handleNotify(event: React.MouseEvent<any>) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (eventId) {
+      Events.get().notifyEvent(eventId)
     }
   }
 
@@ -496,14 +504,19 @@ export default function SubmitPage(props: any) {
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="6">
-                      <Button primary loading={state.loading} disabled={state.loading} style={{ width: '100%' }} onClick={handleSubmit}>
+                      <Button primary loading={state.loading} disabled={(event && !(event.owned || event.editable)) || state.loading} style={{ width: '100%' }} onClick={handleSubmit}>
                         {event && 'SAVE'}
                         {!event && 'SUBMIT'}
                       </Button>
                     </Grid.Column>
-                    <Grid.Column mobile="6">
+                    <Grid.Column mobile="5">
                       {event && (event.owned || event.editable) && <Button basic loading={state.loading} disabled={state.loading} style={{ width: '100%' }} onClick={handleReject}>
                         DELETE
+                      </Button>}
+                    </Grid.Column>
+                    <Grid.Column mobile="5">
+                      {event && event.editable && <Button basic loading={state.loading} disabled={state.loading} style={{ width: '100%' }} onClick={handleNotify}>
+                        NOTIFY ME
                       </Button>}
                     </Grid.Column>
                   </Grid.Row>
