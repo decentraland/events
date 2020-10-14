@@ -83,6 +83,7 @@ export async function updateProfileSettings(req: WithAuth) {
   }
 
   if (profile.email !== newProfile.email) {
+    newProfile.notify_by_email = false
     newProfile.email_verified = false
     newProfile.email_updated_at = now
     newProfile.email_verified_at = null
@@ -97,6 +98,7 @@ export async function updateProfileSettings(req: WithAuth) {
     newProfile.email_verified = false
     newProfile.email_verified_at = null
     newProfile.email_updated_at = now
+    newProfile.notify_by_email = false
     emailVerificationRequired = true
   }
 
