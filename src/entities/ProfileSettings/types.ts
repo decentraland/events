@@ -19,6 +19,7 @@ export const UNSUBSCRIBE_PATH = '/unsubscribe'
 
 export const editableAttributes = [
   'email',
+  'email_verified',
   'use_local_time',
   'notify_by_email',
   'notify_by_browser',
@@ -45,6 +46,9 @@ export const profileSettingsSchema = {
     email: {
       type: 'string',
       format: 'email'
+    },
+    email_verified: {
+      type: 'boolean'
     },
     use_local_time: {
       type: 'boolean'

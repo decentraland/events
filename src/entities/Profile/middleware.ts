@@ -24,12 +24,18 @@ export function getUserParam(req: Request) {
 }
 
 export function withProfile(options: WithProfileOptions = {}) {
-  return middleware(async (req) => {
-    const user = getUserParam(req).toLowerCase()
-    const profile = await API.catch(Katalyst.get().getProfile(user))
+  return middleware(async (req: Request<{ user: string }>) => {
+    let profile: Avatar | null = null
+    const user = req.params.user
+    if (!isEthereumAddress(user || '') && !options.optional) {
+      throw new RequestError(`Invalid param user: "${user}"`, RequestError.NotFound)
+    }
 
-    if (!profile && !options.optional) {
-      throw new RequestError(`Not found profile for "${user}"`, RequestError.NotFound)
+    if (user) {
+      profile = await API.catch(Katalyst.get().getProfile(user))
+      if (!profile && !options.optional) {
+        throw new RequestError(`Not found profile for "${user}"`, RequestError.NotFound)
+      }
     }
 
     Object.assign(req, { profile })

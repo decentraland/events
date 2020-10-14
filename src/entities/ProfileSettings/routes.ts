@@ -13,6 +13,7 @@ import { requiredEnv } from 'decentraland-gatsby/dist/utils/env';
 import ProfileSubscriptionModel from '../ProfileSubscription/model';
 import EventAttendeeModel from '../EventAttendee/model';
 import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
+import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
 const SIGN_SECRET = requiredEnv('SIGN_SECRET')
@@ -58,6 +59,7 @@ export async function getMyProfileSettings(req: WithAuth) {
 }
 
 export async function updateProfileSettings(req: WithAuth) {
+  const now = new Date()
   const user = req.auth!
   const profile = await getProfileSettings(user)
   const updateAttributes = utils.pick(req.body || {}, editableAttributes) as ProfileSettingsAttributes
@@ -68,26 +70,34 @@ export async function updateProfileSettings(req: WithAuth) {
   }
 
   let emailVerificationRequired = false
-  const newProfile = {
+  const newProfile: ProfileSettingsAttributes = {
     ...profile,
-    ...updateAttributes
+    ...updateAttributes,
+    email_verified: profile.email_verified,
   }
 
   if (!newProfile.email) {
     newProfile.notify_by_email = false
     newProfile.email_updated_at = null
+    newProfile.email_verified_at = null
   }
 
   if (profile.email !== newProfile.email) {
     newProfile.email_verified = false
-
-    if (newProfile.email) {
-      newProfile.email_updated_at = new Date
-    }
-
-    if (isEmail(newProfile.email || '')) {
-      emailVerificationRequired = true
-    }
+    newProfile.email_updated_at = now
+    newProfile.email_verified_at = null
+    emailVerificationRequired = true
+  }
+  
+  if (
+    newProfile.email &&
+    profile.email === newProfile.email &&
+    updateAttributes.email_verified === false
+  ) {
+    newProfile.email_verified = false
+    newProfile.email_verified_at = null
+    newProfile.email_updated_at = now
+    emailVerificationRequired = true
   }
 
   const amount = await ProfileSettingsModel.count({ user })
@@ -98,20 +108,26 @@ export async function updateProfileSettings(req: WithAuth) {
   }
 
   if (emailVerificationRequired) {
-    const verificationData: EmailSubscription = {
-      action: 'verify',
-      user: profile.user,
-      email: newProfile.email!,
-      exp: Date.now() + 15 * Datetime.Minute
-    }
-
-    const verificationUrl = new URL(EVENTS_URL)
-    verificationUrl.pathname = SUBSCRIPTION_PATH + '/'
-    verificationUrl.searchParams.set(DATA_PARAM, sign(verificationData, SIGN_SECRET))
-    sendEmailVerification(newProfile.email!, verificationUrl.toString())
+    await sendVerification(profile.user, newProfile.email!)
   }
 
   return newProfile
+}
+
+async function sendVerification(user: string, email: string) {
+  if (isEthereumAddress(user) && isEmail(email)) {
+    const verificationData: EmailSubscription = {
+      action: 'verify',
+      user: user,
+      email: email,
+      exp: Date.now() + 15 * Datetime.Minute
+    }
+  
+    const verificationUrl = new URL(EVENTS_URL)
+    verificationUrl.pathname = SUBSCRIPTION_PATH + '/'
+    verificationUrl.searchParams.set(DATA_PARAM, sign(verificationData, SIGN_SECRET))
+    await sendEmailVerification(email, verificationUrl.toString())
+  }
 }
 
 /**

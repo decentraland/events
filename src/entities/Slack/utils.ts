@@ -89,7 +89,7 @@ export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, emai
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `:runner: event *<${url(event)}|${event.name}>* is about to start (${emailNotifications} :email:, ${pushNotifications} :bell:)`
+          "text": `:runner: event *<${url(event)}|${event.name}>* is about to start (sent: ${emailNotifications} :email:, ${pushNotifications} :bell:)`
         }
       }
     ]
