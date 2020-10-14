@@ -15,8 +15,7 @@
 }
 
 .ui.modal .AttendingButtons .ui.button.inverted,
-.AttendingButtons .ui.button.inverted,
-.AttendingButtons .ui.button {
+.AttendingButtons .ui.button.inverted {
   background-color: transparent;
 }
 .AttendingButtons .ui.button {
