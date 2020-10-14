@@ -46,7 +46,5 @@ export async function sendEmailUpcomingEvent(event: EventAttributes, settings: P
     defaultReplacement: replacement
   }
 
-  console.log(options)
-
   return sender.send(options)
 }
