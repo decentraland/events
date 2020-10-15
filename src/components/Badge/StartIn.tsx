@@ -16,10 +16,14 @@ export default function StartIn(props: StartInProps) {
     return <Live primary />
   }
 
+  const days = countdown.days
+  const hours = countdown.hours
+  const minutes = countdown.minutes
+
   return <div className={TokenList.join(["StartIn"])}>
-    {countdown.days > 0 && `in ${countdown.days} ${countdown.days === 1 ? 'day' : 'days'}`}
-    {countdown.days === 0 && countdown.hours > 0 && `in ${countdown.hours} ${countdown.hours === 1 ? 'hour' : 'hours'}`}
-    {countdown.days === 0 && countdown.hours === 0 && countdown.minutes > 0 && `in ${countdown.minutes} ${countdown.minutes === 1 ? 'minute' : 'minutes'}`}
-    {countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && `in less than a minute`}
+    {days > 0 && `in ${days} ${days === 1 ? 'day' : 'days'}`}
+    {days === 0 && hours > 0 && `in ${hours} ${hours === 1 ? 'hour' : 'hours'}`}
+    {days === 0 && hours === 0 && minutes > 0 && `in ${minutes + 1} ${(minutes + 1) === 1 ? 'minute' : 'minutes'}`}
+    {days === 0 && hours === 0 && minutes === 0 && `in less than a minute`}
   </div>
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import Bold from 'decentraland-gatsby/dist/components/Text/Bold'
 import Datetime from 'decentraland-gatsby/dist/utils/Datetime'
@@ -21,26 +21,30 @@ export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {
 
 export default function EventDateDetail({ event, startAt, secondary, completed, countdown, utc, ...props }: EventDateDetailProps) {
   const duration = event.duration
-  const start_at = Datetime.from(startAt || event.start_at, { utc })
-  const finish_at = Datetime.from(start_at.getTime() + duration, { utc })
+  const start_at = useMemo(() => Datetime.from(startAt || event.start_at, { utc }), [ startAt || event.start_at ])
+  const finish_at = useMemo(() => Datetime.from(start_at.getTime() + duration, { utc }), [ start_at ])
   const time = useCountdown(start_at.date, Datetime.Second, true)
   const live = time.countingUp
   const capitalized = true
   const short = true
 
+  const days = time.days
+  const hours = time.hours
+  const minutes = time.minutes
+
   return <EventSection {...props}>
     <EventSection.Icon src={secondary ? '' : clock} width="16" height="16" />
     {live && <EventSection.Detail>
-      {time.days > 0 && <Paragraph secondary={secondary}>Started: {time.days} {time.days === 1 ? 'day' : 'days'} ago</Paragraph>}
-      {time.days === 0 && time.hours > 0 && <Paragraph secondary={secondary}>Started: {time.hours} {time.hours === 1 ? 'hour' : 'hours'} ago</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes > 0 && <Paragraph secondary={secondary}>Started: {time.minutes} {time.minutes === 1 ? 'minute' : 'minutes'} ago</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes === 0 && <Paragraph secondary={secondary}>Started: Less than a minute ago</Paragraph>}
+      {days > 0 && <Paragraph secondary={secondary}>Started: {days} {days === 1 ? 'day' : 'days'} ago</Paragraph>}
+      {days === 0 && hours > 0 && <Paragraph secondary={secondary}>Started: {hours} {hours === 1 ? 'hour' : 'hours'} ago</Paragraph>}
+      {days === 0 && hours === 0 && minutes > 0 && <Paragraph secondary={secondary}>Started: {minutes + 1} {(minutes + 1) === 1 ? 'minute' : 'minutes'} ago</Paragraph>}
+      {days === 0 && hours === 0 && minutes === 0 && <Paragraph secondary={secondary}>Started: Less than a minute ago</Paragraph>}
     </EventSection.Detail>}
     {!live && countdown && <EventSection.Detail>
-      {time.days > 0 && <Paragraph secondary={secondary}>Starts in: {time.days} {time.days === 1 ? 'day' : 'days'}</Paragraph>}
-      {time.days === 0 && time.hours > 0 && <Paragraph secondary={secondary}>Starts in: {time.hours} {time.hours === 1 ? 'hour' : 'hours'} {time.minutes} {time.minutes === 1 ? 'minute' : 'minutes'}</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes > 0 && <Paragraph secondary={secondary}>Starts in: {time.minutes} {time.minutes === 1 ? 'minute' : 'minutes'}</Paragraph>}
-      {time.days === 0 && time.hours === 0 && time.minutes === 0 && <Paragraph secondary={secondary}>Starts in: Less than a minute</Paragraph>}
+      {days > 0 && <Paragraph secondary={secondary}>Starts in: {days} {days === 1 ? 'day' : 'days'}</Paragraph>}
+      {days === 0 && hours > 0 && <Paragraph secondary={secondary}>Starts in: {hours} {hours === 1 ? 'hour' : 'hours'} {minutes + 1} {(minutes + 1) === 1 ? 'minute' : 'minutes'}</Paragraph>}
+      {days === 0 && hours === 0 && minutes > 0 && <Paragraph secondary={secondary}>Starts in: {minutes + 1} {(minutes + 1) === 1 ? 'minute' : 'minutes'}</Paragraph>}
+      {days === 0 && hours === 0 && minutes === 0 && <Paragraph secondary={secondary}>Starts in: Less than a minute</Paragraph>}
     </EventSection.Detail>}
     {!live && !countdown && duration < Datetime.Day && <EventSection.Detail>
       <Paragraph secondary={secondary} >

@@ -3,6 +3,7 @@ import { Button } from 'decentraland-ui/dist/components/Button/Button'
 import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
+import useTimeout from 'decentraland-gatsby/dist/hooks/useTimeout'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import track from 'decentraland-gatsby/dist/components/Segment/track'
 import { SessionEventAttributes } from '../../entities/Event/types'
@@ -35,6 +36,8 @@ export type AttendingButtonsProps = {
 export default function AttendingButtons(props: AttendingButtonsProps) {
 
   const event: SessionEventAttributes = props.event
+  const nextStartAt = useMemo(() => new Date(Date.parse(event.next_start_at.toString())), [event.next_start_at])
+  const isLive = useTimeout(() => true, nextStartAt)
   const [state, patchState] = usePatchState<AttendingButtonsState>({ sharing: false })
   const [profile, actions] = useProfile()
   const location = useLocation()
@@ -134,17 +137,17 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     </>}
 
     {!state.sharing && <>
-      {event.live && (actions.provider || !isMobile) && <Button primary size="small" disabled={loading || !event.approved} onClick={handlePropagation} className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      {isLive && (actions.provider || !isMobile) && <Button primary size="small" disabled={loading || !event.approved} onClick={handlePropagation} className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <span>JUMP IN</span>
         <img src={primaryJumpIn} width={14} height={14} style={{ marginLeft: '.5rem' }} />
       </Button>}
 
-      {!event.live && (actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={TokenList.join(['attending-status', 'fluid', event.attending && 'attending'])}>
+      {!isLive && (actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || !event.approved} className={TokenList.join(['attending-status', 'fluid', event.attending && 'attending'])}>
         {event.attending && 'GOING'}
         {!event.attending && 'WANT TO GO'}
       </Button>}
 
-      {!event.live && event.attending && (actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || !event.approved} onClick={handleNotify}>
+      {!isLive && event.attending && (actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || !event.approved} onClick={handleNotify}>
         <img src={event.notify && notificationEnabled || notificationDisabled} width="22" height="22" />
       </Button>}
 

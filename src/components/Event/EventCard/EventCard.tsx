@@ -1,10 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import { SessionEventAttributes } from '../../../entities/Event/types'
-import Live from '../../Badge/Live'
 import JumpInButton from '../../Button/JumpInButton'
 import AttendingButtons from '../../Button/AttendingButtons'
 
@@ -26,10 +25,7 @@ export type EventCardProps = {
 
 export default function EventCard(props: EventCardProps) {
   const event = props.event
-  const now = Date.now()
-  const nextStartAt = new Date(Date.parse(event.next_start_at.toString()))
-  const finishAt = new Date(nextStartAt.getTime() + event.duration)
-  // const live = now >= nextStartAt.getTime() && now <= finishAt.getTime()
+  const nextStartAt = useMemo(() => new Date(Date.parse(event.next_start_at.toString())), [event.next_start_at])
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     if (props.onClick) {
@@ -41,7 +37,6 @@ export default function EventCard(props: EventCardProps) {
     <Card link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={props.href} onClick={handleClick} >
       <div />
       <StartIn date={nextStartAt} />
-      {/* {live && <Live primary={event.approved} />} */}
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
