@@ -19,10 +19,6 @@ export type WithProfileOptions = {
   optional?: boolean,
 }
 
-export function getUserParam(req: Request) {
-  return param(req, 'user', isEthereumAddress)
-}
-
 export function withProfile(options: WithProfileOptions = {}) {
   return middleware(async (req: Request<{ user: string }>) => {
     let profile: Avatar | null = null
