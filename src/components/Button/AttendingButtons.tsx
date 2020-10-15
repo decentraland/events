@@ -116,6 +116,10 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     patchState({ sharing: false })
   }
 
+  function handlePropagation(e: React.MouseEvent<any>) {
+    e.stopPropagation()
+  }
+
   return <div className="AttendingButtons">
     {state.sharing && <>
       <Button inverted size="small" className="share fluid" onClick={handleShareFacebook}>
@@ -130,7 +134,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     </>}
 
     {!state.sharing && <>
-      {event.live && (actions.provider || !isMobile) && <Button primary size="small" disabled={loading || !event.approved} className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      {event.live && (actions.provider || !isMobile) && <Button primary size="small" disabled={loading || !event.approved} onClick={handlePropagation} className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <span>JUMP IN</span>
         <img src={primaryJumpIn} width={14} height={14} style={{ marginLeft: '.5rem' }} />
       </Button>}

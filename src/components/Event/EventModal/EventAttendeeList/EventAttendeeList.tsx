@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
-import { useLocation } from "@reach/router"
 import { EventAttendeeAttributes } from '../../../../entities/EventAttendee/types'
-import { EventAttributes, SessionEventAttributes } from '../../../../entities/Event/types'
+import { SessionEventAttributes } from '../../../../entities/Event/types'
 import useAsyncEffect from 'decentraland-gatsby/dist/hooks/useAsyncEffect'
 import Events from '../../../../api/Events'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 
-import './EventAttendeeList.css'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
-import { navigate } from 'gatsby'
-import url from '../../../../utils/url'
+
+import './EventAttendeeList.css'
 
 const back = require('../../../../images/popup-back.svg')
 const close = require('../../../../images/popup-close.svg')
