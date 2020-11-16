@@ -26,6 +26,4 @@ COPY ./.env.*            /app/
 
 RUN npm run build
 
-RUN ls public
-
 ENTRYPOINT [ "./entrypoint.sh" ]
