@@ -153,7 +153,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   if (!data.realm) {
     data.realm = null
   }
-
+  
   if (!data.url) {
     data.url = eventTargetUrl(data)
   }
