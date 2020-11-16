@@ -106,18 +106,6 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     }
   }
 
-  async function updateSettings(updateSettings: Partial<ProfileSettingsAttributes>) {
-    track((analytics) => analytics.track(segment.Track.Settings, { settings: { 
-      ...settings,
-      ...updateSettings
-    }}))
-    const newSettings = await API.catch(Events.get().updateProfileSettings(updateSettings))
-    if (newSettings) {
-      setProfileSettings(newSettings)
-    }
-    return newSettings
-  }
-
   async function updateSubscription(options: { endpoint: string, p256dh: string, auth: string } | null) {
     if (options) {
       await API.catch(Events.get().createSubscription(options))
@@ -127,6 +115,18 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
     const newSettings = await API.catch(Events.get().getMyProfileSettings())
     setProfileSettings(newSettings)
+  }
+
+  async function updateSettings(updateSettings: Partial<ProfileSettingsAttributes>) {
+    track((analytics) => analytics.track(segment.Track.Settings, { settings: {
+      ...settings,
+      ...updateSettings
+    }}))
+    const newSettings = await API.catch(Events.get().updateProfileSettings(updateSettings))
+    if (newSettings) {
+      setProfileSettings(newSettings)
+    }
+    return newSettings
   }
 
   async function createEvent(data: EditEvent) {
@@ -229,4 +229,3 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     getNavigationState
   }
 }
-
