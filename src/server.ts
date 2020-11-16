@@ -24,10 +24,11 @@ jobs.cron('@eachMinute', updateNextStartAt)
 const app = express()
 app.set('x-powered-by', false)
 app.use(social)
+app.use(logger())
 app.use('/api', [
   ddos(),
   status(),
-  logger(),
+  // logger(),
   bodyParser.json(),
   events,
   poster,
