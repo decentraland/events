@@ -13,7 +13,7 @@ import dao from '../Contracts/DAO/CatalystAbi'
 import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
 
 const CATALYST_CONTRACT_ADDRESS = '0x4a2f10076101650f40342885b99b6b101d83c486'
-const ETHEREUM_ENDPOINT = `https://mainnet.infura.io/ws/v3/1da6448958b2444f956aed19030a53e7`
+const ETHEREUM_ENDPOINT = `https://mainnet.infura.io/v3/1da6448958b2444f956aed19030a53e7`
 
 export default routes((router) => {
   router.get('/realms', cache.middleware('1 hour'), handle(getRealms))
