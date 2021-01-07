@@ -1,23 +1,13 @@
+const pkg = require('./package.json')
+const { proxy } = require('decentraland-gatsby/dist/entities/Gatsby/config')
+
 module.exports = {
   siteMetadata: {
     title: `Decentraland Events`,
     description: `Decentraland Events`,
     author: `@decentraland`,
   },
-  proxy: [
-    {
-      url: `http://localhost:3001`,
-      prefix: `/api`,
-    },
-    {
-      url: `http://localhost:3001`,
-      prefix: `/verify`,
-    },
-    {
-      url: `http://localhost:3001`,
-      prefix: `/unsubscribe`,
-    },
-  ],
+  proxy: proxy(`http://localhost:3001`, pkg.proxy),
   plugins: [
     `gatsby-plugin-react-helmet`,
     {
