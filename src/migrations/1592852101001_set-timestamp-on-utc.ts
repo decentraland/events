@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import EventModel from '../src/entities/Event/model'
-import EventAttendeeModel from '../src/entities/EventAttendee/model'
+import EventModel from '../entities/Event/model'
+import EventAttendeeModel from '../entities/EventAttendee/model'
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.alterColumn(EventModel.tableName, 'start_at', { type: 'TIMESTAMPTZ' })

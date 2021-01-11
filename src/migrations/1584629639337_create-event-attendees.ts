@@ -1,23 +1,27 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import Model from '../src/entities/Event/model'
+import Model from '../entities/EventAttendee/model'
 
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.addColumns(Model.tableName, {
-    x: {
-      type: 'INTEGER',
-      default: 0
+  pgm.createTable(Model.tableName, {
+    event_id: {
+      type: 'UUID',
+      primaryKey: true
     },
-    y: {
-      type: 'INTEGER',
-      default: 0
+    user: {
+      type: 'TEXT',
+      primaryKey: true
     },
+    created_at: {
+      type: 'TIMESTAMP',
+    }
+  }, {
+    temporary: false
   })
-
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumns(Model.tableName, ['x', 'y'])
+  pgm.dropTable(Model.tableName)
 }

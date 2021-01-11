@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import Model from '../src/entities/Event/model'
+import Model from '../entities/Event/model'
 
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
-
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns(Model.tableName, {
-    recurrent_setpos: {
-      type: 'INTEGER',
-      default: null
+    total_attendees: {
+      type: 'INT',
+      notNull: true,
+      default: 0
     },
-    recurrent_monthday: {
-      type: 'INTEGER',
-      default: null
+    latest_attendees: {
+      type: 'TEXT[]',
+      notNull: true,
+      default: '{0,0}'
     },
   })
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumns(Model.tableName, ['recurrent_setpos', 'recurrent_monthday'])
+  pgm.dropColumns(Model.tableName, ['total_attendees', 'latest_attendees'])
 }
