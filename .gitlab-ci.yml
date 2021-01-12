@@ -15,25 +15,25 @@ docker-build:
 
   script:
     - touch .env.production
-    - echo "AWS_ACCESS_KEY=$AWS_ACCESS_KEY" >> .env.production
-    - echo "AWS_ACCESS_SECRET=$AWS_ACCESS_SECRET" >> .env.production
-    - echo "AWS_BUCKET_DIR=$AWS_BUCKET_DIR" >> .env.production
-    - echo "AWS_BUCKET_NAME=$AWS_BUCKET_NAME" >> .env.production
-    - echo "AWS_BUCKET_URL=$AWS_BUCKET_URL" >> .env.production
-    - echo "GATSBY_DECENTRALAND_URL=$GATSBY_DECENTRALAND_URL" >> .env.production
-    - echo "GATSBY_EVENTS_URL=$GATSBY_EVENTS_URL" >> .env.production
-    - echo "GATSBY_LAND_URL=$GATSBY_LAND_URL" >> .env.production
-    - echo 'GATSBY_PROFILE_URL=https://peer.decentraland.org' >> .env.production
-    - echo "GATSBY_SEGMENT_KEY=$GATSBY_SEGMENT_KEY" >> .env.production
-    - echo "GATSBY_WEB_PUSH_KEY=$GATSBY_WEB_PUSH_KEY" >> .env.production
-    - echo "GOOGLE_CLEINT_ID=$GOOGLE_CLEINT_ID" >> .env.production
-    - echo "GOOGLE_CLEINT_SECRET=$GOOGLE_CLEINT_SECRET" >> .env.production
-    - echo "SES_ACCESS_KEY=$SES_ACCESS_KEY" >> .env.production
-    - echo "SES_ACCESS_SECRET=$SES_ACCESS_SECRET" >> .env.production
-    - echo "SES_ORIGIN=$SES_ORIGIN" >> .env.production
-    - echo "SES_SOURCE=$SES_SOURCE" >> .env.production
-    - echo "WEB_PUSH_SECRET=$WEB_PUSH_SECRET" >> .env.production
-    - cat .env.production
-    - DOCKER_BUILDKIT=1 docker build --pull --cache-from "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
-    - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-    - echo "decentraland/events:$CI_COMMIT_SHA"
+    # - echo "AWS_ACCESS_KEY=$AWS_ACCESS_KEY" >> .env.production
+    # - echo "AWS_ACCESS_SECRET=$AWS_ACCESS_SECRET" >> .env.production
+    # - echo "AWS_BUCKET_DIR=$AWS_BUCKET_DIR" >> .env.production
+    # - echo "AWS_BUCKET_NAME=$AWS_BUCKET_NAME" >> .env.production
+    # - echo "AWS_BUCKET_URL=$AWS_BUCKET_URL" >> .env.production
+    # - echo "GATSBY_DECENTRALAND_URL=$GATSBY_DECENTRALAND_URL" >> .env.production
+    # - echo "GATSBY_EVENTS_URL=$GATSBY_EVENTS_URL" >> .env.production
+    # - echo "GATSBY_LAND_URL=$GATSBY_LAND_URL" >> .env.production
+    # - echo 'GATSBY_PROFILE_URL=https://peer.decentraland.org' >> .env.production
+    # - echo "GATSBY_SEGMENT_KEY=$GATSBY_SEGMENT_KEY" >> .env.production
+    # - echo "GATSBY_WEB_PUSH_KEY=$GATSBY_WEB_PUSH_KEY" >> .env.production
+    # - echo "GOOGLE_CLEINT_ID=$GOOGLE_CLEINT_ID" >> .env.production
+    # - echo "GOOGLE_CLEINT_SECRET=$GOOGLE_CLEINT_SECRET" >> .env.production
+    # - echo "SES_ACCESS_KEY=$SES_ACCESS_KEY" >> .env.production
+    # - echo "SES_ACCESS_SECRET=$SES_ACCESS_SECRET" >> .env.production
+    # - echo "SES_ORIGIN=$SES_ORIGIN" >> .env.production
+    # - echo "SES_SOURCE=$SES_SOURCE" >> .env.production
+    # - echo "WEB_PUSH_SECRET=$WEB_PUSH_SECRET" >> .env.production
+    # - cat .env.production
+    # - DOCKER_BUILDKIT=1 docker build --pull --cache-from "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+    # - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    # - echo "decentraland/events:$CI_COMMIT_SHA"

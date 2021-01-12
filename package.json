@@ -4,11 +4,17 @@
   "description": "A simple starter to get up and developing quickly with Gatsby",
   "version": "0.1.0",
   "author": "",
-  "proxy": [
-    "/api/*",
-    "/verify",
-    "/unsubscribe"
-  ],
+  "server": {
+    "email": true,
+    "bucket": [
+      "/poster/*"
+    ],
+    "proxy": [
+      "/api/*",
+      "/verify",
+      "/unsubscribe"
+    ]
+  },
   "dependencies": {
     "@types/apicache": "^1.2.2",
     "@types/express": "^4.17.3",
