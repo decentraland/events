@@ -1,7 +1,7 @@
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
-import { env, domain as internalDomain, publicDomain } from "dcl-ops-lib/domain";
+import { env, domain as envDomain, publicDomain, publicTLD, envTLD } from "dcl-ops-lib/domain";
 import { getCertificateFor } from "dcl-ops-lib/certificate";
 import { acceptAlbSecurityGroupId } from "dcl-ops-lib/acceptAlb";
 import { acceptBastionSecurityGroupId } from "dcl-ops-lib/acceptBastion";
@@ -20,7 +20,8 @@ import { getCluster } from "./ecs";
 export async function buildGatsby(config: GatsbyOptions) {
   const serviceName = slug(config.name);
   const serviceVersion = getServiceVersion()
-  const decentralandDomain = config.usePublicTLD ? publicDomain : internalDomain
+  const decentralandDomain = config.usePublicTLD ? publicDomain : envDomain
+  const serviceTLD = config.usePublicTLD ? publicTLD : envTLD
   const serviceDomain = `${serviceName}.${decentralandDomain}`
   const emailDomains = []
   const domains = [ serviceDomain, ...config.additionalDomains ]
@@ -47,6 +48,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     // if config.servicePaths !== false service will ve public
     if (config.servicePaths !== false) {
       // iniject public service environment
+      environment.push(variable('SERVICE_TLD', serviceTLD))
       environment.push(variable('SERVICE_DOMAIN', serviceDomain))
       environment.push(variable('SERVICE_URL', `https://${serviceDomain}`))
       environment.push(variable('PORT', `${port}`))
@@ -98,6 +100,7 @@ export async function buildGatsby(config: GatsbyOptions) {
         // create bucket and grant acccess
         const useBucket = config.useBucket === true ? [] : config.useBucket
         const bucket = addBucketResource(access.user, useBucket)
+        environment.push(variable('AWS_BUCKET_NAME', bucket.bucket))
 
         // attach paths to cloudfront
         if (useBucket.length > 0) {
@@ -111,9 +114,14 @@ export async function buildGatsby(config: GatsbyOptions) {
       if (config.useEmail) {
         // grant access to email service
         const useEmail = config.useEmail === true ? [ serviceDomain ] : config.useEmail
-        addEmailResource(access.user, useEmail)
-        for (const email of useEmail) {
-          emailDomains.push(email)
+
+        if (useEmail[0]) {
+          addEmailResource(access.user, useEmail)
+          environment.push(variable('AWS_EMAIL_DOMAIN', useEmail[0]))
+
+          for (const email of useEmail) {
+            emailDomains.push(email)
+          }
         }
       }
 

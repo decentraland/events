@@ -5,7 +5,7 @@ export type GatsbyOptions = {
    * service name
    *
    * > This value will be injected as SERVICE_NAME env.
-   * > SERVICE_VERSION, SERVICE_DOMAIN, SERVICE_URL will be also injected
+   * > SERVICE_VERSION, SERVICE_DOMAIN, SERVICE_TLD, SERVICE_URL will be also injected
    */
   name: string;
 
@@ -90,6 +90,8 @@ export type GatsbyOptions = {
    *
    * it can be used with others `use*` options
    *
+   * > This value will be injected as AWS_BUCKET_NAME env
+   *
    *  @default false
    */
   useBucket?: boolean | string[]
@@ -103,6 +105,8 @@ export type GatsbyOptions = {
    * > Note: deploy will fail if that domain is not configured in the account
    *
    * it can be used with others `use*` options
+   *
+   * > The first value will be injected as AWS_EMAIL_DOMAIN env
    *
    * @default false
    */

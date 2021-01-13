@@ -14,8 +14,8 @@ let BUCKET_CHECKED_JOB: Promise<void> | null = null
 const ACCESS_KEY = requiredEnv('AWS_ACCESS_KEY')
 const ACCESS_SECRET = requiredEnv('AWS_ACCESS_SECRET')
 const BUCKET_NAME = requiredEnv('AWS_BUCKET_NAME')
-const BUCKET_DIR = requiredEnv('AWS_BUCKET_DIR')
 const BUCKET_URL = requiredEnv('AWS_BUCKET_URL')
+const BUCKET_DIR = 'poster'
 
 const s3 = new AWS.S3({
   accessKeyId: ACCESS_KEY,
