@@ -17,8 +17,6 @@ cache:
 build:code:
   stage: install
   image: decentraland/ci-node:latest
-  environment:
-    PATH: "P"
   only:
     - master
     - staging
