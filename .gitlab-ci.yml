@@ -33,7 +33,7 @@ build:code:
     - npm install --cache .npm --prefer-offline
     - env | sort
 
-    - dcl-env
+    - source dcl-env
     - env | sort
 
     - $HOME/.pulumi/bin/pulumi stack --cwd .ci select "website-events-$ENVIRONMENT"
