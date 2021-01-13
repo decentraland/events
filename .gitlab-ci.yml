@@ -17,27 +17,22 @@ cache:
 build:code:
   stage: install
   image: decentraland/ci-node:latest
+  environment:
+    PATH: "P"
   only:
     - master
     - staging
     - release
-  artifacts:
-    paths:
-      - lib
-      - public
-      - static
-      - package.json
-    when: on_success
-    expire_in: 30 days
   script:
+    - export PATH="$PATH:$HOME/.pulumi/bin"
     - npm install --cache .npm --prefer-offline
     - env | sort
 
     - source dcl-env
     - env | sort
 
-    - $HOME/.pulumi/bin/pulumi login -c "s3://$STATE_BUCKET/"
-    - $HOME/.pulumi/bin/pulumi stack --cwd .ci select "website-events-$ENVIRONMENT"
+    - pulumi login -c "s3://$STATE_BUCKET/"
+    - pulumi stack --cwd .ci select "website-events-$ENVIRONMENT"
     - source ./node_modules/.bin/pulumi-environment
     - env | sort
 
