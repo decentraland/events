@@ -36,6 +36,7 @@ build:code:
     - source dcl-env
     - env | sort
 
+    - $HOME/.pulumi/bin/pulumi login -c "s3://$STATE_BUCKET/"
     - $HOME/.pulumi/bin/pulumi stack --cwd .ci select "website-events-$ENVIRONMENT"
     - source ./node_modules/.bin/pulumi-environment
     - env | sort
