@@ -36,8 +36,8 @@ build:code:
     - source ./node_modules/.bin/pulumi-environment
 
     - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
-    - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA" .
-    - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    # - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA" .
+    # - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
 
     - cd .ci && npm install --cache ../.npm --prefer-offline
     - dcl-up $PULUMI_STACK
