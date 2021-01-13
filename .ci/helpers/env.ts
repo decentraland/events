@@ -16,5 +16,18 @@ export function secret(name: string, secretKey: string = name) {
 }
 
 export function conf() {
-  console.log(allConfig())
+  const settings = allConfig()
+  Object.keys(settings)
+    .forEach(key => {
+      if (key.startsWith('aws:') && settings[key] !== '[secret]') {
+        const name = key.replace('/\W+/gi', '_').toUpperCase()
+        console.log(key, name, settings[key])
+
+      } else if (key.startsWith(config.name + ':') ) {
+        const name = key.slice(config.name.length + 1)
+        const value = settings[key] === '[secret]' ? config.requireSecret(name) : settings[key]
+        console.log(key, name, value)
+
+      }
+    })
 }
