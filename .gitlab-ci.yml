@@ -13,10 +13,14 @@ cache:
   key: ${CI_COMMIT_REF_NAME}
   paths:
     - .npm/
+    - node_modules/
+    - .ci/node_modules/
 
 build:code:
   stage: install
   image: decentraland/ci-node:latest
+  variables:
+    PULUMI_STACK: "website-events"
   only:
     - master
     - staging
@@ -24,15 +28,23 @@ build:code:
   script:
     - export PATH="$PATH:$HOME/.pulumi/bin"
     - npm install --cache .npm --prefer-offline
-    - env | sort
 
     - source dcl-env
-    - env | sort
 
     - pulumi login -c "s3://$STATE_BUCKET/"
-    - pulumi stack --cwd .ci select "website-events-$ENVIRONMENT"
+    - pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT"
     - source ./node_modules/.bin/pulumi-environment
-    - env | sort
+
+    - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
+    - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA" .
+    - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+    - cd .ci && npm install --cache ../.npm --prefer-offline
+    - dcl-up $PULUMI_STACK
+
+
+
+
 
 # build:docker:
 #   stage: build

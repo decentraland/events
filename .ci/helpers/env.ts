@@ -1,5 +1,6 @@
 import * as awsx from "@pulumi/awsx";
 import * as pulumi from "@pulumi/pulumi";
+import { allConfig } from "@pulumi/pulumi/runtime/config";
 
 const config = new pulumi.Config();
 
@@ -12,4 +13,8 @@ export function variable(
 
 export function secret(name: string, secretKey: string = name) {
   return variable(name, config.requireSecret(secretKey))
+}
+
+export function conf() {
+  console.log(allConfig())
 }
