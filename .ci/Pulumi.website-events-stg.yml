@@ -1,1 +1,4 @@
 encryptionsalt: v1:wMf4U69zWaw=:v1:Qa032rcEd8x73Hl0:m1wVIFvQtnZK42jeptV2BpKOe5IMYA==
+config:
+  aws:region: us-east-1
+  events:USE_PUBLIC_TLD: "false"

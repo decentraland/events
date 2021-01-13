@@ -1,39 +1,79 @@
-image: docker:latest
+stages:
+  - install
+  - build
+  # - test
+  - deploy
 
 services:
   - docker:dind
 
-docker-build:
+# Cache modules in between jobs
+cache:
+  # key: ${CI_COMMIT_REF_SLUG}
+  key: ${CI_COMMIT_REF_NAME}
+  paths:
+    - .npm/
+
+build:code:
+  stage: install
+  image: decentraland/ci-node:latest
   only:
     - master
-  image: docker:latest
-  stage: build
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-
+    - staging
+    - release
+  artifacts:
+    paths:
+      - lib
+      - public
+      - static
+      - package.json
+    when: on_success
+    expire_in: 30 days
   script:
-    - touch .env.production
-    # - echo "AWS_ACCESS_KEY=$AWS_ACCESS_KEY" >> .env.production
-    # - echo "AWS_ACCESS_SECRET=$AWS_ACCESS_SECRET" >> .env.production
-    # - echo "AWS_BUCKET_DIR=$AWS_BUCKET_DIR" >> .env.production
-    # - echo "AWS_BUCKET_NAME=$AWS_BUCKET_NAME" >> .env.production
-    # - echo "AWS_BUCKET_URL=$AWS_BUCKET_URL" >> .env.production
-    # - echo "GATSBY_DECENTRALAND_URL=$GATSBY_DECENTRALAND_URL" >> .env.production
-    # - echo "GATSBY_EVENTS_URL=$GATSBY_EVENTS_URL" >> .env.production
-    # - echo "GATSBY_LAND_URL=$GATSBY_LAND_URL" >> .env.production
-    # - echo 'GATSBY_PROFILE_URL=https://peer.decentraland.org' >> .env.production
-    # - echo "GATSBY_SEGMENT_KEY=$GATSBY_SEGMENT_KEY" >> .env.production
-    # - echo "GATSBY_WEB_PUSH_KEY=$GATSBY_WEB_PUSH_KEY" >> .env.production
-    # - echo "GOOGLE_CLEINT_ID=$GOOGLE_CLEINT_ID" >> .env.production
-    # - echo "GOOGLE_CLEINT_SECRET=$GOOGLE_CLEINT_SECRET" >> .env.production
-    # - echo "SES_ACCESS_KEY=$SES_ACCESS_KEY" >> .env.production
-    # - echo "SES_ACCESS_SECRET=$SES_ACCESS_SECRET" >> .env.production
-    # - echo "SES_ORIGIN=$SES_ORIGIN" >> .env.production
-    # - echo "SES_SOURCE=$SES_SOURCE" >> .env.production
-    # - echo "WEB_PUSH_SECRET=$WEB_PUSH_SECRET" >> .env.production
-    # - cat .env.production
-    # - DOCKER_BUILDKIT=1 docker build --pull --cache-from "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
-    # - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-    # - echo "decentraland/events:$CI_COMMIT_SHA"
+    - npm install --cache .npm --prefer-offline
+    - dcl-env
+    - pulumi stack --cwd .ci select "website-events-$ENVIRONMENT"
+    - source ./node_modules/.bin/pulumi-environment
+    - env
+
+# build:docker:
+#   stage: build
+#   image: docker:latest
+#   dependencies:
+#     - build:code
+#   only:
+#     - master
+#     - staging
+#     - release
+#   services:
+#     - docker:dind
+#   before_script:
+#     - source .ci/env.sh
+#     - source ".ci/.env.$NODE_ENV"
+#     - env
+#     - apk add --no-cache python3 py3-pip
+#     - pip install awscli
+#     - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY"
+#   script:
+#     - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+#     - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+# deploy:
+#   stage: deploy
+#   image: decentraland/ci-node:latest
+#   dependencies:
+#     - build:code
+#     - build:docker
+#   only:
+#     - master
+#     - staging
+#     - release
+#   script:
+#     - source .ci/env.sh
+#     - source ".ci/.env.$NODE_ENV"
+#     - cd .ci && npm install --cache ../.npm --prefer-offline
+#     - dcl-lock-sync
+#     - dcl-up website-referral
+#     - dcl-sync-release
+#     - cd .. && dcl-upload public
+#     - cd .ci && dcl-cache-invalidation
