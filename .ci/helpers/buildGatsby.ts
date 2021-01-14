@@ -18,6 +18,8 @@ import { createHostForwardListenerRule } from "./alb";
 import { getCluster } from "./ecs";
 
 export async function buildGatsby(config: GatsbyOptions) {
+  console.log(`Creating gatsby service with:`, JSON.stringify(config, null, 2))
+
   const serviceName = slug(config.name);
   const serviceVersion = getServiceVersion()
   const decentralandDomain = config.usePublicTLD ? publicDomain : envDomain
@@ -197,17 +199,22 @@ export async function buildGatsby(config: GatsbyOptions) {
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
 
   const cdn = new aws.cloudfront.Distribution(serviceName + "-cdn", {
+
     enabled: true,
+
     // Alternate aliases the CloudFront distribution can be reached at, in addition to https://xxxx.cloudfront.net.
     // Required if you want to access the distribution via config.targetDomain as well.
     aliases: domains,
+
     // We only specify one origin for this distribution, the S3 content bucket.
-    origins,
     defaultRootObject: "index.html",
+    origins,
+
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
     defaultCacheBehavior: defaultStaticContentBehavior(contentBucket),
     orderedCacheBehaviors,
+
     // "All" is the most broad distribution, and also the most expensive.
     // "100" is the least broad, and also the least expensive.
     priceClass: "PriceClass_100",

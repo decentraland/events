@@ -83,7 +83,6 @@ export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBala
     forwardedValues: {
       headers: ["*"],
       queryString: true,
-      queryStringCacheKeys: [],
       cookies: { forward: "none" },
     },
     minTtl: 0,
