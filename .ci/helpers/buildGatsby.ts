@@ -28,12 +28,14 @@ export async function buildGatsby(config: GatsbyOptions) {
   const port = config.servicePort || 4000
 
   // cloudfront mapping
+  let environment: awsx.ecs.KeyValuePair[] = []
   const origins: aws.types.input.cloudfront.DistributionOrigin[] = []
   const orderedCacheBehaviors: aws.types.input.cloudfront.DistributionOrderedCacheBehavior[] = []
 
   if (config.serviceImage) {
     const portMappings: awsx.ecs.ContainerPortMappingProvider[] = []
-    const environment = [
+    environment = [
+      ...environment,
       variable('IMAGE', config.serviceImage),
       variable('SERVICE_NAME', serviceName),
       variable('SERVICE_VERSION', serviceVersion),
@@ -51,10 +53,13 @@ export async function buildGatsby(config: GatsbyOptions) {
     // if config.servicePaths !== false service will ve public
     if (config.servicePaths !== false) {
       // iniject public service environment
-      environment.push(variable('SERVICE_TLD', serviceTLD))
-      environment.push(variable('SERVICE_DOMAIN', serviceDomain))
-      environment.push(variable('SERVICE_URL', `https://${serviceDomain}`))
-      environment.push(variable('PORT', `${port}`))
+      environment = [
+        ...environment,
+        variable('SERVICE_TLD', serviceTLD),
+        variable('SERVICE_DOMAIN', serviceDomain),
+        variable('SERVICE_URL', `https://${serviceDomain}`),
+        variable('PORT', `${port}`)
+      ]
 
       // grant access to load banlancer
       securityGroups.push(await acceptAlbSecurityGroupId())
@@ -102,7 +107,7 @@ export async function buildGatsby(config: GatsbyOptions) {
         // create bucket and grant acccess
         const useBucket = config.useBucket === true ? [] : config.useBucket
         const bucket = addBucketResource(serviceName, access.user, useBucket)
-        environment.push(variable('AWS_BUCKET_NAME', bucket.bucket))
+        environment = [ ...environment, variable('AWS_BUCKET_NAME', bucket.bucket) ]
 
         // attach paths to cloudfront
         if (useBucket.length > 0) {
@@ -119,7 +124,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
         if (useEmail[0]) {
           addEmailResource(serviceName, access.user, useEmail)
-          environment.push(variable('AWS_EMAIL_DOMAIN', useEmail[0]))
+          environment = [ ...environment, variable('AWS_EMAIL_DOMAIN', useEmail[0]) ]
 
           for (const email of useEmail) {
             emailDomains.push(email)
@@ -127,8 +132,11 @@ export async function buildGatsby(config: GatsbyOptions) {
         }
       }
 
-      environment.push(variable('AWS_ACCESS_KEY', access.creds.id))
-      environment.push(variable('AWS_ACCESS_SECRET', access.creds.secret))
+      environment = [
+        ...environment,
+        variable('AWS_ACCESS_KEY', access.creds.id),
+        variable('AWS_ACCESS_SECRET', access.creds.secret),
+      ]
     }
 
     // create Fargate service
@@ -278,7 +286,8 @@ export async function buildGatsby(config: GatsbyOptions) {
     cloudfrontDistribution: cdn.id,
     cloudfrontDistributionBehaviors: {
       '*': cdn.defaultCacheBehavior.targetOriginId
-    }
+    },
+    environment,
   }
 
   for (const behavior of orderedCacheBehaviors) {
