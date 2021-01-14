@@ -44,6 +44,7 @@ export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string
     allowedMethods: ["GET", "HEAD", "OPTIONS"],
     cachedMethods: ["GET", "HEAD", "OPTIONS"],
     forwardedValues: {
+      headers: ["*"],
       cookies: { forward: "none" },
       queryString: false,
     },
@@ -62,6 +63,7 @@ export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: str
     allowedMethods: ["GET", "HEAD", "OPTIONS"],
     cachedMethods: ["GET", "HEAD", "OPTIONS"],
     forwardedValues: {
+      headers: ["*"],
       cookies: { forward: "none" },
       queryString: false,
     },
@@ -83,6 +85,7 @@ export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBala
     forwardedValues: {
       headers: ["*"],
       queryString: true,
+      queryStringCacheKeys: [],
       cookies: { forward: "none" },
     },
     minTtl: 0,

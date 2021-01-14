@@ -5,9 +5,7 @@
   "version": "0.1.0",
   "author": "",
   "proxy": [
-    "/api/*",
-    "/verify",
-    "/unsubscribe"
+    "/api/*"
   ],
   "dependencies": {
     "@types/apicache": "^1.2.2",
