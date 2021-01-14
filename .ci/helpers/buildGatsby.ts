@@ -38,7 +38,7 @@ export async function buildGatsby(config: GatsbyOptions) {
       variable('SERVICE_NAME', serviceName),
       variable('SERVICE_VERSION', serviceVersion),
       ...configurationEnvironment(),
-      ...config.serviceEnvironment,
+      ...(config.serviceEnvironment || []),
     ]
 
     const cluster = await getCluster()
