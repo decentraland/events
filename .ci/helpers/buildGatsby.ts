@@ -60,12 +60,11 @@ export async function buildGatsby(config: GatsbyOptions) {
       securityGroups.push(await acceptAlbSecurityGroupId())
 
       // create target group
-      const vpc = awsx.ec2.Vpc.getDefault()
       const { alb, listener } = await getAlb();
       const targetGroup = alb.createTargetGroup(("tg-" + serviceName).slice(-32), {
-        vpc,
         port,
         protocol: "HTTP",
+        vpc: awsx.ec2.Vpc.getDefault(),
         healthCheck: {
           path: config.serviceHealthCheck || "/api/status",
           matcher: "200",
@@ -116,7 +115,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
       if (config.useEmail) {
         // grant access to email service
-        const useEmail = config.useEmail === true ? [ serviceDomain ] : config.useEmail
+        const useEmail = config.useEmail === true ? [ decentralandDomain ] : config.useEmail
 
         if (useEmail[0]) {
           addEmailResource(serviceName, access.user, useEmail)
