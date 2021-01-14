@@ -12,7 +12,7 @@ export function getServiceVersion() {
     process.env['CI_COMMIT_BRANCH'] || 'current'
 }
 
-export function debug<T>(value: T): T {
-  console.log(value);
-  return
+export function debug<T extends (object | string | number | null | undefined)>(value: T): T {
+  console.log('debug:', JSON.stringify(value, null, 2));
+  return value
 }
