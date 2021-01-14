@@ -1,5 +1,6 @@
 import { buildGatsby } from "./helpers/buildGatsby";
-import { proxy } from "../package.json";
+
+const { proxy } = require("../package.json");
 
 export = async function main() {
   return buildGatsby({
