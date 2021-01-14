@@ -97,12 +97,12 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // attach AWS resources
     if (config.useBucket || config.useEmail) {
-      const access = createUser(`${serviceName}-user`)
+      const access = createUser(serviceName)
 
       if (config.useBucket) {
         // create bucket and grant acccess
         const useBucket = config.useBucket === true ? [] : config.useBucket
-        const bucket = addBucketResource(access.user, useBucket)
+        const bucket = addBucketResource(serviceName, access.user, useBucket)
         environment.push(variable('AWS_BUCKET_NAME', bucket.bucket))
 
         // attach paths to cloudfront
@@ -119,7 +119,7 @@ export async function buildGatsby(config: GatsbyOptions) {
         const useEmail = config.useEmail === true ? [ serviceDomain ] : config.useEmail
 
         if (useEmail[0]) {
-          addEmailResource(access.user, useEmail)
+          addEmailResource(serviceName, access.user, useEmail)
           environment.push(variable('AWS_EMAIL_DOMAIN', useEmail[0]))
 
           for (const email of useEmail) {

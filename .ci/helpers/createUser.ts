@@ -7,7 +7,12 @@ export type UserResource = {
   email?: string[] | boolean
 }
 
-export function createUser(name: string) {
+function getUserName(service: string) {
+  return `${service}-user`
+}
+
+export function createUser(service: string) {
+  const name = getUserName(service)
   const user = new aws.iam.User(name, { name });
   const creds = new aws.iam.AccessKey(name + "-key", { user: user.name });
   const role = new aws.iam.Role(`${name}-role`, {
@@ -26,8 +31,9 @@ export function createUser(name: string) {
   };
 }
 
-export function addBucketResource(user: aws.iam.User, paths: string[]) {
-  const name = user.name.get()
+
+export function addBucketResource(service: string, user: aws.iam.User, paths: string[]) {
+  const name = getUserName(service)
   const bucket = new aws.s3.Bucket(name)
   new aws.s3.BucketPolicy(`${name}-bucket-policy`, {
     bucket: bucket.bucket,
@@ -59,12 +65,10 @@ export function addBucketResource(user: aws.iam.User, paths: string[]) {
   return bucket
 }
 
-export function addEmailResource(user: aws.iam.User, domains: string[]) {
+export function addEmailResource(service: string, user: aws.iam.User, domains: string[]) {
   for (const domain of domains) {
-    const name = user.name.apply(name => `${name}-${slug(domain)}`).get()
-
+    const name = `${getUserName(service)}-${slug(domain)}`
     const domainIdentity = new aws.ses.DomainIdentity(`${name}-identity`, { domain })
-
     const policyDocument = all([user.arn, domainIdentity.arn]).apply(([user, domain]) => aws.iam.getPolicyDocument({
       version: '2012-10-17',
       statements: [
