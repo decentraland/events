@@ -8,6 +8,7 @@ import { acceptBastionSecurityGroupId } from "dcl-ops-lib/acceptBastion";
 import { acceptDbSecurityGroupId } from "dcl-ops-lib/acceptDb";
 import { accessTheInternetSecurityGroupId } from "dcl-ops-lib/accessTheInternet";
 import { getAlb } from "dcl-ops-lib/alb";
+import { getVpc } from "dcl-ops-lib/vpc";
 
 import { variable, configurationEnvironment } from "./env"
 import { albOrigin, apiBehavior, bucketOrigin, defaultStaticContentBehavior, immutableContentBehavior } from "./cloudfront";
@@ -60,11 +61,12 @@ export async function buildGatsby(config: GatsbyOptions) {
       securityGroups.push(await acceptAlbSecurityGroupId())
 
       // create target group
+      const vpc = await getVpc();
       const { alb, listener } = await getAlb();
       const targetGroup = alb.createTargetGroup(("tg-" + serviceName).slice(-32), {
+        vpc,
         port,
         protocol: "HTTP",
-        vpc: awsx.ec2.Vpc.getDefault(),
         healthCheck: {
           path: config.serviceHealthCheck || "/api/status",
           matcher: "200",
@@ -241,7 +243,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     .then((zone: { zoneId: string }) => zone.zoneId);
 
 
-  const aRecord = new aws.route53.Record(serviceDomain, {
+  new aws.route53.Record(serviceDomain, {
     name: serviceName,
     zoneId: hostedZoneId,
     type: "A",
