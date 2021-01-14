@@ -24,7 +24,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   const serviceTLD = config.usePublicTLD ? publicTLD : envTLD
   const serviceDomain = `${serviceName}.${decentralandDomain}`
   const emailDomains = []
-  const domains = [ serviceDomain, ...config.additionalDomains ]
+  const domains = [ serviceDomain, ...(config.additionalDomains || []) ]
   const port = config.servicePort || 4000
 
   // cloudfront mapping
