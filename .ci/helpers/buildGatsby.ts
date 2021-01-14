@@ -7,9 +7,9 @@ import { acceptAlbSecurityGroupId } from "dcl-ops-lib/acceptAlb";
 import { acceptBastionSecurityGroupId } from "dcl-ops-lib/acceptBastion";
 import { acceptDbSecurityGroupId } from "dcl-ops-lib/acceptDb";
 import { accessTheInternetSecurityGroupId } from "dcl-ops-lib/accessTheInternet";
-
-import { variable } from "./env"
 import { getAlb } from "dcl-ops-lib/alb";
+
+import { variable, configurationEnvironment } from "./env"
 import { albOrigin, apiBehavior, bucketOrigin, defaultStaticContentBehavior, immutableContentBehavior } from "./cloudfront";
 import { addBucketResource, addEmailResource, createUser } from "./createUser";
 import { getServiceVersion, slug } from "./utils";
@@ -33,10 +33,13 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   if (config.serviceImage) {
     const portMappings: awsx.ecs.ContainerPortMappingProvider[] = []
-    const environment = config.serviceEnvironment || []
-    environment.push(variable('IMAGE', config.serviceImage))
-    environment.push(variable('SERVICE_NAME', serviceName))
-    environment.push(variable('SERVICE_VERSION', serviceVersion))
+    const environment = [
+      variable('IMAGE', config.serviceImage),
+      variable('SERVICE_NAME', serviceName),
+      variable('SERVICE_VERSION', serviceVersion),
+      ...configurationEnvironment(),
+      ...config.serviceEnvironment,
+    ]
 
     const cluster = await getCluster()
     const securityGroups = await Promise.all([
@@ -64,7 +67,7 @@ export async function buildGatsby(config: GatsbyOptions) {
         port,
         protocol: "HTTP",
         healthCheck: {
-          path: "/api/status",
+          path: config.serviceHealthCheck || "/api/status",
           matcher: "200",
           interval: 10,
           unhealthyThreshold: 5,

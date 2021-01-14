@@ -1,5 +1,5 @@
-import * as awsx from "@pulumi/awsx";
 import * as pulumi from "@pulumi/pulumi";
+import * as awsx from "@pulumi/awsx";
 import { allConfig } from "@pulumi/pulumi/runtime/config";
 
 const config = new pulumi.Config();
@@ -15,19 +15,20 @@ export function secret(name: string, secretKey: string = name) {
   return variable(name, config.requireSecret(secretKey))
 }
 
-export function conf() {
+export function configurationEnvironment() {
   const settings = allConfig()
-  Object.keys(settings)
-    .forEach(key => {
+  return Object.keys(settings)
+    .map(key => {
       if (key.startsWith('aws:') && settings[key] !== '[secret]') {
-        const name = key.replace('/\W+/gi', '_').toUpperCase()
-        console.log(key, name, settings[key])
+        const name = key.replace(/\W+/gi, '_').toUpperCase()
+        const value = settings[key]
+        return { name, value }
 
       } else if (key.startsWith(config.name + ':') ) {
         const name = key.slice(config.name.length + 1)
         const value = settings[key] === '[secret]' ? config.requireSecret(name) : settings[key]
-        console.log(key, name, value)
-
+        return { name, value }
       }
     })
+    .filter(Boolean)
 }

@@ -26,64 +26,37 @@ build:code:
     - staging
     - release
   script:
-    - export PATH="$PATH:$HOME/.pulumi/bin"
-    - npm install --cache .npm --prefer-offline
 
+    # install dependencies
+    - npm install --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
+
+    # setup dcl environment
+    - export PATH="$PATH:$HOME/.pulumi/bin"
     - source dcl-env
 
+    # setup project environment
     - pulumi login -c "s3://$STATE_BUCKET/"
     - pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT"
     - source ./node_modules/.bin/pulumi-environment
 
+    # build source
+    - npm run build
+
+    # build docker
+    - export CI_REGISTRY_IMAGE="$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA"
     - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
-    # - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA" .
-    # - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - DOCKER_BUILDKIT=1 docker build --pull -t $CI_REGISTRY_IMAGE .
 
-    - cd .ci && npm install --cache ../.npm --prefer-offline
+    # push docker
+    - docker push $CI_REGISTRY_IMAGE
+
+    # push server
+    - cd .ci && npm install --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
+    - dcl-lock-sync
     - dcl-up $PULUMI_STACK
+    - dcl-sync-release
 
-
-
-
-
-# build:docker:
-#   stage: build
-#   image: docker:latest
-#   dependencies:
-#     - build:code
-#   only:
-#     - master
-#     - staging
-#     - release
-#   services:
-#     - docker:dind
-#   before_script:
-#     - source .ci/env.sh
-#     - source ".ci/.env.$NODE_ENV"
-#     - env
-#     - apk add --no-cache python3 py3-pip
-#     - pip install awscli
-#     - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY"
-#   script:
-#     - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
-#     - DOCKER_BUILDKIT=1 docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-
-# deploy:
-#   stage: deploy
-#   image: decentraland/ci-node:latest
-#   dependencies:
-#     - build:code
-#     - build:docker
-#   only:
-#     - master
-#     - staging
-#     - release
-#   script:
-#     - source .ci/env.sh
-#     - source ".ci/.env.$NODE_ENV"
-#     - cd .ci && npm install --cache ../.npm --prefer-offline
-#     - dcl-lock-sync
-#     - dcl-up website-referral
-#     - dcl-sync-release
-#     - cd .. && dcl-upload public
-#     - cd .ci && dcl-cache-invalidation
+    # push static
+    - cd .. && dcl-upload public
+    - cd .ci && dcl-cache-invalidation
+    - cd ..
