@@ -12,14 +12,12 @@ import { getAlb } from "dcl-ops-lib/alb";
 import { variable, configurationEnvironment } from "./env"
 import { albOrigin, apiBehavior, bucketOrigin, defaultStaticContentBehavior, immutableContentBehavior } from "./cloudfront";
 import { addBucketResource, addEmailResource, createUser } from "./createUser";
-import { getServiceVersion, slug } from "./utils";
-import { GatsbyOptions } from "./types";
 import { createHostForwardListenerRule } from "./alb";
+import { GatsbyOptions } from "./types";
 import { getCluster } from "./ecs";
+import { getServiceVersion, slug, debug } from "./utils";
 
 export async function buildGatsby(config: GatsbyOptions) {
-  console.log(`Creating gatsby service with:`, JSON.stringify(config, null, 2))
-
   const serviceName = slug(config.name);
   const serviceVersion = getServiceVersion()
   const decentralandDomain = config.usePublicTLD ? publicDomain : envDomain
@@ -198,9 +196,16 @@ export async function buildGatsby(config: GatsbyOptions) {
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
 
-  const cdn = new aws.cloudfront.Distribution(serviceName + "-cdn", {
-
+  const cdn = new aws.cloudfront.Distribution(serviceName + "-cdn", debug({
+    // From this field, you can enable or disable the selected distribution.
     enabled: true,
+
+    // (Optional) Specify the maximum HTTP version that you want viewers to use to communicate with CloudFront.
+    // The default value for new web distributions is http1.1. For viewers and CloudFront to use HTTP/2,
+    // viewers must support TLS 1.2 or later, and must support server name identification (SNI).
+    // In general, configuring CloudFront to communicate with viewers using HTTP/2 reduces latency.
+    // You can improve performance by optimizing for HTTP/2. (values: http1.1 | http2)
+    httpVersion: 'http2',
 
     // Alternate aliases the CloudFront distribution can be reached at, in addition to https://xxxx.cloudfront.net.
     // Required if you want to access the distribution via config.targetDomain as well.
@@ -217,6 +222,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // "All" is the most broad distribution, and also the most expensive.
     // "100" is the least broad, and also the least expensive.
+    // (values: PriceClass_100 | PriceClass_200 | PriceClass_All)
     priceClass: "PriceClass_100",
 
     // You can customize error responses. When CloudFront recieves an error from the origin (e.g. S3 or some other
@@ -225,23 +231,26 @@ export async function buildGatsby(config: GatsbyOptions) {
       { errorCode: 404, responseCode: 404, responsePagePath: "/404.html" }
     ],
 
+    // A complex type that identifies ways in which you want to restrict distribution of your content.
     restrictions: {
       geoRestriction: {
         restrictionType: "none",
       },
     },
 
+    // A complex type that determines the distribution’s SSL/TLS configuration for communicating with viewers.
     viewerCertificate: {
       acmCertificateArn: getCertificateFor(serviceDomain),
       sslSupportMethod: "sni-only",
     },
 
+    // A complex type that controls whether access logs are written for the distribution.
     loggingConfig: {
       bucket: logs.bucketDomainName,
       includeCookies: false,
       prefix: `${serviceDomain}/`,
     },
-  });
+  }));
 
   const hostedZoneId = aws.route53
     .getZone({ name: decentralandDomain }, { async: true })
@@ -264,6 +273,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   // Export properties from this stack. This prints them at the end of `pulumi up` and
   // makes them easier to access from the pulumi.com.
   const output: Record<string, any> = {
+    logsBuckt: logs.bucket,
     contentBucket: contentBucket.bucket,
     cloudfrontDistribution: cdn.id,
     cloudfrontDistributionBehaviors: {

@@ -11,3 +11,8 @@ export function getServiceVersion() {
     (process.env['CI_COMMIT_SHA'] && process.env['CI_COMMIT_SHA'].slice(0, 6)) ||
     process.env['CI_COMMIT_BRANCH'] || 'current'
 }
+
+export function debug<T>(value: T): T {
+  console.log(value);
+  return
+}
