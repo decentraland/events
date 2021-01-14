@@ -9,12 +9,9 @@ services:
 
 # Cache modules in between jobs
 cache:
-  # key: ${CI_COMMIT_REF_SLUG}
-  key: ${CI_COMMIT_REF_NAME}
+  key: ${CI_PROJECT_NAME}
   paths:
     - .npm/
-    - node_modules/
-    - .ci/node_modules/
 
 build:code:
   stage: install
