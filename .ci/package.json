@@ -1,7 +1,7 @@
 {
   "name": "website-events",
   "devDependencies": {
-    "@types/node": "^14.0.13"
+    "@types/node": "^14.14.20"
   },
   "dependencies": {
     "@pulumi/aws": "^3.14.0",

@@ -7,7 +7,7 @@ module.exports = {
     description: `Decentraland Events`,
     author: `@decentraland`,
   },
-  proxy: proxy(`http://localhost:3001`, pkg?.proxy?.proxy),
+  proxy: proxy(`http://localhost:3001`, pkg.proxy || []),
   plugins: [
     `gatsby-plugin-react-helmet`,
     {
