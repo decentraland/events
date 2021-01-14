@@ -4,6 +4,8 @@ config:
   events:ADMIN_ADDRESSES:
     secure: v1:bYzEa6iBdTPt6Hek:IZ096PIPrk2yijmhf81vp96vhrq2fH3S4Etu/UixUeA4iBBXjtpvpIVrAR51nnS17IVGftVnPb/GBNB7E+hmIgQDUuhRsC4JlnapdFvIBvUpz6/F1V2J9+x42eSsl2T4E/Twjmc=
   events:AWS_BUCKET_URL: https://events.decentraland.io
+  events:CONNECTION_STRING:
+    secure: v1:Qnl9UxZmPaJEnQKR:m9O+4z453mTgx6OsHhWXsl+EPIKz85GKp+xX+ALd/CXnf6cpqBpx2YufgyegT1eSzxJ92p7A7RUPo4+uJlW66C9Oi4mhvzJIX2H3uRU56tjxwg9Qv0kGj1f5x3iSUrQEWuXka6YtEeYcIdYJEAFiaGXbrVjR+fC7bCuKZ7j/
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
   events:GATSBY_EVENTS_URL: https://events.decentraland.io/api
   events:GATSBY_LAND_URL: https://api.decentraland.org/v1
