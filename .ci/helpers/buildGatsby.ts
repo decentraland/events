@@ -29,8 +29,8 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   // cloudfront mapping
   let environment: awsx.ecs.KeyValuePair[] = []
-  const origins: aws.types.input.cloudfront.DistributionOrigin[] = []
-  const orderedCacheBehaviors: aws.types.input.cloudfront.DistributionOrderedCacheBehavior[] = []
+  let serviceOrigins: aws.types.input.cloudfront.DistributionOrigin[] = []
+  let serviceOrderedCacheBehaviors: aws.types.input.cloudfront.DistributionOrderedCacheBehavior[] = []
 
   if (config.serviceImage) {
     const portMappings: awsx.ecs.ContainerPortMappingProvider[] = []
@@ -90,13 +90,17 @@ export async function buildGatsby(config: GatsbyOptions) {
       })
 
       // add load balancer to origin list
-      origins.push(albOrigin(alb))
+      serviceOrigins = [
+        ...serviceOrigins,
+        albOrigin(alb)
+      ]
 
       // map paths to load balancer
       const servicePaths = config.servicePaths || [ '/api/*' ]
-      for (const servicePath of servicePaths) {
-        orderedCacheBehaviors.push(apiBehavior(alb, servicePath))
-      }
+      serviceOrderedCacheBehaviors = [
+        ...serviceOrderedCacheBehaviors,
+        ...servicePaths.map(servicePath => apiBehavior(alb, servicePath))
+      ]
     }
 
     // attach AWS resources
@@ -111,10 +115,15 @@ export async function buildGatsby(config: GatsbyOptions) {
 
         // attach paths to cloudfront
         if (useBucket.length > 0) {
-          origins.push(bucketOrigin(bucket))
-          for (const path of useBucket) {
-            orderedCacheBehaviors.push(immutableContentBehavior(bucket, path))
-          }
+          serviceOrigins = [
+            ...serviceOrigins,
+            bucketOrigin(bucket)
+          ]
+
+          serviceOrderedCacheBehaviors = [
+            ...serviceOrderedCacheBehaviors,
+            ...useBucket.map(path => immutableContentBehavior(bucket, path))
+          ]
         }
       }
 
@@ -221,12 +230,17 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // We only specify one origin for this distribution, the S3 content bucket.
     defaultRootObject: "index.html",
-    origins: [],
+    origins: [
+      bucketOrigin(contentBucket),
+      ...serviceOrigins
+    ],
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
     defaultCacheBehavior: defaultStaticContentBehavior(contentBucket),
-    orderedCacheBehaviors: [],
+    orderedCacheBehaviors: [
+      ...serviceOrderedCacheBehaviors
+    ],
 
     // "All" is the most broad distribution, and also the most expensive.
     // "100" is the least broad, and also the least expensive.
@@ -290,7 +304,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     environment,
   }
 
-  for (const behavior of orderedCacheBehaviors) {
+  for (const behavior of serviceOrderedCacheBehaviors) {
     output.cloudfrontDistributionBehaviors[behavior.pathPattern.toString()] = behavior.targetOriginId
   }
 
