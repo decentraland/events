@@ -3,7 +3,7 @@ import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
 export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer): Output<aws.types.input.cloudfront.DistributionOrigin> {
-  return all([alb.loadBalancer.id, alb.loadBalancer.dnsName]).apply(([originId, domainName]) => ({
+  return all([alb.loadBalancer.arn, alb.loadBalancer.dnsName]).apply(([originId, domainName]) => ({
     // originId: elb.elbArn, //alb.loadBalancer.arn,
     // domainName: elb.dns,
     // originId: alb.loadBalancer.id, //alb.loadBalancer.arn,
@@ -77,7 +77,7 @@ export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: str
 }
 
 export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
-  return all([alb.loadBalancer.id]).apply(([targetOriginId]) => ({
+  return all([alb.loadBalancer.arn]).apply(([targetOriginId]) => ({
     compress: true,
     pathPattern,
     targetOriginId,
