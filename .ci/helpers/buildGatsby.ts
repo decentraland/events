@@ -232,14 +232,14 @@ export async function buildGatsby(config: GatsbyOptions) {
     defaultRootObject: "index.html",
     origins: [
       bucketOrigin(contentBucket),
-      ...serviceOrigins
+      // ...serviceOrigins
     ],
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
     defaultCacheBehavior: defaultStaticContentBehavior(contentBucket),
     orderedCacheBehaviors: [
-      ...serviceOrderedCacheBehaviors
+      // ...serviceOrderedCacheBehaviors
     ],
 
     // "All" is the most broad distribution, and also the most expensive.
