@@ -37,15 +37,15 @@ build:code:
     - source ./node_modules/.bin/pulumi-environment
 
     # build source
-    # - npm run build
+    - npm run build
 
     # build docker
-    # - export CI_REGISTRY_IMAGE="$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA"
-    # - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
-    # - DOCKER_BUILDKIT=1 docker build --pull -t $CI_REGISTRY_IMAGE .
+    - export CI_REGISTRY_IMAGE="$CI_REGISTRY_REPOSITORY_AWS/events:$CI_COMMIT_SHA"
+    - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
+    - DOCKER_BUILDKIT=1 docker build --pull -t $CI_REGISTRY_IMAGE .
 
     # push docker
-    # - docker push $CI_REGISTRY_IMAGE
+    - docker push $CI_REGISTRY_IMAGE
 
     # push server
     - cd .ci && npm install --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
@@ -54,6 +54,6 @@ build:code:
     - dcl-sync-release
 
     # push static
-    # - cd .. && dcl-upload public
-    # - cd .ci && dcl-cache-invalidation
-    # - cd ..
+    - cd .. && dcl-upload public
+    - cd .ci && dcl-cache-invalidation
+    - cd ..

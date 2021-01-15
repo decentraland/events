@@ -18,7 +18,6 @@ import { createHostForwardListenerRule } from "./alb";
 import { GatsbyOptions } from "./types";
 import { getCluster } from "./ecs";
 import { getServiceVersion, slug } from "./utils";
-import { ComprehendMedical } from "aws-sdk";
 
 export async function buildGatsby(config: GatsbyOptions) {
   const serviceName = slug(config.name);
@@ -336,11 +335,10 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   // export serviceEnvironment
   if (environment.length > 0) {
-    output.environment = {}
-
-    for (const env of environment) {
-      output.environment[env.name.toString()] = env.value
-    }
+    output.environment = all(environment).apply(values => values.reduce((envs, env) => {
+      output.environment[env.name] = env.value
+      return envs
+    }, {} as Record<string, string>))
   }
 
   // export serviceEmails
