@@ -189,11 +189,6 @@ export async function buildGatsby(config: GatsbyOptions) {
         },
       }
     );
-
-
-    console.log(service.cluster.vpc)
-    console.log(service.cluster.securityGroups)
-    console.log(serviceSecurityGroups)
   }
 
   // const userAndBucket = createBucketWithUser(`builder-assetpacks-${env}`)

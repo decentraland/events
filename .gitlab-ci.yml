@@ -49,9 +49,9 @@ build:code:
 
     # push server
     - cd .ci && npm install --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
-    - dcl-lock-sync
-    - dcl-up $PULUMI_STACK
-    - dcl-sync-release
+    # - dcl-lock-sync
+    # - dcl-up $PULUMI_STACK
+    # - dcl-sync-release
 
     # push static
     # - cd .. && dcl-upload public
