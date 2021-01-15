@@ -47,6 +47,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     const cluster = await getCluster()
     serviceSecurityGroups = [
+      ...serviceSecurityGroups,
       await acceptBastionSecurityGroupId(),
       await acceptDbSecurityGroupId(),
       await accessTheInternetSecurityGroupId(),
@@ -65,6 +66,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
       // grant access to load banlancer
       serviceSecurityGroups = [
+        ...serviceSecurityGroups,
         await acceptAlbSecurityGroupId()
       ]
 
