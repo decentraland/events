@@ -243,7 +243,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
     defaultCacheBehavior: defaultStaticContentBehavior(contentBucket),
     orderedCacheBehaviors: [
-      // ...serviceOrderedCacheBehaviors
+      ...serviceOrderedCacheBehaviors
     ],
 
     // "All" is the most broad distribution, and also the most expensive.
