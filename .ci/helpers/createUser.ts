@@ -34,7 +34,7 @@ export function createUser(service: string) {
 
 export function addBucketResource(service: string, user: aws.iam.User, paths: string[]) {
   const name = getUserName(service)
-  const bucket = new aws.s3.Bucket(name)
+  const bucket = new aws.s3.Bucket(name, { acl: paths.length > 0 ? "public-read" : "private" })
   new aws.s3.BucketPolicy(`${name}-bucket-policy`, {
     bucket: bucket.bucket,
     policy: all([ user.arn, bucket.bucket ]).apply(([ user, bucket]): aws.iam.PolicyDocument => ({
