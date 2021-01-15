@@ -309,8 +309,8 @@ export async function buildGatsby(config: GatsbyOptions) {
   // Export properties from this stack. This prints them at the end of `pulumi up` and
   // makes them easier to access from the pulumi.com.
   const output: Record<string, any> = {
+    bucketName: contentBucket.bucket,
     logsBucket: logs.bucket,
-    contentBucket: contentBucket.bucket,
     cloudfrontDistribution: cdn.id,
     cloudfrontDistributionBehaviors: cdn
       .apply(cdn => all([ cdn.defaultCacheBehavior, cdn.orderedCacheBehaviors])
