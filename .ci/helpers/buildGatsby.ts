@@ -17,7 +17,7 @@ import { addBucketResource, addEmailResource, createUser } from "./createUser";
 import { createHostForwardListenerRule } from "./alb";
 import { GatsbyOptions } from "./types";
 import { getCluster } from "./ecs";
-import { getServiceVersion, slug } from "./utils";
+import { debug, getServiceVersion, slug } from "./utils";
 
 export async function buildGatsby(config: GatsbyOptions) {
   const serviceName = slug(config.name);
@@ -234,10 +234,10 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // We only specify one origin for this distribution, the S3 content bucket.
     defaultRootObject: "index.html",
-    origins: [
+    origins: debug([
       bucketOrigin(contentBucket),
       ...serviceOrigins
-    ],
+    ]),
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
