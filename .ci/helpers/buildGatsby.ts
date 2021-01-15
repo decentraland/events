@@ -151,7 +151,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     // create Fargate service
     new awsx.ecs.FargateService(
       `${serviceName}-${serviceVersion}`,
-      {
+      debug({
         cluster,
         securityGroups,
         desiredCount: config.serviceDesiredCount || 1,
@@ -174,7 +174,7 @@ export async function buildGatsby(config: GatsbyOptions) {
             },
           },
         },
-      },
+      }),
       {
         customTimeouts: {
           create: "5m",
@@ -210,7 +210,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
 
-  const cdn = new aws.cloudfront.Distribution(serviceName + "-cdn", debug({
+  const cdn = new aws.cloudfront.Distribution(serviceName + "-cdn", {
     // From this field, you can enable or disable the selected distribution.
     enabled: true,
 
@@ -269,7 +269,7 @@ export async function buildGatsby(config: GatsbyOptions) {
       includeCookies: false,
       prefix: `${serviceDomain}/`,
     },
-  }));
+  });
 
   const hostedZoneId = aws.route53
     .getZone({ name: decentralandDomain }, { async: true })
@@ -298,11 +298,15 @@ export async function buildGatsby(config: GatsbyOptions) {
     cloudfrontDistributionBehaviors: {
       '*': cdn.defaultCacheBehavior.targetOriginId
     },
-    environment,
+    environment: {},
   }
 
   for (const behavior of serviceOrderedCacheBehaviors) {
     output.cloudfrontDistributionBehaviors[behavior.pathPattern.toString()] = behavior.targetOriginId
+  }
+
+  for (const env of environment) {
+    output.environment[env.name.toString()] = env.value
   }
 
   if (emailDomains.length > 0) {
