@@ -197,9 +197,9 @@ export async function buildGatsby(config: GatsbyOptions) {
   // contentBucket is the S3 bucket that the website's contents will be stored in.
   const contentBucket = new aws.s3.Bucket(serviceName + "-website", {
     acl: "public-read",
+
     // Configure S3 to serve bucket contents as a website. This way S3 will automatically convert
     // requests for "foo/" to "foo/index.html".
-
     website: {
       indexDocument: "index.html",
       errorDocument: "404.html",
@@ -207,6 +207,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     corsRules: [
       {
         allowedMethods: ["GET", "HEAD"],
+        exposeHeaders: ["ETag"],
         allowedOrigins: ["*"],
         maxAgeSeconds: 3600
       }

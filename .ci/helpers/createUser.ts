@@ -34,19 +34,26 @@ export function createUser(service: string) {
 
 export function addBucketResource(service: string, user: aws.iam.User, paths: string[]) {
   const name = getUserName(service)
-  const bucket = new aws.s3.Bucket(name, { acl: paths.length > 0 ? "public-read" : "private" })
+  const bucket = new aws.s3.Bucket(name,
+    paths.length === 0 ? { acl:  "private" } : {
+      acl: "public-read",
+      website: { indexDocument: 'index.html' },
+      corsRules: [
+        {
+          allowedMethods: ["GET", "HEAD"],
+          exposeHeaders: ["ETag"],
+          allowedOrigins: ["*"],
+          maxAgeSeconds: 3600
+        }
+      ]
+    }
+  )
+
   new aws.s3.BucketPolicy(`${name}-bucket-policy`, {
     bucket: bucket.bucket,
     policy: all([ user.arn, bucket.bucket ]).apply(([ user, bucket]): aws.iam.PolicyDocument => ({
       "Version": "2012-10-17",
       "Statement": [
-        ...paths.map(path => (
-          {
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": ["s3:GetObject"],
-            "Resource": [`arn:aws:s3:::${bucket}${path}`]
-          } as aws.iam.PolicyStatement)),
         {
           "Effect": "Allow",
           "Action": ["s3:*"],
