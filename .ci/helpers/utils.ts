@@ -13,6 +13,11 @@ export function getServiceVersion() {
 }
 
 export function debug<T extends (object | string | number | null | undefined)>(value: T): T {
-  console.log('debug:', JSON.stringify(value, null, 2));
+  try {
+    console.log('debug:', JSON.stringify(value, null, 2));
+  } catch (err) {
+    console.log('debug:', value);
+  }
+
   return value
 }
