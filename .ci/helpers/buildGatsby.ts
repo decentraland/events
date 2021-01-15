@@ -195,7 +195,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   // const userAndBucket = createBucketWithUser(`builder-assetpacks-${env}`)
   // contentBucket is the S3 bucket that the website's contents will be stored in.
-  const contentBucket = new aws.s3.Bucket(serviceName + "-website", {
+  const contentBucket = new aws.s3.Bucket(`${serviceName}-website`, {
     acl: "public-read",
 
     // Configure S3 to serve bucket contents as a website. This way S3 will automatically convert
@@ -214,6 +214,24 @@ export async function buildGatsby(config: GatsbyOptions) {
     ]
   });
 
+  new aws.s3.BucketPolicy(`${serviceName}-website-bucket-policy`, {
+    bucket: contentBucket.bucket,
+    policy: contentBucket.bucket.apply((bucket): aws.iam.PolicyDocument => ({
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                `arn:aws:s3:::${bucket}/*`
+            ]
+        }
+      ]
+    }))
+  })
 
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
