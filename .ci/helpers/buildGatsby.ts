@@ -160,9 +160,6 @@ export async function buildGatsby(config: GatsbyOptions) {
             service: {
               image: config.serviceImage,
               memoryReservation: config.serviceMemory || 256,
-              repositoryCredentials: {
-                credentialsParameter: 'arn:aws:secretsmanager:us-east-1:564327678575:secret:dev/docker/authorization-xr3Rh8'
-              },
               essential: true,
               environment,
               portMappings,
