@@ -55,6 +55,16 @@ export function addBucketResource(service: string, user: aws.iam.User, paths: st
       "Version": "2012-10-17",
       "Statement": [
         {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                `arn:aws:s3:::${bucket}/*`
+            ]
+        },
+        {
           "Effect": "Allow",
           "Action": ["s3:*"],
           "Principal": {
