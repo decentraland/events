@@ -298,19 +298,22 @@ export async function buildGatsby(config: GatsbyOptions) {
     cloudfrontDistributionBehaviors: {
       '*': cdn.defaultCacheBehavior.targetOriginId
     },
-    environment: {},
   }
 
   for (const behavior of serviceOrderedCacheBehaviors) {
     output.cloudfrontDistributionBehaviors[behavior.pathPattern.toString()] = behavior.targetOriginId
   }
 
-  for (const env of environment) {
-    output.environment[env.name.toString()] = env.value
-  }
-
   if (emailDomains.length > 0) {
     output.emailFromDomains = emailDomains
+  }
+
+  if (environment.length > 0) {
+    output.environment = {}
+
+    for (const env of environment) {
+      output.environment[env.name.toString()] = env.value
+    }
   }
 
   return output
