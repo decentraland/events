@@ -17,7 +17,8 @@ import { addBucketResource, addEmailResource, createUser } from "./createUser";
 import { createHostForwardListenerRule } from "./alb";
 import { GatsbyOptions } from "./types";
 import { getCluster } from "./ecs";
-import { debug, getServiceVersion, slug } from "./utils";
+import { getServiceVersion, slug } from "./utils";
+import { ComprehendMedical } from "aws-sdk";
 
 export async function buildGatsby(config: GatsbyOptions) {
   const serviceName = slug(config.name);
@@ -312,29 +313,39 @@ export async function buildGatsby(config: GatsbyOptions) {
     logsBucket: logs.bucket,
     contentBucket: contentBucket.bucket,
     cloudfrontDistribution: cdn.id,
-    cloudfrontDistributionBehaviors: {
-      '*': cdn.defaultCacheBehavior.targetOriginId
-    },
+    cloudfrontDistributionBehaviors: cdn
+      .apply(cdn => all([ cdn.defaultCacheBehavior, cdn.orderedCacheBehaviors])
+      .apply(([ defaultCacheBehavior, orderedCacheBehaviors ]) => {
+        const behaviors: Record<string, string> = {
+          '*': defaultCacheBehavior.targetOriginId
+        }
+
+        for (const behavior of orderedCacheBehaviors) {
+          behaviors[behavior.pathPattern] = behavior.targetOriginId
+        }
+
+        return behaviors
+      })
+    )
   }
 
-  for (const behavior of serviceOrderedCacheBehaviors) {
-    output.cloudfrontDistributionBehaviors[behavior.pathPattern.toString()] = behavior.targetOriginId
-  }
-
+  // export serviceSecurityGroups
   if (serviceSecurityGroups.length > 0) {
     output.securityGroups = serviceSecurityGroups
   }
 
-  if (emailDomains.length > 0) {
-    output.emailFromDomains = emailDomains
-  }
-
+  // export serviceEnvironment
   if (environment.length > 0) {
     output.environment = {}
 
     for (const env of environment) {
       output.environment[env.name.toString()] = env.value
     }
+  }
+
+  // export serviceEmails
+  if (emailDomains.length > 0) {
+    output.emailFromDomains = emailDomains
   }
 
   return output
