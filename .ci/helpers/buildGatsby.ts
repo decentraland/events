@@ -155,7 +155,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     }
 
     // create Fargate service
-    new awsx.ecs.FargateService(
+    const service = new awsx.ecs.FargateService(
       `${serviceName}-${serviceVersion}`,
       {
         cluster,
@@ -190,6 +190,10 @@ export async function buildGatsby(config: GatsbyOptions) {
       }
     );
 
+
+    console.log(service.cluster.vpc)
+    console.log(service.cluster.securityGroups)
+    console.log(serviceSecurityGroups)
   }
 
   // const userAndBucket = createBucketWithUser(`builder-assetpacks-${env}`)
