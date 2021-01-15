@@ -216,8 +216,20 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
-  const cdn = all([ all(serviceOrigins), all(serviceOrderedCacheBehaviors) ])
-  .apply(([ serviceOrigins, serviceOrderedCacheBehaviors ]) => new aws.cloudfront.Distribution(serviceName + "-cdn", debug({
+  const cdn = all([
+    bucketOrigin(contentBucket),
+    defaultStaticContentBehavior(contentBucket),
+    all(serviceOrigins),
+    all(serviceOrderedCacheBehaviors),
+    logs.bucketDomainName
+  ])
+  .apply(([
+    contentBucketOrigin,
+    defaultContentBehavior,
+    serviceOrigins,
+    serviceOrderedCacheBehaviors,
+    logsBucketDomainName
+  ]) => new aws.cloudfront.Distribution(serviceName + "-cdn", debug({
     // From this field, you can enable or disable the selected distribution.
     enabled: true,
 
@@ -235,16 +247,14 @@ export async function buildGatsby(config: GatsbyOptions) {
     // We only specify one origin for this distribution, the S3 content bucket.
     defaultRootObject: "index.html",
     origins: [
-      bucketOrigin(contentBucket),
+      contentBucketOrigin,
       ...serviceOrigins
     ],
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
-    defaultCacheBehavior: defaultStaticContentBehavior(contentBucket),
-    orderedCacheBehaviors: [
-      ...serviceOrderedCacheBehaviors
-    ],
+    defaultCacheBehavior: defaultContentBehavior,
+    orderedCacheBehaviors: [ ...serviceOrderedCacheBehaviors ],
 
     // "All" is the most broad distribution, and also the most expensive.
     // "100" is the least broad, and also the least expensive.
@@ -272,7 +282,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // A complex type that controls whether access logs are written for the distribution.
     loggingConfig: {
-      bucket: logs.bucketDomainName,
+      bucket: logsBucketDomainName,
       includeCookies: false,
       prefix: `${serviceDomain}/`,
     },
