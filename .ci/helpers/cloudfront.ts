@@ -68,7 +68,6 @@ export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: str
     allowedMethods: ["GET", "HEAD", "OPTIONS"],
     cachedMethods: ["GET", "HEAD", "OPTIONS"],
     forwardedValues: {
-      headers: ["*"],
       cookies: { forward: "none" },
       queryString: false,
     },
