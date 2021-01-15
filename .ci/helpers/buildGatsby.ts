@@ -9,6 +9,7 @@ import { acceptBastionSecurityGroupId } from "dcl-ops-lib/acceptBastion";
 import { acceptDbSecurityGroupId } from "dcl-ops-lib/acceptDb";
 import { accessTheInternetSecurityGroupId } from "dcl-ops-lib/accessTheInternet";
 import { getAlb } from "dcl-ops-lib/alb";
+import { getPrivateSubnetIds } from "dcl-ops-lib/network"
 
 import { variable, configurationEnvironment } from "./env"
 import { albOrigin, apiBehavior, bucketOrigin, defaultStaticContentBehavior, immutableContentBehavior } from "./cloudfront";
@@ -155,10 +156,11 @@ export async function buildGatsby(config: GatsbyOptions) {
     }
 
     // create Fargate service
-    const service = new awsx.ecs.FargateService(
+    new awsx.ecs.FargateService(
       `${serviceName}-${serviceVersion}`,
       {
         cluster,
+        subnets: await getPrivateSubnetIds(),
         securityGroups: serviceSecurityGroups,
         desiredCount: config.serviceDesiredCount || 1,
         taskDefinitionArgs: {
