@@ -1,3 +1,4 @@
+import { Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
@@ -15,7 +16,7 @@ import { addBucketResource, addEmailResource, createUser } from "./createUser";
 import { createHostForwardListenerRule } from "./alb";
 import { GatsbyOptions } from "./types";
 import { getCluster } from "./ecs";
-import { getServiceVersion, slug, debug } from "./utils";
+import { getServiceVersion, slug } from "./utils";
 
 export async function buildGatsby(config: GatsbyOptions) {
   const serviceName = slug(config.name);
@@ -31,6 +32,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   let environment: awsx.ecs.KeyValuePair[] = []
   let serviceOrigins: aws.types.input.cloudfront.DistributionOrigin[] = []
   let serviceOrderedCacheBehaviors: aws.types.input.cloudfront.DistributionOrderedCacheBehavior[] = []
+  let serviceSecurityGroups: Output<string>[] = []
 
   if (config.serviceImage) {
     const portMappings: awsx.ecs.ContainerPortMappingProvider[] = []
@@ -44,11 +46,11 @@ export async function buildGatsby(config: GatsbyOptions) {
     ]
 
     const cluster = await getCluster()
-    const securityGroups = await Promise.all([
-      acceptBastionSecurityGroupId(),
-      acceptDbSecurityGroupId(),
-      accessTheInternetSecurityGroupId()
-    ])
+    serviceSecurityGroups = [
+      await acceptBastionSecurityGroupId(),
+      await acceptDbSecurityGroupId(),
+      await accessTheInternetSecurityGroupId(),
+    ]
 
     // if config.servicePaths !== false service will ve public
     if (config.servicePaths !== false) {
@@ -62,7 +64,9 @@ export async function buildGatsby(config: GatsbyOptions) {
       ]
 
       // grant access to load banlancer
-      securityGroups.push(await acceptAlbSecurityGroupId())
+      serviceSecurityGroups = [
+        await acceptAlbSecurityGroupId()
+      ]
 
       // create target group
       const { alb, listener } = await getAlb();
@@ -153,7 +157,7 @@ export async function buildGatsby(config: GatsbyOptions) {
       `${serviceName}-${serviceVersion}`,
       {
         cluster,
-        securityGroups,
+        securityGroups: serviceSecurityGroups,
         desiredCount: config.serviceDesiredCount || 1,
         taskDefinitionArgs: {
           containers: {
@@ -292,7 +296,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   // Export properties from this stack. This prints them at the end of `pulumi up` and
   // makes them easier to access from the pulumi.com.
   const output: Record<string, any> = {
-    logsBuckt: logs.bucket,
+    logsBucket: logs.bucket,
     contentBucket: contentBucket.bucket,
     cloudfrontDistribution: cdn.id,
     cloudfrontDistributionBehaviors: {
@@ -302,6 +306,10 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   for (const behavior of serviceOrderedCacheBehaviors) {
     output.cloudfrontDistributionBehaviors[behavior.pathPattern.toString()] = behavior.targetOriginId
+  }
+
+  if (serviceSecurityGroups.length > 0) {
+    output.securityGroups = serviceSecurityGroups
   }
 
   if (emailDomains.length > 0) {
