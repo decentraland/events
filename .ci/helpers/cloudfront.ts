@@ -3,11 +3,9 @@ import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
 export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer): Output<aws.types.input.cloudfront.DistributionOrigin> {
-  return all([alb.loadBalancer.arn, alb.loadBalancer.dnsName]).apply(([originId, domainName]) => ({
-    // originId: elb.elbArn, //alb.loadBalancer.arn,
-    // domainName: elb.dns,
-    // originId: alb.loadBalancer.id, //alb.loadBalancer.arn,
-    // domainName: alb.loadBalancer.dnsName,
+  return all([ alb.loadBalancer ])
+  .apply(([loadBalancer]) => all([loadBalancer.arn, loadBalancer.dnsName])
+  .apply(([originId, domainName]) => ({
     originId,
     domainName,
     customOriginConfig: {
@@ -16,11 +14,13 @@ export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalanc
       httpsPort: 443,
       originSslProtocols: ["TLSv1.2"],
     }
-  }))
+  })))
 }
 
 export function bucketOrigin(bucket: aws.s3.Bucket): Output<aws.types.input.cloudfront.DistributionOrigin> {
-  return all([ bucket.arn, bucket.websiteEndpoint ]).apply(([originId, domainName]) => ({
+  return all([ bucket ])
+  .apply(([bucket]) => all([ bucket.arn, bucket.websiteEndpoint ])
+  .apply(([originId, domainName]) => ({
     originId,
     domainName,
     customOriginConfig: {
@@ -31,7 +31,8 @@ export function bucketOrigin(bucket: aws.s3.Bucket): Output<aws.types.input.clou
       httpsPort: 443,
       originSslProtocols: ["TLSv1.2"],
     },
-  }))
+  })
+  ))
 }
 
 export function defaultStaticContentBehavior(bucket: aws.s3.Bucket): Output<aws.types.input.cloudfront.DistributionDefaultCacheBehavior> {
