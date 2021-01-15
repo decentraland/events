@@ -1,6 +1,7 @@
 import { all, Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
+import { debug } from "./utils";
 
 export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer): Output<aws.types.input.cloudfront.DistributionOrigin> {
   return all([ alb.loadBalancer ])
@@ -20,7 +21,7 @@ export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalanc
 export function bucketOrigin(bucket: aws.s3.Bucket): Output<aws.types.input.cloudfront.DistributionOrigin> {
   return all([ bucket ])
   .apply(([bucket]) => all([ bucket.arn, bucket.websiteEndpoint ])
-  .apply(([originId, domainName]) => ({
+  .apply(([originId, domainName]) => debug([originId, domainName]) && debug({
     originId,
     domainName,
     customOriginConfig: {

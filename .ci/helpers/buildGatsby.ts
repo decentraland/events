@@ -229,7 +229,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     serviceOrigins,
     serviceOrderedCacheBehaviors,
     logsBucketDomainName
-  ]) => new aws.cloudfront.Distribution(serviceName + "-cdn", debug({
+  ]) => new aws.cloudfront.Distribution(serviceName + "-cdn", {
     // From this field, you can enable or disable the selected distribution.
     enabled: true,
 
@@ -286,7 +286,7 @@ export async function buildGatsby(config: GatsbyOptions) {
       includeCookies: false,
       prefix: `${serviceDomain}/`,
     },
-  })));
+  }));
 
   const hostedZoneId = aws.route53
     .getZone({ name: decentralandDomain }, { async: true })
