@@ -236,7 +236,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     defaultRootObject: "index.html",
     origins: [
       bucketOrigin(contentBucket),
-      // ...serviceOrigins
+      ...serviceOrigins
     ],
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
