@@ -40,6 +40,7 @@ export function defaultStaticContentBehavior(bucket: aws.s3.Bucket): Output<aws.
 
 export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
   return all([bucket.arn]).apply(([targetOriginId]) => ({
+    compress: true,
     targetOriginId,
     pathPattern,
     viewerProtocolPolicy: "redirect-to-https",
@@ -50,7 +51,6 @@ export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string
       cookies: { forward: "none" },
       queryString: false,
     },
-    compress: true,
     minTtl: 0,
     defaultTtl: 600,
     maxTtl: 600,
@@ -59,6 +59,7 @@ export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string
 
 export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
   return all([bucket.arn]).apply(([targetOriginId]) => ({
+    compress: true,
     targetOriginId,
     pathPattern,
     viewerProtocolPolicy: "redirect-to-https",
@@ -69,7 +70,6 @@ export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: str
       cookies: { forward: "none" },
       queryString: false,
     },
-    compress: true,
     minTtl: 1,
     defaultTtl: 86400,
     maxTtl: 31536000,
