@@ -69,7 +69,7 @@ export async function buildGatsby(config: GatsbyOptions) {
       const targetGroup = alb.createTargetGroup(("tg-" + serviceName).slice(-32), {
         port,
         protocol: "HTTP",
-        vpc: awsx.ec2.Vpc.getDefault(),
+        vpc: cluster.vpc,
         healthCheck: {
           path: config.serviceHealthCheck || "/api/status",
           matcher: "200",
