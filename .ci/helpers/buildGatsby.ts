@@ -151,7 +151,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     // create Fargate service
     new awsx.ecs.FargateService(
       `${serviceName}-${serviceVersion}`,
-      debug({
+      {
         cluster,
         securityGroups,
         desiredCount: config.serviceDesiredCount || 1,
@@ -174,7 +174,7 @@ export async function buildGatsby(config: GatsbyOptions) {
             },
           },
         },
-      }),
+      },
       {
         customTimeouts: {
           create: "5m",
