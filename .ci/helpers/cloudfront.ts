@@ -1,25 +1,28 @@
+import { all, Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
-export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer): aws.types.input.cloudfront.DistributionOrigin {
-  return {
+export function albOrigin(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer): Output<aws.types.input.cloudfront.DistributionOrigin> {
+  return all([alb.loadBalancer.id, alb.loadBalancer.dnsName]).apply(([originId, domainName]) => ({
     // originId: elb.elbArn, //alb.loadBalancer.arn,
     // domainName: elb.dns,
-    originId: alb.loadBalancer.id, //alb.loadBalancer.arn,
-    domainName: alb.loadBalancer.dnsName,
+    // originId: alb.loadBalancer.id, //alb.loadBalancer.arn,
+    // domainName: alb.loadBalancer.dnsName,
+    originId,
+    domainName,
     customOriginConfig: {
       originProtocolPolicy: "https-only",
       httpPort: 80,
       httpsPort: 443,
       originSslProtocols: ["TLSv1.2"],
     }
-  }
+  }))
 }
 
-export function bucketOrigin(bucket: aws.s3.Bucket): aws.types.input.cloudfront.DistributionOrigin {
-  return {
-    originId: bucket.arn,
-    domainName: bucket.websiteEndpoint,
+export function bucketOrigin(bucket: aws.s3.Bucket): Output<aws.types.input.cloudfront.DistributionOrigin> {
+  return all([ bucket.arn, bucket.websiteEndpoint ]).apply(([originId, domainName]) => ({
+    originId,
+    domainName,
     customOriginConfig: {
       // Amazon S3 doesn't support HTTPS connections when using an S3 bucket configured as a website endpoint.
       // https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesOriginProtocolPolicy
@@ -28,17 +31,16 @@ export function bucketOrigin(bucket: aws.s3.Bucket): aws.types.input.cloudfront.
       httpsPort: 443,
       originSslProtocols: ["TLSv1.2"],
     },
-  }
+  }))
 }
 
-export function defaultStaticContentBehavior(bucket: aws.s3.Bucket): aws.types.input.cloudfront.DistributionDefaultCacheBehavior {
-  const { pathPattern, ...behavior } = staticContentBehavior(bucket, '/*')
-  return behavior
+export function defaultStaticContentBehavior(bucket: aws.s3.Bucket): Output<aws.types.input.cloudfront.DistributionDefaultCacheBehavior> {
+  return staticContentBehavior(bucket, '/*').apply(({ pathPattern, ...behavior }) => behavior)
 }
 
-export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string): aws.types.input.cloudfront.DistributionOrderedCacheBehavior {
-  return {
-    targetOriginId: bucket.arn,
+export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
+  return all([bucket.arn]).apply(([targetOriginId]) => ({
+    targetOriginId,
     pathPattern,
     viewerProtocolPolicy: "redirect-to-https",
     allowedMethods: ["GET", "HEAD", "OPTIONS"],
@@ -52,12 +54,12 @@ export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string
     minTtl: 0,
     defaultTtl: 600,
     maxTtl: 600,
-  }
+  }))
 }
 
-export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: string): aws.types.input.cloudfront.DistributionOrderedCacheBehavior {
-  return {
-    targetOriginId: bucket.arn,
+export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
+  return all([bucket.arn]).apply(([targetOriginId]) => ({
+    targetOriginId,
     pathPattern,
     viewerProtocolPolicy: "redirect-to-https",
     allowedMethods: ["GET", "HEAD", "OPTIONS"],
@@ -71,14 +73,14 @@ export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: str
     minTtl: 1,
     defaultTtl: 86400,
     maxTtl: 31536000,
-  }
+  }))
 }
 
-export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer, pathPattern: string): aws.types.input.cloudfront.DistributionOrderedCacheBehavior {
-  return {
+export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
+  return all([alb.loadBalancer.id]).apply(([targetOriginId]) => ({
     compress: true,
     pathPattern,
-    targetOriginId: alb.loadBalancer.id,
+    targetOriginId,
     viewerProtocolPolicy: "redirect-to-https",
     allowedMethods: ["HEAD", "OPTIONS", "GET", "POST", "DELETE", "PUT", "PATCH"],
     cachedMethods: ["HEAD", "OPTIONS", "GET"],
@@ -91,5 +93,5 @@ export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBala
     minTtl: 0,
     defaultTtl: 0,
     maxTtl: 0
-  }
+  }))
 }

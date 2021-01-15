@@ -1,4 +1,4 @@
-import { Output } from "@pulumi/pulumi";
+import { Output, all } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
@@ -31,8 +31,8 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   // cloudfront mapping
   let environment: awsx.ecs.KeyValuePair[] = []
-  let serviceOrigins: aws.types.input.cloudfront.DistributionOrigin[] = []
-  let serviceOrderedCacheBehaviors: aws.types.input.cloudfront.DistributionOrderedCacheBehavior[] = []
+  let serviceOrigins: Output<aws.types.input.cloudfront.DistributionOrigin>[] = []
+  let serviceOrderedCacheBehaviors: Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior>[] = []
   let serviceSecurityGroups: Output<string>[] = []
 
   if (config.serviceImage) {
@@ -216,8 +216,8 @@ export async function buildGatsby(config: GatsbyOptions) {
 
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
-
-  const cdn = new aws.cloudfront.Distribution(serviceName + "-cdn", {
+  const cdn = all([ all(serviceOrigins), all(serviceOrderedCacheBehaviors) ])
+  .apply(([ serviceOrigins, serviceOrderedCacheBehaviors ]) => new aws.cloudfront.Distribution(serviceName + "-cdn", debug({
     // From this field, you can enable or disable the selected distribution.
     enabled: true,
 
@@ -234,10 +234,10 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // We only specify one origin for this distribution, the S3 content bucket.
     defaultRootObject: "index.html",
-    origins: debug([
+    origins: [
       bucketOrigin(contentBucket),
       ...serviceOrigins
-    ]),
+    ],
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
@@ -276,14 +276,13 @@ export async function buildGatsby(config: GatsbyOptions) {
       includeCookies: false,
       prefix: `${serviceDomain}/`,
     },
-  });
+  })));
 
   const hostedZoneId = aws.route53
     .getZone({ name: decentralandDomain }, { async: true })
-    .then((zone: { zoneId: string }) => zone.zoneId);
+    .then((zone: { zoneId: string }) => zone.zoneId)
 
-
-  new aws.route53.Record(serviceDomain, {
+  all([ cdn ]).apply(([cdn]) => new aws.route53.Record(serviceDomain, {
     name: serviceName,
     zoneId: hostedZoneId,
     type: "A",
@@ -294,7 +293,7 @@ export async function buildGatsby(config: GatsbyOptions) {
         evaluateTargetHealth: false,
       },
     ],
-  });
+  }))
 
   // Export properties from this stack. This prints them at the end of `pulumi up` and
   // makes them easier to access from the pulumi.com.
