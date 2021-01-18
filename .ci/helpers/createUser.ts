@@ -118,10 +118,10 @@ export function addEmailResource(service: string, user: aws.iam.User, domains: s
       })
   });
 
-  all([ user.arn, policy.arn])
-    .apply(([ user, policy ]) => new aws.iam.PolicyAttachment(`${getUserName(service)}-ses-attachment`, {
-      users: [user],
-      policyArn: policy
+  all([ user.name, policy.arn])
+    .apply(([ user, policyArn ]) => new aws.iam.UserPolicyAttachment(`${getUserName(service)}-ses-attachment`, {
+      policyArn,
+      user,
     }));
 
   return true
