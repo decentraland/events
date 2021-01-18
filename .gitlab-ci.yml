@@ -33,13 +33,13 @@ build:code:
 
     # setup project environment
     - pulumi login -c "s3://$STATE_BUCKET/"s
-    - |
-        if pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT" then \
-          echo "[stack $stack] Stack exists ✅"; \
-        else \
-          pulumi stack --cwd .ci init "$PULUMI_STACK-$ENVIRONMENT" \
-          echo "[stack $stack] Stack created ✅"; \
-        fi \
+    - >
+        if pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT" then
+          echo "[stack $stack] Stack exists ✅";
+        else
+          pulumi stack --cwd .ci init "$PULUMI_STACK-$ENVIRONMENT"
+          echo "[stack $stack] Stack created ✅";
+        fi
 
     - source ./node_modules/.bin/pulumi-environment
 
