@@ -107,5 +107,22 @@ export function addEmailResource(service: string, user: aws.iam.User, domains: s
     })
   }
 
+  const policy = new aws.iam.Policy(`${getUserName(service)}-ses-policy`, {
+      policy: JSON.stringify({
+          Version: "2012-10-17",
+          Statement: [{
+              Action: [ "ses:*" ],
+              Effect: "Allow",
+              Resource: "*"
+          }]
+      })
+  });
+
+  all([ user.arn, policy.arn])
+    .apply(([ user, policy ]) => new aws.iam.PolicyAttachment(`${getUserName(service)}-ses-attachment`, {
+      users: [user],
+      policyArn: policy
+    }));
+
   return true
 }
