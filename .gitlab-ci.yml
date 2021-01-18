@@ -34,6 +34,14 @@ build:code:
     # setup project environment
     - pulumi login -c "s3://$STATE_BUCKET/"
     - pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT"
+    - |
+        if pulumi stack select $stack; then
+          echo "[stack $stack] Stack exists ✅";
+        else
+          pulumi stack init $stack
+          echo "[stack $stack] Stack created ✅";
+        fi
+
     - source ./node_modules/.bin/pulumi-environment
 
     # build source
