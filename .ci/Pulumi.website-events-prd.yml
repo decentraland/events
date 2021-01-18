@@ -3,7 +3,7 @@ config:
   aws:region: us-east-1
   events:ADMIN_ADDRESSES:
     secure: v1:6FRgPL2jfVEkgzts:YxsDF2RpsMvkoLlrc3b7kot8J+1zX7L093+0uyvJQymeppwcPL4FHL0/dgh9YwQxBZEaTeXMMvNjrQqFgycxy40rOvkNAmGGYYIzoCDH+67PwcUsU+/SzEKVOiVZy5oQMPFfDoO93tfMZbz5HB+bko9GsgR43mrTbCOJKp+1nfWlKKebqz8DGBjwsf+VghcHroQhooLeST97C2llbNKgEiPE/jfXGTi4ZL+l1MlSKePFzYciNLkI0gRalg==
-  events:AWS_BUCKET_URL: https://api.decentraland.org
+  events:AWS_BUCKET_URL: https://events.decentraland.org
   events:CONNECTION_STRING:
     secure: v1:+ENLPDJ1vziMEZz3:vHMhEu64mNHnit53Yf3l5kvvYbnBj3EZTWvTBIUcOXrV+X0mtYboiZt0v0GSb0rgQojXFOz8Rvx0fQiX5yRBw5hVpRKgKV2CS+qgLepF8lo1aFxHqe0H0WWOgpLhVlXwk84DJeocVVoRM+6tktUUluhJ+u+QWqR2+vyXKeMi
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
