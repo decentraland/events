@@ -32,8 +32,7 @@ build:code:
     - source dcl-env
 
     # setup project environment
-    - pulumi login -c "s3://$STATE_BUCKET/"
-    - pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT"
+    - pulumi login -c "s3://$STATE_BUCKET/"s
     - |
         if pulumi stack --cwd .ci select "$PULUMI_STACK-$ENVIRONMENT" then
           echo "[stack $stack] Stack exists ✅";
