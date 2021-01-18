@@ -204,6 +204,7 @@ export async function buildGatsby(config: GatsbyOptions) {
       indexDocument: "index.html",
       errorDocument: "404.html",
     },
+
     corsRules: [
       {
         allowedMethods: ["GET", "HEAD"],

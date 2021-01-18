@@ -48,7 +48,6 @@ export function staticContentBehavior(bucket: aws.s3.Bucket, pathPattern: string
     allowedMethods: ["GET", "HEAD", "OPTIONS"],
     cachedMethods: ["GET", "HEAD", "OPTIONS"],
     forwardedValues: {
-      headers: ["*"],
       cookies: { forward: "none" },
       queryString: false,
     },
