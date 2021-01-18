@@ -89,7 +89,7 @@ export async function updateProfileSettings(req: WithAuth) {
     newProfile.email_verified_at = null
     emailVerificationRequired = true
   }
-  
+
   if (
     newProfile.email &&
     profile.email === newProfile.email &&
@@ -124,16 +124,16 @@ async function sendVerification(user: string, email: string) {
       email: email,
       exp: Date.now() + 15 * Datetime.Minute
     }
-  
+
     const verificationUrl = new URL(EVENTS_URL)
-    verificationUrl.pathname = SUBSCRIPTION_PATH + '/'
+    verificationUrl.pathname = SUBSCRIPTION_PATH
     verificationUrl.searchParams.set(DATA_PARAM, sign(verificationData, SIGN_SECRET))
     await sendEmailVerification(email, verificationUrl.toString())
   }
 }
 
 /**
- * 
+ *
  */
 async function checkSubscription(
   req: Request,
