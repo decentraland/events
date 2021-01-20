@@ -51,6 +51,7 @@
   flex: 1 1 auto;
   max-width: 90%;
   overflow: auto;
+  word-break: break-word;
 }
 
 .EventSection .EventSection__Detail .dg.ImgAvatar {
