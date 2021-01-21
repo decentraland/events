@@ -283,9 +283,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // You can customize error responses. When CloudFront recieves an error from the origin (e.g. S3 or some other
     // web service) it can return a different error code, and return the response for a different resource.
-    customErrorResponses: [
-      { errorCode: 404, responseCode: 404, responsePagePath: "/404.html" }
-    ],
+    customErrorResponses: [],
 
     // A complex type that identifies ways in which you want to restrict distribution of your content.
     restrictions: {
