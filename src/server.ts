@@ -23,7 +23,6 @@ jobs.cron('@eachMinute', updateNextStartAt)
 
 const app = express()
 app.set('x-powered-by', false)
-app.use(social)
 app.use('/api', [
   ddos(),
   status(),
@@ -43,7 +42,7 @@ app.use('/api', [
 
 app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
-
+app.use(logger(), social)
 app.use(filesystem('public', '404.html'))
 
 Promise.resolve()
@@ -51,6 +50,6 @@ Promise.resolve()
   .then(() => jobs.start())
   .then(() => listen(
     app,
-    process.env.PORT || 3001,
+    process.env.PORT || 4000,
     process.env.HOST
   ))
