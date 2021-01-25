@@ -1,7 +1,3 @@
-import { Location as HLocation } from 'history';
-import { TemporaryCredentials } from 'aws-sdk';
-
-export type WindowLocation = Window['location'] & HLocation;
 
 export default {
 
@@ -21,31 +17,31 @@ export default {
     return pathname + params + hash
   },
 
-  toMyEvents(location: WindowLocation) {
+  toMyEvents(location: Location) {
     return this.toUrl('/me')
   },
 
-  toSubmit(location: WindowLocation) {
+  toSubmit(location: Location) {
     return this.toUrl('/submit')
   },
 
-  toSettings(location: WindowLocation) {
+  toSettings(location: Location) {
     return this.toUrl('/settings')
   },
 
-  toHome(location: WindowLocation) {
+  toHome(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.delete('event')
     targetSearchParams.delete('view')
     return this.toUrl('/', targetSearchParams.toString())
   },
 
-  isHome(location: WindowLocation) {
+  isHome(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
     return !targetSearchParams.has('event') && !targetSearchParams.has('view')
   },
 
-  toEvent(location: WindowLocation, eventId: string, myEvents: boolean = false) {
+  toEvent(location: Location, eventId: string, myEvents: boolean = false) {
     const path = myEvents ? '/me/' : '/'
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set('event', eventId)
@@ -53,41 +49,41 @@ export default {
     return this.toUrl(path, targetSearchParams.toString())
   },
 
-  isEvent(location: WindowLocation) {
+  isEvent(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
     return targetSearchParams.has('event') && !targetSearchParams.has('view')
   },
 
-  getEventId(location: WindowLocation) {
+  getEventId(location: Location) {
     const searchParams = new URLSearchParams(location.search)
     return location && searchParams.get('event') || null
   },
 
-  toEventEdit(location: WindowLocation, eventId: string) {
+  toEventEdit(location: Location, eventId: string) {
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set('event', eventId)
     targetSearchParams.set('view', 'edit')
     return this.toUrl('/submit', targetSearchParams.toString())
   },
 
-  isEventEdit(location: WindowLocation) {
+  isEventEdit(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
     return targetSearchParams.has('event') && targetSearchParams.get('view') === 'edit'
   },
 
-  toEventClone(location: WindowLocation, eventId: string) {
+  toEventClone(location: Location, eventId: string) {
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set('event', eventId)
     targetSearchParams.set('view', 'clone')
     return this.toUrl('/submit', targetSearchParams.toString())
   },
 
-  isEventClone(location: WindowLocation) {
+  isEventClone(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
     return targetSearchParams.has('event') && targetSearchParams.get('view') === 'clone'
   },
 
-  toEventAttendees(location: WindowLocation, eventId: string, myEvents: boolean = false) {
+  toEventAttendees(location: Location, eventId: string, myEvents: boolean = false) {
     const path = myEvents ? '/me/' : '/'
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set('event', eventId)
@@ -95,7 +91,7 @@ export default {
     return this.toUrl(path, targetSearchParams.toString())
   },
 
-  isEventAttendees(location: WindowLocation) {
+  isEventAttendees(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
     return targetSearchParams.has('event') && targetSearchParams.get('view') === 'attendees'
   },
