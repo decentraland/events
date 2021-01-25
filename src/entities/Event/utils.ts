@@ -1,12 +1,17 @@
-import { EventAttributes, MonthMask, WeekdayMask, Weekdays, Months, Position, RecurrentEventAttributes, Frequency, MAX_EVENT_RECURRENT } from './types'
+import { EventAttributes, MonthMask, WeekdayMask, Weekdays, Months, Position, RecurrentEventAttributes, MAX_EVENT_RECURRENT } from './types'
 import { RRule, Weekday } from 'rrule'
 
 const DECENTRALAND_URL = process.env.GATSBY_DECENTRALAND_URL || process.env.DECENTRALAND_URL || 'https://play.decentraland.org'
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
 
-export function eventUrl(event: EventAttributes): string {
+export function siteUrl() {
   const target = new URL(EVENTS_URL)
   target.pathname = ''
+  return target
+}
+
+export function eventUrl(event: EventAttributes): string {
+  const target = siteUrl()
   target.searchParams.set('event', event.id)
   return target.toString()
 }
