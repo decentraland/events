@@ -12,6 +12,10 @@ export default function HTML(props) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
+        <link rel="stylesheet" href="semantic.min.css" />
+        <link rel="stylesheet" href="balloon.min.css" />
+        <link rel="stylesheet" href="base-theme.css" />
+        <link rel="stylesheet" href="light-theme.css" />
         {props.headComponents}
       </head>
       <body {...props.bodyAttributes}>

@@ -18,7 +18,6 @@ import Datetime from "decentraland-gatsby/dist/utils/Datetime"
 import { navigate } from 'gatsby-plugin-intl'
 
 import Layout from "../components/Layout/Layout"
-import SEO from "../components/seo"
 import useEventEditor from "../hooks/useEventEditor"
 import BackButton from "../components/Button/BackButton"
 import AddCoverButton from "../components/Button/AddCoverButton"
@@ -297,8 +296,7 @@ export default function SubmitPage(props: any) {
   const now = Date.now()
 
   return (
-    <Layout {...props} onOpenProfile={handleSettings}>
-      <SEO title="Submit event" />
+    <Layout {...props} onOpenProfile={handleSettings} title="Submit event" >
       <ConfirmModal open={state.requireConfirmation} onClose={() => patchState({ requireConfirmation: false })}>
         <Title>Are you absolutely sure?</Title>
         <Paragraph>This action <Bold>cannot</Bold> be undone. This will permanently delete the <Bold>{event ? event.name : 'this'}</Bold> event</Paragraph>

@@ -6,13 +6,8 @@
  */
 
 import React, { useState, useEffect } from "react"
-import { DropdownProps } from "semantic-ui-react"
+import { DropdownProps } from "semantic-ui-react/dist/commonjs/modules/Dropdown/Dropdown"
 import { /* Link, */ changeLocale } from "gatsby-plugin-intl"
-
-import 'semantic-ui-css/semantic.min.css'
-import 'balloon-css/balloon.min.css'
-import 'decentraland-ui/dist/themes/base-theme.css'
-import 'decentraland-ui/dist/themes/alternative/light-theme.css'
 
 import { Footer } from "decentraland-ui/dist/components/Footer/Footer"
 import { Locale } from "decentraland-ui/dist/components/LanguageIcon/LanguageIcon"
@@ -23,8 +18,9 @@ import useWindowScroll from "decentraland-gatsby/dist/hooks/useWindowScroll"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
 
-import "./Layout.css"
 import TokenList from "decentraland-gatsby/dist/utils/TokenList"
+import SEO from "../seo"
+import "./Layout.css"
 
 export default function Layout({ children, ...props }: any) {
   const language: Locale = props?.pageContext?.intl?.language || 'en'
@@ -46,6 +42,7 @@ export default function Layout({ children, ...props }: any) {
 
   return (
     <>
+      <SEO title={props.title} />
       <Navbar
         activePage="events"
         className={isScrolled ? "" : "initial"}

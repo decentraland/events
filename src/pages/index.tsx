@@ -9,9 +9,12 @@ import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
+import Title from "decentraland-gatsby/dist/components/Text/Title"
+import Datetime from "decentraland-gatsby/dist/utils/Datetime"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -19,23 +22,19 @@ import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import EventCardBig from "../components/Event/EventCardBig/EventCardBig"
 import Carousel from "../components/Carousel/Carousel"
 import SubmitButton from "../components/Button/SubmitButton"
-import useListEvents from '../hooks/useListEvents'
-import useListEventsByMonth from '../hooks/useListEventsByMonth'
-import { SessionEventAttributes } from "../entities/Event/types"
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
-import SEO from "../components/seo"
-import url from '../utils/url'
+import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
+import { SessionEventAttributes } from "../entities/Event/types"
+
+import useListEventsByMonth from '../hooks/useListEventsByMonth'
+import useListEvents from '../hooks/useListEvents'
 import useSiteStore from '../hooks/useSiteStore'
-import * as segment from '../utils/segment'
 import useAnalytics from "../hooks/useAnalytics"
 
-import './index.css'
-import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
-import Title from "decentraland-gatsby/dist/components/Text/Title"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import Datetime from "decentraland-gatsby/dist/utils/Datetime"
+import * as segment from '../utils/segment'
+import url from '../utils/url'
 
-const invertedAdd = require('../images/inverted-add.svg')
+import './index.css'
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -164,8 +163,7 @@ export default function IndexPage(props: any) {
   }
 
   return (
-    <Layout {...props} onOpenProfile={handleSettings}>
-      <SEO title={title} />
+    <Layout {...props} onOpenProfile={handleSettings} title={title}>
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)}>
         <Title>Notifications</Title>

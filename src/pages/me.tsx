@@ -19,18 +19,17 @@ import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import useListEvents from '../hooks/useListEvents'
 import { SessionEventAttributes } from "../entities/Event/types"
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
-import SEO from "../components/seo"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
 import * as segment from '../utils/segment'
 import useAnalytics from "../hooks/useAnalytics"
 
-import './index.css'
 import SubmitButton from "../components/Button/SubmitButton"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import './index.css'
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -147,8 +146,7 @@ export default function IndexPage(props: any) {
   }
 
   return (
-    <Layout {...props} onOpenProfile={handleSettings}>
-      <SEO title={title} />
+    <Layout {...props} onOpenProfile={handleSettings} title={title}>
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)}>
         <Title>Notifications</Title>

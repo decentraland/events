@@ -9,16 +9,12 @@ import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import Link from "decentraland-gatsby/dist/components/Text/Link"
-
 import SubmitButton from "../components/Button/SubmitButton"
-import SEO from "../components/seo"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
 import * as segment from '../utils/segment'
 import useAnalytics from "../hooks/useAnalytics"
 import { ProfileSettingsAttributes, EmailSubscriptionStatus } from "../entities/ProfileSettings/types"
-
 
 import './settings.css'
 
@@ -66,8 +62,7 @@ export default function SettingsPage(props: any) {
   }
 
   return (
-    <Layout {...props} active>
-      <SEO title={title} />
+    <Layout {...props} title={title} active>
       <div style={{ paddingTop: "75px" }} />
       <Tabs>
         <Tabs.Tab onClick={handleHome}>World Events</Tabs.Tab>

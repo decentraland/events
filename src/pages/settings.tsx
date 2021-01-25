@@ -21,7 +21,6 @@ import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import SubmitButton from "../components/Button/SubmitButton"
-import SEO from "../components/seo"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
 import * as segment from '../utils/segment'
@@ -38,8 +37,8 @@ import isEmail from "validator/lib/isEmail"
 import track from "decentraland-gatsby/dist/components/Segment/track"
 import Datetime from "decentraland-gatsby/dist/utils/Datetime"
 
-import './settings.css'
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
+import './settings.css'
 
 export type SettingsPageState = {
   updating: Partial<{
@@ -83,7 +82,7 @@ export default function SettingsPage(props: any) {
     ) {
       return true
     }
-    
+
     return false
   }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
 
@@ -95,7 +94,7 @@ export default function SettingsPage(props: any) {
     if (emailVerificationCountdown.time === 0) {
       return l.str(`settings.profile_section.email_reverifying_message`) || ''
     }
-    
+
     const seconds = emailVerificationCountdown.minutes * 60 + emailVerificationCountdown.seconds
     return l.str(`settings.profile_section.email_verifying_message`, { seconds }) || ''
   }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
@@ -204,8 +203,7 @@ export default function SettingsPage(props: any) {
   }
 
   return (
-    <Layout {...props} active>
-      <SEO title={title} />
+    <Layout {...props} title={title} active>
       <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <div style={{ paddingTop: "75px" }} />
       <Tabs>

@@ -73,3 +73,7 @@ public
 tmp
 node_modules
 tsconfig.tsbuildinfo
+static/balloon.min.css
+static/base-theme.css
+static/light-theme.css
+static/semantic.min.css
