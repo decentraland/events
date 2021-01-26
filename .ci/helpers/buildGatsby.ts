@@ -235,7 +235,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   })
 
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
-  const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "private" });
+  const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "log-delivery-write" });
   const cdn = all([
     bucketOrigin(contentBucket),
     defaultStaticContentBehavior(contentBucket),
