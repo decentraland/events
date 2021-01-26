@@ -42,7 +42,7 @@ app.use('/api', [
 
 app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
-app.use(logger(), social)
+app.use('/', [ logger(), social ])
 app.use(filesystem('public', '404.html'))
 
 Promise.resolve()
