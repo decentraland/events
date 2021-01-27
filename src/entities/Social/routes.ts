@@ -76,7 +76,7 @@ export async function injectHomeMetadata(req: Request) {
   return replaceHelmetMetadata(page.toString(), {
     title: 'Decentraland Events',
     description: 'Live music, conferences, and more in a community built virtual world.',
-    image: 'https://decentraland.org/images/logo.png',
+    image: 'https://decentraland.org/images/decentraland.png',
     url,
     "og:type": 'website',
     "twitter:card": 'summary',
@@ -90,8 +90,8 @@ export async function injectSubmitMetadata(req: Request) {
   const url = siteUrl().toString() + req.originalUrl.slice(1)
   return replaceHelmetMetadata(page.toString(), {
     title: 'Submit an Event',
-    description: 'Live music, conferences, and more in a community built virtual world.',
-    image: 'https://decentraland.org/images/logo.png',
+    description: 'Organize and host your own community event in Decentraland.',
+    image: 'https://decentraland.org/images/decentraland.png',
     url,
     "og:site_name": "Decentraland Events",
     "og:type": 'website',
@@ -109,7 +109,7 @@ export async function injectEventMetadata(req: Request) {
       const page = await readFile(req)
       return replaceHelmetMetadata(page.toString(), {
         title: escape(event.name) + ' | Decentraland Events',
-        description: escape(event.description),
+        description: escape((event.description || '').trim()),
         image: event.image || '',
         url: eventUrl(event),
         "og:type": 'website',
