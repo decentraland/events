@@ -33,7 +33,6 @@ export async function buildGatsby(config: GatsbyOptions) {
   let environment: awsx.ecs.KeyValuePair[] = []
   let serviceOrigins: Output<aws.types.input.cloudfront.DistributionOrigin>[] = []
   let serviceOrderedCacheBehaviors: Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior>[] = []
-  let defaultContentBehavior: Output<aws.types.input.cloudfront.DistributionDefaultCacheBehavior>
   let serviceSecurityGroups: Output<string>[] = []
 
   if (config.serviceImage) {
@@ -109,10 +108,6 @@ export async function buildGatsby(config: GatsbyOptions) {
         ...serviceOrderedCacheBehaviors,
         ...servicePaths.map(servicePath => serverBehavior(alb, servicePath))
       ]
-
-      if (servicePaths.includes('/')) {
-        defaultContentBehavior = defaultServerBehavior(alb)
-      }
     }
 
     // attach AWS resources
@@ -245,22 +240,10 @@ export async function buildGatsby(config: GatsbyOptions) {
     bucketOrigin(contentBucket)
   ]
 
-  // if there isn't any default behavior use the content bucket
-  // otherwise add it to the behaviors list
-  if (!defaultContentBehavior) {
-    defaultContentBehavior = defaultStaticContentBehavior(contentBucket)
-
-  } else {
-    serviceOrderedCacheBehaviors = [
-      ...serviceOrderedCacheBehaviors,
-      staticContentBehavior(contentBucket, '/*')
-    ]
-  }
-
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "log-delivery-write" });
   const cdn = all([
-    defaultContentBehavior || defaultStaticContentBehavior(contentBucket),
+    defaultStaticContentBehavior(contentBucket),
     all(serviceOrigins),
     all(serviceOrderedCacheBehaviors),
     logs.bucketDomainName
