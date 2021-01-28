@@ -75,7 +75,11 @@ export function immutableContentBehavior(bucket: aws.s3.Bucket, pathPattern: str
   }))
 }
 
-export function apiBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
+export function defaultServerBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer): Output<aws.types.input.cloudfront.DistributionDefaultCacheBehavior> {
+  return serverBehavior(alb, '/*').apply(({ pathPattern, ...behavior }) => behavior)
+}
+
+export function serverBehavior(alb: awsx.elasticloadbalancingv2.ApplicationLoadBalancer, pathPattern: string): Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior> {
   return all([alb.loadBalancer.arn]).apply(([targetOriginId]) => ({
     compress: true,
     pathPattern,

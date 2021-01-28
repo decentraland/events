@@ -12,7 +12,7 @@ import { getAlb } from "dcl-ops-lib/alb";
 import { getPrivateSubnetIds } from "dcl-ops-lib/network"
 
 import { variable, configurationEnvironment } from "./env"
-import { albOrigin, apiBehavior, bucketOrigin, defaultStaticContentBehavior, immutableContentBehavior } from "./cloudfront";
+import { albOrigin, serverBehavior, bucketOrigin, defaultStaticContentBehavior, immutableContentBehavior, defaultServerBehavior, staticContentBehavior } from "./cloudfront";
 import { addBucketResource, addEmailResource, createUser } from "./createUser";
 import { createHostForwardListenerRule } from "./alb";
 import { GatsbyOptions } from "./types";
@@ -33,6 +33,7 @@ export async function buildGatsby(config: GatsbyOptions) {
   let environment: awsx.ecs.KeyValuePair[] = []
   let serviceOrigins: Output<aws.types.input.cloudfront.DistributionOrigin>[] = []
   let serviceOrderedCacheBehaviors: Output<aws.types.input.cloudfront.DistributionOrderedCacheBehavior>[] = []
+  let defaultContentBehavior: Output<aws.types.input.cloudfront.DistributionDefaultCacheBehavior>
   let serviceSecurityGroups: Output<string>[] = []
 
   if (config.serviceImage) {
@@ -106,8 +107,12 @@ export async function buildGatsby(config: GatsbyOptions) {
       const servicePaths = config.servicePaths || [ '/api/*' ]
       serviceOrderedCacheBehaviors = [
         ...serviceOrderedCacheBehaviors,
-        ...servicePaths.map(servicePath => apiBehavior(alb, servicePath))
+        ...servicePaths.map(servicePath => serverBehavior(alb, servicePath))
       ]
+
+      if (servicePaths.includes('/')) {
+        defaultContentBehavior = defaultServerBehavior(alb)
+      }
     }
 
     // attach AWS resources
@@ -234,17 +239,33 @@ export async function buildGatsby(config: GatsbyOptions) {
     }))
   })
 
+  // add bucket to the origin list
+  serviceOrigins = [
+    ...serviceOrigins,
+    bucketOrigin(contentBucket)
+  ]
+
+  // if there isn't any default behavior use the content bucket
+  // otherwise add it to the behaviors list
+  if (!defaultContentBehavior) {
+    defaultContentBehavior = defaultStaticContentBehavior(contentBucket)
+
+  } else {
+    serviceOrderedCacheBehaviors = [
+      ...serviceOrderedCacheBehaviors,
+      staticContentBehavior(contentBucket, '/*')
+    ]
+  }
+
   // logsBucket is an S3 bucket that will contain the CDN's request logs.
   const logs = new aws.s3.Bucket(serviceName + "-logs", { acl: "log-delivery-write" });
   const cdn = all([
-    bucketOrigin(contentBucket),
-    defaultStaticContentBehavior(contentBucket),
+    defaultContentBehavior || defaultStaticContentBehavior(contentBucket),
     all(serviceOrigins),
     all(serviceOrderedCacheBehaviors),
     logs.bucketDomainName
   ])
   .apply(([
-    contentBucketOrigin,
     defaultContentBehavior,
     serviceOrigins,
     serviceOrderedCacheBehaviors,
@@ -266,10 +287,7 @@ export async function buildGatsby(config: GatsbyOptions) {
 
     // We only specify one origin for this distribution, the S3 content bucket.
     defaultRootObject: "index.html",
-    origins: [
-      contentBucketOrigin,
-      ...serviceOrigins
-    ],
+    origins: [ ...serviceOrigins ],
 
     // A CloudFront distribution can configure different cache behaviors based on the request path.
     // Here we just specify a single, default cache behavior which is just read-only requests to S3.
