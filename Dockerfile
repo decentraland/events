@@ -16,7 +16,7 @@ WORKDIR /app
 COPY ./package-lock.json /app/package-lock.json
 COPY ./package.json      /app/package.json
 
-RUN npm ci
+RUN NODE_ENV=production npm ci
 RUN apk del native-deps && rm -rf /var/cache/apk/*
 
 COPY ./lib               /app/lib
