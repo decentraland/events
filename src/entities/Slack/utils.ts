@@ -1,10 +1,11 @@
 import fetch from 'isomorphic-fetch'
-import { DeprecatedEventAttributes } from '../Event/types';
+import { resolve } from 'url'
 import isURL from 'validator/lib/isURL';
 import env from 'decentraland-gatsby/dist/utils/env';
-import { resolve } from 'url'
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { Avatar } from 'decentraland-gatsby/dist/utils/api/Katalyst';
+import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
+import { DeprecatedEventAttributes } from '../Event/types';
 
 const SLACK_WEBHOOK = env('SLACK_WEBHOOK', '')
 const EVENTS_URL = env('EVENTS_URL', 'https://events.centraland.org/api')
@@ -64,9 +65,16 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
   )
 }
 
-
+const latestEditNotification = new Map<string, number>()
 export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
+  const now = Date.now()
+  const latestNotification = latestEditNotification.get(event.id) || 0
+  if ((now - latestNotification) < Datetime.Minute) {
+    return
+  }
+
   console.log(`sending edited event "${event.id}" to slack`)
+  latestEditNotification.set(event.id, now)
   await sendToSlack({
     "blocks": [
       {
@@ -77,8 +85,7 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
         }
       }
     ]
-  }
-  )
+  })
 }
 
 export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, emailNotifications: number, pushNotifications: number) {
@@ -147,4 +154,4 @@ async function sendToSlack(body: object) {
   } catch (error) {
     console.error(`Slack service error: ` + error.message, error)
   }
-} 
+}
