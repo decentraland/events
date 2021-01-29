@@ -10,6 +10,15 @@ export type GatsbyOptions = {
   name: string;
 
   /**
+   * path of the content will by upload to the content bucket
+   */
+  contentDirectory: string;
+
+  useContentMetadata?: Record<string, Partial<{
+
+  }>>
+
+  /**
    * define which tld (top level domain will be used)
    * - if `true` will use `.org`, `.today`, `.zone` and `.system`
    * - if `false` will use `.co`, `.net`, `.io` and `.system`

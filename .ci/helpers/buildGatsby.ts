@@ -202,7 +202,7 @@ export async function buildGatsby(config: GatsbyOptions) {
     // requests for "foo/" to "foo/index.html".
     website: {
       indexDocument: "index.html",
-      errorDocument: "404.html",
+      errorDocument: "404.html"
     },
 
     corsRules: [

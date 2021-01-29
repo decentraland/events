@@ -40,7 +40,7 @@ build:code:
         pulumi stack --cwd .ci init "$PULUMI_STACK-$ENVIRONMENT"
         echo "[stack $stack] Stack created ✅";
       fi
-    - source ./node_modules/.bin/pulumi-environment
+    - source ./node_modules/.bin/setup-environment
 
     # build source
     - npm run build
@@ -54,12 +54,10 @@ build:code:
     - docker push $CI_REGISTRY_IMAGE
 
     # push server
-    - cd .ci && npm install --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
     - dcl-lock-sync
     - dcl-up $PULUMI_STACK
     - dcl-sync-release
 
     # push static
-    - cd .. && dcl-upload public
-    - cd .ci && dcl-cache-invalidation
-    - cd ..
+    # - cd .. && dcl-upload public
+    - dcl-cache-invalidation

@@ -17,6 +17,7 @@ COPY ./package-lock.json /app/package-lock.json
 COPY ./package.json      /app/package.json
 
 RUN NODE_ENV=production npm ci
+RUN npm prune --production
 RUN apk del native-deps && rm -rf /var/cache/apk/*
 
 COPY ./lib               /app/lib

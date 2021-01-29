@@ -1,16 +1,14 @@
-import { buildGatsby } from "./helpers/buildGatsby";
+import { resolve } from "path";
+import { buildGatsby } from "./.ci/helpers/buildGatsby";
 const { gatsby } = require("../package.json");
 
 export = async function main() {
   return buildGatsby({
     name: 'events',
+    contentDirectory: resolve(__dirname, '../public'),
     usePublicTLD: process.env['USE_PUBLIC_TLD'] === 'true',
     serviceImage: process.env['CI_REGISTRY_IMAGE'],
     servicePaths: [
-      '/',
-      '/me/',
-      '/settings/',
-      '/submit/',
       '/en/',
       '/en/me/',
       '/en/settings/',
