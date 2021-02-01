@@ -102,8 +102,9 @@ export async function injectSubmitMetadata(req: Request) {
 }
 
 export async function injectEventMetadata(req: Request) {
-  if (isUUID(req.query.event || '')) {
-    const event = await EventModel.findOne<EventAttributes>({ id: req.query.event, rejected: false, approved: true })
+  const id = String(req.query.event || '')
+  if (isUUID(id)) {
+    const event = await EventModel.findOne<EventAttributes>({ id, rejected: false, approved: true })
 
     if (event) {
       const page = await readFile(req)

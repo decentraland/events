@@ -78,8 +78,9 @@ export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
   }
 
   if (req.query['user']) {
-    if (isEthereumAddress(req.query['user'])) {
-      options.user = String(req.query['user']).toLowerCase()
+    const user = String(req.query['user'])
+    if (isEthereumAddress(user)) {
+      options.user = user.toLowerCase()
     } else {
 
       // invalid user address
@@ -153,7 +154,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   if (!data.realm) {
     data.realm = null
   }
-  
+
   if (!data.url) {
     data.url = eventTargetUrl(data)
   }
@@ -262,7 +263,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
   } else if (!isAdmin(user)) {
     notifyEditedEvent(updatedEvent)
   }
-  
+
   return EventModel.toPublic(updatedEvent, user)
 }
 
@@ -274,7 +275,7 @@ async function notifyEvent(req: WithEvent<WithAuthProfile<WithAuth>>) {
     return {}
   }
 
-  
+
   const attendee: EventAttendeeAttributes = {
     event_id: event.id,
     user: profile.ethAddress,
