@@ -24,6 +24,7 @@ import { EventAttendeeAttributes } from '../EventAttendee/types';
 import ProfileSettingsModel from '../ProfileSettings/model'
 import ProfileSubscriptionModel from '../ProfileSubscription/model'
 import { notify } from './cron';
+import API from 'decentraland-gatsby/dist/utils/api/API';
 
 const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
 export const BASE_PATH = '/events/:eventId'
@@ -171,8 +172,8 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const event_id = uuid()
   const x = data.x
   const y = data.y
-  const content = await Land.get().getMapContent([x, y], [x, y])
-  const estate = content.assets.estates[0]
+  const content = await API.catch(Land.get().getMapContent([x, y], [x, y]))
+  const estate = content?.assets.estates[0]
   const image = data.image || (estate ? Land.get().getEstateImage(estate.id) : Land.get().getParcelImage([x, y]))
   const user_name = userProfile.name || null;
   const estate_id = estate?.id || null;
@@ -231,8 +232,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   const x = updatedAttributes.x
   const y = updatedAttributes.y
-  const content = await Land.get().getMapContent([x, y], [x, y])
-  const estate = content.assets.estates[0]
+  const content = await API.catch(Land.get().getMapContent([x, y], [x, y]))
+  const estate = content?.assets.estates[0]
   updatedAttributes.estate_id = estate?.id || updatedAttributes.estate_id
   updatedAttributes.estate_name = estate?.data?.name || updatedAttributes.estate_name
   updatedAttributes.scene_name = updatedAttributes.estate_name
