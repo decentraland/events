@@ -60,5 +60,5 @@ build:code:
     - dcl-sync-release
 
     # push static
-    - ./node_modules/.bin/setup-stack public
+    - ./node_modules/.bin/setup-bucket public
     - dcl-cache-invalidation
