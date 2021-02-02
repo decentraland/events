@@ -207,7 +207,7 @@ export default function SubmitPage(props: any) {
       })
       .catch((error) => {
         GLOBAL_LOADING = false
-        patchState({ loading: false, error: error.message })
+        patchState({ loading: false, error: error.body?.error || error.message })
       })
   }
 
