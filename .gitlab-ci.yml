@@ -27,7 +27,20 @@ build:code:
     # install dependencies
     - npm ci --cache .npm --prefer-offline
 
-    - ./node_modules/.bin/setup-stack
+    # setup dcl environment
+    - export PATH="$PATH:$HOME/.pulumi/bin"
+    - source dcl-env
+
+    # setup project environment
+    - pulumi login -c "s3://$STATE_BUCKET/"
+    - >
+      if pulumi stack select "$PULUMI_STACK-$ENVIRONMENT"; then
+        echo "[stack $stack] Stack exists ✅";
+      else
+        pulumi stack init "$PULUMI_STACK-$ENVIRONMENT"
+        echo "[stack $stack] Stack created ✅";
+      fi
+
     - source ./node_modules/.bin/setup-environment
 
     # build source
