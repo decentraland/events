@@ -45,8 +45,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         }
       }
     ]
-  }
-  )
+  })
 }
 
 export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
