@@ -6,7 +6,7 @@ import { withEvent, WithEvent } from "../Event/middleware";
 import { EventAttendeeAttributes } from './types';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import EventModel from '../Event/model';
-import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
+import { withAuthProfile, WithAuthProfile } from 'decentraland-gatsby/dist/entities/Profile/middleware'
 import { getProfileSettings } from '../ProfileSettings/routes';
 
 export default routes((router) => {

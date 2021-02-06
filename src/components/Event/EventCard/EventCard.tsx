@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
-import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
+import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
 import { SessionEventAttributes } from '../../../entities/Event/types'
@@ -11,7 +11,6 @@ import './EventCard.css'
 import EventDate from '../EventDate/EventDate'
 import StartIn from '../../Badge/StartIn'
 
-const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const EVENTS_LIST = 3
 
 export type EventCardProps = {
@@ -38,7 +37,7 @@ export default function EventCard(props: EventCardProps) {
       <div />
       <StartIn date={nextStartAt} />
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
-        {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <ImgAvatar size="mini" key={address} address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
+        {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <Avatar size="mini" key={address} address={address} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
           <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
         </div>}

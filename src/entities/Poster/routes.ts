@@ -7,7 +7,7 @@ import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middlewar
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES, PosterAttributes, extension } from './types'
-import { withAuthProfile } from '../Profile/middleware'
+import { withAuthProfile } from 'decentraland-gatsby/dist/entities/Profile/middleware'
 
 let BUCKET_CHECKED = false;
 let BUCKET_CHECKED_JOB: Promise<void> | null = null

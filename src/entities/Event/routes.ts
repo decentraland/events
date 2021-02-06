@@ -13,7 +13,7 @@ import { withEvent, WithEvent } from './middleware';
 import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import { bool, integer } from 'decentraland-gatsby/dist/entities/Route/param';
-import { withAuthProfile, WithAuthProfile } from '../Profile/middleware';
+import { withAuthProfile, WithAuthProfile } from 'decentraland-gatsby/dist/entities/Profile/middleware';
 import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
 import { Request } from 'express';

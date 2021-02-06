@@ -6,14 +6,13 @@ import Events from '../../../../api/Events'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
-import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
+import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 
 import './EventAttendeeList.css'
 
 const back = require('../../../../images/popup-back.svg')
 const close = require('../../../../images/popup-close.svg')
-const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 
 const attendees = new Map<string, EventAttendeeAttributes[]>()
 
@@ -55,7 +54,7 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
     {list && list.length === 0 && <div />}
     {list && list.length > 0 && list.map((attendee) => {
       return <div key={attendee.user} className="EventAttendeeList__Item">
-        <ImgAvatar address={attendee.user} src={`${EVENTS_URL}/profile/${attendee.user.toString()}/face.png`} />
+        <Avatar address={attendee.user} />
         <Paragraph>{attendee.user_name || 'Guest'}</Paragraph>
       </div>
     })}

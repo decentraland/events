@@ -5,7 +5,7 @@
  * See: https://www.gatsbyjs.org/docs/use-static-query/
  */
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { DropdownProps } from "semantic-ui-react/dist/commonjs/modules/Dropdown/Dropdown"
 import { /* Link, */ changeLocale } from "gatsby-plugin-intl"
 
@@ -13,7 +13,7 @@ import { Footer } from "decentraland-ui/dist/components/Footer/Footer"
 import { Locale } from "decentraland-ui/dist/components/LanguageIcon/LanguageIcon"
 import { Navbar } from "decentraland-ui/dist/components/Navbar/Navbar"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
-import ImgAvatar from "decentraland-gatsby/dist/components/Profile/ImgAvatar"
+import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
 import useWindowScroll from "decentraland-gatsby/dist/hooks/useWindowScroll"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
@@ -49,7 +49,9 @@ export default function Layout({ children, ...props }: any) {
         rightMenu={(actions.provider || !isMobile) && <>
           {!profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.connect()}>Sign in</Button>}
           {profile && <Button size="small" basic loading={actions.loading} disabled={actions.loading} onClick={() => actions.disconnect()}>Logout</Button>}
-          {profile && <div onClick={props.onOpenProfile} className={TokenList.join(['dcl', 'profile', props.active && 'active'])}><ImgAvatar size="small" profile={profile} /></div>}
+          {profile && <div onClick={props.onOpenProfile} className={TokenList.join(['dcl', 'profile', props.active && 'active'])}>
+            <Avatar size="small" address={profile.address.toString()} />
+          </div>}
         </>}
       />
       <div>{children}</div>

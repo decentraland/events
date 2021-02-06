@@ -6,7 +6,7 @@ import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
-import ImgAvatar from 'decentraland-gatsby/dist/components/Profile/ImgAvatar'
+import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
 import { SessionEventAttributes } from '../../../../entities/Event/types'
 import JumpInButton from '../../../Button/JumpInButton'
@@ -20,10 +20,6 @@ const info = require('../../../../images/secondary-info.svg')
 const pin = require('../../../../images/secondary-pin.svg')
 const friends = require('../../../../images/secondary-friends.svg')
 
-const MINUTE = 1000 * 60
-const HOUR = MINUTE * 60
-const DAY = HOUR * 24
-const EVENTS_URL = process.env.GATSBY_EVENTS_URL || '/api'
 const ATTENDEES_PREVIEW_LIMIT = 12
 
 export type EventDetailProps = {
@@ -124,7 +120,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {props.showAttendees !== false && <EventSection>
         <EventSection.Icon src={friends} width="16x" height="16" center />
         <EventSection.Detail style={{ display: 'flex', justifyContent: attendeesDiff > 0 ? 'space-around' : '' }}>
-          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <ImgAvatar key={address} size="small" address={address} src={`${EVENTS_URL}/profile/${address.toString()}/face.png`} />)}
+          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <Avatar key={address} size="small" address={address} />)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
         </EventSection.Detail>
         <EventSection.Action>

@@ -6,7 +6,6 @@ import { status, logger, ddos, filesystem } from 'decentraland-gatsby/dist/entit
 import database from 'decentraland-gatsby/dist/entities/Database/index'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
-import profiles from './entities/Profile/routes'
 import social from './entities/Social/routes'
 import poster from './entities/Poster/routes'
 import realms from './entities/Realm/routes'
@@ -31,7 +30,6 @@ app.use('/api', [
   events,
   poster,
   attendees,
-  profiles,
   profileSettings,
   profileSubscription,
   realms,
