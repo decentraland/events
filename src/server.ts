@@ -4,6 +4,7 @@ import Manager from 'decentraland-gatsby/dist/entities/Job/job'
 import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
 import { status, logger, ddos, filesystem } from 'decentraland-gatsby/dist/entities/Route/routes'
 import database from 'decentraland-gatsby/dist/entities/Database/index'
+import profile from 'decentraland-gatsby/dist/entities/Profile/routes'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
 import social from './entities/Social/routes'
@@ -32,6 +33,7 @@ app.use('/api', [
   attendees,
   profileSettings,
   profileSubscription,
+  profile,
   realms,
   handle(async () => {
     throw new RequestError('NotFound', RequestError.NotFound)

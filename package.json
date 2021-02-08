@@ -12,7 +12,8 @@
     "proxy": [
       "/api/*",
       "/verify",
-      "/unsubscribe"
+      "/unsubscribe",
+      "/metrics"
     ]
   },
   "proxy": [
