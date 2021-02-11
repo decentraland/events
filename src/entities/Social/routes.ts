@@ -1,64 +1,26 @@
 import { resolve } from 'path'
-import { Request, Response } from "express";
+import { Request } from "express";
 import { escape } from "html-escaper";
 import isUUID from "validator/lib/isUUID";
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils";
 import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file";
+import { handleRaw } from 'decentraland-gatsby/dist/entities/Route/handle';
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
-import EventModel from "../Event/model";
-import { EventAttributes } from "../Event/types";
 import { eventUrl, siteUrl } from '../Event/utils';
-import { AsyncHandler } from 'decentraland-gatsby/dist/entities/Route/handle';
-import Context from 'decentraland-gatsby/dist/entities/Route/context';
-import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
+import { EventAttributes } from "../Event/types";
+import EventModel from "../Event/model";
 
 export default routes((router) => {
-  router.get('/', handle(injectHomeMetadata))
-  router.get('/en/', handle(injectHomeMetadata))
-  router.get('/me/', handle(injectHomeMetadata))
-  router.get('/en/me/', handle(injectHomeMetadata))
-  router.get('/settings/', handle(injectHomeMetadata))
-  router.get('/en/settings/', handle(injectHomeMetadata))
+  router.get('/', handleRaw(injectHomeMetadata, 'html'))
+  router.get('/en/', handleRaw(injectHomeMetadata, 'html'))
+  router.get('/me/', handleRaw(injectHomeMetadata, 'html'))
+  router.get('/en/me/', handleRaw(injectHomeMetadata, 'html'))
+  router.get('/settings/', handleRaw(injectHomeMetadata, 'html'))
+  router.get('/en/settings/', handleRaw(injectHomeMetadata, 'html'))
 
-  router.get('/submit/', handle(injectSubmitMetadata))
-  router.get('/en/submit/', handle(injectSubmitMetadata))
+  router.get('/submit/', handleRaw(injectSubmitMetadata, 'html'))
+  router.get('/en/submit/', handleRaw(injectSubmitMetadata, 'html'))
 })
-
-function handle(handler: AsyncHandler) {
-  return function (req: Request, res: Response) {
-    handler(req, res, new Context(req, res))
-      .then((html: string) => {
-        if (!res.headersSent) {
-          res.status(200)
-        }
-
-        if (!res.writableFinished) {
-          res
-            .type('text/html')
-            .send(html)
-        }
-      })
-      .catch((err: RequestError) => {
-        readErrorFile().then((file) => {
-
-          if (!res.headersSent) {
-            res.status(err.statusCode || RequestError.NotFound)
-          }
-
-          if (!res.writableFinished) {
-            res
-              .type('text/html')
-              .send(file)
-          }
-        })
-      })
-  }
-}
-
-async function readErrorFile() {
-  const path = resolve(process.cwd(), './public/404.html')
-  return readOnce(path)
-}
 
 async function readFile(req: Request) {
   const path = resolve(process.cwd(), './public', '.' + req.path, './index.html')
