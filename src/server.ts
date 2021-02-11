@@ -1,10 +1,13 @@
 import express from 'express'
-import bodyParser from 'body-parser'
 import Manager from 'decentraland-gatsby/dist/entities/Job/job'
 import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
-import { status, logger, ddos, filesystem } from 'decentraland-gatsby/dist/entities/Route/routes'
+import { status, filesystem } from 'decentraland-gatsby/dist/entities/Route/routes'
+import { withDDosProtection, withLogs, withCors, withBody } from 'decentraland-gatsby/dist/entities/Route/middleware'
 import database from 'decentraland-gatsby/dist/entities/Database/index'
 import profile from 'decentraland-gatsby/dist/entities/Profile/routes'
+import metrics from 'decentraland-gatsby/dist/entities/Prometheus/routes'
+import handle from 'decentraland-gatsby/dist/entities/Route/handle'
+import RequestError from 'decentraland-gatsby/dist/entities/Route/error'
 import events from './entities/Event/routes'
 import attendees from './entities/EventAttendee/routes'
 import social from './entities/Social/routes'
@@ -14,8 +17,6 @@ import profileSettings, { verifySubscription, removeSubscription } from './entit
 import profileSubscription from './entities/ProfileSubscription/routes'
 import { SUBSCRIPTION_PATH, UNSUBSCRIBE_PATH } from './entities/ProfileSettings/types'
 import { notifyUpcomingEvents, updateNextStartAt } from './entities/Event/cron'
-import handle from 'decentraland-gatsby/dist/entities/Route/handle'
-import RequestError from 'decentraland-gatsby/dist/entities/Route/error'
 
 const jobs = new Manager({ concurrency: 10 })
 jobs.cron('@eachMinute', notifyUpcomingEvents)
@@ -23,11 +24,12 @@ jobs.cron('@eachMinute', updateNextStartAt)
 
 const app = express()
 app.set('x-powered-by', false)
+app.use(withLogs())
 app.use('/api', [
-  ddos(),
   status(),
-  logger(),
-  bodyParser.json(),
+  withCors(),
+  withDDosProtection(),
+  withBody(),
   events,
   poster,
   attendees,
@@ -42,7 +44,9 @@ app.use('/api', [
 
 app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
-app.use('/', [ logger(), social ])
+
+app.use(metrics)
+app.use('/', social)
 app.use(filesystem('public', '404.html'))
 
 Promise.resolve()
