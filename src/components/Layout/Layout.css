@@ -18,6 +18,10 @@
   color: var(--text);
 }
 
+.dcl.navbar .ui.menu .item[href="https://avatars.decentraland.org"] {
+  display: none;
+}
+
 .dcl.navbar .dcl.profile {
   position: relative;
   cursor: pointer;
