@@ -95,10 +95,6 @@ export default class Events extends API {
     } as ProfileSettingsAttributes
   }
 
-  // options(options: RequestOptions = {}) {
-  //   return new Options(options)
-  // }
-
   async fetch<T extends object>(url: string, options: Options = new Options({})) {
     const result = await super.fetch<{ ok: boolean, data: T }>(url, options)
     return result.data
