@@ -1,6 +1,6 @@
 import React from 'react'
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal";
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList';
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList';
 import { SessionEventAttributes } from "../../../entities/Event/types";
 import EventAttendeeList from './EventAttendeeList/EventAttendeeList';
 import EventDetail from './EventDetail/EventDetail';

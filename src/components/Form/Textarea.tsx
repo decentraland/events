@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 import { FieldProps } from 'decentraland-ui/dist/components/Field/Field'
 
 import './Textarea.css'

@@ -1,7 +1,7 @@
 import React from "react";
-import TokenList from "decentraland-gatsby/dist/utils/TokenList";
-import track from "decentraland-gatsby/dist/components/Segment/track";
-import useProfile from "decentraland-gatsby/dist/hooks/useProfile";
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList";
+import track from "decentraland-gatsby/dist/utils/segment/segment";
+import useAuth from "decentraland-gatsby/dist/hooks/useAuth";
 import { EventAttributes } from "../../entities/Event/types";
 import * as segment from "../../utils/segment"
 
@@ -17,11 +17,11 @@ export type JumpInButtonProps = React.HTMLProps<HTMLAnchorElement> & {
 }
 
 export default function JumpInButton({ event, href, compact, ...props }: JumpInButtonProps) {
-  const [profile] = useProfile()
+  const [address] = useAuth()
   const to = href || event && eventTargetUrl(event) || '#'
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : 'HTTP'
-  const ethAddress = profile?.address.toString()
+  const ethAddress = address
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.stopPropagation()

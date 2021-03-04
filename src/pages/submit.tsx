@@ -14,7 +14,7 @@ import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Datetime from "decentraland-gatsby/dist/utils/Datetime"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { navigate } from 'gatsby-plugin-intl'
 
 import Layout from "../components/Layout/Layout"
@@ -118,12 +118,6 @@ export default function SubmitPage(props: any) {
 
   useEffect(() => { GLOBAL_LOADING = false }, [])
 
-  useEffect(() => {
-    if (siteStore.connectError === 'CONNECT_ERROR') {
-      patchState({ requireWallet: true })
-    }
-  }, [siteStore.connectError])
-
   useAnalytics((analytics) => analytics.page(segment.Page.Submit))
 
   useEffect(() => {
@@ -203,7 +197,7 @@ export default function SubmitPage(props: any) {
     submit
       .then((event) => {
         GLOBAL_LOADING = false
-        navigate(url.toEvent(location, event.id), siteStore.getNavigationState())
+        navigate(url.toEvent(location, event!.id), siteStore.getNavigationState())
       })
       .catch((error) => {
         GLOBAL_LOADING = false
@@ -305,7 +299,6 @@ export default function SubmitPage(props: any) {
       </ConfirmModal>
       <div onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop} >
         <Container style={{ paddingTop: '110px' }}>
-          <WalletRequiredModal open={!!state.requireWallet} onClose={() => patchState({ requireWallet: false })} />
           {siteStore.loading && <Grid stackable>
             <Grid.Row centered>
               <Grid.Column mobile="16" textAlign="center" style={{ paddingTop: '30vh', paddingBottom: '30vh' }}>
@@ -316,7 +309,7 @@ export default function SubmitPage(props: any) {
           {!siteStore.loading && !siteStore.profile && <Grid stackable>
             <Grid.Row centered>
               <Grid.Column mobile="16" textAlign="center" style={{ paddingTop: '30vh', paddingBottom: '30vh' }}>
-                <Paragraph secondary>You need to <Link onClick={() => siteStore.connect()}>sign in</Link> before to submit an event</Paragraph>
+                <Paragraph secondary>You need to <Link onClick={() => null}>sign in</Link> before to submit an event</Paragraph>
               </Grid.Column>
             </Grid.Row>
           </Grid>}
@@ -383,7 +376,7 @@ export default function SubmitPage(props: any) {
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column mobile="8">
-                      <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={editActions.getStartDate()} min={Datetime.Today(options).toInputDate()} onChange={editActions.handleChange} />
+                      <Field label="Start date" name="start_date" type="date" error={!!errors['start_at'] || !!errors['start_date']} message={errors['finish_at'] || errors['start_date']} value={editActions.getStartDate()} min={Time.from(Date.now()).startOf('day').format(Time.Formats.InputDate)} onChange={editActions.handleChange} />
                     </Grid.Column>
                     {!editing.all_day && <Grid.Column mobile="6">
                       <Field label="Start time" name="start_time" type="time" error={!!errors['start_at'] || !!errors['start_time']} message={errors['start_time']} value={editActions.getStartTime()} onChange={editActions.handleChange} />
@@ -426,10 +419,10 @@ export default function SubmitPage(props: any) {
                           <Radio label={`Monthly on day ${editing.start_at.getUTCDate()}`} name="recurrent_monthday[current]" checked={editing.recurrent_monthday !== null} onClick={editActions.handleChange} />
                         </div>
                         <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
-                          <Radio label={`Monthly on the ${toRecurrentSetposName(editing.start_at)} ${new Datetime(editing.start_at, options).getDayName({ capitalized })}`} name="recurrent_setpos[current]" checked={editing.recurrent_setpos !== null && editing.recurrent_setpos !== Position.LAST} onChange={editActions.handleChange} />
+                          <Radio label={`Monthly on the ${toRecurrentSetposName(editing.start_at)} ${Time.from(editing.start_at, options).format('dddd')}`} name="recurrent_setpos[current]" checked={editing.recurrent_setpos !== null && editing.recurrent_setpos !== Position.LAST} onChange={editActions.handleChange} />
                         </div>
                         {isLatestRecurrentSetpos(editing.start_at) && <div style={{ flex: '1 1 100%', marginBottom: '.7em' }}>
-                          <Radio label={`Monthly on the last ${new Datetime(editing.start_at, options).getDayName({ capitalized })}`} name="recurrent_setpos[last]" checked={editing.recurrent_setpos === Position.LAST} onChange={editActions.handleChange} />
+                          <Radio label={`Monthly on the last ${Time.from(editing.start_at, options).format('dddd')}`} name="recurrent_setpos[last]" checked={editing.recurrent_setpos === Position.LAST} onChange={editActions.handleChange} />
                         </div>}
                       </RadioGroup>
                     </Grid.Column>}
@@ -441,24 +434,20 @@ export default function SubmitPage(props: any) {
                     </Grid.Column>}
                     {editing.recurrent && editing.recurrent_count !== null && <Grid.Column mobile="5"><Paragraph className="FieldNote">Occurrences</Paragraph></Grid.Column>}
                     {editing.recurrent && editing.recurrent_until !== null && <Grid.Column mobile="8">
-                      <Field label="&nbsp;" name="recurrent_until" type="date" value={new Datetime(editing.recurrent_until, options).toInputDate()} onChange={editActions.handleChange} min={Datetime.from() /*toInputDate(editing.start_at)*/} />
+                      <Field label="&nbsp;" name="recurrent_until" type="date" value={Time.from(editing.recurrent_until, options).format(Time.Formats.InputDate)} onChange={editActions.handleChange} min={Time.from(Date.now()).format(Time.Formats.InputDate)} />
                     </Grid.Column>}
                     {editing.recurrent && recurrent_date.length > 0 && <Grid.Column mobile="16">
                       <Label>Dates ({recurrent_date.length}): </Label>
                     </Grid.Column>}
                     {editing.recurrent && recurrent_date.length > 0 && recurrent_date.map(date => {
-                      const datetime = new Datetime(date, options)
+                      const datetime = Time.from(date, options)
                       return <Grid.Column mobile="12" key={date.getTime()}>
                         <Paragraph secondary={date.getTime() + editing.duration < now}>
                           <span style={{ display: 'inline-block', minWidth: '8em', textAlign: 'right', marginRight: '.5em' }}>
-                            {datetime.getDayName({ capitalized })}
-                            {', '}
+                            {datetime.format('dddd, ')}
                           </span>
                           <span style={{ display: 'inline-block', minWidth: '4em' }}>
-                            {datetime.getDatePadded()}
-                            {' '}
-                            {datetime.getMonthName({ capitalized })}
-                            {' '}
+                            {datetime.format('DD MMMM ')}
                           </span>
                           {date.getUTCFullYear()}
                         </Paragraph>

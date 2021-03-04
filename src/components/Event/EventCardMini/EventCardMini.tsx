@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 import { SessionEventAttributes } from '../../../entities/Event/types'
 import JumpInButton from '../../Button/JumpInButton'
 import EventDate from '../EventDate/EventDate'

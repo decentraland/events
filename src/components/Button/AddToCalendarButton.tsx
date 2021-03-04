@@ -1,9 +1,9 @@
 import React from "react";
 import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Button";
-import TokenList from "decentraland-gatsby/dist/utils/TokenList"
-import useProfile from "decentraland-gatsby/dist/hooks/useProfile";
-import track from "decentraland-gatsby/dist/components/Segment/track";
-import Datetime from "decentraland-gatsby/dist/utils/Datetime";
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import useAuth from "decentraland-gatsby/dist/hooks/useAuth";
+import track from "decentraland-gatsby/dist/utils/segment/segment";
+import Time from "decentraland-gatsby/dist/utils/date/Time";
 
 import { EventAttributes } from "../../entities/Event/types";
 import * as segment from '../../utils/segment'
@@ -17,12 +17,11 @@ export type AddToCalendarButtonProps = ButtonProps & {
 }
 
 export default function AddToCalendarButton({ href, event, startAt, ...props }: AddToCalendarButtonProps) {
-  const [profile] = useProfile()
+  const [ address ] = useAuth()
   const to = href || getGoogleCalendar(event, startAt) || '#'
-  const ethAddress = profile?.address.toString() || null
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
-    track((analytics) => analytics.track(segment.Track.AddToCalendar, { ethAddress, event: event?.id }))
+    track((analytics) => analytics.track(segment.Track.AddToCalendar, { ethAddress: address, event: event?.id }))
     if (props.onClick) {
       props.onClick(e, data)
     }
@@ -38,8 +37,6 @@ function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
     return null
   }
 
-  const start_at = Datetime.from(startAt || event.start_at)
-  const finish_at = Datetime.from(start_at.getTime() + event.duration)
   const url = eventTargetUrl(event);
   const params = new URLSearchParams()
   params.set('text', event.name)
@@ -54,7 +51,12 @@ function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
     params.set('details', `jump in: ${url}`)
   }
 
-  params.set('dates', [start_at.toGoogleCalendar(), finish_at.toGoogleCalendar()].join('/'))
+  const start_at = startAt || event.start_at
+  const dates = [
+    Time.from(start_at, { utc: true }).format(Time.Formats.GoogleCalendar),
+    Time.from(start_at.getTime() + event.duration, { utc: true }).format(Time.Formats.GoogleCalendar),
+  ]
+  params.set('dates', dates.join('/'))
 
   return `https://calendar.google.com/calendar/r/eventedit?${params.toString()}`
 }

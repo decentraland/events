@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
-import useProfile from 'decentraland-gatsby/dist/hooks/useProfile'
+import useAuth from 'decentraland-gatsby/dist/hooks/useAuth'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
 import useTimeout from 'decentraland-gatsby/dist/hooks/useTimeout'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
-import track from 'decentraland-gatsby/dist/components/Segment/track'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
+import track from 'decentraland-gatsby/dist/utils/segment/segment'
 import { SessionEventAttributes } from '../../entities/Event/types'
 import { eventTwitterUrl, eventFacebookUrl, eventTargetUrl } from '../../entities/Event/utils'
 import { useLocation } from '@reach/router'
@@ -39,10 +39,10 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const nextStartAt = useMemo(() => new Date(Date.parse(event.next_start_at.toString())), [event.next_start_at])
   const isLive = useTimeout(() => true, nextStartAt)
   const [state, patchState] = usePatchState<AttendingButtonsState>({ sharing: false })
-  const [profile, actions] = useProfile()
+  const [address, actions] = useAuth()
   const location = useLocation()
   const isMobile = useMobileDetector()
-  const ethAddress = profile?.address.toString() || null
+  const ethAddress = address
   const loading = props.loading
   const href = useMemo(() => eventTargetUrl(event), [ event ])
 
@@ -95,7 +95,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   }
 
   function handleShare(e: React.MouseEvent<any>) {
-    const ethAddress = profile?.address.toString() || null
+    const ethAddress = address
     if (typeof navigator !== 'undefined' && (navigator as any).share) {
       (navigator as any).share({
         title: event.name,

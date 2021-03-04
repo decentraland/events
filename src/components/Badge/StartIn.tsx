@@ -1,5 +1,5 @@
 import React from 'react'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 import useCountdown from 'decentraland-gatsby/dist/hooks/useCountdown'
 import Live from './Live'
 import './StartIn.css'

@@ -1,7 +1,7 @@
 import APIOptions from 'decentraland-gatsby/dist/utils/api/Options'
 import { getCurrentProfile } from 'decentraland-gatsby/dist/utils/auth/identify'
 import { Profile } from 'decentraland-gatsby/dist/utils/auth/types'
-import { toBase64 } from 'decentraland-gatsby/dist/utils/base64'
+import { toBase64 } from 'decentraland-gatsby/dist/utils/string/base64'
 
 export default class Options extends APIOptions {
   authorization() {

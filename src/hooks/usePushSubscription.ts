@@ -1,6 +1,6 @@
 import useAsyncEffect from 'decentraland-gatsby/dist/hooks/useAsyncEffect'
 import useServiceWorker from './useServiceWorker'
-import { fromWebPushKey } from 'decentraland-gatsby/dist/utils/base64'
+import { fromWebPushKey } from 'decentraland-gatsby/dist/utils/string/base64'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
 
 export type PushSubscriptionState = {

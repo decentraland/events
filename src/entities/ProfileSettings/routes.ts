@@ -12,7 +12,7 @@ import { sendEmailVerification } from '../Notification/utils';
 import { requiredEnv } from 'decentraland-gatsby/dist/utils/env';
 import ProfileSubscriptionModel from '../ProfileSubscription/model';
 import EventAttendeeModel from '../EventAttendee/model';
-import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
+import Time from 'decentraland-gatsby/dist/utils/date/Time';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
@@ -122,7 +122,7 @@ async function sendVerification(user: string, email: string) {
       action: 'verify',
       user: user,
       email: email,
-      exp: Date.now() + 15 * Datetime.Minute
+      exp: Date.now() + 15 * Time.Minute
     }
 
     const verificationUrl = new URL(EVENTS_URL)

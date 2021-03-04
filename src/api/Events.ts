@@ -1,8 +1,8 @@
 import API from 'decentraland-gatsby/dist/utils/api/API'
 import env from 'decentraland-gatsby/dist/utils/env'
-import Options from './Options'
+// import Options from './Options'
 import { EventAttributes, SessionEventAttributes } from '../entities/Event/types'
-import { RequestOptions } from 'decentraland-gatsby/dist/utils/api/Options'
+import Options from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 import { PosterAttributes } from '../entities/Poster/types'
 import { Realm } from '../entities/Realm/types'
@@ -95,9 +95,9 @@ export default class Events extends API {
     } as ProfileSettingsAttributes
   }
 
-  options(options: RequestOptions = {}) {
-    return new Options(options)
-  }
+  // options(options: RequestOptions = {}) {
+  //   return new Options(options)
+  // }
 
   async fetch<T extends object>(url: string, options: Options = new Options({})) {
     const result = await super.fetch<{ ok: boolean, data: T }>(url, options)

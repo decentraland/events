@@ -1,7 +1,9 @@
 import { useLocation } from "@reach/router"
+import { ChainId } from '@dcl/schemas';
+import { ProviderType } from "decentraland-connect/dist/types"
 import useStore from "decentraland-gatsby/dist/hooks/useStore"
 import EntityStore, { EntityStoreState } from "decentraland-gatsby/dist/utils/EntityStore"
-import useProfile from "decentraland-gatsby/dist/hooks/useProfile"
+import useAuth from "decentraland-gatsby/dist/hooks/useAuth"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import isUUID from "validator/lib/isUUID"
 import { SessionEventAttributes } from "../entities/Event/types"
@@ -9,7 +11,7 @@ import url from "../utils/url"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import Events, { EditEvent } from "../api/Events"
 import { Realm } from "../entities/Realm/types"
-import track from "decentraland-gatsby/dist/components/Segment/track"
+import track from "decentraland-gatsby/dist/utils/segment/segment"
 import * as segment from '../utils/segment'
 import { useEffect, useState } from "react"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
@@ -38,7 +40,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
   const location = useLocation()
   const eventId = url.getEventId(location)
-  const [profile, actions] = useProfile()
+  const [address, actions] = useAuth()
   const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events, [siteInitialState?.state?.events])
   const event = eventId && isUUID(eventId) && events.getEntity(eventId) || null
   const realms = useStore<Realm>(siteInitialState?.state?.realms, [siteInitialState?.state?.events])
@@ -51,13 +53,13 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   }, [events.getState().data, realms.getState().data])
 
   useAsyncEffect(async () => {
-    if (!profile && settings) {
+    if (!address && settings) {
       setProfileSettings(null)
-    } else if (profile && (!settings || profile.address.toString().toLowerCase() !== settings.user)) {
+    } else if (address && (!settings || address !== settings.user)) {
       const newSettings = await API.catch(Events.get().getMyProfileSettings())
       setProfileSettings(newSettings)
     }
-  }, [profile, actions.loading])
+  }, [address, actions.loading])
 
   useAsyncEffect(async () => {
     if (actions.loading || events.isLoading() || events.getList()) {
@@ -80,7 +82,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
     events.setEntities(loadedEvents)
     events.setLoading(false)
-  }, [profile, actions.loading])
+  }, [address, actions.loading])
 
   useAsyncEffect(async () => {
     if (realms.getList()) {
@@ -97,7 +99,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     return {
       state: {
         settings: settings,
-        profile: profile ? profile.address.toString().toLowerCase() : null,
+        profile: address,
         events: events.getState(),
         realms: realms.getState(),
         ...extraState,
@@ -130,7 +132,9 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   }
 
   async function createEvent(data: EditEvent) {
-    profile || await actions.connect()
+    if (!address) {
+      return null
+    }
 
     try {
       const newEvent = await Events.get().createEvent(data)
@@ -145,7 +149,9 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   }
 
   async function updateEvent(eventId: string, data: Partial<EditEvent> = {}) {
-    profile || await actions.connect()
+    if (!address) {
+      return null
+    }
 
     try {
       const newEvent = await Events.get().updateEvent(eventId, data)
@@ -160,12 +166,15 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   }
 
   async function editAttendingEvent(eventId: string, edit: () => Promise<EventAttendeeAttributes[]>) {
-    profile || await actions.connect()
+    if (!address) {
+      return null
+    }
+
     const event = events.getEntity(eventId)
 
     try {
       const newAttendees = await edit()
-      const ethAddress = profile && profile.address.toString().toLowerCase()
+      const ethAddress = address
       let newAttendee: EventAttendeeAttributes | null = null
       const attendees: string[] = []
       for (const attendee of newAttendees) {
@@ -202,19 +211,17 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     return editAttendingEvent(eventId, () => Events.get().updateEventAttendee(eventId, { notify }))
   }
 
-  function connect() {
-    return actions.connect()
+  function connect(providerType: ProviderType, chainId: ChainId = ChainId.ETHEREUM_MAINNET) {
+    return actions.connect(providerType, chainId)
   }
 
   return {
-    profile,
+    profile: address,
     settings,
     updateSettings,
     updateSubscription,
 
     connect,
-    connectError: actions.error && actions.error.code,
-
 
     event,
     events,

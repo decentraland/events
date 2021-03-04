@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import usePatchState from 'decentraland-gatsby/dist/hooks/usePatchState'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 
 import './Carousel.css'
 

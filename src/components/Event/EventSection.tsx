@@ -1,5 +1,5 @@
 import React from 'react'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 import DividerComponent from 'decentraland-gatsby/dist/components/Text/Divider'
 
 import './EventSection.css'

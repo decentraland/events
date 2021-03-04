@@ -1,10 +1,10 @@
 import React from 'react'
 import { Modal } from 'decentraland-ui/dist/components/Modal/Modal'
 import useMobileDetector from 'decentraland-gatsby/dist/hooks/useMobileDetector'
-import './WalletRequiredModal.css'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import { Button } from 'decentraland-ui/dist/components/Button/Button'
+import './WalletRequiredModal.css'
 
 const metamask = require('../../images/metamask-logo.svg')
 const imtoken = require('../../images/imtoken-logo.svg')

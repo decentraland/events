@@ -15,7 +15,7 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
-import useFeatureDetection from "decentraland-gatsby/dist/hooks/useFeatureDetection"
+import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
 
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 
@@ -29,13 +29,13 @@ import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 
 import Section from "../components/Text/Section"
 
-import TokenList from "decentraland-gatsby/dist/utils/TokenList"
-import { toBase64 } from "decentraland-gatsby/dist/utils/base64"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
 import usePushSubscription from "../hooks/usePushSubscription"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import isEmail from "validator/lib/isEmail"
-import track from "decentraland-gatsby/dist/components/Segment/track"
-import Datetime from "decentraland-gatsby/dist/utils/Datetime"
+import track from "decentraland-gatsby/dist/utils/segment/segment"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
 import './settings.css'
@@ -58,9 +58,9 @@ export default function SettingsPage(props: any) {
   const eventId = url.getEventId(location)
   const siteStore = useSiteStore(props.location)
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
-  const notificationSupported = useFeatureDetection("Notification")
-  const serviceWorkerSupported = useFeatureDetection("ServiceWorker")
-  const pushSupported = useFeatureDetection("PushManager")
+  const notificationSupported = useFeatureSupported("Notification")
+  const serviceWorkerSupported = useFeatureSupported("ServiceWorker")
+  const pushSupported = useFeatureSupported("PushManager")
   const pushNotificationSupported = notificationSupported && serviceWorkerSupported && pushSupported
   const [subscription, subscribe, unsubscribe] = usePushSubscription()
   const [state, patchState] = usePatchState<SettingsPageState>({ updating: {}, settings: { ...siteStore.settings } })
@@ -70,7 +70,7 @@ export default function SettingsPage(props: any) {
   const settings: Partial<ProfileSettingsAttributes> = siteStore.settings || {}
   const emailNextVerificationDate = useMemo(() => {
     return settings.email_updated_at ?
-      new Date(settings.email_updated_at.getTime() + Datetime.Minute):
+      new Date(settings.email_updated_at.getTime() + Time.Minute):
       new Date()
   }, [settings.email_updated_at?.getTime()])
   const emailVerificationCountdown = useCountdown(emailNextVerificationDate)
@@ -92,19 +92,12 @@ export default function SettingsPage(props: any) {
     }
 
     if (emailVerificationCountdown.time === 0) {
-      return l.str(`settings.profile_section.email_reverifying_message`) || ''
+      return l(`settings.profile_section.email_reverifying_message`) || ''
     }
 
     const seconds = emailVerificationCountdown.minutes * 60 + emailVerificationCountdown.seconds
-    return l.str(`settings.profile_section.email_verifying_message`, { seconds }) || ''
+    return l(`settings.profile_section.email_verifying_message`, { seconds }) || ''
   }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
-
-  const [requireWallet, setRequireWallet] = useState(false)
-  useEffect(() => {
-    if (siteStore.connectError === 'CONNECT_ERROR') {
-      setRequireWallet(true)
-    }
-  }, [siteStore.connectError])
 
   useEffect(() => {
     if (siteStore.settings) {
@@ -204,7 +197,6 @@ export default function SettingsPage(props: any) {
 
   return (
     <Layout {...props} title={title} active>
-      <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <div style={{ paddingTop: "75px" }} />
       <Tabs>
         <Tabs.Tab onClick={handleHome}>World Events</Tabs.Tab>
@@ -220,9 +212,9 @@ export default function SettingsPage(props: any) {
         {!siteStore.loading && !siteStore.profile && <div style={{ textAlign: 'center' }}>
           <Divider />
           <Paragraph secondary>
-            {l.str(`sign_in.message`, {
-              action: <Link onClick={() => siteStore.connect()}>
-                {l.str(`general.sign_in`)}
+            {l(`sign_in.message`, {
+              action: <Link onClick={() => null}>
+                {l(`general.sign_in`)}
               </Link>
             })}
           </Paragraph>
@@ -232,20 +224,20 @@ export default function SettingsPage(props: any) {
           <Grid.Row>
             <Grid.Column tablet="4">
               <Section uppercase>
-                {l.str(`settings.profile_section.label`)}
+                {l(`settings.profile_section.label`)}
               </Section>
             </Grid.Column>
             <Grid.Column tablet="8">
               <Paragraph small secondary style={{ margin: 0 }}>
-                {l.str(`settings.profile_section.email_title`)}
+                {l(`settings.profile_section.email_title`)}
               </Paragraph>
               <Paragraph small semiBold>
-                {l.str(`settings.profile_section.email_description`)}
+                {l(`settings.profile_section.email_description`)}
               </Paragraph>
               <div className="AddonField">
                 <Field label="Email address" placeholder="example@domain.com" message={emailMessageField} value={currentEmail} onChange={handleChangeEmail} />
                 {currentEmailChanged && <Button basic loading={state.updating.email} disabled={!currentEmailIsValid} onClick={handleSaveEmail}>
-                  {l.str(`settings.profile_section.email_save_action`)}
+                  {l(`settings.profile_section.email_save_action`)}
                 </Button>}
                 {(
                   !currentEmailChanged &&
@@ -253,7 +245,7 @@ export default function SettingsPage(props: any) {
                   siteStore.settings.email &&
                   siteStore.settings.email_verified
                   ) && <Button basic>
-                  {l.str(`settings.profile_section.email_verified`)} <img src={check} width={18} height={18} />
+                  {l(`settings.profile_section.email_verified`)} <img src={check} width={18} height={18} />
                 </Button>}
                 {(
                   !currentEmailChanged &&
@@ -262,7 +254,7 @@ export default function SettingsPage(props: any) {
                   !siteStore.settings.email_verified &&
                   emailVerificationAvailable
                   ) && <Button basic loading={state.updating.email} onClick={handleSaveEmail}>
-                  {l.str(`settings.profile_section.email_reverifying`)}
+                  {l(`settings.profile_section.email_reverifying`)}
                 </Button>}
                 {(
                   !currentEmailChanged &&
@@ -271,7 +263,7 @@ export default function SettingsPage(props: any) {
                   !siteStore.settings.email_verified &&
                   !emailVerificationAvailable
                   ) && <Button basic disabled>
-                  {l.str(`settings.profile_section.email_verifying`)}
+                  {l(`settings.profile_section.email_verifying`)}
                 </Button>}
               </div>
             </Grid.Column>
@@ -280,19 +272,19 @@ export default function SettingsPage(props: any) {
         {!siteStore.loading && siteStore.profile && <Grid style={{ paddingTop: '4rem' }}>
           <Grid.Row>
             <Grid.Column tablet="4">
-              <Section uppercase>{l.str(`settings.event_section.label`)}</Section>
+              <Section uppercase>{l(`settings.event_section.label`)}</Section>
             </Grid.Column>
             <Grid.Column tablet="8">
               <Paragraph small secondary>
-                {l.str(`settings.event_section.timezone_title`)}
+                {l(`settings.event_section.timezone_title`)}
               </Paragraph>
               <div className="SettingsSection">
                 <div className="SettingsDetails">
                   <Paragraph small semiBold>
-                    {l.str(`settings.event_section.timezone_description`)}
+                    {l(`settings.event_section.timezone_description`)}
                   </Paragraph>
                   <Paragraph tiny secondary>
-                    {l.str(`settings.event_section.timezone_message`)}
+                    {l(`settings.event_section.timezone_message`)}
                   </Paragraph>
                 </div>
                 <div className="SettingsToggle">
@@ -309,7 +301,7 @@ export default function SettingsPage(props: any) {
             </Grid.Column>
             <Grid.Column tablet="8">
               <Paragraph small secondary>
-                {l.str(`settings.event_section.notification_title`)}
+                {l(`settings.event_section.notification_title`)}
               </Paragraph>
             </Grid.Column>
             <Grid.Column tablet="4"></Grid.Column>
@@ -321,10 +313,10 @@ export default function SettingsPage(props: any) {
               <div className="SettingsSection">
                 <div className={TokenList.join(["SettingsDetails", !state.settings.email_verified && 'SettingsDetails--disabled'])}>
                   <Paragraph small semiBold>
-                    {l.str(`settings.event_section.notification_by_email_description`)}
+                    {l(`settings.event_section.notification_by_email_description`)}
                   </Paragraph>
                   <Paragraph primary tiny>
-                    {l.str(`settings.event_section.notification_by_email_message`)}
+                    {l(`settings.event_section.notification_by_email_message`)}
                   </Paragraph>
                 </div>
                 <div className="SettingsToggle">
@@ -341,10 +333,10 @@ export default function SettingsPage(props: any) {
               <div className="SettingsSection">
                 <div className={TokenList.join(["SettingsDetails", !pushNotificationSupported && 'SettingsDetails--disabled'])}>
                   <Paragraph small semiBold>
-                    {l.str(`settings.event_section.notification_by_browser_description`)}
+                    {l(`settings.event_section.notification_by_browser_description`)}
                   </Paragraph>
                   <Paragraph tiny secondary>
-                    {l.str(`settings.event_section.notification_by_browser_message`)}
+                    {l(`settings.event_section.notification_by_browser_message`)}
                   </Paragraph>
                 </div>
                 <div className="SettingsToggle">

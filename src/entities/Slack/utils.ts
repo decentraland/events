@@ -3,8 +3,8 @@ import { resolve } from 'url'
 import isURL from 'validator/lib/isURL';
 import env from 'decentraland-gatsby/dist/utils/env';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
-import { Avatar } from 'decentraland-gatsby/dist/utils/api/Katalyst';
-import Datetime from 'decentraland-gatsby/dist/utils/Datetime';
+import { Avatar } from 'decentraland-gatsby/dist/utils/api/Catalyst';
+import Time from 'decentraland-gatsby/dist/utils/date/Time';
 import { DeprecatedEventAttributes } from '../Event/types';
 
 const SLACK_WEBHOOK = env('SLACK_WEBHOOK', '')
@@ -68,7 +68,7 @@ const latestEditNotification = new Map<string, number>()
 export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
   const now = Date.now()
   const latestNotification = latestEditNotification.get(event.id) || 0
-  if ((now - latestNotification) < Datetime.Minute) {
+  if ((now - latestNotification) < Time.Minute) {
     return
   }
 

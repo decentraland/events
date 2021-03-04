@@ -1,6 +1,6 @@
 import React from 'react'
 import './Section.css'
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList'
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 
 export type SectionProps = React.HTMLProps<HTMLParagraphElement> & {
   uppercase?: boolean

@@ -46,14 +46,6 @@ export default function IndexPage(props: any) {
   const attendingEvents = useMemo(() => events.filter((event) => !!event.attending), [siteStore.events.getState()])
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
   const utc = !siteStore.settings?.use_local_time
-
-  const [requireWallet, setRequireWallet] = useState(false)
-  useEffect(() => {
-    if (siteStore.connectError === 'CONNECT_ERROR') {
-      setRequireWallet(true)
-    }
-  }, [siteStore.connectError])
-
   const [enabledNotification, setEnabledNotification] = useState(false)
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
@@ -147,7 +139,6 @@ export default function IndexPage(props: any) {
 
   return (
     <Layout {...props} onOpenProfile={handleSettings} title={title}>
-      <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)}>
         <Title>Notifications</Title>
         <Paragraph>Go to settings and setup your notifications preferences!</Paragraph>
@@ -178,7 +169,7 @@ export default function IndexPage(props: any) {
         </div>}
         {!siteStore.loading && !siteStore.profile && <div style={{ textAlign: 'center' }}>
           <Divider />
-          <Paragraph secondary>You need to <Link onClick={() => siteStore.connect()}>sign in</Link> before to submit an event</Paragraph>
+          <Paragraph secondary>You need to <Link onClick={() => null}>sign in</Link> before to submit an event</Paragraph>
           <Divider />
         </div>}
         {!siteStore.loading && siteStore.profile && <div>

@@ -14,7 +14,7 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
-import Datetime from "decentraland-gatsby/dist/utils/Datetime"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -61,14 +61,6 @@ export default function IndexPage(props: any) {
     [siteStore.events.getState()]
   )
   const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
-
-  const [requireWallet, setRequireWallet] = useState(false)
-  useEffect(() => {
-    if (siteStore.connectError === 'CONNECT_ERROR') {
-      setRequireWallet(true)
-    }
-  }, [siteStore.connectError])
-
   const [enabledNotification, setEnabledNotification] = useState(false)
   const title = currentEvent && currentEvent.name || "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
@@ -164,7 +156,6 @@ export default function IndexPage(props: any) {
 
   return (
     <Layout {...props} onOpenProfile={handleSettings} title={title}>
-      <WalletRequiredModal open={requireWallet} onClose={() => setRequireWallet(false)} />
       <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)}>
         <Title>Notifications</Title>
         <Paragraph>Go to settings and setup your notifications preferences!</Paragraph>
@@ -217,7 +208,7 @@ export default function IndexPage(props: any) {
           </Card.Group></div>}
         {!siteStore.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
-            <SubTitle>{new Datetime(date, { utc }).getMonthName()}</SubTitle>
+            <SubTitle>{Time.from(date, { utc }).format('MMMM')}</SubTitle>
           </div>
           <Card.Group>
             {events.map((event) => <EventCard

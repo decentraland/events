@@ -14,7 +14,7 @@ import isAdmin from '../Auth/isAdmin';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import { bool, integer } from 'decentraland-gatsby/dist/entities/Route/param';
 import { withAuthProfile, WithAuthProfile } from 'decentraland-gatsby/dist/entities/Profile/middleware';
-import Katalyst from 'decentraland-gatsby/dist/utils/api/Katalyst';
+import Catalyst from 'decentraland-gatsby/dist/utils/api/Catalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
 import { Request } from 'express';
 import Context from 'decentraland-gatsby/dist/entities/Route/context';
@@ -225,7 +225,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, update: updatedAttributes, body: req.body })
   }
 
-  const userProfile = await Katalyst.get().getProfile(event.user)
+  const userProfile = await Catalyst.get().getProfile(event.user)
   if (userProfile && userProfile.name && event.user_name !== userProfile.name) {
     updatedAttributes.user_name = userProfile.name
   }

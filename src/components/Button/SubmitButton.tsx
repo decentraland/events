@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, ButtonProps } from 'decentraland-ui/dist/components/Button/Button';
-import TokenList from 'decentraland-gatsby/dist/utils/TokenList';
+import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList';
 
 import './SubmitButton.css'
 
