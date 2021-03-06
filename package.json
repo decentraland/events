@@ -28,7 +28,7 @@
     "aws-sdk": "^2.683.0",
     "body-parser": "^1.19.0",
     "decentraland-crypto": "0.0.2",
-    "decentraland-gatsby": "^3.0.11",
+    "decentraland-gatsby": "^3.1.1",
     "decentraland-server": "^2.11.6",
     "decentraland-ui": "^3.1.2",
     "eth-crypto": "^1.6.0",
