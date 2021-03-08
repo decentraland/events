@@ -9,7 +9,7 @@ config:
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
   events:GATSBY_EVENTS_URL: https://events.decentraland.org/api
   events:GATSBY_LAND_URL: https://api.decentraland.org/v1
-  events:GATSBY_PROFILE_URL: https://peer.decentraland.org
+  events:GATSBY_PROFILE_URL: https://peer-ec1.decentraland.org
   events:GATSBY_SEGMENT_KEY: d4skMcpfGrW2tP8FGTDtCIetsp3W7Boo
   events:GATSBY_WEB_PUSH_KEY: BDcSrhptgGRYliwF8EtHUjKS7zwUAb7xiKZn2wsGfqDpWhXld5844vAKzzX6X8OvmcjGEfuoHvnYVKoijpL1D_w
   events:SIGN_SECRET:
