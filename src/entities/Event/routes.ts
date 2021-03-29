@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import EventModel from './model';
 import { eventTargetUrl, calculateRecurrentProperties } from './utils'
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
+import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware";
 import EventAttendee from '../EventAttendee/model';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
@@ -35,11 +36,12 @@ export default routes((router) => {
   const withOptionalAuth = auth({ optional: true })
   const withEventExists = withEvent()
   const withEventOwner = withEvent({ owner: true })
+  const withPublicAccess = withCors({ cors: '*' })
 
-  router.get('/events', withOptionalAuth, handle(listEvents))
+  router.get('/events', withPublicAccess, withOptionalAuth, handle(listEvents))
   router.post('/events', withAuth, withAuthProfile(), handle(createNewEvent))
-  router.get('/events/attending', withAuth, handle(getAttendingEvents))
-  router.get('/events/:eventId', withOptionalAuth, withEventExists, handle(getEvent))
+  router.get('/events/attending', withPublicAccess, withAuth, handle(getAttendingEvents))
+  router.get('/events/:eventId', withPublicAccess, withOptionalAuth, withEventExists, handle(getEvent))
   router.patch('/events/:eventId', withAuth, withEventOwner, handle(updateEvent))
   router.post('/events/:eventId/notifications', withAuth, withAuthProfile(), withEventExists, handle(notifyEvent))
 })
