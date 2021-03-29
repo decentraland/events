@@ -1,9 +1,9 @@
 import React, { useMemo, useEffect } from 'react'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
+import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 
 import './ImageInput.css'
-import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 
 export type ImageInputProps = Omit<React.HTMLProps<HTMLInputElement>, 'value'> & {
   onFileChange?: (file: File) => void
