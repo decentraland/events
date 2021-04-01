@@ -81,7 +81,7 @@ export enum Position {
   LAST = -1
 }
 
-export const MAX_EVENT_RECURRENT = 100
+export const MAX_EVENT_RECURRENT = 10
 
 export type EventAttributes = {
   id: string // primary key

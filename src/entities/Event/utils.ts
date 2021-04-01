@@ -203,13 +203,8 @@ export function calculateRecurrentProperties(event: Partial<RecurrentEventAttrib
     recurrent.recurrent_until = recurrent_until || recurrent.recurrent_until
 
 
-    const new_recurrent_dates = toRRuleDates(recurrent, (_, i) => i < MAX_EVENT_RECURRENT)
+    const recurrent_dates = toRRuleDates(recurrent, (_, i) => i < MAX_EVENT_RECURRENT)
       .filter(date => date.getTime() + duration > now)
-
-    const recurrent_dates = [
-      ...previous_recurrent_dates,
-      ...new_recurrent_dates
-    ]
 
     if (recurrent_dates.length) {
       const last_date = new Date(recurrent_dates[recurrent_dates.length - 1])
