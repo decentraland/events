@@ -1,3 +1,4 @@
+import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import { EventAttributes, MonthMask, WeekdayMask, Weekdays, Months, Position, RecurrentEventAttributes, MAX_EVENT_RECURRENT } from './types'
 import { RRule, Weekday } from 'rrule'
 
@@ -168,10 +169,11 @@ export function toRecurrentSetposName(date: Date) {
 
 export function calculateRecurrentProperties(event: Partial<RecurrentEventAttributes> & Partial<Pick<EventAttributes, 'recurrent_dates'>> & Pick<EventAttributes, 'start_at' | 'duration' | 'finish_at'>): RecurrentEventAttributes & Pick<EventAttributes, 'start_at' | 'duration' | 'finish_at' | 'recurrent_dates'> {
   const now = Date.now()
-  const start_at = new Date(Date.parse(event.start_at.toString()))
+  const start_at = Time.date(event.start_at)
   const finish_at = new Date(start_at.getTime() + event.duration)
   const duration = Math.max(event.duration, 0)
-  const previous_recurrent_dates = event.recurrent && (event.recurrent_dates || []).filter((date) => (date.getTime() + duration) <= now) || []
+  const previous_recurrent_dates = event.recurrent && (event.recurrent_dates || [])
+    .filter((date) => (date.getTime() + duration) <= now) || []
   const recurrent: RecurrentEventAttributes & Pick<EventAttributes, 'start_at' | 'duration' | 'finish_at' | 'recurrent_dates'> = {
     start_at,
     duration,
@@ -189,7 +191,7 @@ export function calculateRecurrentProperties(event: Partial<RecurrentEventAttrib
   }
 
   if (event.recurrent && event.recurrent_frequency && (event.recurrent_count || event.recurrent_until)) {
-    const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
+    const recurrent_until = event.recurrent_until && Time.date(event.recurrent_until)
     recurrent.recurrent = event.recurrent
     recurrent.recurrent_interval = event.recurrent_interval || 1
     recurrent.recurrent_frequency = event.recurrent_frequency || recurrent.recurrent_frequency

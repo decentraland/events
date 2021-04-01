@@ -3,6 +3,7 @@ import { Model, SQL } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
 import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
 import schema from 'decentraland-gatsby/dist/entities/Schema'
+import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes } from './types'
 import EventAttendee from '../EventAttendee/model'
@@ -26,11 +27,11 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       return event
     }
 
-    const start_at = new Date(Date.parse(event.start_at.toString()))
-    const finish_at = new Date(Date.parse(event.finish_at.toString()))
+    const start_at = Time.date(event.start_at)
+    const finish_at = Time.date(event.finish_at)
     const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
     const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
-      event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
+      event.recurrent_dates.map(date => Time.date(date)) : [start_at]
 
     if (recurrent_dates[0].getTime() !== start_at.getTime()) {
       recurrent_dates.unshift(start_at)
@@ -38,7 +39,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
     const next_start_at = this.selectNextStartAt(
       duration,
-      event.next_start_at && new Date(Date.parse(event.next_start_at.toString())),
+      event.next_start_at && Time.date(event.next_start_at),
       recurrent_dates
     )
 
@@ -87,7 +88,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
     const query = SQL`
-      SELECT 
+      SELECT
         e.*
         ${conditional(!!options.currentUser, SQL`, a.user is not null as attending`)}
         ${conditional(!!options.currentUser, SQL`, a.notify = TRUE as notify`)}
@@ -134,8 +135,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     const errors: string[] = []
-    const start_at = new Date(Date.parse(event.start_at.toString()))
-    const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
+    const start_at = Time.date(event.start_at.toString())
+    const recurrent_until = event.recurrent_until && Time.date(event.recurrent_until.toString())
 
     if (recurrent_until && start_at.getTime() > recurrent_until.getTime() + 1000 * 60 * 60 * 24) {
       errors.push(`recurrent must finish after the start date`)

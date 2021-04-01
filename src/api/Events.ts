@@ -1,6 +1,6 @@
 import API from 'decentraland-gatsby/dist/utils/api/API'
+import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import env from 'decentraland-gatsby/dist/utils/env'
-// import Options from './Options'
 import { EventAttributes, SessionEventAttributes } from '../entities/Event/types'
 import Options from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
@@ -55,15 +55,15 @@ export default class Events extends API {
   }
 
   static parseEvent(event: Record<string, any>): SessionEventAttributes {
-    const start_at = event.start_at && new Date(Date.parse(event.start_at.toString()))
-    const next_start_at = event.next_start_at && new Date(Date.parse(event.next_start_at.toString()))
-    const finish_at = event.finish_at && new Date(Date.parse(event.finish_at.toString()))
-    const created_at = event.created_at && new Date(Date.parse(event.created_at.toString()))
-    const updated_at = event.updated_at && new Date(Date.parse(event.updated_at.toString()))
-    const recurrent_until = event.recurrent_until && new Date(Date.parse(event.recurrent_until.toString()))
+    const start_at = event.start_at && Time.date(event.start_at)
+    const next_start_at = event.next_start_at && Time.date(event.next_start_at)
+    const finish_at = event.finish_at && Time.date(event.finish_at)
+    const created_at = event.created_at && Time.date(event.created_at)
+    const updated_at = event.updated_at && Time.date(event.updated_at)
+    const recurrent_until = event.recurrent_until && Time.date(event.recurrent_until)
     const duration = Number(event.duration) || finish_at.getTime() - start_at.getTime()
     const recurrent_dates = Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0 ?
-      event.recurrent_dates.map(date => new Date(Date.parse(date.toString()))) : [start_at]
+      event.recurrent_dates.map(date => Time.date(date)) : [start_at]
 
     return {
       ...event,
@@ -85,8 +85,8 @@ export default class Events extends API {
   }
 
   static parseSettings(settings: Record<string, any>): ProfileSettingsAttributes {
-    const email_verified_at = settings.email_verified_at && new Date(Date.parse(settings.email_verified_at.toString()))
-    const email_updated_at = settings.email_updated_at && new Date(Date.parse(settings.email_updated_at.toString()))
+    const email_verified_at = settings.email_verified_at && Time.date(settings.email_verified_at)
+    const email_updated_at = settings.email_updated_at && Time.date(settings.email_updated_at)
 
     return {
       ...settings,
