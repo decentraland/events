@@ -54,7 +54,7 @@ export default class Events extends API {
     return this.from(env('EVENTS_URL', this.Url))
   }
 
-  static parseEvent(event: Record<string, any>): SessionEventAttributes {
+  static parseEvent(event: SessionEventAttributes): SessionEventAttributes {
     const start_at = event.start_at && Time.date(event.start_at)
     const next_start_at = event.next_start_at && Time.date(event.next_start_at)
     const finish_at = event.finish_at && Time.date(event.finish_at)
