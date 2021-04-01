@@ -174,7 +174,7 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const event_id = uuid()
   const x = data.x
   const y = data.y
-  const content = await API.catch(Land.get().getMapContent([x, y], [x, y]))
+  const content = null as any // await API.catch(Land.get().getMapContent([x, y], [x, y]))
   const estate = content?.assets.estates[0]
   const image = data.image || (estate ? Land.get().getEstateImage(estate.id) : Land.get().getParcelImage([x, y]))
   const user_name = userProfile.name || null;
@@ -227,14 +227,14 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, update: updatedAttributes, body: req.body })
   }
 
-  const userProfile = await Catalyst.get().getProfile(event.user)
-  if (userProfile && userProfile.name && event.user_name !== userProfile.name) {
-    updatedAttributes.user_name = userProfile.name
+  const userProfiles = await Catalyst.get().getProfiles([event.user])
+  if (userProfiles && userProfiles[0] && userProfiles[0].name && event.user_name !== userProfiles[0].name) {
+    updatedAttributes.user_name = userProfiles[0].name
   }
 
   const x = updatedAttributes.x
   const y = updatedAttributes.y
-  const content = await API.catch(Land.get().getMapContent([x, y], [x, y]))
+  const content = null as any // await API.catch(Land.get().getMapContent([x, y], [x, y]))
   const estate = content?.assets.estates[0]
   updatedAttributes.estate_id = estate?.id || updatedAttributes.estate_id
   updatedAttributes.estate_name = estate?.data?.name || updatedAttributes.estate_name
@@ -277,7 +277,6 @@ async function notifyEvent(req: WithEvent<WithAuthProfile<WithAuth>>) {
   if (!isAdmin(user)) {
     return {}
   }
-
 
   const attendee: EventAttendeeAttributes = {
     event_id: event.id,
