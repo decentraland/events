@@ -120,7 +120,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {props.showAttendees !== false && <EventSection>
         <EventSection.Icon src={friends} width="16x" height="16" center />
         <EventSection.Detail style={{ display: 'flex', justifyContent: attendeesDiff > 0 ? 'space-around' : '' }}>
-          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <Avatar key={address} size="small" address={address} />)}
+          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <div style={attendeesDiff <= 0 ? { margin: '0 .4rem' } : {}}>
+            <Avatar key={address} size="small" address={address} />
+          </div>)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
         </EventSection.Detail>
         <EventSection.Action>
