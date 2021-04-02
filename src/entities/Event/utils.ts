@@ -69,7 +69,7 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
   }
 
   return new RRule({
-    dtstart: options.start_at,
+    dtstart: new Date(),
     freq: RRule[options.recurrent_frequency],
     interval: options.recurrent_interval || 1,
     until: options.recurrent_until && new Date(options.recurrent_until.getTime() + 1000 * 60 * 60 * 24),
