@@ -1,7 +1,7 @@
-import { Model, SQL } from 'decentraland-server'
 import isUUID from 'validator/lib/isUUID'
 import { EventAttendeeAttributes } from './types'
-import { table, conditional, values, join } from 'decentraland-gatsby/dist/entities/Database/utils'
+import { SQL, table, conditional, values, join } from 'decentraland-gatsby/dist/entities/Database/utils'
+import { Model } from 'decentraland-gatsby/dist/entities/Database/model'
 
 const LATEST_EVENT_ATTENDING = 10
 

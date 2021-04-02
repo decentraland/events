@@ -1,7 +1,7 @@
 
-import { Model, SQL } from 'decentraland-server'
 import { utils } from 'decentraland-commons';
-import { table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
+import { SQL, table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
+import { Model } from 'decentraland-gatsby/dist/entities/Database/model';
 import schema from 'decentraland-gatsby/dist/entities/Schema'
 import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
