@@ -174,12 +174,12 @@ export async function createNewEvent(req: WithAuthProfile<WithAuth>) {
   const event_id = uuid()
   const x = data.x
   const y = data.y
-  const content = null as any // await API.catch(Land.get().getMapContent([x, y], [x, y]))
-  const estate = content?.assets.estates[0]
-  const image = data.image || (estate ? Land.get().getEstateImage(estate.id) : Land.get().getParcelImage([x, y]))
+  const tiles = await API.catch(Land.get().getTiles([x, y], [x, y]))
+  const tile = tiles && tiles[[x,y].join(',')]
+  const estate_id = tile?.estateId || null
+  const estate_name = tile?.name || null
+  const image = data.image || (estate_id ? Land.get().getEstateImage(estate_id) : Land.get().getParcelImage([x, y]))
   const user_name = userProfile.name || null;
-  const estate_id = estate?.id || null;
-  const estate_name = estate?.data?.name || null;
   const next_start_at = EventModel.selectNextStartAt(recurrent.duration, recurrent.start_at, recurrent.recurrent_dates)
 
   const event: DeprecatedEventAttributes = {
@@ -234,10 +234,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   const x = updatedAttributes.x
   const y = updatedAttributes.y
-  const content = null as any // await API.catch(Land.get().getMapContent([x, y], [x, y]))
-  const estate = content?.assets.estates[0]
-  updatedAttributes.estate_id = estate?.id || updatedAttributes.estate_id
-  updatedAttributes.estate_name = estate?.data?.name || updatedAttributes.estate_name
+  const tiles = await API.catch(Land.get().getTiles([x, y], [x, y]))
+  const tile = tiles && tiles[[x,y].join(',')]
+  updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
+  updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
   updatedAttributes.scene_name = updatedAttributes.estate_name
   updatedAttributes.coordinates = [x, y]
 
