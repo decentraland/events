@@ -30,7 +30,7 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
     <EventSection.Icon src={secondary ? '' : clock} width="16" height="16" />
     <EventSection.Detail>
       {isLive && <Paragraph secondary={secondary}>Started: {start_at.fromNow()}</Paragraph>}
-      {!isLive && countdown && <Paragraph secondary={secondary}>Starts in: {start_at.fromNow(true)}</Paragraph>}
+      {!isLive && countdown && <Paragraph secondary={secondary}>Starts in {start_at.fromNow(true)}</Paragraph>}
       {!isLive && !countdown && duration < Time.Day && <Paragraph secondary={secondary}>
         <Bold>{start_at.format('dddd, MMM DD')}</Bold>
         {duration === 0 && <Bold>{start_at.format(' hh:mma')}</Bold>}
