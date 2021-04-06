@@ -25,7 +25,7 @@
     "abort-controller": "^3.0.0",
     "apicache": "^1.5.3",
     "aws-sdk": "^2.683.0",
-    "decentraland-gatsby": "^3.13.0",
+    "decentraland-gatsby": "^3.14.0",
     "express-fileupload": "^1.1.7-alpha.3",
     "gatsby": "^2.31.1",
     "gatsby-image": "^2.2.39",
