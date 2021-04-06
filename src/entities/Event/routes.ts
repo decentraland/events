@@ -234,8 +234,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   const x = updatedAttributes.x
   const y = updatedAttributes.y
-  const tiles = await API.catch(Land.get().getTiles([x, y], [x, y]))
-  const tile = tiles && tiles[[x,y].join(',')]
+  const tile = await API.catch(Land.get().getTile([x, y]))
   updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
   updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
   updatedAttributes.scene_name = updatedAttributes.estate_name
