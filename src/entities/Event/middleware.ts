@@ -7,10 +7,6 @@ import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { middleware } from "decentraland-gatsby/dist/entities/Route/handle";
 import isAdmin from '../Auth/isAdmin';
 
-export function getEventIdParam(req: Request) {
-  return param(req, 'eventId', (value?: string) => isUUID(value || ''));
-}
-
 export type WithEvent<R extends Request = Request> = R & {
   event: DeprecatedEventAttributes
 }
@@ -21,11 +17,14 @@ export type WithEventOptions = {
 }
 
 export function withEvent(options: WithEventOptions = {}) {
-  return middleware(async (req) => {
-    const event_id = getEventIdParam(req)
+  return middleware(async (req: Request<{ eventId: string }>) => {
+    const event_id = req.params.eventId
+    if (!isUUID(event_id)) {
+      throw new RequestError(`Not found event "${event_id}"`, RequestError.NotFound)
+    }
+
     const enforce = options.enforce || {}
     const event = EventModel.build(await EventModel.findOne<EventAttributes>({ id: event_id, ...enforce }))
-
     if (!event) {
       throw new RequestError(`Not found event "${event_id}"`, RequestError.NotFound)
     }
