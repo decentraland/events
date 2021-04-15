@@ -269,7 +269,7 @@ export default function IndexPage(props: any) {
                   <Table.Cell><Code inline>attend</Code></Table.Cell>
                   <Table.Cell><Code inline>boolean (default: true)</Code></Table.Cell>
                   <Table.Cell><Code inline>message</Code></Table.Cell>
-                  <Table.Cell>if <Code inline>true</Code> an attend will be register if false and attend will be removed.</Table.Cell>
+                  <Table.Cell>if is <Code inline>true</Code> an attend will be register if is <Code inline>false</Code> the attend will be removed.</Table.Cell>
                 </Table.Row>
               </Table.Body>
             </Table>
