@@ -13,6 +13,7 @@ import attendees from './entities/EventAttendee/routes'
 import social from './entities/Social/routes'
 import poster from './entities/Poster/routes'
 import realms from './entities/Realm/routes'
+import message from './entities/Message/routes'
 import profileSettings, { verifySubscription, removeSubscription } from './entities/ProfileSettings/routes'
 import profileSubscription from './entities/ProfileSubscription/routes'
 import { SUBSCRIPTION_PATH, UNSUBSCRIBE_PATH } from './entities/ProfileSettings/types'
@@ -37,6 +38,7 @@ app.use('/api', [
   profileSubscription,
   profile,
   realms,
+  message,
   handle(async () => {
     throw new RequestError('NotFound', RequestError.NotFound)
   })

@@ -217,6 +217,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
   return {
     profile: address,
+    provider: actions.provider,
     settings,
     updateSettings,
     updateSubscription,

@@ -7,6 +7,7 @@ export default function useListEvents(events?: Record<string, SessionEventAttrib
       return []
     }
 
+    const now = Date.now()
     return Object.values(events)
       .filter(event => {
         if (event.rejected) {
@@ -14,6 +15,10 @@ export default function useListEvents(events?: Record<string, SessionEventAttrib
         }
 
         if (!event.approved && !event.owned && !event.editable) {
+          return false
+        }
+
+        if (event.finish_at.getTime() < now) {
           return false
         }
 

@@ -16,10 +16,8 @@ import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
-
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 
-import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import SubmitButton from "../components/Button/SubmitButton"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
