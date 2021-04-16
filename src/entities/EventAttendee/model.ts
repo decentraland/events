@@ -48,25 +48,25 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     return EventAttendeeModel.query<EventAttendeeAttributes>(query)
   }
 
-  static async getList(eventId: string, limit?: number) {
+  static async listByEventId(eventId: string, options: { limit?: number, offest?: number } = {}) {
     if (!isUUID(eventId)) {
       return []
     }
 
     const query = SQL`
-      SELECT *
+      SELECT "event_id", "user", "user_name", "created_at"
       FROM ${table(EventAttendeeModel)}
       WHERE "event_id" = ${eventId}
       ORDER BY created_at DESC
-      ${conditional(!!limit, SQL`LIMIT ${limit}`)}
+      ${conditional(!!options.limit, SQL`LIMIT ${options.limit}`)}
+      ${conditional(!!options.offest, SQL`OFFSET ${options.offest}`)}
     `
 
-    const attendees = await EventAttendeeModel.query<EventAttendeeAttributes>(query)
-
-    return attendees.map(attendee => attendee.user)
+    return EventAttendeeModel.query<EventAttendeeAttributes>(query)
   }
 
   static async latest(eventId: string) {
-    return this.getList(eventId, LATEST_EVENT_ATTENDING)
+    const attendees = await this.listByEventId(eventId, { limit: LATEST_EVENT_ATTENDING, offest: 0 })
+    return attendees.map(attendee => attendee.user)
   }
 }

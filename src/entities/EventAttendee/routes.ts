@@ -24,7 +24,7 @@ export default routes((router) => {
 })
 
 export async function getEventAttendeeList(event_id: string) {
-  return await EventAttendeeModel.find<EventAttendeeAttributes>({ event_id })
+  return EventAttendeeModel.listByEventId(event_id)
 }
 
 export async function getEventAttendees(req: WithEvent) {
