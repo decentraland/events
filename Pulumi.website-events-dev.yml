@@ -2,7 +2,7 @@ encryptionsalt: v1:5g6OY0hHq10=:v1:2v1dmNBoUC4Ls4eB:jG0ttHuD/beq4tREu887OY++Kvz2
 config:
   aws:region: us-east-1
   events:ADMIN_ADDRESSES:
-    secure: v1:bYzEa6iBdTPt6Hek:IZ096PIPrk2yijmhf81vp96vhrq2fH3S4Etu/UixUeA4iBBXjtpvpIVrAR51nnS17IVGftVnPb/GBNB7E+hmIgQDUuhRsC4JlnapdFvIBvUpz6/F1V2J9+x42eSsl2T4E/Twjmc=
+    secure: v1:hRhzfEe1QCfL9QIF:1Rwi7ltsnmSg4cE9ZHsGoqbAoc/ElKXTpUPfnognXGL7I09keQ3Sm3Vm4jPLRxjlCdLvBU+zw6RSwJj3s68H4w3rPR2ysPfk06oDSBf/HWOaKyC30Z6Pj4c3VhCfGl35zr4HAVSrs37KrzmMTYQPo2hSk92d/tMvQPQ9bK/9HnND0JEgaEqVi45XfGcgRGyRtbgMX0Vancu73K9A3zbAr19cwG5v2q5aGamvRa3204AYoX1COKqUAscbj4K6Ncv90zjDwYBGb1qoXxZ6slZnDMPfgi/DLXiM9fzRPduNFQmLctr3NiI=
   events:AWS_BUCKET_URL: https://events.decentraland.io
   events:CONNECTION_STRING:
     secure: v1:Qnl9UxZmPaJEnQKR:m9O+4z453mTgx6OsHhWXsl+EPIKz85GKp+xX+ALd/CXnf6cpqBpx2YufgyegT1eSzxJ92p7A7RUPo4+uJlW66C9Oi4mhvzJIX2H3uRU56tjxwg9Qv0kGj1f5x3iSUrQEWuXka6YtEeYcIdYJEAFiaGXbrVjR+fC7bCuKZ7j/

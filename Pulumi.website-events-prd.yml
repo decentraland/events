@@ -2,7 +2,7 @@ encryptionsalt: v1:9oCf235QAQ8=:v1:uRW+FkAVO8o424II:P+oGJS3OY1Krmv/3faRNcy6mGYpZ
 config:
   aws:region: us-east-1
   events:ADMIN_ADDRESSES:
-    secure: v1:6FRgPL2jfVEkgzts:YxsDF2RpsMvkoLlrc3b7kot8J+1zX7L093+0uyvJQymeppwcPL4FHL0/dgh9YwQxBZEaTeXMMvNjrQqFgycxy40rOvkNAmGGYYIzoCDH+67PwcUsU+/SzEKVOiVZy5oQMPFfDoO93tfMZbz5HB+bko9GsgR43mrTbCOJKp+1nfWlKKebqz8DGBjwsf+VghcHroQhooLeST97C2llbNKgEiPE/jfXGTi4ZL+l1MlSKePFzYciNLkI0gRalg==
+    secure: v1:CRWKWMBsqMEK/1lc:jR6p5bGH229sBygGcp8VUI4xlfcJ06xHdcmNZk4VMyLCuVkYpIWvkRVjEVz8LsC+KRhZ6D0oAjSqTs+k7NnKJk/j9VUw5WaszO5vAj8dyIQKL2bhFYlhqZOncx+vidJaIvMBD+FP4kTrTjGl/Ik8KWJ+hJtY5xwG0bsNfgfFOYPAN8tFbHPawKshFJiYIKza+Z5cdXaH+SD4fc7xqagGqHkuR9DfPH521p4ltaGd10LNEwxWPzFMOILywoyDjVx3A3HXcB/VQSR91nQn4mgxgU4VALItCrQBHokSPwVACtr/htiBfas=
   events:AWS_BUCKET_URL: https://events.decentraland.org
   events:CONNECTION_STRING:
     secure: v1:+ENLPDJ1vziMEZz3:vHMhEu64mNHnit53Yf3l5kvvYbnBj3EZTWvTBIUcOXrV+X0mtYboiZt0v0GSb0rgQojXFOz8Rvx0fQiX5yRBw5hVpRKgKV2CS+qgLepF8lo1aFxHqe0H0WWOgpLhVlXwk84DJeocVVoRM+6tktUUluhJ+u+QWqR2+vyXKeMi
