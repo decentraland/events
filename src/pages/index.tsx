@@ -54,7 +54,7 @@ export default function IndexPage(props: any) {
   const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [siteStore.events.getState()])
   const mainEvents = useMemo(
     () => events
-      .filter((event) => event.approved && (!!event.highlighted || !!event.trending) && event.finish_at.getTime() > now)
+      .filter((event) => event.approved && event.highlighted && event.finish_at.getTime() > now)
       .sort((eventA, eventB) => {
         return Math.abs(now - eventA.next_start_at.getTime()) - Math.abs(now - eventB.next_start_at.getTime())
       }),
