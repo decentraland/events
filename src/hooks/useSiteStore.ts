@@ -16,11 +16,12 @@ import * as segment from '../utils/segment'
 import { useEffect, useState } from "react"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
+import { CommsStatusWithLayers } from "decentraland-gatsby/dist/utils/api/Catalyst";
 
 
 export type SiteStore = {
   events?: EntityStore<SessionEventAttributes>
-  realms?: EntityStore<Realm>
+  realms?: EntityStore<CommsStatusWithLayers>
 }
 
 export type SiteState = {
@@ -28,7 +29,7 @@ export type SiteState = {
   profile?: string | null,
   settings?: ProfileSettingsAttributes | null
   events?: Partial<EntityStoreState<SessionEventAttributes>>
-  realms?: Partial<EntityStoreState<Realm>>
+  realms?: Partial<EntityStoreState<CommsStatusWithLayers>>
 }
 
 export type SiteLocationState = {
@@ -43,7 +44,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   const [address, actions] = useAuth()
   const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events, [siteInitialState?.state?.events])
   const event = eventId && isUUID(eventId) && events.getEntity(eventId) || null
-  const realms = useStore<Realm>(siteInitialState?.state?.realms, [siteInitialState?.state?.events])
+  const realms = useStore<CommsStatusWithLayers>(siteInitialState?.state?.realms, [siteInitialState?.state?.events])
   const [settings, setProfileSettings] = useState<ProfileSettingsAttributes | null>(siteInitialState?.state?.settings || null)
 
   useEffect(() => {
@@ -91,7 +92,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
     realms.setLoading()
     const newRealms = await API.catch(Events.get().getRealms())
-    realms.setEntities(newRealms || [])
+    realms.setEntities((newRealms || []).map(realm => ({ id: realm.name, ...realm }) as any ))
     realms.setLoading(false)
   }, [])
 

@@ -7,6 +7,7 @@ import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 import { PosterAttributes } from '../entities/Poster/types'
 import { Realm } from '../entities/Realm/types'
 import { ProfileSettingsAttributes } from '../entities/ProfileSettings/types'
+import Catalyst, { CommsStatusWithLayers } from 'decentraland-gatsby/dist/utils/api/Catalyst'
 
 export type EditEvent = Pick<EventAttributes,
   'name' |
@@ -152,7 +153,17 @@ export default class Events extends API {
   }
 
   async getRealms() {
-    return this.fetch<Realm[]>('/realms')
+    const servers = await Catalyst.get().getServers()
+    return Promise.all(servers
+      .map(server => {
+        console.log(server)
+        return API.catch(Catalyst.from(server.address).getCommsStatus(true))
+      })
+    )
+      .then(statuses => {
+        console.log(statuses)
+        return statuses.filter(Boolean) as CommsStatusWithLayers[]
+      })
   }
 
   async getEvents() {

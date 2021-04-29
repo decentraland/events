@@ -22,7 +22,6 @@ import useEventEditor from "../hooks/useEventEditor"
 import BackButton from "../components/Button/BackButton"
 import AddCoverButton from "../components/Button/AddCoverButton"
 import ConfirmModal from "../components/Modal/ConfirmModal"
-import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import useSiteStore from '../hooks/useSiteStore'
 import useAnalytics from '../hooks/useAnalytics'
 import * as segment from '../utils/segment'
@@ -71,11 +70,15 @@ export default function SubmitPage(props: any) {
       { key: 'default', value: '', text: 'any realm' }
     ]
     const realms = siteStore.realms.getList() || []
+    const names = new Set<string>()
+    console.log(realms)
     for (let realm of realms) {
-      for (let layer of realm.layers) {
-        const value = `${realm.id}-${layer}`
-        const key = `${value}-${realm.url}`
-        result.push({ key, value, text: value })
+      if (!names.has(realm.name)) {
+        names.add(realm.name)
+        for (let layer of realm.layers) {
+          const value = `${realm.name}-${layer.name}`
+          result.push({ key: value, value, text: value })
+        }
       }
     }
 
