@@ -54,7 +54,7 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     }
 
     const query = SQL`
-      SELECT "event_id", "user", "user_name", "created_at"
+      SELECT "event_id", "user", "user_name", "notify", "created_at"
       FROM ${table(EventAttendeeModel)}
       WHERE "event_id" = ${eventId}
       ORDER BY created_at DESC
