@@ -14,13 +14,13 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
+import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import EventCardBig from "../components/Event/EventCardBig/EventCardBig"
-import Carousel from "../components/Carousel/Carousel"
 import SubmitButton from "../components/Button/SubmitButton"
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
@@ -189,18 +189,20 @@ export default function IndexPage(props: any) {
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </div>}
-        {!siteStore.loading && events.length > 0 && mainEvents.length > 0 && <div><Carousel>
-          {mainEvents.map(event => <EventCardBig
-            key={'live:' + event.id}
-            event={event}
-            utc={utc}
-            updating={state.updating[event.id]}
-            href={url.toEvent(location, event.id)}
-            onChangeEvent={handleChangeEvent}
-            onClickEdit={handleOpenEdit}
-            onClick={handleOpenEventDetail}
-          />)}
-        </Carousel></div>}
+        {!siteStore.loading && events.length > 0 && mainEvents.length > 0 && <div>
+          <Carousel>
+            {mainEvents.map(event => <EventCardBig
+              key={'live:' + event.id}
+              event={event}
+              utc={utc}
+              updating={state.updating[event.id]}
+              href={url.toEvent(location, event.id)}
+              onChangeEvent={handleChangeEvent}
+              onClickEdit={handleOpenEdit}
+              onClick={handleOpenEventDetail}
+            />)}
+        </Carousel>
+        </div>}
         {!siteStore.loading && events.length > 0 && trendingEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
           <Card.Group>
