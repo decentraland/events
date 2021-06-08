@@ -25,6 +25,7 @@ import SubmitButton from "../components/Button/SubmitButton"
 import WalletRequiredModal from "../components/Modal/WalletRequiredModal"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { SessionEventAttributes } from "../entities/Event/types"
+import Navigation from "../components/Layout/Navigation"
 
 import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import useListEvents from '../hooks/useListEvents'
@@ -173,11 +174,7 @@ export default function IndexPage(props: any) {
         onChangeEvent={handleChangeEvent}
       />
       <div style={{ paddingTop: "75px" }} />
-      <Tabs>
-        <Tabs.Tab active>World Events</Tabs.Tab>
-        {siteStore.profile && <Tabs.Tab onClick={handleMyEvents}>My Events</Tabs.Tab>}
-        <SubmitButton onClick={handleSubmit} />
-      </Tabs>
+      <Navigation />
       <Container>
         {siteStore.loading && <div>
           <Divider />

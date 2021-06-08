@@ -5,6 +5,12 @@
   "sign_in": {
     "message": "You need to {action} before to submit an event"
   },
+  "page": {
+    "404": {
+      "title": "Page not found",
+      "description": "You just hit a route that doesn't exist..."
+    }
+  },
   "settings": {
     "profile_section": {
       "label": "Profile",

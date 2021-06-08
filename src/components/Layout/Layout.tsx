@@ -28,7 +28,6 @@ import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useAuth from "decentraland-gatsby/dist/hooks/useAuth"
 
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import SEO from "../seo"
 import "./Layout.css"
 
 export default function Layout({ children, ...props }: any) {
@@ -58,7 +57,6 @@ export default function Layout({ children, ...props }: any) {
 
   return (
     <>
-      <SEO title={props.title} />
       <Navbar
         activePage="events"
         className={isScrolled ? "" : "initial"}
