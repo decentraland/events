@@ -17,13 +17,15 @@ const defaultProfileSettings = [
     loading: false as boolean,
     approving: [] as string[],
     rejecting: [] as string[],
+    restoring: [] as string[],
     attending: [] as string[],
     notifying: [] as string[],
-    modifying: [] as string[],
+    modifying: new Set<string>(),
     reload: (() => null) as () => void,
     add: (() => null) as (newEvent: SessionEventAttributes) => void,
     approve: (() => null) as (id: string) => void,
     reject: (() => null) as (id: string) => void,
+    restore: (() => null) as (id: string) => void,
     attend: (() => null) as (id: string, attending: boolean) => void,
     notify: (() => null) as (id: string, attending: boolean) => void,
   }
@@ -60,26 +62,20 @@ export function useEvents() {
     })
   }
 
-
-  const [ approving, approve ] =  useAsyncTasks(async (id) => {
+  async function updateEventState(id: string, changes: Pick<SessionEventAttributes, 'approved' | 'rejected'>) {
     if (!account) {
       return accountState.select()
     }
 
-    const newEvent = await Events.get().updateEvent(id as string, { approved: true, rejected: false })
+    const newEvent = await Events.get().updateEvent(id as string, changes)
     track((analytics) => analytics.track(SegmentEvent.EditEvent, { event: newEvent }))
     add(newEvent)
-  })
+  }
 
-  const [ rejecting, reject ] = useAsyncTasks(async (id) => {
-    if (!account) {
-      return accountState.select()
-    }
 
-    const newEvent = await Events.get().updateEvent(id as string, { approved: false, rejected: true })
-    track((analytics) => analytics.track(SegmentEvent.EditEvent, { event: newEvent }))
-    add(newEvent)
-  })
+  const [ approving, approve ] =  useAsyncTasks((id) => updateEventState(id as string, { approved: true, rejected: false }))
+  const [ rejecting, reject ] = useAsyncTasks((id) => updateEventState(id as string, { approved: false, rejected: true }))
+  const [ restoring, restore ] = useAsyncTasks((id) => updateEventState(id as string, { approved: false, rejected: false }))
 
  async function updateAttendee(id: string, updateAttendee: () => Promise<EventAttendeeAttributes[]>) {
     if (!account) {
@@ -122,7 +118,7 @@ export function useEvents() {
     await updateAttendee(id, () => Events.get().updateEventAttendee(id, { notify }))
   })
 
-  const modifying = useMemo(() => [ ...approving, ...rejecting, ...attending, ...notifying ], [approving, rejecting, attending, notifying ])
+  const modifying = useMemo(() => new Set([ ...approving, ...rejecting, ...restoring, ...attending, ...notifying ]), [approving, rejecting, restoring, attending, notifying ])
 
 
   return [
@@ -132,6 +128,7 @@ export function useEvents() {
       loading: eventsState.loading,
       approving,
       rejecting,
+      restoring,
       attending,
       notifying,
       modifying,
@@ -139,6 +136,7 @@ export function useEvents() {
       add,
       approve,
       reject,
+      restore,
       notify,
       attend
     }

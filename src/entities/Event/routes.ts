@@ -251,7 +251,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
 
   await EventModel.update(updatedAttributes, { id: event.id })
 
-  const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({ user })
+  const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({ event_id: event.id, user })
   const updatedEvent = {
     ...event,
     ...updatedAttributes,

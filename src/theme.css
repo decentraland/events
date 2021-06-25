@@ -10,3 +10,7 @@ body {
 .dcl.navbar.LayoutNavbarContainer.initial {
   background-color: var(--background);
 }
+
+.ui.container > .SignIn {
+  position: relative;
+}

@@ -46,7 +46,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const isMobile = useMobileDetector()
   const [ all, state ] = useEventsContext()
   const ethAddress = address
-  const loading = useMemo(() => props.loading ?? state.modifying.includes(event.id), [ props.loading, state.modifying ])
+  const loading = useMemo(() => props.loading ?? state.modifying.has(event.id), [ props.loading, state.modifying ])
   const href = useMemo(() => eventTargetUrl(event), [ event ])
 
   function handleShareFacebook(e: React.MouseEvent<any>) {

@@ -38,12 +38,12 @@ export default function EventModal({ event, onClose, className, ...props }: Even
 
     {/* SOCIAL */}
     {showSocialActions && <EventSection>
-      <AttendingButtons loading={props.updating} event={event!} />
+      <AttendingButtons event={event!} />
     </EventSection>}
 
     {/* APPROVE */}
     {showApproveActions && <EventSection>
-      <EditButtons loading={props.updating} event={event!} />
+      <EditButtons event={event!} />
     </EventSection>}
   </Modal>
 }

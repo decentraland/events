@@ -24,8 +24,9 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
   const [ settings ] = useProfileSettingsContext()
   const now = useInterval(() => Time.from(Date.now()), Time.Second, [ !settings?.use_local_time ])
   const start_at = useMemo(() => Time.from(startAt || event.start_at, { utc: !settings?.use_local_time }), [ startAt || event.start_at, !settings?.use_local_time ])
-  const finish_at = useMemo(() => Time.from(start_at.getTime() + duration, { utc: !settings?.use_local_time }), [ start_at ])
+  const finish_at = useMemo(() => Time.from(start_at.getTime() + duration, { utc: !settings?.use_local_time }), [ start_at, !settings?.use_local_time ])
   const isLive = now.isBetween(start_at, finish_at)
+  console.log(!settings?.use_local_time)
 
   return <EventSection {...props}>
     <EventSection.Icon src={secondary ? '' : clock} width="16" height="16" />

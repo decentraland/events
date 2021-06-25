@@ -64,5 +64,5 @@ export default function usePushSubscription(path: string = '/sw.js') {
     return result
   }
 
-  return [state.subscription, subscribe, unsubscribe] as const
+  return [state.subscription, { subscribe, unsubscribe }] as const
 }
