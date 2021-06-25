@@ -6,7 +6,7 @@ import track from "decentraland-gatsby/dist/utils/segment/segment";
 import Time from "decentraland-gatsby/dist/utils/date/Time";
 
 import { EventAttributes } from "../../entities/Event/types";
-import * as segment from '../../utils/segment'
+import { SegmentEvent } from "../../modules/segment";
 
 import { eventTargetUrl } from "../../entities/Event/utils";
 import './AddToCalendarButton.css'
@@ -21,7 +21,7 @@ export default function AddToCalendarButton({ href, event, startAt, ...props }: 
   const to = href || getGoogleCalendar(event, startAt) || '#'
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, data: ButtonProps) {
-    track((analytics) => analytics.track(segment.Track.AddToCalendar, { ethAddress: address, event: event?.id }))
+    track((analytics) => analytics.track(SegmentEvent.AddToCalendar, { ethAddress: address, event: event?.id }))
     if (props.onClick) {
       props.onClick(e, data)
     }

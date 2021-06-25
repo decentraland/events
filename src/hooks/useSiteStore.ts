@@ -10,9 +10,8 @@ import { SessionEventAttributes } from "../entities/Event/types"
 import url from "../utils/url"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import Events, { EditEvent } from "../api/Events"
-import { Realm } from "../entities/Realm/types"
 import track from "decentraland-gatsby/dist/utils/segment/segment"
-import * as segment from '../utils/segment'
+import * as segment from '../modules/segment'
 import { useEffect, useState } from "react"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
@@ -44,14 +43,13 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   const [address, actions] = useAuth()
   const events = useStore<SessionEventAttributes>(siteInitialState?.state?.events, [siteInitialState?.state?.events])
   const event = eventId && isUUID(eventId) && events.getEntity(eventId) || null
-  const realms = useStore<CommsStatusWithLayers>(siteInitialState?.state?.realms, [siteInitialState?.state?.events])
   const [settings, setProfileSettings] = useState<ProfileSettingsAttributes | null>(siteInitialState?.state?.settings || null)
 
   useEffect(() => {
     if (window.history) {
       window.history.replaceState(getNavigationState(), document.title)
     }
-  }, [events.getState().data, realms.getState().data])
+  }, [events.getState().data])
 
   useAsyncEffect(async () => {
     if (!address && settings) {
@@ -85,24 +83,12 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     events.setLoading(false)
   }, [address, actions.loading])
 
-  useAsyncEffect(async () => {
-    if (realms.getList()) {
-      return
-    }
-
-    realms.setLoading()
-    const newRealms = await API.catch(Events.get().getRealms())
-    realms.setEntities((newRealms || []).map(realm => ({ id: realm.name, ...realm }) as any ))
-    realms.setLoading(false)
-  }, [])
-
   function getNavigationState(extraState: Record<string, any> = {}, replace: boolean = false): SiteLocationState {
     return {
       state: {
         settings: settings,
         profile: address,
         events: events.getState(),
-        realms: realms.getState(),
         ...extraState,
       },
       replace
@@ -121,7 +107,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
   }
 
   async function updateSettings(updateSettings: Partial<ProfileSettingsAttributes>) {
-    track((analytics) => analytics.track(segment.Track.Settings, { settings: {
+    track((analytics) => analytics.track(segment.SegmentEvent.Settings, { settings: {
       ...settings,
       ...updateSettings
     }}))
@@ -139,12 +125,12 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
     try {
       const newEvent = await Events.get().createEvent(data)
-      track((analytics) => analytics.track(segment.Track.NewEvent, { event: newEvent }))
+      track((analytics) => analytics.track(segment.SegmentEvent.NewEvent, { event: newEvent }))
       events.setEntity(newEvent)
       return Promise.resolve(newEvent)
     } catch (error) {
       console.error(error)
-      track((analytics) => analytics.track(segment.Track.Error, { error: error.message, post: data, ...error }))
+      track((analytics) => analytics.track(segment.SegmentEvent.Error, { error: error.message, post: data, ...error }))
       return Promise.reject(error)
     }
   }
@@ -156,12 +142,12 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
 
     try {
       const newEvent = await Events.get().updateEvent(eventId, data)
-      track((analytics) => analytics.track(segment.Track.EditEvent, { event: newEvent }))
+      track((analytics) => analytics.track(segment.SegmentEvent.EditEvent, { event: newEvent }))
       events.setEntity(newEvent)
       return Promise.resolve(newEvent)
     } catch (error) {
       console.error(error)
-      track((analytics) => analytics.track(segment.Track.Error, { error: error.message, post: data, ...error }))
+      track((analytics) => analytics.track(segment.SegmentEvent.Error, { error: error.message, post: data, ...error }))
       return Promise.reject(error)
     }
   }
@@ -174,8 +160,8 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     const event = events.getEntity(eventId)
 
     try {
-      const newAttendees = await edit()
       const ethAddress = address
+      const newAttendees = await edit()
       let newAttendee: EventAttendeeAttributes | null = null
       const attendees: string[] = []
       for (const attendee of newAttendees) {
@@ -194,12 +180,12 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
       }
 
       events.setEntity(newEvent as any)
-      track((analytics) => analytics.track(segment.Track.Going, { ethAddress, event: event?.id || null }))
+      track((analytics) => analytics.track(segment.SegmentEvent.Going, { ethAddress, event: event?.id || null }))
       return Promise.resolve(event)
 
     } catch (error) {
       console.error(error)
-      track((analytics) => analytics.track(segment.Track.Error, { error: error.message, eventId, ...error }))
+      track((analytics) => analytics.track(segment.SegmentEvent.Error, { error: error.message, eventId, ...error }))
       return Promise.reject(error)
     }
   }
@@ -232,9 +218,7 @@ export default function useSiteStore(siteInitialState: SiteLocationState = {}) {
     attendEvent,
     notifyEvent,
 
-    realms,
-
-    loading: actions.loading || events.isLoading() || realms.isLoading(),
+    loading: actions.loading || events.isLoading(),
     getNavigationState
   }
 }

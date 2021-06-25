@@ -8,14 +8,12 @@ import './EventCardBig.css'
 import EventDetail from '../EventModal/EventDetail/EventDetail'
 import EventSection from '../EventSection'
 import AttendingButtons from '../../Button/AttendingButtons'
+import locations from '../../../modules/locations'
+import { navigate } from 'gatsby-plugin-intl'
 
 export type EventCardBigProps = {
   event: SessionEventAttributes,
-  href?: string,
-  updating?: boolean
-  utc?: boolean
   onClick?: (e: React.MouseEvent<any>, data: SessionEventAttributes) => void,
-  onClickEdit?: (e: React.MouseEvent<any>, data: SessionEventAttributes) => void,
   onChangeEvent?: (event: React.MouseEvent<any>, data: SessionEventAttributes) => void
 }
 
@@ -25,9 +23,13 @@ export default function EventCardBig(props: EventCardBigProps) {
     if (props.onClick) {
       props.onClick(e, props.event)
     }
+
+    if (!e.defaultPrevented) {
+      navigate(locations.event(event.id))
+    }
   }
 
-  return <Card className={TokenList.join(['EventCardBig', !event.approved && 'pending'])} href={props.href} onClick={handleClick}>
+  return <Card className={TokenList.join(['EventCardBig', !event.approved && 'pending'])} href={locations.event(event.id)} onClick={handleClick}>
     <div className="EventCardBig__Container">
       <div className="EventCardBig__Cover">
         <ImgFixed src={event.image || ''} dimension="wide" />
@@ -35,17 +37,15 @@ export default function EventCardBig(props: EventCardBigProps) {
       <Card.Content>
         <EventDetail
           event={event}
-          utc={props.utc}
           showDescription={false}
           showAttendees={false}
           showContact={false}
           showDetails={false}
           showAllDates={false}
           showCountdownDate={true}
-          onClickEdit={props.onClickEdit}
         />
         <EventSection>
-          <AttendingButtons loading={props.updating} event={event} onChangeEvent={props.onChangeEvent} />
+          <AttendingButtons event={event} />
         </EventSection>
       </Card.Content>
     </div>

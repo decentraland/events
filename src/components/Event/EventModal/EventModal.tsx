@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal";
 import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList';
 import { SessionEventAttributes } from "../../../entities/Event/types";
@@ -15,37 +15,35 @@ const close = require('../../../images/remove.svg')
 
 export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: SessionEventAttributes | null
-  attendees?: boolean
-  updating?: boolean
-  utc?: boolean
-  onClickEdit?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
-  onClickAttendees?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
-  onClickDetails?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
-  onChangeEvent?: (event: React.MouseEvent<HTMLElement>, data: SessionEventAttributes) => void
 }
 
-export default function EventModal({ event, attendees, edit, utc, className, onClose, onClickEdit, onClickAttendees, onChangeEvent, onClickDetails, ...props }: EventModalProps) {
+export default function EventModal({ event, onClose, className, ...props }: EventModalProps) {
+  const [ attendees, setAttendees ] = useState(false)
+  const showAttendees = event && attendees
+  const showEvent = event && !attendees
+  const showSocialActions = event && !attendees && event.approved
+  const showApproveActions = event && !attendees && !event.approved && event.editable
 
   return <Modal {...props} open={!!event} className={TokenList.join(['EventModal', (!event || !event.approved) && 'pending', className])} onClose={onClose} >
-    {event && attendees && <EventAttendeeList event={event} onBack={onClickDetails} onClose={onClose} />}
+    {showAttendees && <EventAttendeeList event={event!} onBack={() => setAttendees(false)} onClose={onClose} />}
 
-    {event && !attendees && <div className="EventModal__Action" onClick={onClose}>
+    {showEvent && <div className="EventModal__Action" onClick={onClose}>
       <div className="EventModal__Action__Background" />
       <img src={close} width="14" height="14" />
     </div>}
-    {event && !attendees && <ImgFixed src={event.image || ''} dimension="wide" />}
-    {event && !attendees && <EventDetail event={event} utc={utc} onClickEdit={onClickEdit} onClickAttendees={onClickAttendees} />}
+    {showEvent && <ImgFixed src={event!.image || ''} dimension="wide" />}
+    {showEvent && <EventDetail event={event!} onClickAttendees={() => setAttendees(true)} />}
+
+    {(showSocialActions || showApproveActions) && <EventSection.Divider />}
 
     {/* SOCIAL */}
-    {event && !attendees && event.approved && <EventSection.Divider />}
-    {event && !attendees && event.approved && <EventSection>
-      <AttendingButtons loading={props.updating} event={event} onChangeEvent={onChangeEvent} />
+    {showSocialActions && <EventSection>
+      <AttendingButtons loading={props.updating} event={event!} />
     </EventSection>}
 
     {/* APPROVE */}
-    {event && !attendees && !event.approved && event.editable && <EventSection.Divider />}
-    {event && !attendees && !event.approved && event.editable && <EventSection>
-      <EditButtons loading={props.updating} event={event} onChangeEvent={onChangeEvent} />
+    {showApproveActions && <EventSection>
+      <EditButtons loading={props.updating} event={event!} />
     </EventSection>}
   </Modal>
 }

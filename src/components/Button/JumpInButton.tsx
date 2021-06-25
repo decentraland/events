@@ -1,43 +1,30 @@
-import React from "react";
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList";
-import track from "decentraland-gatsby/dist/utils/segment/segment";
-import useAuth from "decentraland-gatsby/dist/hooks/useAuth";
-import { EventAttributes } from "../../entities/Event/types";
-import * as segment from "../../utils/segment"
+import React, { useMemo, useState } from 'react'
+import { Button, ButtonProps } from 'decentraland-ui/dist/components/Button/Button'
+import { SessionEventAttributes } from '../../entities/Event/types'
+import { eventTargetUrl } from '../../entities/Event/utils'
 
-import './JumpInButton.css'
-import { eventTargetUrl } from "../../entities/Event/utils";
-
-const primaryJumpIn = require('../../images/primary-jump-in.svg')
-const secondaryPin = require('../../images/secondary-pin-small.svg')
-
-export type JumpInButtonProps = React.HTMLProps<HTMLAnchorElement> & {
-  event?: EventAttributes
-  compact?: boolean
+const icons = {
+  primaryJumpIn: require('../../images/primary-jump-in.svg'),
 }
 
-export default function JumpInButton({ event, href, compact, ...props }: JumpInButtonProps) {
-  const [address] = useAuth()
-  const to = href || event && eventTargetUrl(event) || '#'
-  const isPosition = !href && !!event
-  const position = isPosition ? event && `${event.x},${event.y}` : 'HTTP'
-  const ethAddress = address
+import './AttendingButtons.css'
+import useFormatMessage from 'decentraland-gatsby/dist/hooks/useFormatMessage'
 
-  function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    e.stopPropagation()
-    track((analytics) => analytics.track(segment.Track.JumpIn, { ethAddress, event: event?.id || null }))
-    if (props.onClick) {
-      props.onClick(e)
-    }
-  }
+type AttendingButtonsState = {
+  sharing: boolean
+}
 
-  return <a {...props} target="_blank" onClick={handleClick} href={to} className={TokenList.join(['JumpInButton', compact && 'JumpInButton--compact', props.className])}>
-    <span className="JumpInButton__Position">
-      {isPosition && <img src={secondaryPin} width="16" height="16" />}
-      <span>{position}</span>
-    </span>
-    <span className="JumpInButton__Icon">
-      <img src={primaryJumpIn} width={16} height={16} />
-    </span>
-  </a>
+export type JumpInButtonProps = Omit<ButtonProps, 'href' | 'target' | 'children'> & {
+  event: SessionEventAttributes
+}
+
+export default function JumpInButton(props: ButtonProps) {
+  const l = useFormatMessage()
+  const event: SessionEventAttributes = props.event
+  const href = useMemo(() => eventTargetUrl(event), [ event ])
+
+  return <Button primary className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <span>JUMP IN</span>
+    <img src={icons.primaryJumpIn} width={14} height={14} style={{ marginLeft: '.5rem' }} />
+  </Button>
 }

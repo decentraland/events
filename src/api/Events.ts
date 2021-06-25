@@ -156,12 +156,10 @@ export default class Events extends API {
     const servers = await Catalyst.get().getServers()
     return Promise.all(servers
       .map(server => {
-        console.log(server)
         return API.catch(Catalyst.from(server.address).getCommsStatus(true))
       })
     )
       .then(statuses => {
-        console.log(statuses)
         return statuses.filter(Boolean) as CommsStatusWithLayers[]
       })
   }

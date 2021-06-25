@@ -13,7 +13,11 @@ export = async function main() {
       '/en/me/',
       '/en/settings/',
       '/en/submit/',
-      ...(gatsby.proxy || [])
+      '/api/*',
+      '/verify',
+      '/unsubscribe',
+      '/metrics/*',
+      '/metrics',
     ],
     useBucket: [ '/poster/*' ],
     useEmail: true

@@ -4,22 +4,20 @@ import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
 import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
 import { SessionEventAttributes } from '../../../entities/Event/types'
-import JumpInButton from '../../Button/JumpInButton'
+import JumpInPosition from '../../Button/JumpInPosition'
 import AttendingButtons from '../../Button/AttendingButtons'
 
 import './EventCard.css'
 import EventDate from '../EventDate/EventDate'
 import StartIn from '../../Badge/StartIn'
+import { navigate } from 'gatsby-plugin-intl'
+import locations from '../../../modules/locations'
 
 const EVENTS_LIST = 3
 
 export type EventCardProps = {
   event: SessionEventAttributes,
-  href?: string,
-  updating?: boolean,
-  utc?: boolean,
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
-  onChangeEvent?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
 
 export default function EventCard(props: EventCardProps) {
@@ -30,10 +28,14 @@ export default function EventCard(props: EventCardProps) {
     if (props.onClick) {
       props.onClick(e, props.event)
     }
+
+    if (!e.defaultPrevented) {
+      navigate(locations.event(event.id))
+    }
   }
 
   return (
-    <Card link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={props.href} onClick={handleClick} >
+    <Card link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={locations.event(event.id)} onClick={handleClick} >
       <div />
       <StartIn date={nextStartAt} />
       {event.total_attendees > 0 && <div className="EventCard__Attendees">
@@ -45,15 +47,15 @@ export default function EventCard(props: EventCardProps) {
       <ImgFixed src={event.image || ''} dimension="wide" />
       <Card.Content>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <EventDate event={event} utc={props.utc} />
+          <EventDate event={event} />
           <div>
-            <JumpInButton event={event} />
+            <JumpInPosition event={event} onClick={(e) => e.stopPropagation()} />
           </div>
         </div>
 
         <Card.Header>{event.name}</Card.Header>
         <Card.Description>
-          <AttendingButtons event={event} loading={props.updating} onChangeEvent={props.onChangeEvent} />
+          <AttendingButtons event={event} />
         </Card.Description>
       </Card.Content>
     </Card>)

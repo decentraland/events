@@ -1,16 +1,13 @@
-const { proxy } = require('decentraland-gatsby/dist/entities/Gatsby/config')
-const pkg = require('./package.json')
-
-const proxyPaths = pkg.gatsby && pkg.gatsby.proxy || []
-const languages = pkg.gatsby && pkg.gatsby.languages || [ 'en' ]
-
 module.exports = {
   siteMetadata: {
-    title: `Decentraland Events`,
-    description: `Decentraland Events`,
+    title: `Decentraland`,
+    description: `Decentraland`,
     author: `@decentraland`,
   },
-  proxy: proxy(`http://localhost:4000`, proxyPaths),
+  proxy: {
+    prefix: `/api`,
+    url: `http://localhost:4000`,
+  },
   plugins: [
     `gatsby-plugin-react-helmet`,
     {
@@ -52,9 +49,9 @@ module.exports = {
         // language JSON resource path
         path: `${__dirname}/src/intl`,
         // supported language
-        languages,
+        languages: [`en` /*, `es`, `zh` */],
         // language file path
-        defaultLanguage: languages[0],
+        defaultLanguage: `en`,
         // option to redirect to `/ko` when connecting `/`
         redirect: true,
       },

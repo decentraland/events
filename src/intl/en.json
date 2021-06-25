@@ -5,6 +5,18 @@
   "sign_in": {
     "message": "You need to {action} before to submit an event"
   },
+  "navigation": {
+    "events": "World Events",
+    "my_events": "My Events",
+    "pending_events": "Pending Events",
+    "submit_events": "Submit Event"
+  },
+  "page": {
+    "404": {
+      "title": "Page not found",
+      "description": "You just hit a route that doesn't exist..."
+    }
+  },
   "settings": {
     "profile_section": {
       "label": "Profile",

@@ -12,11 +12,12 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubmitButton from "../components/Button/SubmitButton"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
-import * as segment from '../utils/segment'
+import * as segment from '../modules/segment'
 import useAnalytics from "../hooks/useAnalytics"
 import { ProfileSettingsAttributes, EmailSubscriptionStatus } from "../entities/ProfileSettings/types"
 
 import './settings.css'
+import Navigation from "../components/Layout/Navigation"
 
 export type SettingsPageState = {
   updating: Partial<{
@@ -41,7 +42,7 @@ export default function SettingsPage(props: any) {
   const title = "Decentraland Events"
   const path = url.toUrl(location.pathname, location.search)
 
-  useAnalytics((analytics) => analytics.page(segment.Page.Confirm, { title, path }))
+  useAnalytics((analytics) => analytics.page(segment.SegemntPage.Confirm, { title, path }))
 
   function handleSubmit(event: React.MouseEvent<any>) {
     event.preventDefault()
@@ -62,13 +63,8 @@ export default function SettingsPage(props: any) {
   }
 
   return (
-    <Layout {...props} title={title} active>
-      <div style={{ paddingTop: "75px" }} />
-      <Tabs>
-        <Tabs.Tab onClick={handleHome}>World Events</Tabs.Tab>
-        {siteStore.profile && <Tabs.Tab onClick={handleMyEvents}>My Events</Tabs.Tab>}
-        <SubmitButton onClick={handleSubmit} />
-      </Tabs>
+    <>
+      <Navigation />
       <Container className="SettingsPage">
         {siteStore.loading && <div>
           <Divider />
@@ -96,6 +92,6 @@ export default function SettingsPage(props: any) {
           <Divider />
         </div>}
       </Container>
-    </Layout>
+    </>
   )
 }

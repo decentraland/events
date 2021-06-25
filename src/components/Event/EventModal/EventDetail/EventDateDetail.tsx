@@ -7,6 +7,7 @@ import { SessionEventAttributes } from '../../../../entities/Event/types'
 import AddToCalendarButton from '../../../Button/AddToCalendarButton'
 import Live from '../../../Badge/Live'
 import EventSection from '../../EventSection'
+import { useProfileSettingsContext } from '../../../../context/ProfileSetting';
 
 const clock = require('../../../../images/secondary-clock.svg')
 
@@ -16,14 +17,14 @@ export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {
   secondary?: boolean
   completed?: boolean
   countdown?: boolean
-  utc?: boolean
 }
 
-export default React.memo(function EventDateDetail({ event, startAt, secondary, completed, countdown, utc, ...props }: EventDateDetailProps) {
+export default React.memo(function EventDateDetail({ event, startAt, secondary, completed, countdown, ...props }: EventDateDetailProps) {
   const duration = event.duration
-  const now = useInterval(() => Time.from(Date.now()), Time.Second, [ utc ])
-  const start_at = useMemo(() => Time.from(startAt || event.start_at, { utc }), [ startAt || event.start_at, utc ])
-  const finish_at = useMemo(() => Time.from(start_at.getTime() + duration, { utc }), [ start_at ])
+  const [ settings ] = useProfileSettingsContext()
+  const now = useInterval(() => Time.from(Date.now()), Time.Second, [ !settings?.use_local_time ])
+  const start_at = useMemo(() => Time.from(startAt || event.start_at, { utc: !settings?.use_local_time }), [ startAt || event.start_at, !settings?.use_local_time ])
+  const finish_at = useMemo(() => Time.from(start_at.getTime() + duration, { utc: !settings?.use_local_time }), [ start_at ])
   const isLive = now.isBetween(start_at, finish_at)
 
   return <EventSection {...props}>
@@ -40,7 +41,7 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
           {' to '}
           <Bold>{finish_at.format('hh:mma')}</Bold>
           {' '}
-          <Bold>{utc ? 'UTC' : finish_at.format('Z')}</Bold>
+          <Bold>{!settings?.use_local_time ? 'UTC' : finish_at.format('Z')}</Bold>
         </>}
       </Paragraph>}
       {!isLive && !countdown && duration >= Time.Day && event.all_day && <Paragraph secondary={secondary} >
@@ -49,7 +50,7 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
         {' to '}
         <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>
         {' '}
-        <Bold>{utc ? 'UTC' : finish_at.format('Z')}</Bold>
+        <Bold>{!settings?.use_local_time ? 'UTC' : finish_at.format('Z')}</Bold>
       </Paragraph>}
       {!isLive && !countdown && duration >= Time.Day && !event.all_day && <>
         <Paragraph secondary={secondary} >
@@ -58,7 +59,7 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
           {' at '}
           <Bold>{start_at.format('hh:mma')}</Bold>
           {' '}
-          <Bold>{utc ? 'UTC' : start_at.format('Z')}</Bold>
+          <Bold>{!settings?.use_local_time ? 'UTC' : start_at.format('Z')}</Bold>
         </Paragraph>
         <Paragraph secondary={secondary} >
           <span style={{ width: '3.5em', display: 'inline-block' }}>{'To: '}</span>
@@ -66,7 +67,7 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
           {' at '}
           <Bold>{finish_at.format('hh:mma')}</Bold>
           {' '}
-          <Bold>{utc ? 'UTC' : finish_at.format('Z')}</Bold>
+          <Bold>{!settings?.use_local_time ? 'UTC' : finish_at.format('Z')}</Bold>
         </Paragraph>
       </>}
     </EventSection.Detail>
