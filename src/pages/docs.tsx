@@ -25,6 +25,7 @@ import './index.css'
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useListEvents from "../hooks/useListEvents"
+import Navigation from "../components/Layout/Navigation"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -87,38 +88,8 @@ export default function IndexPage(props: any) {
     }
   }, [ attendState.processing, siteStore.provider, siteStore.profile ])
 
-  function handleHome(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toHome(location), siteStore.getNavigationState())
-  }
-
-  function handleSubmit(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toSubmit(location), siteStore.getNavigationState())
-  }
-
-  function handleMyEvents(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toMyEvents(location), siteStore.getNavigationState())
-  }
-
-  function handleSettings(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toSettings(location), siteStore.getNavigationState())
-  }
-
-  return (
-    <Layout {...props} onOpenProfile={handleSettings} title="Decentraland Events API">
-      <div style={{ paddingTop: "75px" }} />
-      <Tabs>
-        <Tabs.Tab onClick={handleHome}>World Events</Tabs.Tab>
-        {siteStore.profile && <Tabs.Tab onClick={handleMyEvents}>My Events</Tabs.Tab>}
-        <SubmitButton onClick={handleSubmit} />
-      </Tabs>
+  return (<>
+      <Navigation />
       <Container>
         <Card style={{width: '100%'}}>
           <Card.Content>
@@ -351,6 +322,5 @@ export default function IndexPage(props: any) {
           </Card.Content>
         </Card>
       </Container>
-    </Layout>
-  )
+    </>)
 }

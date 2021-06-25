@@ -1,4 +1,4 @@
-export enum Page {
+export enum SegemntPage {
   Home = 'Home',
   Event = 'Event',
   Submit = 'Submit',
@@ -6,7 +6,7 @@ export enum Page {
   Confirm = 'Confirm',
 }
 
-export enum Track {
+export enum SegmentEvent {
   NewEvent = 'New Event',
   EditEvent = 'Edit Event',
   Settings = 'Settings',

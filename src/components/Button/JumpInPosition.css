@@ -1,11 +1,11 @@
-.JumpInButton {
+.JumpInPosition {
   display: inline-block;
   display: flex;
   flex-wrap: nowrap;
   position: relative;
 }
 
-.JumpInButton .JumpInButton__Position {
+.JumpInPosition .JumpInPosition__Position {
   padding: 4px 8px 4px 5px;
   border-radius: 4px;
   display: block;
@@ -17,7 +17,7 @@
   height: 24px;
 }
 
-.JumpInButton.JumpInButton--compact .JumpInButton__Position {
+.JumpInPosition.JumpInPosition--compact .JumpInPosition__Position {
   display: none;
   position: absolute;
   top: 0;
@@ -25,17 +25,17 @@
   z-index: 1000;
 }
 
-.JumpInButton.JumpInButton--compact:hover .JumpInButton__Position {
+.JumpInPosition.JumpInPosition--compact:hover .JumpInPosition__Position {
   display: flex;
 }
 
-.JumpInButton .JumpInButton__Position img {
+.JumpInPosition .JumpInPosition__Position img {
   width: 16px;
   margin-right: 4px;
   display: block;
 }
 
-.JumpInButton .JumpInButton__Position span {
+.JumpInPosition .JumpInPosition__Position span {
   font-size: 13px;
   font-weight: 500;
   font-stretch: normal;
@@ -45,7 +45,7 @@
   color: #736e7d;
 }
 
-.JumpInButton .JumpInButton__Icon {
+.JumpInPosition .JumpInPosition__Icon {
   padding: 5px;
   border-radius: 4px;
   display: block;
@@ -54,15 +54,15 @@
   height: 24px;
 }
 
-.JumpInButton .JumpInButton__Icon img {
+.JumpInPosition .JumpInPosition__Icon img {
   width: 14px;
   height: auto;
   display: block;
 }
 
-.ui.card .JumpInButton .JumpInButton__Icon img,
-.ui.card .JumpInButton .JumpInButton__Position img,
-.ui.cards > .card .JumpInButton .JumpInButton__Icon img,
-.ui.cards > .card .JumpInButton .JumpInButton__Position img {
+.ui.card .JumpInPosition .JumpInPosition__Icon img,
+.ui.card .JumpInPosition .JumpInPosition__Position img,
+.ui.cards > .card .JumpInPosition .JumpInPosition__Icon img,
+.ui.cards > .card .JumpInPosition .JumpInPosition__Position img {
   vertical-align: super;
 }

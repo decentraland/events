@@ -18,11 +18,12 @@ function url(path: string, query?: Record<string, string> | URLSearchParams) {
 export default {
   events: () => url('/'),
   event: (event: string) => url('/', { event }),
-  eventAttendees: (event: string) => url('/', { event, view: EventView.Attendees }),
 
   myEvents: () => url('/me/'),
   myEvent: (event: string) => url('/me/', { event }),
-  myEventAttendees: (event: string) => url('/me/', { event, view: EventView.Attendees }),
+
+  pendingEvents: () => url('/pending/'),
+  pendingEvent: (event: string) => url('/pending/', { event }),
 
   submit: () => url('/submit/'),
   edit: (event: string) => url('/submit/', { event, view: SubmitView.Edit }),

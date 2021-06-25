@@ -9,16 +9,22 @@ import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
 import { SessionEventAttributes } from '../../../../entities/Event/types'
-import JumpInButton from '../../../Button/JumpInButton'
+import JumpInButton from '../../../Button/JumpInPosition'
 import EventSection from '../../EventSection'
 import EventDateDetail from './EventDateDetail'
 
 import './EventDetail.css'
+import { useProfileSettingsContext } from '../../../../context/ProfileSetting'
+import locations from '../../../../modules/locations'
+import prevent from 'decentraland-gatsby/dist/utils/react/prevent'
+import { navigate } from 'gatsby-plugin-intl'
 
-const extra = require('../../../../images/info.svg')
-const info = require('../../../../images/secondary-info.svg')
-const pin = require('../../../../images/secondary-pin.svg')
-const friends = require('../../../../images/secondary-friends.svg')
+const icons = {
+  extra: require('../../../../images/info.svg'),
+  info: require('../../../../images/secondary-info.svg'),
+  pin: require('../../../../images/secondary-pin.svg'),
+  friends: require('../../../../images/secondary-friends.svg'),
+}
 
 const ATTENDEES_PREVIEW_LIMIT = 12
 
@@ -33,7 +39,6 @@ export type EventDetailProps = {
   showContact?: boolean
   showDetails?: boolean
   utc?: boolean
-  onClickEdit?: (event: React.MouseEvent<HTMLButtonElement>, data: SessionEventAttributes) => void
   onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
 }
 
@@ -44,12 +49,8 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const dates = completed ? event.recurrent_dates : event.recurrent_dates.filter((date) => date.getTime() + event.duration > now)
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const advance = event.editable || event.owned
-
-  function handleEdit(e: React.MouseEvent<HTMLButtonElement>) {
-    if (props.onClickEdit) {
-      props.onClickEdit(e, event)
-    }
-  }
+  const [ settings ] = useProfileSettingsContext()
+  const utc = props.utc ?? !settings?.use_local_time
 
   function handleAttendees(e: React.MouseEvent<HTMLDivElement>) {
     if (props.onClickAttendees) {
@@ -62,20 +63,20 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     {event && !event.rejected && !event.approved && <div className="EventNote"><code>This event is pending approval</code></div>}
     {event && <div className={'EventDetail'}>
       <div className="EventDetail__Header">
-        <DateBox date={next_start_at} utc={props.utc} />
+        <DateBox date={next_start_at} utc={utc} />
         <div className="EventDetail__Header__Event">
           <SubTitle>{event.name}</SubTitle>
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
         </div>
         {advance && <div className="EventDetail__Header__Actions">
-          {props.onClickEdit && <Button basic onClick={handleEdit}> EDIT </Button>}
+          <Button basic as="a" href={locations.edit(event.id)} onClick={prevent(() => navigate(locations.edit(event.id)))}> EDIT </Button>
         </div>}
       </div>
 
       {/* DESCRIPTION */}
       {props.showDescription !== false && <EventSection.Divider />}
       {props.showDescription !== false && <EventSection maxHeight="500px">
-        <EventSection.Icon src={info} width="16" height="16" />
+        <EventSection.Icon src={icons.info} width="16" height="16" />
         <EventSection.Detail >
           {!event.description && <Paragraph secondary={!event.description} >
             <Italic>No description</Italic>
@@ -87,12 +88,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DATE */}
       {props.showDate !== false && <EventSection.Divider />}
-      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} utc={props.utc} countdown={!!props.showCountdownDate} />}
+      {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} countdown={!!props.showCountdownDate} />}
       {props.showDate !== false && props.showAllDates !== false && <div style={{ maxHeight: '500px', overflow: 'auto' }}>
         {dates.map((date, i) => {
           return <EventDateDetail
             key={date.getTime()}
-            utc={props.utc}
             style={i > 0 ? { paddingTop: '0' } : {}}
             secondary={i > 0 || date.getTime() + event.duration < now}
             completed={date.getTime() + event.duration < now}
@@ -104,7 +104,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* PLACE */}
       {props.showPlace !== false && <EventSection.Divider />}
       {props.showPlace !== false && <EventSection>
-        <EventSection.Icon src={pin} width="16" height="16" />
+        <EventSection.Icon src={icons.pin} width="16" height="16" />
         <EventSection.Detail>
           <Paragraph bold>
             {event.scene_name || 'Decentraland'}
@@ -118,9 +118,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* ATTENDEES */}
       {props.showAttendees !== false && <EventSection.Divider />}
       {props.showAttendees !== false && <EventSection>
-        <EventSection.Icon src={friends} width="16x" height="16" center />
+        <EventSection.Icon src={icons.friends} width="16x" height="16" center />
         <EventSection.Detail style={{ display: 'flex', justifyContent: attendeesDiff > 0 ? 'space-around' : '' }}>
-          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <div style={attendeesDiff <= 0 ? { margin: '0 .4rem' } : {}}>
+          {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <div key={address} style={attendeesDiff <= 0 ? { margin: '0 .4rem' } : {}}>
             <Avatar key={address} size="small" address={address} />
           </div>)}
           {event.total_attendees === 0 && <Paragraph secondary><Italic>Nobody confirmed yet</Italic></Paragraph>}
@@ -135,7 +135,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* CONTACT */}
       {props.showContact !== false && !event.approved && advance && <EventSection.Divider />}
       {props.showContact !== false && !event.approved && advance && <EventSection highlight>
-        <EventSection.Icon src={extra} width="16" height="16" />
+        <EventSection.Icon src={icons.extra} width="16" height="16" />
         <EventSection.Detail>
           {event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
           {event.contact && isEmail(event.contact) && <Paragraph>
@@ -151,7 +151,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* DETAILS */}
       {props.showContact !== false && !event.approved && advance && <EventSection.Divider />}
       {props.showContact !== false && !event.approved && advance && <EventSection highlight>
-        <EventSection.Icon src={extra} width="16" height="16" />
+        <EventSection.Icon src={icons.extra} width="16" height="16" />
         <EventSection.Detail>
           {event.details && <Paragraph>{event.details}</Paragraph>}
           {!event.details && <Paragraph secondary={!event.details} >

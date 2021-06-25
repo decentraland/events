@@ -1,11 +1,9 @@
 
-import React, { useMemo, useEffect, useState } from "react"
+import React, { useMemo, useEffect } from "react"
 import { useLocation } from "@reach/router"
 import { navigate } from "gatsby-plugin-intl"
 
-import Layout from "../components/Layout/Layout"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { Field } from "decentraland-ui/dist/components/Field/Field"
@@ -18,10 +16,9 @@ import Link from "decentraland-gatsby/dist/components/Text/Link"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 
-import SubmitButton from "../components/Button/SubmitButton"
 import url from '../utils/url'
 import useSiteStore from '../hooks/useSiteStore'
-import * as segment from '../utils/segment'
+import * as segment from '../modules/segment'
 import useAnalytics from "../hooks/useAnalytics"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 
@@ -37,6 +34,7 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
 import './settings.css'
+import Navigation from "../components/Layout/Navigation"
 
 export type SettingsPageState = {
   updating: Partial<{
@@ -52,14 +50,11 @@ const check = require('../images/check.svg')
 
 export default function SettingsPage(props: any) {
   const l = useFormatMessage()
-  const location = useLocation()
-  const eventId = url.getEventId(location)
   const siteStore = useSiteStore(props.location)
-  const currentEvent = eventId && siteStore.events.getEntity(eventId) || null
-  const notificationSupported = useFeatureSupported("Notification")
-  const serviceWorkerSupported = useFeatureSupported("ServiceWorker")
-  const pushSupported = useFeatureSupported("PushManager")
-  const pushNotificationSupported = notificationSupported && serviceWorkerSupported && pushSupported
+  const isNotificationSupported = useFeatureSupported("Notification")
+  const isServiceWorkerSupported = useFeatureSupported("ServiceWorker")
+  const isPushSupported = useFeatureSupported("PushManager")
+  const isPushNotificationSupported = isNotificationSupported && isServiceWorkerSupported && isPushSupported
   const [subscription, subscribe, unsubscribe] = usePushSubscription()
   const [state, patchState] = usePatchState<SettingsPageState>({ updating: {}, settings: { ...siteStore.settings } })
   const currentEmail = state.settings.email || ''
@@ -103,29 +98,6 @@ export default function SettingsPage(props: any) {
     }
   }, [siteStore.settings])
 
-  const title = currentEvent && currentEvent.name || "Decentraland Events"
-  const path = url.toUrl(location.pathname, location.search)
-
-  useAnalytics((analytics) => analytics.page(segment.Page.Settings, { title, path }))
-
-  function handleSubmit(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toSubmit(location), siteStore.getNavigationState())
-  }
-
-  function handleHome(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toHome(location), siteStore.getNavigationState())
-  }
-
-  function handleMyEvents(event: React.MouseEvent<any>) {
-    event.preventDefault()
-    event.stopPropagation()
-    navigate(url.toMyEvents(location), siteStore.getNavigationState())
-  }
-
   function handleChangeEmail(event: any, data: any) {
     const value = data.value || ''
     patchState({ settings: { ...state.settings, email: value } })
@@ -146,7 +118,7 @@ export default function SettingsPage(props: any) {
     patchState({ updating: { ...state.updating, useLocalTime: true } })
     siteStore
       .updateSettings({ use_local_time: !state.settings.use_local_time })
-      .then((settings) => settings && track((analytics) => analytics.track(segment.Track.Settings, settings)))
+      .then((settings) => settings && track((analytics) => analytics.track(segment.SegmentEvent.Settings, settings)))
       .then(() => patchState({ updating: { ...state.updating, useLocalTime: false } }))
   }
 
@@ -158,7 +130,7 @@ export default function SettingsPage(props: any) {
     patchState({ updating: { ...state.updating, emailNotification: true } })
     siteStore
       .updateSettings({ notify_by_email: !state.settings.notify_by_email })
-      .then((settings) => settings && track((analytics) => analytics.track(segment.Track.Settings, settings)))
+      .then((settings) => settings && track((analytics) => analytics.track(segment.SegmentEvent.Settings, settings)))
       .then(() => patchState({ updating: { ...state.updating, emailNotification: false } }))
   }
 
@@ -193,14 +165,8 @@ export default function SettingsPage(props: any) {
     }
   }
 
-  return (
-    <Layout {...props} title={title} active>
-      <div style={{ paddingTop: "75px" }} />
-      <Tabs>
-        <Tabs.Tab onClick={handleHome}>World Events</Tabs.Tab>
-        <Tabs.Tab onClick={handleMyEvents}>My Events</Tabs.Tab>
-        <SubmitButton onClick={handleSubmit} />
-      </Tabs>
+  return (<>
+      <Navigation />
       <Container className="SettingsPage">
         {siteStore.loading && <div>
           <Divider />
@@ -329,7 +295,7 @@ export default function SettingsPage(props: any) {
             </Grid.Column>
             <Grid.Column tablet="8">
               <div className="SettingsSection">
-                <div className={TokenList.join(["SettingsDetails", !pushNotificationSupported && 'SettingsDetails--disabled'])}>
+                <div className={TokenList.join(["SettingsDetails", !isPushNotificationSupported && 'SettingsDetails--disabled'])}>
                   <Paragraph small semiBold>
                     {l(`settings.event_section.notification_by_browser_description`)}
                   </Paragraph>
@@ -339,13 +305,12 @@ export default function SettingsPage(props: any) {
                 </div>
                 <div className="SettingsToggle">
                   {state.updating.webNotification && <Loader size="mini" active />}
-                  {!state.updating.webNotification && <Radio toggle disabled={!pushNotificationSupported} checked={!!subscription} onClick={handleChangeBrowserNotification} />}
+                  {!state.updating.webNotification && <Radio toggle disabled={!isPushNotificationSupported} checked={!!subscription} onClick={handleChangeBrowserNotification} />}
                 </div>
               </div>
             </Grid.Column>
           </Grid.Row>
         </Grid>}
       </Container>
-    </Layout>
-  )
+    </>)
 }

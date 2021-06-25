@@ -32,16 +32,15 @@ export default function MyEventsPage(props: any) {
   const [ eventList, eventsState ] = useEventsContext()
   const events = useEventSorter(eventList)
   const [ event ] = useEventIdContext(params.get('event'))
-  const myEvents = useMemo(() => events.filter((event) => event.owned), [ events ])
-  const attendingEvents = useMemo(() => events.filter((event) => !!event.attending), [ events ])
+  const pendingEvents = useMemo(() => events.filter((event) => !event.approved && !event.rejected), [ events ])
   const [enabledNotification, setEnabledNotification] = useState(false)
   const loading = accountState.loading || eventsState.loading
 
   return (
     <>
       <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)} />
-      <EventModal event={event} onClose={prevent(() => navigate(locations.myEvents()))} />
-      <Navigation activeTab={NavigationTab.MyEvents} />
+      <EventModal event={event} onClose={prevent(() => navigate(locations.pendingEvents()))} />
+      <Navigation activeTab={NavigationTab.PendingEvents} />
       <Container>
         {loading && <div>
           <Divider />
@@ -54,32 +53,17 @@ export default function MyEventsPage(props: any) {
           <Divider />
         </div>}
         {!loading && account && <div>
-          <div className="GroupTitle"><SubTitle>GOING</SubTitle></div>
-          {attendingEvents.length === 0 && <div style={{ textAlign: 'center' }}>
-            <Divider size="mini" />
-            <Paragraph secondary>You are not attending to any event, find some <Link href={locations.events()} onClick={prevent(() => navigate(locations.events()))}>amazing event</Link>.</Paragraph>
-            <Divider size="mini" />
-          </div>}
-          {attendingEvents.length > 0 && <Card.Group>
-            {attendingEvents.map(event => <EventCardMini
-              key={'going:' + event.id}
-              event={event}
-              onClick={prevent(() => navigate(locations.myEvent(event.id)))}
-            />)}
-          </Card.Group>}
-        </div>}
-        {!loading && account && <div>
-          <div className="GroupTitle"><SubTitle>HOSTED BY ME</SubTitle></div>
-          {myEvents.length === 0 && <div style={{ textAlign: 'center' }}>
+          <div className="GroupTitle"><SubTitle>PENDING EVENTS</SubTitle></div>
+          {pendingEvents.length === 0 && <div style={{ textAlign: 'center' }}>
             <Divider size="tiny" />
             <Paragraph secondary>You are not hosting any events, try to propose a <Link href={locations.submit()} onClick={prevent(() => locations.submit())}>new event</Link>.</Paragraph>
             <Divider size="tiny" />
           </div>}
-          {myEvents.length > 0 && <Card.Group>
-            {myEvents.map((event) => <EventCard
+          {pendingEvents.length > 0 && <Card.Group>
+            {pendingEvents.map((event) => <EventCard
               key={'event:' + event.id}
               event={event}
-              onClick={prevent(() => navigate(locations.myEvent(event.id)))}
+              onClick={prevent(() => navigate(locations.pendingEvent(event.id)))}
             />)}
           </Card.Group>}
         </div>}

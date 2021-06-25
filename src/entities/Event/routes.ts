@@ -17,7 +17,7 @@ import { bool, integer } from 'decentraland-gatsby/dist/entities/Route/param';
 import { withAuthProfile, WithAuthProfile } from 'decentraland-gatsby/dist/entities/Profile/middleware';
 import Catalyst from 'decentraland-gatsby/dist/utils/api/Catalyst';
 import { notifyNewEvent, notifyApprovedEvent, notifyEditedEvent, notifyEventError } from '../Slack/utils';
-import { Request } from 'express';
+import { Response } from 'express';
 import Context from 'decentraland-gatsby/dist/entities/Route/context';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
 import EventAttendeeModel from '../EventAttendee/model';
@@ -37,7 +37,6 @@ export default routes((router) => {
   const withEventExists = withEvent()
   const withEventOwner = withEvent({ owner: true })
   const withPublicAccess = withCors({ cors: '*' })
-
   router.get('/events', withPublicAccess, withOptionalAuth, handle(listEvents))
   router.post('/events', withAuth, withAuthProfile(), handle(createNewEvent))
   router.get('/events/attending', withPublicAccess, withAuth, handle(getAttendingEvents))
@@ -46,7 +45,7 @@ export default routes((router) => {
   router.post('/events/:eventId/notifications', withAuth, withAuthProfile(), withEventExists, handle(notifyEvent))
 })
 
-export async function listEvents(req: WithAuth, _: Request, ctx: Context) {
+export async function listEvents(req: WithAuth, res: Response, ctx: Context) {
   const options: Partial<EventListOptions> = {
     currentUser: req.auth,
     offset: integer(req.query['offset']) ?? 0,

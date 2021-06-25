@@ -1,11 +1,14 @@
 import { SessionEventAttributes } from "../entities/Event/types";
 import { useMemo } from "react";
+import { useProfileSettingsContext } from "../context/ProfileSetting";
 
 export type EventGroup = [Date, SessionEventAttributes[]]
 
-export default function useListEventsByMonth(events?: SessionEventAttributes[] | null, utc: boolean = true) {
+export default function useListEventsByMonth(events?: SessionEventAttributes[] | null) {
+  const [ settings ] = useProfileSettingsContext()
   return useMemo<EventGroup[]>(() => {
     const now = Date.now()
+    const utc = !settings?.use_local_time
     const group = new Map<string, SessionEventAttributes[]>()
 
     if (events && events.length) {
@@ -34,5 +37,5 @@ export default function useListEventsByMonth(events?: SessionEventAttributes[] |
 
     return list
 
-  }, [events])
+  }, [ events, settings ])
 }
