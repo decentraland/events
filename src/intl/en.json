@@ -15,7 +15,8 @@
     "404": {
       "title": "Page not found",
       "description": "You just hit a route that doesn't exist..."
-    }
+    },
+    "submit": {}
   },
   "settings": {
     "profile_section": {

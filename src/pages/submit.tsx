@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react"
 import { useLocation } from '@reach/router'
 import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
@@ -187,40 +188,7 @@ export default function SubmitPage() {
     }
   }
 
-  // function handleDragStart(event: React.DragEvent<any>) {
-  //   event.preventDefault()
-  //   event.stopPropagation()
-  //   patchState({ dragging: true })
-  // }
-
-  // function handleDragEnd(event: React.DragEvent<any>) {
-  //   event.preventDefault()
-  //   event.stopPropagation()
-  //   patchState({ dragging: false })
-  // }
-
-  // function handleDragOver(event: React.DragEvent<any>) {
-  //   event.preventDefault()
-  //   event.stopPropagation()
-  // }
-
-  // function handleDrop(event: React.DragEvent<any>) {
-  //   event.preventDefault()
-  //   event.stopPropagation()
-  //   const files = event.dataTransfer?.files
-  //   if (!files) {
-  //     return
-  //   }
-
-  //   const file = files[0]
-  //   if (!file) {
-  //     return file
-  //   }
-
-  //   handlePoster(file)
-  // }
-
-  const dragging = useFileDrop((e) => {
+  useFileDrop((e) => {
     const files = e.dataTransfer?.files
     if (files && files[0]) {
       uploadPoster(files[0])
@@ -229,8 +197,13 @@ export default function SubmitPage() {
 
   const errors = editing.errors
   const coverError = state.errorImageSize || state.errorImageFormat || !!state.errorImageServer
-  // const event = eventId && siteStore.events.getEntity(eventId) || null
   const now = Date.now()
+
+  if (!account) {
+    return <Container className="SettingsPage">
+      <SignIn />
+    </Container>
+  }
 
   return (<>
       <Container style={{ paddingTop: '75px' }}>
@@ -426,17 +399,17 @@ export default function SubmitPage() {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="6">
-                    <Button primary loading={submitting || removing} disabled={(!!original && (original.owned || original.editable)) || submitting || removing} style={{ width: '100%' }} onClick={prevent(() => submit())}>
+                    <Button primary loading={submitting || removing || notifying} disabled={!original || (!original.owned && !original.editable) || submitting || removing} style={{ width: '100%' }} onClick={prevent(() => submit())}>
                       {original ? 'SAVE' : 'SUBMIT'}
                     </Button>
                   </Grid.Column>
                   <Grid.Column mobile="5">
-                    {!!original && (!!original.owned || !!original.editable) && <Button basic loading={submitting || removing} disabled={submitting || removing} style={{ width: '100%' }} onClick={handleReject}>
+                    {!!original && (!!original.owned || !!original.editable) && <Button basic loading={submitting || removing || notifying} disabled={submitting || removing || notifying} style={{ width: '100%' }} onClick={handleReject}>
                       DELETE
                     </Button>}
                   </Grid.Column>
                   <Grid.Column mobile="5">
-                    {!!original?.editable && <Button basic loading={submitting || removing} disabled={submitting || removing} style={{ width: '100%' }} onClick={prevent(() => notify())}>
+                    {!!original?.editable && <Button basic loading={submitting || removing || notifying} disabled={submitting || removing || notifying} style={{ width: '100%' }} onClick={prevent(() => notify())}>
                       NOTIFY ME
                     </Button>}
                   </Grid.Column>

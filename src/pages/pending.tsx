@@ -12,8 +12,6 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
-import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
-import useSiteStore from '../hooks/useSiteStore'
 
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
@@ -27,7 +25,6 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 export default function MyEventsPage(props: any) {
   const location = useLocation()
   const params = new URLSearchParams(location.search)
-  // const events = useListEvents(siteStore.events.getState().data)
   const [ account, accountState ] = useAuthContext()
   const [ eventList, eventsState ] = useEventsContext()
   const events = useEventSorter(eventList)

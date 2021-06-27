@@ -2,30 +2,25 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { Address } from 'web3x/address'
 import { Personal } from 'web3x/personal'
-import { useLocation } from "@reach/router"
-import { navigate } from "gatsby-plugin-intl"
 
-import Layout from "../components/Layout/Layout"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Table } from "decentraland-ui/dist/components/Table/Table"
-import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import { Stats } from 'decentraland-ui/dist/components/Stats/Stats'
-import SubmitButton from "../components/Button/SubmitButton"
 import Accordion from "../components/Doc/Accordion"
-import useSiteStore from '../hooks/useSiteStore'
-import url from '../utils/url'
 
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Code from "decentraland-gatsby/dist/components/Text/Code"
-import './index.css'
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import useListEvents from "../hooks/useListEvents"
 import Navigation from "../components/Layout/Navigation"
+import { useEventsContext, useEventSorter } from "../context/Event"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import './index.css'
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -40,10 +35,15 @@ type AttendState = {
   signature: null | string,
 }
 
+const attendOptions = [
+  { key: 'yes', value: true, text: 'yes' },
+  { key: 'no', value: false, text: 'no' },
+]
+
 export default function IndexPage(props: any) {
-  const location = useLocation()
-  const siteStore = useSiteStore(props.location)
-  const eventList = useListEvents(siteStore.events.getState().data)
+  const [ account, accountState ] = useAuthContext()
+  const [ events, eventsState ] = useEventsContext()
+  const sortedEvents = useEventSorter(events)
   const [ attendState, setAttendState ] = useState<AttendState>({
     processing: false,
     event: null,
@@ -53,15 +53,15 @@ export default function IndexPage(props: any) {
     signature: null
   })
 
-  const eventOptions = useMemo(() => eventList.map(event => ({ key: event.id, value: event.id, text: event.name, image: event.image })), [ eventList ])
-  const attendOptions = useMemo(() => [
-    { key: 'yes', value: true, text: 'yes' },
-    { key: 'no', value: false, text: 'no' },
-  ], [])
+  const eventOptions = useMemo(() => {
+    return sortedEvents
+      .filter(event => event.approved)
+      .map(event => ({ key: event.id, value: event.id, text: event.name, image: event.image }))
+  }, [ sortedEvents ])
 
   useEffect(() => {
     if (attendState.processing) {
-      if (!attendState.event || !siteStore.provider || !siteStore.profile) {
+      if (!attendState.event || !accountState.provider || !account) {
         setAttendState((current) => ({ ...current, processing: false }))
       } else {
         const message = JSON.stringify({
@@ -70,15 +70,15 @@ export default function IndexPage(props: any) {
           event: attendState.event,
           attend: attendState.attend ?? true,
         })
-        new Personal(siteStore.provider)
+        new Personal(accountState.provider)
           .sign(
             message,
-            Address.fromString(siteStore.profile),
+            Address.fromString(account),
             ''
           )
           .then((signature) => {
             console.log(signature)
-            setAttendState((current) => ({ ...current, address: siteStore.profile, message, signature, processing: false }))
+            setAttendState((current) => ({ ...current, address: account, message, signature, processing: false }))
           })
           .catch((err) => {
             console.error(err)
@@ -86,7 +86,16 @@ export default function IndexPage(props: any) {
           })
       }
     }
-  }, [ attendState.processing, siteStore.provider, siteStore.profile ])
+  }, [ attendState.processing, accountState.provider, account ])
+
+  if (!account) {
+    return <>
+      <Navigation />
+      <Container className="SettingsPage">
+        <SignIn />
+      </Container>
+    </>
+  }
 
   return (<>
       <Navigation />
@@ -264,7 +273,7 @@ export default function IndexPage(props: any) {
                   <SelectField label="attend" options={attendOptions} placeholder="Are you attending?" onChange={(_, { value }) => setAttendState((current) => ({ ...current, attend: value as any }))} />
                 </Grid.Column>
                 <Grid.Column tablet="4">
-                  <Button primary onClick={() => setAttendState((current) => ({ ...current, processing: true }))} style={{ marginTop: '20px' }} loading={attendState.processing} disabled={!siteStore.profile || attendState.attend === null || attendState.event === null}>
+                  <Button primary onClick={() => setAttendState((current) => ({ ...current, processing: true }))} style={{ marginTop: '20px' }} loading={attendState.processing} disabled={!account || attendState.attend === null || attendState.event === null}>
                     SIGN MESSAGE
                   </Button>
                 </Grid.Column>

@@ -13,7 +13,6 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
 import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
-import useSiteStore from '../hooks/useSiteStore'
 
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"

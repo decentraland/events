@@ -77,11 +77,6 @@ export default function SettingsPage(props: any) {
     state.update({ email })
   }
 
-  // function handleChangeUseLocalTime() {
-  //   settingsState.update({ use_local_time: !state.settings.use_local_time })
-  // }
-
-
   if (!account) {
     return <>
       <Navigation />
