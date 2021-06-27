@@ -399,7 +399,7 @@ export default function SubmitPage() {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column mobile="6">
-                    <Button primary loading={submitting || removing || notifying} disabled={!original || (!original.owned && !original.editable) || submitting || removing} style={{ width: '100%' }} onClick={prevent(() => submit())}>
+                    <Button primary loading={submitting || removing || notifying} disabled={(!!original && !original.owned && !original.editable) || submitting || removing || notifying} style={{ width: '100%' }} onClick={prevent(() => submit())}>
                       {original ? 'SAVE' : 'SUBMIT'}
                     </Button>
                   </Grid.Column>
