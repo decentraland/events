@@ -4,6 +4,7 @@ import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
 import { status, filesystem } from 'decentraland-gatsby/dist/entities/Route/routes'
 import { withDDosProtection, withLogs, withCors, withBody } from 'decentraland-gatsby/dist/entities/Route/middleware'
 import database from 'decentraland-gatsby/dist/entities/Database/index'
+import metricsDatabase from 'decentraland-gatsby/dist/entities/Database/routes'
 import profile from 'decentraland-gatsby/dist/entities/Profile/routes'
 import metrics from 'decentraland-gatsby/dist/entities/Prometheus/routes'
 import handle from 'decentraland-gatsby/dist/entities/Route/handle'
@@ -48,6 +49,7 @@ app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
 app.use(metrics)
+app.use(metricsDatabase)
 app.use('/', social)
 app.use(filesystem('public', '404.html'))
 
