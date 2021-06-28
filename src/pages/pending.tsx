@@ -5,6 +5,7 @@ import { navigate } from "gatsby-plugin-intl"
 
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
@@ -31,7 +32,15 @@ export default function MyEventsPage(props: any) {
   const [ event ] = useEventIdContext(params.get('event'))
   const pendingEvents = useMemo(() => events.filter((event) => !event.approved && !event.rejected), [ events ])
   const [enabledNotification, setEnabledNotification] = useState(false)
-  const loading = accountState.loading || eventsState.loading
+
+  if (accountState.loading || !account) {
+    return <>
+      <Navigation />
+      <Container>
+        <SignIn isConnecting={accountState.loading}  onConnect={() => accountState.select()} />
+      </Container>
+    </>
+  }
 
   return (
     <>
@@ -39,21 +48,16 @@ export default function MyEventsPage(props: any) {
       <EventModal event={event} onClose={prevent(() => navigate(locations.pendingEvents()))} />
       <Navigation activeTab={NavigationTab.PendingEvents} />
       <Container>
-        {loading && <div>
+        {eventsState.loading && <div>
           <Divider />
           <Loader active size="massive" style={{ position: 'relative' }} />
           <Divider />
         </div>}
-        {!loading && !account && <div style={{ textAlign: 'center' }}>
-          <Divider />
-          <Paragraph secondary>You need to <Link onClick={() => null}>sign in</Link> before to submit an event</Paragraph>
-          <Divider />
-        </div>}
-        {!loading && account && <div>
+        {!eventsState.loading && account && <div>
           <div className="GroupTitle"><SubTitle>PENDING EVENTS</SubTitle></div>
           {pendingEvents.length === 0 && <div style={{ textAlign: 'center' }}>
             <Divider size="tiny" />
-            <Paragraph secondary>You are not hosting any events, try to propose a <Link href={locations.submit()} onClick={prevent(() => locations.submit())}>new event</Link>.</Paragraph>
+            <Paragraph secondary>You don't have any pending events, try to propose a <Link href={locations.submit()} onClick={prevent(() => navigate(locations.submit()))}>new event</Link>.</Paragraph>
             <Divider size="tiny" />
           </div>}
           {pendingEvents.length > 0 && <Card.Group>

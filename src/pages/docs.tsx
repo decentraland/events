@@ -88,11 +88,11 @@ export default function IndexPage(props: any) {
     }
   }, [ attendState.processing, accountState.provider, account ])
 
-  if (!account) {
+  if (accountState.loading || !account) {
     return <>
       <Navigation />
-      <Container className="SettingsPage">
-        <SignIn />
+      <Container>
+        <SignIn isConnecting={accountState.loading}  onConnect={() => accountState.select()} />
       </Container>
     </>
   }

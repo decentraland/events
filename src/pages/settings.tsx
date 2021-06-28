@@ -28,7 +28,7 @@ import { useEffect } from "react"
 const check = require('../images/check.svg')
 export default function SettingsPage(props: any) {
   const l = useFormatMessage()
-  const [account] = useAuthContext()
+  const [account, accountState] = useAuthContext()
   const [settings, state] = useProfileSettingsContext()
   const [email, setEmail] = useState(settings?.email)
   const currentEmailChanged = email !== settings?.email
@@ -77,11 +77,11 @@ export default function SettingsPage(props: any) {
     state.update({ email })
   }
 
-  if (!account) {
+  if (!account || accountState.loading) {
     return <>
       <Navigation />
-      <Container className="SettingsPage">
-        <SignIn />
+      <Container>
+        <SignIn isConnecting={accountState.loading} onConnect={() => accountState.select()} />
       </Container>
     </>
   }

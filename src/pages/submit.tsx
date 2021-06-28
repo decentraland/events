@@ -199,9 +199,9 @@ export default function SubmitPage() {
   const coverError = state.errorImageSize || state.errorImageFormat || !!state.errorImageServer
   const now = Date.now()
 
-  if (!account) {
-    return <Container className="SettingsPage">
-      <SignIn />
+  if (!account || accountState.loading) {
+    return <Container style={{ paddingTop: '75px' }}>
+      <SignIn isConnecting={accountState.loading} onConnect={() => accountState.select()} />
     </Container>
   }
 

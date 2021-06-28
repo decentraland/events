@@ -13,7 +13,7 @@ export type AccordionProps = {
   description?: React.ReactNode,
 }
 
-function Accordion(props: AccordionProps) {
+export default React.memo(function Accordion(props: AccordionProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [ open, setOpen ] = useState(false)
   const [ height, setHeight ] = useState(0)
@@ -54,6 +54,4 @@ function Accordion(props: AccordionProps) {
       </div>
     </div>
   </div>
-}
-
-export default React.memo(Accordion)
+})
