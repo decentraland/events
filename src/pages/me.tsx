@@ -71,7 +71,7 @@ export default function MyEventsPage(props: any) {
           <div className="GroupTitle"><SubTitle>HOSTED BY ME</SubTitle></div>
           {myEvents.length === 0 && <div style={{ textAlign: 'center' }}>
             <Divider size="tiny" />
-            <Paragraph secondary>You are not hosting any events, try to propose a <Link href={locations.submit()} onClick={prevent(() => locations.submit())}>new event</Link>.</Paragraph>
+            <Paragraph secondary>You are not hosting any events, try to propose a <Link href={locations.submit()} onClick={prevent(() => navigate(locations.submit()))}>new event</Link>.</Paragraph>
             <Divider size="tiny" />
           </div>}
           {myEvents.length > 0 && <Card.Group>
