@@ -2,9 +2,9 @@ import { Request } from 'express';
 import isUUID from 'validator/lib/isUUID';
 import EventModel from './model';
 import { DeprecatedEventAttributes, EventAttributes } from './types';
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin";
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { middleware } from "decentraland-gatsby/dist/entities/Route/handle";
-import isAdmin from '../Auth/isAdmin';
 
 export type WithEvent<R extends Request = Request> = R & {
   event: DeprecatedEventAttributes

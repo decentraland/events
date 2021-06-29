@@ -1,9 +1,11 @@
 import express from 'express'
 import Manager from 'decentraland-gatsby/dist/entities/Job/job'
-import { listen } from 'decentraland-gatsby/dist/entities/Server/utils'
+import { jobInitializer } from 'decentraland-gatsby/dist/entities/Job/utils'
+import { initializeServices } from 'decentraland-gatsby/dist/entities/Server/handler'
+import { serverInitializer } from 'decentraland-gatsby/dist/entities/Server/utils'
 import { status, filesystem } from 'decentraland-gatsby/dist/entities/Route/routes'
 import { withDDosProtection, withLogs, withCors, withBody } from 'decentraland-gatsby/dist/entities/Route/middleware'
-import database from 'decentraland-gatsby/dist/entities/Database/index'
+import { databaseInitializer } from 'decentraland-gatsby/dist/entities/Database/utils'
 import metricsDatabase from 'decentraland-gatsby/dist/entities/Database/routes'
 import profile from 'decentraland-gatsby/dist/entities/Profile/routes'
 import metrics from 'decentraland-gatsby/dist/entities/Prometheus/routes'
@@ -53,11 +55,12 @@ app.use(metricsDatabase)
 app.use('/', social)
 app.use(filesystem('public', '404.html'))
 
-Promise.resolve()
-  .then(() => database.connect())
-  .then(() => jobs.start())
-  .then(() => listen(
+initializeServices([
+  process.env.DATABASE !== 'false' && databaseInitializer(),
+  process.env.JOBS !== 'false' && jobInitializer(jobs),
+  process.env.HTTP !== 'false' && serverInitializer(
     app,
     process.env.PORT || 4000,
     process.env.HOST
-  ))
+  )
+])
