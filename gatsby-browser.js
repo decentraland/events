@@ -40,7 +40,7 @@ export const wrapRootElement = ({ element }) => (<>
 export const wrapPageElement = ({ element, props }) => {
   return <Layout
     {...props}
-    rightMenu={<UserMenu hideBalance onClickSettings={() => navigate(locations.settings())} />}
+    rightMenu={<UserMenu onClickSettings={() => navigate(locations.settings())} />}
   >
     {element}
   </Layout>
