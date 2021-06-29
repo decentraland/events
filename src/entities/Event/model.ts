@@ -2,12 +2,12 @@
 import { utils } from 'decentraland-commons';
 import { SQL, table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
 import { Model } from 'decentraland-gatsby/dist/entities/Database/model';
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin";
 import schema from 'decentraland-gatsby/dist/entities/Schema'
 import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes } from './types'
 import EventAttendee from '../EventAttendee/model'
-import isAdmin from '../Auth/isAdmin';
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = 'events'
