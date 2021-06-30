@@ -62,7 +62,14 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
   const filename = BUCKET_DIR + '/' + userHash + timeHash + ext
   await ensure()
 
-  const params = { Bucket: BUCKET_NAME, Key: filename, Body: poster.data, ACL: 'public-read' } as AWS.S3.Types.PutObjectRequest
+  const params: AWS.S3.Types.PutObjectRequest = {
+    Bucket: BUCKET_NAME,
+    Key: filename,
+    Body: poster.data,
+    ACL: 'public-read',
+    CacheControl: 'public, max-age=604800, immutable'
+  }
+
   await new Promise((resolve, reject) => s3.upload(params, (err: Error | null | undefined, data?: any) => err ? reject(err) : resolve(data)))
 
   const time = ((Date.now() - initial) / 1000).toFixed(3)
