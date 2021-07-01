@@ -26,6 +26,7 @@ import locations from "../modules/locations"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import { useEventIdContext, useEventsContext, useEventSorter } from "../context/Event"
 import './index.css'
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -33,13 +34,14 @@ export type IndexPageState = {
 
 export default function IndexPage(props: any) {
   const now = Date.now()
-  // const [state, patchState] = usePatchState<IndexPageState>({ updating: {} })
+  const [ , accountState ] = useAuthContext()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const [ event ] = useEventIdContext(params.get('event'))
   const [ settings ] = useProfileSettingsContext()
   const [ all, state ] = useEventsContext()
   const events = useEventSorter(all)
+  const loading = accountState.loading || loading
 
   const eventsByMonth = useListEventsByMonth(events)
   const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [events])
@@ -60,19 +62,19 @@ export default function IndexPage(props: any) {
       <Navigation activeTab={NavigationTab.Events} />
       <Container>
 
-        {state.loading && <div>
+        {loading && <div>
           <Divider />
           <Loader active size="massive" style={{ position: 'relative' }} />
           <Divider />
         </div>}
 
-        {!state.loading && events.length === 0 && <div>
+        {!loading && events.length === 0 && <div>
           <Divider />
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </div>}
 
-        {!state.loading && events.length > 0 && mainEvents.length > 0 && <div>
+        {!loading && events.length > 0 && mainEvents.length > 0 && <div>
           <Carousel>
             {mainEvents.map(event => <EventCardBig
               key={'live:' + event.id}
@@ -82,7 +84,7 @@ export default function IndexPage(props: any) {
         </Carousel>
         </div>}
 
-        {!state.loading && events.length > 0 && trendingEvents.length > 0 && <div>
+        {!loading && events.length > 0 && trendingEvents.length > 0 && <div>
           <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
           <Card.Group>
             {trendingEvents.map(event => <EventCardMini
@@ -92,7 +94,7 @@ export default function IndexPage(props: any) {
             />)}
           </Card.Group></div>}
 
-        {!state.loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
+        {!loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
             <SubTitle>{Time.from(date, { utc: !settings?.use_local_time }).format('MMMM')}</SubTitle>
           </div>
