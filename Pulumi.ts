@@ -18,6 +18,9 @@ export = async function main() {
       '/unsubscribe',
       '/metrics/*',
       '/metrics',
+      '/sitemap.xml',
+      '/sitemap.static.xml',
+      '/sitemap.events.xml',
     ],
     useBucket: [ '/poster/*' ],
     useEmail: true

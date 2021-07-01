@@ -5,19 +5,19 @@ import { RRule, Weekday } from 'rrule'
 const DECENTRALAND_URL = process.env.GATSBY_DECENTRALAND_URL || process.env.DECENTRALAND_URL || 'https://play.decentraland.org'
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
 
-export function siteUrl() {
+export function siteUrl(pathname: string = '') {
   const target = new URL(EVENTS_URL)
-  target.pathname = ''
+  target.pathname = pathname
   return target
 }
 
-export function eventUrl(event: EventAttributes): string {
+export function eventUrl(event: Pick<EventAttributes, 'id'>): string {
   const target = siteUrl()
   target.searchParams.set('event', event.id)
   return target.toString()
 }
 
-export function eventTargetUrl(event: EventAttributes): string {
+export function eventTargetUrl(event: Pick<EventAttributes, 'x' | 'y' | 'realm'>): string {
   const target = new URL(DECENTRALAND_URL)
   target.pathname = ''
   target.searchParams.set('position', [event.x || 0, event.y || 0].join(','))
@@ -29,7 +29,7 @@ export function eventTargetUrl(event: EventAttributes): string {
   return target.toString()
 }
 
-export function eventFacebookUrl(event: EventAttributes): string {
+export function eventFacebookUrl(event: Pick<EventAttributes, 'id' | 'description'>): string {
   const target = new URL('https://www.facebook.com/sharer/sharer.php')
   target.searchParams.set('u', eventUrl(event))
 
@@ -40,7 +40,7 @@ export function eventFacebookUrl(event: EventAttributes): string {
   return target.toString()
 }
 
-export function eventTwitterUrl(event: EventAttributes): string {
+export function eventTwitterUrl(event: Pick<EventAttributes, 'id' |  'description'>): string {
   const target = new URL('https://twitter.com/intent/tweet')
   target.searchParams.set('hashtags', 'decentraland,socialworld,virtualgames')
 

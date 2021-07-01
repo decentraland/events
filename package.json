@@ -30,7 +30,8 @@
     "react-helmet": "^5.2.1",
     "rrule": "^2.6.4",
     "uuid": "^7.0.2",
-    "web-push": "^3.4.4"
+    "web-push": "^3.4.4",
+    "xml": "^1.0.1"
   },
   "devDependencies": {
     "@types/apicache": "^1.2.2",
@@ -42,6 +43,7 @@
     "@types/react-helmet": "^5.0.15",
     "@types/validator": "^13.0.0",
     "@types/web-push": "^3.3.0",
+    "@types/xml": "^1.0.5",
     "concurrently": "^5.1.0",
     "dcl-ops-lib": "^4.20.8",
     "decentraland-gatsby-deploy": "^1.9.1",

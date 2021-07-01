@@ -17,6 +17,7 @@ import social from './entities/Social/routes'
 import poster from './entities/Poster/routes'
 import realms from './entities/Realm/routes'
 import message from './entities/Message/routes'
+import sitemap from './entities/Sitemap/routes'
 import profileSettings, { verifySubscription, removeSubscription } from './entities/ProfileSettings/routes'
 import profileSubscription from './entities/ProfileSubscription/routes'
 import { SUBSCRIPTION_PATH, UNSUBSCRIBE_PATH } from './entities/ProfileSettings/types'
@@ -52,6 +53,7 @@ app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
 app.use(metrics)
 app.use(metricsDatabase)
+app.use(sitemap)
 app.use('/', social)
 app.use(filesystem('public', '404.html'))
 

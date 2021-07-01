@@ -198,6 +198,8 @@ export const adminPatchAttributes: (keyof EventAttributes)[] = editableAttribute
   'url',
 ])
 
+export const SITEMAP_ITEMS_PER_PAGE = 100
+
 export const eventSchema = {
   type: 'object',
   additionalProperties: false,

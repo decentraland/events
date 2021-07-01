@@ -6,7 +6,7 @@ import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin";
 import schema from 'decentraland-gatsby/dist/entities/Schema'
 import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes } from './types'
+import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes, SITEMAP_ITEMS_PER_PAGE } from './types'
 import EventAttendee from '../EventAttendee/model'
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
@@ -55,6 +55,23 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
   static buildAll(events: EventAttributes[]): DeprecatedEventAttributes[] {
     return events.map(event => EventModel.build(event) as DeprecatedEventAttributes)
+  }
+
+  static async countEvents() {
+    return this.count<EventAttributes>({ approved: true })
+  }
+
+  static async getSitemapEvents(page: number) {
+    const query = SQL`
+      SELECT id
+      FROM ${table(EventModel)} e
+      WHERE e.approved IS TRUE
+      ORDER BY created_at ASC
+      OFFSET ${page * SITEMAP_ITEMS_PER_PAGE}
+      LIMIT ${SITEMAP_ITEMS_PER_PAGE}
+    `;
+
+    return await EventModel.query<{ id: string }>(query)
   }
 
   static async getUpcomingEvents() {
