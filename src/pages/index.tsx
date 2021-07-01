@@ -41,7 +41,7 @@ export default function IndexPage(props: any) {
   const [ settings ] = useProfileSettingsContext()
   const [ all, state ] = useEventsContext()
   const events = useEventSorter(all)
-  const loading = accountState.loading || loading
+  const loading = accountState.loading || state.loading
 
   const eventsByMonth = useListEventsByMonth(events)
   const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [events])
