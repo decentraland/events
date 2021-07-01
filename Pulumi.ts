@@ -7,12 +7,15 @@ export = async function main() {
     name: 'events',
     // contentSource: resolve(__dirname, '../public'),
     usePublicTLD: process.env['USE_PUBLIC_TLD'] === 'true',
+    contentRoutingRules: {
+      '/en/*': '/$1'
+    },
     serviceImage: process.env['CI_REGISTRY_IMAGE'],
     servicePaths: [
-      '/en/',
-      '/en/me/',
-      '/en/settings/',
-      '/en/submit/',
+      '/',
+      '/me/',
+      '/settings/',
+      '/submit/',
       '/api/*',
       '/verify',
       '/unsubscribe',
