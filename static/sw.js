@@ -1,3 +1,5 @@
+"use strict";
+
 self.addEventListener("push", function(event) {
   const data = (event.data && event.data.json()) || {}
   const exp = data.exp || Infinity
