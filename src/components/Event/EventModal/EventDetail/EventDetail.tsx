@@ -38,6 +38,7 @@ export type EventDetailProps = {
   showAttendees?: boolean
   showContact?: boolean
   showDetails?: boolean
+  showEdit?: boolean
   utc?: boolean
   onClickAttendees?: (event: React.MouseEvent<HTMLDivElement>, data: SessionEventAttributes) => void
 }
@@ -68,7 +69,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <SubTitle>{event.name}</SubTitle>
           <Paragraph className="EventDetail__Header__Event__By" secondary>Public, Organized by <Link>{event.user_name || 'Guest'}</Link></Paragraph>
         </div>
-        {advance && <div className="EventDetail__Header__Actions">
+        {props.showEdit !== false && advance && <div className="EventDetail__Header__Actions">
           <Button basic as="a" href={locations.edit(event.id)} onClick={prevent(() => navigate(locations.edit(event.id)))}> EDIT </Button>
         </div>}
       </div>

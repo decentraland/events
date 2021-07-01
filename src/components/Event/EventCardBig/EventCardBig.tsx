@@ -37,6 +37,7 @@ export default function EventCardBig(props: EventCardBigProps) {
       <Card.Content>
         <EventDetail
           event={event}
+          showEdit={false}
           showDescription={false}
           showAttendees={false}
           showContact={false}
