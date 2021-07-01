@@ -67,7 +67,7 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
     Key: filename,
     Body: poster.data,
     ACL: 'public-read',
-    CacheControl: 'public, max-age=604800, immutable'
+    CacheControl: 'public, max-age=31536000, immutable'
   }
 
   await new Promise((resolve, reject) => s3.upload(params, (err: Error | null | undefined, data?: any) => err ? reject(err) : resolve(data)))
