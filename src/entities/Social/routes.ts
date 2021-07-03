@@ -12,14 +12,9 @@ import EventModel from "../Event/model";
 
 export default routes((router) => {
   router.get('/', handleRaw(injectHomeMetadata, 'html'))
-  router.get('/en/', handleRaw(injectHomeMetadata, 'html'))
   router.get('/me/', handleRaw(injectHomeMetadata, 'html'))
-  router.get('/en/me/', handleRaw(injectHomeMetadata, 'html'))
   router.get('/settings/', handleRaw(injectHomeMetadata, 'html'))
-  router.get('/en/settings/', handleRaw(injectHomeMetadata, 'html'))
-
   router.get('/submit/', handleRaw(injectSubmitMetadata, 'html'))
-  router.get('/en/submit/', handleRaw(injectSubmitMetadata, 'html'))
 })
 
 async function readFile(req: Request) {
