@@ -265,14 +265,18 @@ export default function SubmitPage() {
         <Grid stackable>
           <Grid.Row>
             <Grid.Column mobile="16">
-              <ImageInput label="Event Cover" value={editing.image || ''} onFileChange={uploadPoster} loading={uploadingPoster} error={coverError} message={
-                state.errorImageSize && <>This image is too heavy (more than 500Kb), try with <a href="https://imagecompressor.com/" target="_blank"><strong>optimizilla</strong></a></> ||
-                state.errorImageFormat && <>This file format is not supported, try with <strong>jpg</strong>, <strong>png</strong> or <strong>gif</strong></> ||
-                state.errorImageServer || ''}>
+              <ImageInput label="Event Cover" value={editing.image || ''} onFileChange={uploadPoster} loading={uploadingPoster} error={coverError}
+                message={
+                  state.errorImageSize && <>This image is too heavy (more than 500Kb), try with <a href="https://imagecompressor.com/" target="_blank"><strong>optimizilla</strong></a></> ||
+                  state.errorImageFormat && <>This file format is not supported, try with <strong>jpg</strong>, <strong>png</strong> or <strong>gif</strong></> ||
+                  state.errorImageServer || '(recommended size: 1340 x 670)'
+                }>
                 <div className="ImageInput__Description">
                   <AddCoverButton />
                   <Paragraph>
-                    <span className="ImageInput__Description__Primary">Browse</span> your computer or <br /> drag a picture to add a cover
+                    <span className="ImageInput__Description__Primary">Browse</span> your computer or <br />
+                    drag a picture to add a cover <br />
+                    <i style={{ opacity: .8 }}>(recommended size: 1340 x 670)</i>
                   </Paragraph>
                 </div>
               </ImageInput>
