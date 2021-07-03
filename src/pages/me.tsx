@@ -22,8 +22,11 @@ import locations from "../modules/locations"
 import { useEventIdContext, useEventsContext, useEventSorter } from "../context/Event"
 import './index.css'
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import Helmet from "react-helmet"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 
 export default function MyEventsPage(props: any) {
+  const l = useFormatMessage()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   // const events = useListEvents(siteStore.events.getState().data)
@@ -38,6 +41,22 @@ export default function MyEventsPage(props: any) {
 
   return (
     <>
+      <Helmet>
+        <title>{event?.name || l('social.home.title') || ''}</title>
+        <meta name="description" content={event?.description || l('social.home.description') || ''} />
+
+        <meta property="og:title" content={event?.name || l('social.home.title') || ''} />
+        <meta property="og:description" content={event?.description || l('social.home.description') || ''} />
+        <meta property="og:image" content={event?.image || l('social.home.image') || ''} />
+        <meta property="og:site" content={l('social.home.site') || ''} />
+
+        <meta name="twitter:title" content={event?.description || l('social.home.title') || ''} />
+        <meta name="twitter:description" content={event?.description || l('social.home.description') || ''} />
+        <meta name="twitter:image" content={event?.image || l('social.home.image') || ''} />
+        <meta name="twitter:card" content={event ? 'summary_large_image' : l('social.home.card') || ''} />
+        <meta name="twitter:creator" content={l('social.home.creator') || ''} />
+        <meta name="twitter:site" content={l('social.home.site') || ''} />
+      </Helmet>
       <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)} />
       <EventModal event={event} onClose={prevent(() => navigate(locations.myEvents()))} />
       <Navigation activeTab={NavigationTab.MyEvents} />

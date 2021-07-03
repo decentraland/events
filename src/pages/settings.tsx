@@ -24,6 +24,7 @@ import { useProfileSettingsContext } from "../context/ProfileSetting"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { useEffect } from "react"
+import Helmet from "react-helmet"
 
 const check = require('../images/check.svg')
 export default function SettingsPage(props: any) {
@@ -79,6 +80,22 @@ export default function SettingsPage(props: any) {
 
   if (!account || accountState.loading) {
     return <>
+      <Helmet>
+        <title>{l('social.home.title') || ''}</title>
+        <meta name="description" content={l('social.home.description') || ''} />
+
+        <meta property="og:title" content={l('social.home.title') || ''} />
+        <meta property="og:description" content={l('social.home.description') || ''} />
+        <meta property="og:image" content={l('social.home.image') || ''} />
+        <meta property="og:site" content={l('social.home.site') || ''} />
+
+        <meta name="twitter:title" content={l('social.home.title') || ''} />
+        <meta name="twitter:description" content={l('social.home.description') || ''} />
+        <meta name="twitter:image" content={l('social.home.image') || ''} />
+        <meta name="twitter:card" content={l('social.home.card') || ''} />
+        <meta name="twitter:creator" content={l('social.home.creator') || ''} />
+        <meta name="twitter:site" content={l('social.home.site') || ''} />
+      </Helmet>
       <Navigation />
       <Container>
         <SignIn isConnecting={accountState.loading} onConnect={() => accountState.select()} />
@@ -87,6 +104,22 @@ export default function SettingsPage(props: any) {
   }
 
   return (<>
+      <Helmet>
+        <title>{l('social.home.title') || ''}</title>
+        <meta name="description" content={l('social.home.description') || ''} />
+
+        <meta property="og:title" content={l('social.home.title') || ''} />
+        <meta property="og:description" content={l('social.home.description') || ''} />
+        <meta property="og:image" content={l('social.home.image') || ''} />
+        <meta property="og:site" content={l('social.home.site') || ''} />
+
+        <meta name="twitter:title" content={l('social.home.title') || ''} />
+        <meta name="twitter:description" content={l('social.home.description') || ''} />
+        <meta name="twitter:image" content={l('social.home.image') || ''} />
+        <meta name="twitter:card" content={l('social.home.card') || ''} />
+        <meta name="twitter:creator" content={l('social.home.creator') || ''} />
+        <meta name="twitter:site" content={l('social.home.site') || ''} />
+      </Helmet>
       <Navigation />
       <Container className="SettingsPage">
         <Grid style={{ paddingTop: '4rem' }}>

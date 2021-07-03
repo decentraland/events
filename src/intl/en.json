@@ -15,8 +15,29 @@
     "404": {
       "title": "Page not found",
       "description": "You just hit a route that doesn't exist..."
+    }
+  },
+  "social": {
+    "home": {
+      "title": "Decentraland Events",
+      "description": "Live music, conferences, and more in a community built virtual world.",
+      "image": "https://decentraland.org/images/decentraland.png",
+      "og:site_name": "Decentraland Events",
+      "og:type": "website",
+      "twitter:card": "summary",
+      "twitter:creator": "@decentraland",
+      "twitter:site": "@decentraland"
     },
-    "submit": {}
+    "submit": {
+      "title": "Submit an Event",
+      "description": "Organize and host your own community event in Decentraland.",
+      "image": "https://decentraland.org/images/decentraland.png",
+      "og:site_name": "Decentraland Events",
+      "og:type": "website",
+      "twitter:card": "summary",
+      "twitter:creator": "@decentraland",
+      "twitter:site": "@decentraland"
+    }
   },
   "settings": {
     "profile_section": {

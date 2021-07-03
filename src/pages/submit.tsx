@@ -41,6 +41,8 @@ import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import locations from "../modules/locations"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import Helmet from "react-helmet"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 
 const info = require('../images/info.svg')
 
@@ -76,6 +78,7 @@ const recurrentEndsOptions = [
 ]
 
 export default function SubmitPage() {
+  const l = useFormatMessage()
   const location = useLocation()
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [ account, accountState ] = useAuthContext()
@@ -200,12 +203,46 @@ export default function SubmitPage() {
   const now = Date.now()
 
   if (!account || accountState.loading) {
-    return <Container style={{ paddingTop: '75px' }}>
-      <SignIn isConnecting={accountState.loading} onConnect={() => accountState.select()} />
-    </Container>
+    return <>
+      <Helmet>
+        <title>{l('social.submit.title') || ''}</title>
+        <meta name="description" content={l('social.submit.description') || ''} />
+
+        <meta property="og:title" content={l('social.submit.title') || ''} />
+        <meta property="og:description" content={l('social.submit.description') || ''} />
+        <meta property="og:image" content={l('social.submit.image') || ''} />
+        <meta property="og:site" content={l('social.submit.site') || ''} />
+
+        <meta name="twitter:title" content={l('social.submit.title') || ''} />
+        <meta name="twitter:description" content={l('social.submit.description') || ''} />
+        <meta name="twitter:image" content={l('social.submit.image') || ''} />
+        <meta name="twitter:card" content={l('social.submit.card') || ''} />
+        <meta name="twitter:creator" content={l('social.submit.creator') || ''} />
+        <meta name="twitter:site" content={l('social.submit.site') || ''} />
+      </Helmet>
+      <Container style={{ paddingTop: '75px' }}>
+        <SignIn isConnecting={accountState.loading} onConnect={() => accountState.select()} />
+      </Container>
+    </>
   }
 
   return (<>
+      <Helmet>
+        <title>{l('social.submit.title') || ''}</title>
+        <meta name="description" content={l('social.submit.description') || ''} />
+
+        <meta property="og:title" content={l('social.submit.title') || ''} />
+        <meta property="og:description" content={l('social.submit.description') || ''} />
+        <meta property="og:image" content={l('social.submit.image') || ''} />
+        <meta property="og:site" content={l('social.submit.site') || ''} />
+
+        <meta name="twitter:title" content={l('social.submit.title') || ''} />
+        <meta name="twitter:description" content={l('social.submit.description') || ''} />
+        <meta name="twitter:image" content={l('social.submit.image') || ''} />
+        <meta name="twitter:card" content={l('social.submit.card') || ''} />
+        <meta name="twitter:creator" content={l('social.submit.creator') || ''} />
+        <meta name="twitter:site" content={l('social.submit.site') || ''} />
+      </Helmet>
       <Container style={{ paddingTop: '75px' }}>
         {loading && <Grid stackable>
           <Grid.Row centered>

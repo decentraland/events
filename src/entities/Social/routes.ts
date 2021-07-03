@@ -9,6 +9,7 @@ import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import { eventUrl, siteUrl } from '../Event/utils';
 import { EventAttributes } from "../Event/types";
 import EventModel from "../Event/model";
+import copies from '../../intl/en.json'
 
 export default routes((router) => {
   router.get('/', handleRaw(injectHomeMetadata, 'html'))
@@ -31,14 +32,8 @@ export async function injectHomeMetadata(req: Request) {
   const page = await readFile(req)
   const url = siteUrl().toString() + req.originalUrl.slice(1)
   return replaceHelmetMetadata(page.toString(), {
-    title: 'Decentraland Events',
-    description: 'Live music, conferences, and more in a community built virtual world.',
-    image: 'https://decentraland.org/images/decentraland.png',
-    url,
-    "og:type": 'website',
-    "twitter:card": 'summary',
-    "twitter:creator": '@decentraland',
-    "twitter:site": '@decentraland'
+    ...copies.social.home as any,
+    url
   })
 }
 
@@ -46,15 +41,8 @@ export async function injectSubmitMetadata(req: Request) {
   const page = await readFile(req)
   const url = siteUrl().toString() + req.originalUrl.slice(1)
   return replaceHelmetMetadata(page.toString(), {
-    title: 'Submit an Event',
-    description: 'Organize and host your own community event in Decentraland.',
-    image: 'https://decentraland.org/images/decentraland.png',
-    url,
-    "og:site_name": "Decentraland Events",
-    "og:type": 'website',
-    "twitter:card": 'summary',
-    "twitter:creator": '@decentraland',
-    "twitter:site": '@decentraland'
+    ...copies.social.submit as any,
+    url
   })
 }
 
@@ -66,13 +54,11 @@ export async function injectEventMetadata(req: Request) {
     if (event) {
       const page = await readFile(req)
       return replaceHelmetMetadata(page.toString(), {
+        ...copies.social.home as any,
         title: escape(event.name) + ' | Decentraland Events',
         description: escape((event.description || '').trim()),
         image: event.image || '',
         url: eventUrl(event),
-        "og:type": 'website',
-        "og:site_name": 'Decentraland Events',
-        "twitter:site": '@decentraland',
         "twitter:card": 'summary_large_image'
       })
     }
