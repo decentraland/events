@@ -76,7 +76,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
 
       {/* DESCRIPTION */}
       {props.showDescription !== false && <EventSection.Divider />}
-      {props.showDescription !== false && <EventSection maxHeight="500px">
+      {props.showDescription !== false && <EventSection>
         <EventSection.Icon src={icons.info} width="16" height="16" />
         <EventSection.Detail >
           {!event.description && <Paragraph secondary={!event.description} >
@@ -90,7 +90,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* DATE */}
       {props.showDate !== false && <EventSection.Divider />}
       {props.showDate !== false && props.showAllDates === false && <EventDateDetail event={event} startAt={next_start_at} countdown={!!props.showCountdownDate} />}
-      {props.showDate !== false && props.showAllDates !== false && <div style={{ maxHeight: '500px', overflow: 'auto' }}>
+      {props.showDate !== false && props.showAllDates !== false && <div style={{ overflow: 'auto' }}>
         {dates.map((date, i) => {
           return <EventDateDetail
             key={date.getTime()}

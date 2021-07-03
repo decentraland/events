@@ -82,7 +82,7 @@ export default function MyEventsPage(props: any) {
             {attendingEvents.map(event => <EventCardMini
               key={'going:' + event.id}
               event={event}
-              onClick={prevent(() => navigate(locations.myEvent(event.id)))}
+              onClick={prevent(() => navigate(locations.event(event.id)))}
             />)}
           </Card.Group>}
         </div>}
@@ -97,7 +97,7 @@ export default function MyEventsPage(props: any) {
             {myEvents.map((event) => <EventCard
               key={'event:' + event.id}
               event={event}
-              onClick={prevent(() => navigate(locations.myEvent(event.id)))}
+              onClick={prevent(() => navigate(locations.event(event.id)))}
             />)}
           </Card.Group>}
         </div>}

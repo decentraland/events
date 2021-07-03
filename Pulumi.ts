@@ -7,15 +7,16 @@ export = async function main() {
     name: 'events',
     // contentSource: resolve(__dirname, '../public'),
     usePublicTLD: process.env['USE_PUBLIC_TLD'] === 'true',
-    contentRoutingRules: {
-      '/en/*': '/$1'
-    },
+    // this can't be enabled en order to support old links
+    // contentRoutingRules: {
+    //   '/en/*': '/$1'
+    // },
     serviceImage: process.env['CI_REGISTRY_IMAGE'],
     servicePaths: [
-      '/',
-      '/me/',
-      '/settings/',
-      '/submit/',
+      // root path it's not correctly handle by amazon
+      // '/',
+      '/en/*',
+      '/event/',
       '/api/*',
       '/verify',
       '/unsubscribe',

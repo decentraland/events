@@ -12,8 +12,8 @@ export function siteUrl(pathname: string = '') {
 }
 
 export function eventUrl(event: Pick<EventAttributes, 'id'>): string {
-  const target = siteUrl()
-  target.searchParams.set('event', event.id)
+  const target = siteUrl('/event/')
+  target.searchParams.set('id', event.id)
   return target.toString()
 }
 

@@ -17,13 +17,9 @@ function url(path: string, query?: Record<string, string> | URLSearchParams) {
 
 export default {
   events: () => url('/'),
-  event: (event: string) => url('/', { event }),
-
+  event: (id: string) => url('/event/', { id }),
   myEvents: () => url('/me/'),
-  myEvent: (event: string) => url('/me/', { event }),
-
   pendingEvents: () => url('/pending/'),
-  pendingEvent: (event: string) => url('/pending/', { event }),
 
   submit: () => url('/submit/'),
   edit: (event: string) => url('/submit/', { event, view: SubmitView.Edit }),

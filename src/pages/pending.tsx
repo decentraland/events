@@ -99,7 +99,7 @@ export default function MyEventsPage(props: any) {
             {pendingEvents.map((event) => <EventCard
               key={'event:' + event.id}
               event={event}
-              onClick={prevent(() => navigate(locations.pendingEvent(event.id)))}
+              onClick={prevent(() => navigate(locations.event(event.id)))}
             />)}
           </Card.Group>}
         </div>}
