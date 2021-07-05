@@ -40,10 +40,10 @@ export async function getIndexSitemap() {
 export async function getStaticSitemap() {
   return [
     `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     `<url><loc>${siteUrl('/')}</loc></url>`,
     `<url><loc>${siteUrl('/submit/')}</loc></url>`,
-    '</sitemapindex>'
+    '</urlset>',
   ].join('')
 }
 
