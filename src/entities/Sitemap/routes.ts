@@ -64,8 +64,8 @@ export async function getEventsSitemap(req: Request) {
   const events = await EventModel.getSitemapEvents(page)
   return [
     `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ...events.map(event => `<url><loc>${eventUrl(event)}</loc></url>`,),
-    '</sitemapindex>'
+    '</urlset>',
   ].join('')
 }
