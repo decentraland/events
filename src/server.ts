@@ -53,6 +53,10 @@ app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
 app.use(metrics)
 app.use(metricsDatabase)
+app.get('/metrics/*', handle(async () => {
+  throw new RequestError('NotFound', RequestError.NotFound)
+}))
+
 app.use(sitemap)
 app.use('/', social)
 app.use(filesystem('public', '404.html'))

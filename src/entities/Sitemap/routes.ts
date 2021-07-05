@@ -1,4 +1,3 @@
-import xml from 'xml'
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import EventModel from '../Event/model'
