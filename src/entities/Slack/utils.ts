@@ -6,6 +6,7 @@ import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { Avatar } from 'decentraland-gatsby/dist/utils/api/Catalyst';
 import Time from 'decentraland-gatsby/dist/utils/date/Time';
 import { DeprecatedEventAttributes } from '../Event/types';
+import logger from 'decentraland-gatsby/dist/entities/Development/logger';
 
 const SLACK_WEBHOOK = env('SLACK_WEBHOOK', '')
 const EVENTS_URL = env('EVENTS_URL', 'https://events.centraland.org/api')
@@ -16,7 +17,7 @@ if (!isURL(SLACK_WEBHOOK)) {
 }
 
 export async function notifyNewEvent(event: DeprecatedEventAttributes) {
-  console.log(`sending new event "${event.id}" to slack`)
+  logger.log(`sending new event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
       {
@@ -49,7 +50,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
 }
 
 export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
-  console.log(`sending approved event "${event.id}" to slack`)
+  logger.log(`sending approved event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
       {
@@ -72,7 +73,7 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
     return
   }
 
-  console.log(`sending edited event "${event.id}" to slack`)
+  logger.log(`sending edited event "${event.id}" to slack`)
   latestEditNotification.set(event.id, now)
   await sendToSlack({
     "blocks": [
@@ -88,7 +89,7 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
 }
 
 export async function notifyUpcomingEvent(event: DeprecatedEventAttributes, emailNotifications: number, pushNotifications: number) {
-  console.log(`sending upcoming event "${event.id}" to slack`)
+  logger.log(`sending upcoming event "${event.id}" to slack`)
   await sendToSlack({
     "blocks": [
       {
@@ -108,7 +109,7 @@ let NEXT_ERROR_AT = 0
 export async function notifyEventError(user: Avatar, error: RequestError) {
   if (Date.now() > NEXT_ERROR_AT) {
     NEXT_ERROR_AT = Date.now() + SEND_CLOUD_DOWN
-    console.log(`sending error to slack`)
+    logger.log(`sending error to slack`)
     const userName = user.name || 'Guest'
     const userContact = user.email ? `<mailto:${user.email}|${userName} [${user.ethAddress}]>` : `${userName} [${user.ethAddress}]`
     const errorDetails = '```' + JSON.stringify({ message: error.message, statusCode: error.statusCode, data: error.data || null }, null, 2) + '```'
@@ -148,9 +149,9 @@ async function sendToSlack(body: object) {
     const data = await response.text()
 
     if (response.status >= 400) {
-      console.error(`Slack bad request: ${data} (${response.status})`)
+      logger.error(`Slack bad request: ${data} (${response.status})`)
     }
   } catch (error) {
-    console.error(`Slack service error: ` + error.message, error)
+    logger.error(`Slack service error: ` + error.message, error)
   }
 }
