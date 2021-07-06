@@ -43,7 +43,7 @@ export default React.memo(function Accordion(props: AccordionProps) {
     return () => {
       clearInterval(interval)
     }
-  }, [ ref.current, isOpen ])
+  }, [ ref.current, isOpen, height ])
 
   function handleOpen() {
     if (withContent && props.open === undefined) {
