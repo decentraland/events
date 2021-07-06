@@ -1,6 +1,6 @@
 import React from "react";
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList";
-import track from "decentraland-gatsby/dist/utils/segment/segment";
+import track from "decentraland-gatsby/dist/utils/development/segment";
 import { EventAttributes } from "../../entities/Event/types";
 
 import './JumpInPosition.css'

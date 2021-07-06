@@ -18,7 +18,7 @@ import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 // import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
 import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
 import UserMenu from "decentraland-gatsby/dist/components/User/UserMenu"
-import segment from "decentraland-gatsby/dist/utils/segment/segment"
+import segment from "decentraland-gatsby/dist/utils/development/segment"
 import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
 import ProfileSettings from './src/context/ProfileSetting'

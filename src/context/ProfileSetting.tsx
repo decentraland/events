@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react'
 import useAuthContext from 'decentraland-gatsby/dist/context/Auth/useAuthContext'
 import useAsyncMemo from 'decentraland-gatsby/dist/hooks/useAsyncMemo'
-import track from "decentraland-gatsby/dist/utils/segment/segment"
+import track from "decentraland-gatsby/dist/utils/development/segment"
 import { ProfileSettingsAttributes } from '../entities/ProfileSettings/types'
 import Events from '../api/Events'
 import useAsyncTask from 'decentraland-gatsby/dist/hooks/useAsyncTask'

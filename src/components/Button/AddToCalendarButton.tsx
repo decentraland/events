@@ -2,7 +2,7 @@ import React from "react";
 import { Button, ButtonProps } from "decentraland-ui/dist/components/Button/Button";
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import useAuth from "decentraland-gatsby/dist/hooks/useAuth";
-import track from "decentraland-gatsby/dist/utils/segment/segment";
+import track from "decentraland-gatsby/dist/utils/development/segment";
 import Time from "decentraland-gatsby/dist/utils/date/Time";
 
 import { EventAttributes } from "../../entities/Event/types";
