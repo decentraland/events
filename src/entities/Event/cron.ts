@@ -1,4 +1,5 @@
 import JobContext from "decentraland-gatsby/dist/entities/Job/context";
+import logger from "decentraland-gatsby/dist/entities/Development/logger";
 import EventModel from "./model";
 import EventAttendeeModel from "../EventAttendee/model";
 import ProfileSettingsModel from "../ProfileSettings/model";
@@ -14,7 +15,7 @@ import { EventAttendeeAttributes } from "../EventAttendee/types";
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()
-  
+
   for (const event of events) {
     const update = {
       ...calculateRecurrentProperties(event),
@@ -57,7 +58,7 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
 
     const result = await notify(event, eventAttendees, settingMap, subscriptionMap)
     ctx.log(`Notified event ${event.id} (email: ${result.email.length}, web: ${result.browser.length})`)
-   
+
 
     if (result.email.length + result.browser.length) {
       await notifyBySlack(event, result.email.length, result.browser.length)
@@ -103,7 +104,7 @@ export async function notify(
     .map(async (subscription) => {
       return push(subscription, data)
         .catch((error) => {
-          console.error(error)
+          logger.error(`Error sending push notification to user "${subscription.user}"`, { subscription, data })
           error.statusCode === 410 && expired.push(subscription)
         })
     })

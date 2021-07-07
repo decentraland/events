@@ -77,7 +77,6 @@ export default function IndexPage(props: any) {
             ''
           )
           .then((signature) => {
-            console.log(signature)
             setAttendState((current) => ({ ...current, address: account, message, signature, processing: false }))
           })
           .catch((err) => {

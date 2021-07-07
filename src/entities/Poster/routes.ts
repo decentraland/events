@@ -8,6 +8,7 @@ import handle from 'decentraland-gatsby/dist/entities/Route/handle';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES, PosterAttributes, extension } from './types'
 import { withAuthProfile } from 'decentraland-gatsby/dist/entities/Profile/middleware'
+import logger from 'decentraland-gatsby/dist/entities/Development/logger';
 
 let BUCKET_CHECKED = false;
 let BUCKET_CHECKED_JOB: Promise<void> | null = null
@@ -80,7 +81,7 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
     type,
   }
 
-  console.log(`new poster created: ${JSON.stringify(result)} (time: ${time}s)`)
+  logger.log(`new poster created: ${JSON.stringify(result)} (time: ${time}s)`, {  poster: result, time })
   return result
 }
 

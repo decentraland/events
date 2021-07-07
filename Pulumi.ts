@@ -1,6 +1,6 @@
 // import { resolve } from "path";
 import { buildGatsby } from "decentraland-gatsby-deploy/dist/recepies/buildGatsby";
-const { gatsby } = require("./package.json");
+import { variable } from "decentraland-gatsby-deploy/dist/pulumi/env";
 
 export = async function main() {
   return buildGatsby({
@@ -12,6 +12,9 @@ export = async function main() {
     //   '/en/*': '/$1'
     // },
     serviceImage: process.env['CI_REGISTRY_IMAGE'],
+    serviceEnvironment: [
+      variable('NODE_ENV', 'production')
+    ],
     servicePaths: [
       // root path it's not correctly handle by amazon
       // '/',

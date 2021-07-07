@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react'
 import useAuthContext from 'decentraland-gatsby/dist/context/Auth/useAuthContext'
 import useAsyncTasks from 'decentraland-gatsby/dist/hooks/useAsyncTasks'
 import useAsyncMemo from 'decentraland-gatsby/dist/hooks/useAsyncMemo'
-import track from "decentraland-gatsby/dist/utils/segment/segment"
+import track from "decentraland-gatsby/dist/utils/development/segment"
 import Events from '../api/Events'
 import { SessionEventAttributes } from '../entities/Event/types'
 import { useMemo } from 'react'

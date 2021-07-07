@@ -30,6 +30,21 @@ export default React.memo(function Accordion(props: AccordionProps) {
     }
   }, [ props.open, open ])
 
+  useEffect(() => {
+    let interval: number
+    if (ref.current && isOpen) {
+      interval = setInterval(() => {
+        if (ref.current && height && ref.current.offsetHeight !== height) {
+          setHeight(ref.current.offsetHeight)
+        }
+      }, 1000) as any
+    }
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [ ref.current, isOpen, height ])
+
   function handleOpen() {
     if (withContent && props.open === undefined) {
       setOpen(!open)

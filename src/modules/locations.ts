@@ -26,4 +26,6 @@ export default {
   clone: (event: string) => url('/submit/', { event, view: SubmitView.Clone }),
 
   settings: () => url('/settings/'),
+
+  docs: () => url('/docs/'),
 }
