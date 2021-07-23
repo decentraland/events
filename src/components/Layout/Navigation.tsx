@@ -4,7 +4,7 @@ import SubmitButton from '../Button/SubmitButton';
 import useAuthContext from 'decentraland-gatsby/dist/context/Auth/useAuthContext';
 import { Link } from 'gatsby-plugin-intl';
 import locations from '../../modules/locations';
-import { useEvents, useEventsContext } from '../../context/Event';
+import { useEventsContext } from '../../context/Event';
 
 import './Navigation.css'
 import { useMemo } from 'react';

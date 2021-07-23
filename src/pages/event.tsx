@@ -2,31 +2,10 @@
 import React, { useMemo, useState, Fragment } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@reach/router"
-import { navigate } from "gatsby-plugin-intl"
-
 import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-
-import EventModal from "../components/Event/EventModal/EventModal"
-import EventCard from "../components/Event/EventCard/EventCard"
-import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
-import EventCardBig from "../components/Event/EventCardBig/EventCardBig"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
-import Navigation, { NavigationTab } from "../components/Layout/Navigation"
-
-import useListEventsByMonth from '../hooks/useListEventsByMonth'
-
-import locations from "../modules/locations"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { useEventIdContext, useEventsContext, useEventSorter } from "../context/Event"
-import './index.css'
+import { useEventIdContext } from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import ItemLayout from "../components/Layout/ItemLayout"
@@ -35,6 +14,7 @@ import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
 import EventSection from "../components/Event/EventSection"
 import AttendingButtons from "../components/Button/AttendingButtons"
 import EditButtons from "../components/Button/EditButtons"
+import './index.css'
 
 export type EventPageState = {
   updating: Record<string, boolean>
@@ -46,9 +26,6 @@ export default function EventPage(props: any) {
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const [event] = useEventIdContext(params.get('id'))
-  // const [settings] = useProfileSettingsContext()
-  // const [all, state] = useEventsContext()
-  // const loading = accountState.loading || state.loading
 
   const [enabledNotification, setEnabledNotification] = useState(false)
 
