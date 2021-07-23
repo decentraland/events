@@ -1,5 +1,5 @@
 import express from 'express'
-import Manager from 'decentraland-gatsby/dist/entities/Job/job'
+import Manager from 'decentraland-gatsby/dist/entities/Job/manager'
 import { jobInitializer } from 'decentraland-gatsby/dist/entities/Job/utils'
 import { initializeServices } from 'decentraland-gatsby/dist/entities/Server/handler'
 import { serverInitializer } from 'decentraland-gatsby/dist/entities/Server/utils'

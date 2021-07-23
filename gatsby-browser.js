@@ -44,11 +44,9 @@ export const wrapPageElement = ({ element, props }) => {
     {...props}
     rightMenu={<UserMenu
       onClickSettings={() => navigate(locations.settings())}
-      menuItems={[
-        <>
-          <MenuItem onClick={() => navigate(locations.docs())}><Icon name="code" />&nbsp;API</MenuItem>
-        </>
-      ]}
+      menuItems={<>
+        <MenuItem onClick={() => navigate(locations.docs())}><Icon name="code" />&nbsp;API</MenuItem>
+      </>}
     />}
     >
     {element}
