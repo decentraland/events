@@ -18,7 +18,7 @@ export default function usePushSubscription(path: string = '/sw.js') {
   })
 
   useAsyncEffect(async () => {
-    if (registration) {
+    if (registration && registration.pushManager) {
       const subscription = await registration.pushManager.getSubscription()
 
       patchState({
