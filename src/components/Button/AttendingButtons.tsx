@@ -65,6 +65,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       text: event.description,
       url: location.origin + locations.event(event.id),
     })
+    .cath((err: Error) => console.error(err))
   })
 
   const handleShare = prevent(() => {
