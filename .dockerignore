@@ -1,6 +1,4 @@
 node_modules
-public
-lib
 tsconfig.tsbuildinfo
 .cache
 .git
