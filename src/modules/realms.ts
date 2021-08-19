@@ -26,9 +26,11 @@ export function getRealmsOptions(realms: CommsStatusWithLayers[]): Option[] {
     for (let realm of realms) {
       if (!names.has(realm.name)) {
         names.add(realm.name)
-        for (let layer of realm.layers) {
-          const value = `${realm.name}-${layer.name}`
-          result.push({ key: value, value, text: value })
+        if (realm.layers) {
+          for (let layer of realm.layers) {
+            const value = `${realm.name}-${layer.name}`
+            result.push({ key: value, value, text: value })
+          }
         }
       }
     }
