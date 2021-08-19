@@ -21,7 +21,7 @@ export async function getRealms(): Promise<Realm[]> {
     .map(([server, comm]) =>  ({
       id: comm!.name,
       url: server.address,
-      layers: comm!.layers.map(layer => layer.name)
+      layers: (comm!.layers || []).map(layer => layer.name)
     }))
     .sort((reamlA, realmB) => reamlA.id.localeCompare(realmB.id))
 }
