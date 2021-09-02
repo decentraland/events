@@ -12,6 +12,7 @@ export = async function main() {
     //   '/en/*': '/$1'
     // },
     serviceSource: '.',
+    serviceMemory: 1024,
     serviceEnvironment: [
       variable('NODE_ENV', 'production')
     ],
