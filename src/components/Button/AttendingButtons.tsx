@@ -60,12 +60,15 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   }
 
   const [ sharing, share ] = useAsyncTask(async () => {
-    await (navigator as any).share({
-      title: event.name,
-      text: event.description,
-      url: location.origin + locations.event(event.id),
-    })
-    .cath((err: Error) => console.error(err))
+    try {
+      await (navigator as any).share({
+        title: event.name,
+        text: event.description,
+        url: location.origin + locations.event(event.id),
+      })
+    } catch (err) {
+      console.error(err)
+    }
   })
 
   const handleShare = prevent(() => {
