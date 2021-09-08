@@ -1,6 +1,6 @@
 import isUUID from 'validator/lib/isUUID'
 import { EventAttendeeAttributes } from './types'
-import { SQL, table, conditional, values, join } from 'decentraland-gatsby/dist/entities/Database/utils'
+import { SQL, table, values, join, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils'
 import { Model } from 'decentraland-gatsby/dist/entities/Database/model'
 
 const LATEST_EVENT_ATTENDING = 10
@@ -48,7 +48,7 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     return EventAttendeeModel.query<EventAttendeeAttributes>(query)
   }
 
-  static async listByEventId(eventId: string, options: { limit?: number, offest?: number } = {}) {
+  static async listByEventId(eventId: string, options: { limit?: number, offset?: number } = {}) {
     if (!isUUID(eventId)) {
       return []
     }
@@ -58,15 +58,15 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
       FROM ${table(EventAttendeeModel)}
       WHERE "event_id" = ${eventId}
       ORDER BY created_at DESC
-      ${conditional(!!options.limit, SQL`LIMIT ${options.limit}`)}
-      ${conditional(!!options.offest, SQL`OFFSET ${options.offest}`)}
+      ${limit(options.limit, { max: 500, defaultValue: 500 })}
+      ${offset(options.offset)}
     `
 
     return EventAttendeeModel.query<EventAttendeeAttributes>(query)
   }
 
   static async latest(eventId: string) {
-    const attendees = await this.listByEventId(eventId, { limit: LATEST_EVENT_ATTENDING, offest: 0 })
+    const attendees = await this.listByEventId(eventId, { limit: LATEST_EVENT_ATTENDING, offset: 0 })
     return attendees.map(attendee => attendee.user)
   }
 }
