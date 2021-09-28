@@ -62,9 +62,9 @@ app.use('/', social)
 app.use(filesystem('public', '404.html'))
 
 initializeServices([
-  process.env.DATABASE !== 'false' && databaseInitializer(),
-  process.env.JOBS !== 'false' && jobInitializer(jobs),
-  process.env.HTTP !== 'false' && serverInitializer(
+  databaseInitializer(),
+  jobInitializer(jobs),
+  serverInitializer(
     app,
     process.env.PORT || 4000,
     process.env.HOST

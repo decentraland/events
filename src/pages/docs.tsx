@@ -4,7 +4,6 @@ import { Address } from 'web3x/address'
 import { Personal } from 'web3x/personal'
 
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
-import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
@@ -42,7 +41,7 @@ const attendOptions = [
 
 export default function IndexPage(props: any) {
   const [ account, accountState ] = useAuthContext()
-  const [ events, eventsState ] = useEventsContext()
+  const [ events ] = useEventsContext()
   const sortedEvents = useEventSorter(events)
   const [ attendState, setAttendState ] = useState<AttendState>({
     processing: false,
@@ -86,15 +85,6 @@ export default function IndexPage(props: any) {
       }
     }
   }, [ attendState.processing, accountState.provider, account ])
-
-  if (accountState.loading || !account) {
-    return <>
-      <Navigation />
-      <Container>
-        <SignIn isConnecting={accountState.loading}  onConnect={() => accountState.select()} />
-      </Container>
-    </>
-  }
 
   return (<>
       <Navigation />
@@ -272,7 +262,7 @@ export default function IndexPage(props: any) {
                   <SelectField label="attend" options={attendOptions} placeholder="Are you attending?" onChange={(_, { value }) => setAttendState((current) => ({ ...current, attend: value as any }))} />
                 </Grid.Column>
                 <Grid.Column tablet="4">
-                  <Button primary onClick={() => setAttendState((current) => ({ ...current, processing: true }))} style={{ marginTop: '20px' }} loading={attendState.processing} disabled={!account || attendState.attend === null || attendState.event === null}>
+                  <Button disable={!account} primary onClick={() => setAttendState((current) => ({ ...current, processing: true }))} style={{ marginTop: '20px' }} loading={attendState.processing} disabled={!account || attendState.attend === null || attendState.event === null}>
                     SIGN MESSAGE
                   </Button>
                 </Grid.Column>
