@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { isInsideWorldLimits } from "@dcl/schemas"
 import isURL from "validator/lib/isURL";
 import Time from "decentraland-gatsby/dist/utils/date/Time";
 import { eventSchema, Frequency, WeekdayMask, MonthMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types";
@@ -227,8 +228,22 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const position = Number(value)
     if (value === '') {
       setValue(name, value as any)
-    } else if (position <= 150 && position >= -150) {
-      setValue(name, position)
+    } else {
+      let x = event.x
+      let y = event.y
+
+      switch (name) {
+        case 'x':
+          x = position
+          break;
+        case 'y':
+          y = position
+          break;
+      }
+
+      if (isInsideWorldLimits(x, y)) {
+        setValue(name, position)
+      }
     }
   }
 
