@@ -24,7 +24,6 @@ import primaryJumpInIcon from '../../images/primary-jump-in.svg'
 import { useEventsContext } from '../../context/Event'
 import locations from '../../modules/locations'
 import './AttendingButtons.css'
-import useCountdown from 'decentraland-gatsby/dist/hooks/useCountdown'
 
 
 export type AttendingButtonsProps = {
@@ -32,21 +31,15 @@ export type AttendingButtonsProps = {
   loading?: boolean,
 }
 
-function setLive() {
-  return true
-}
-
 export default function AttendingButtons(props: AttendingButtonsProps) {
   const event = props.event
   const nextStartAt = useMemo(() => new Date(event ? Date.parse(event.next_start_at.toString()) : Date.now()), [event?.next_start_at])
   const isLive = useTimeout(nextStartAt)
-  // const countdown = useCountdown(nextStartAt)
-  // const isLive = countdown.time === 0
   const [fallbackShare, setFallbackShare] = useState(false)
   const [address, actions] = useAuthContext()
   const location = useLocation()
   const isMobile = useMobileDetector()
-  const [ all, state ] = useEventsContext()
+  const [ , state ] = useEventsContext()
   const ethAddress = address
   const approved = useMemo(() => (!event || event.approved), [ event ])
   const loading = useMemo(() => props.loading ?? state.modifying.has(event?.id || ''), [ props.loading, state.modifying ])
@@ -66,14 +59,20 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     }
   }, [ event ])
 
-  const handleShareFacebook = useCallback(() => {
+  const handleShareFacebook = useCallback((e: React.MouseEvent<any>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (event) {
       track((analytics) => analytics.track(SegmentEvent.Share, { ethAddress, event: event?.id || null, medium: 'facebook' }))
       newPopupWindow(eventFacebookUrl(event))
     }
   }, [ event ])
 
-  const handleShareTwitter = useCallback(() => {
+  const handleShareTwitter = useCallback((e: React.MouseEvent<any>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (event) {
       track((analytics) => analytics.track(SegmentEvent.Share, { ethAddress, event: event?.id || null, medium: 'twitter' }))
       newPopupWindow(eventTwitterUrl(event))
@@ -93,43 +92,54 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
 
   }, [ setFallbackShare ])
 
+  const handleFallbackShareClose = useCallback((e: React.MouseEvent<any>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setFallbackShare(false)
+  }, [ setFallbackShare ])
 
+  const handleStopPropagation = useCallback((e: React.MouseEvent<any>) => {
+    e.stopPropagation()
+  }, [])
 
-  // const handleShare = prevent(() => {
-  //   if (typeof navigator !== 'undefined' && (navigator as any).share) {
-  //     share()
-  //   } else {
-  //     track((analytics) => analytics.track(SegmentEvent.ShareFallback, { ethAddress, event: event?.id || null }))
-  //     setFallbackShare(true)
-  //   }
-  // })
+  const handleAttend = useCallback((e: React.MouseEvent<any>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    event && state.attend(event.id, !event.attending)
+  }, [ event, state])
+
+  const handleNotify = useCallback((e: React.MouseEvent<any>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    event && state.notify(event.id, !event.notify)
+  }, [ event, state])
 
   return <div className="AttendingButtons">
     {fallbackShare && <>
-      <Button inverted size="small" className="share fluid" onClick={prevent(handleShareFacebook)}>
+      <Button inverted size="small" className="share fluid" onClick={handleShareFacebook}>
         <img src={facebookIcon} width="10" height="16" />
       </Button>
-      <Button inverted size="small" className="share fluid" onClick={prevent(handleShareTwitter)}>
+      <Button inverted size="small" className="share fluid" onClick={handleShareTwitter}>
         <img src={twitterIcon} width="18" height="15" />
       </Button>
-      <Button inverted size="small" className="share" onClick={prevent(() => setFallbackShare(false))}>
+      <Button inverted size="small" className="share" onClick={handleFallbackShareClose}>
         <img src={closeIcon} width="14" height="14" />
       </Button>
     </>}
 
     {!fallbackShare && <>
-      {isLive && (actions.provider || !isMobile) && <Button primary size="small" disabled={loading || sharing || !approved} onClick={(e) => e.stopPropagation()} className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      {isLive && (actions.provider || !isMobile) && <Button primary size="small" disabled={loading || sharing || !approved} onClick={handleStopPropagation} className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <span>JUMP IN</span>
         <img src={primaryJumpInIcon} width={14} height={14} style={{ marginLeft: '.5rem' }} />
       </Button>}
 
-      {!isLive && (actions.provider || !isMobile) && <Button inverted size="small" onClick={prevent(() => event && state.attend(event.id, !event.attending))} loading={loading} disabled={loading || sharing || !approved} className={TokenList.join(['attending-status', 'fluid', event?.attending && 'attending'])}>
+      {!isLive && (actions.provider || !isMobile) && <Button inverted size="small" onClick={handleAttend} loading={loading} disabled={loading || sharing || !approved} className={TokenList.join(['attending-status', 'fluid', event?.attending && 'attending'])}>
         {!event && ' '}
         {event && event.attending && 'GOING'}
         {event && !event.attending && 'WANT TO GO'}
       </Button>}
 
-      {!isLive && event?.attending && (actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || sharing || !approved} onClick={prevent(() => event && state.notify(event.id, !event.notify))}>
+      {!isLive && event?.attending && (actions.provider || !isMobile) && <Button inverted primary size="small" className="share" disabled={loading || sharing || !approved} onClick={handleNotify}>
         <img src={event?.notify && notificationEnabledIcon || notificationDisabledIcon} width="22" height="22" />
       </Button>}
 
