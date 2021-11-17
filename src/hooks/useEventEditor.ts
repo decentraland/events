@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
+import { isInsideWorldLimits } from "@dcl/schemas"
 import isURL from "validator/lib/isURL";
 import Time from "decentraland-gatsby/dist/utils/date/Time";
-import { eventSchema, Frequency, WeekdayMask, MonthMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types";
+import { Frequency, WeekdayMask, MonthMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types";
 import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils";
 import { EditEvent } from "../api/Events";
+import { newEventSchema } from "../entities/Event/schemas";
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
 
@@ -43,7 +45,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     image: defaultEvent.image || '',
     x: defaultEvent.x || 0,
     y: defaultEvent.x || 0,
-    realm: defaultEvent.realm || null,
+    server: defaultEvent.server || null,
     url: defaultEvent.url || '',
     start_at: defaultEvent.start_at || currentDate.toDate(),
     duration: defaultEvent.duration || DEFAULT_EVENT_DURATION,
@@ -227,8 +229,22 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const position = Number(value)
     if (value === '') {
       setValue(name, value as any)
-    } else if (position <= 150 && position >= -150) {
-      setValue(name, position)
+    } else {
+      let x = event.x
+      let y = event.y
+
+      switch (name) {
+        case 'x':
+          x = position
+          break;
+        case 'y':
+          y = position
+          break;
+      }
+
+      if (isInsideWorldLimits(x, y)) {
+        setValue(name, position)
+      }
     }
   }
 
@@ -370,11 +386,11 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       case 'description':
       case 'details':
       case 'contact':
-        return setValue(name, String(value || '').slice(0, eventSchema.properties[name].maxLength))
+        return setValue(name, String(value || '').slice(0, newEventSchema.properties[name].maxLength))
 
       case 'image':
       case 'url':
-      case 'realm':
+      case 'server':
         return setValue(name, value)
 
       case 'highlighted':

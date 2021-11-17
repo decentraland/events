@@ -8,11 +8,11 @@ import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import SubTitle from 'decentraland-gatsby/dist/components/Text/SubTitle'
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph'
 import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
+import backIcon from '../../../../images/popup-back.svg'
+import closeIcon from '../../../../images/popup-close.svg'
 
 import './EventAttendeeList.css'
 
-const back = require('../../../../images/popup-back.svg')
-const close = require('../../../../images/popup-close.svg')
 
 const attendees = new Map<string, EventAttendeeAttributes[]>()
 
@@ -46,8 +46,8 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
 
   return <div className="EventAttendeeList">
     <div className="EventAttendeeList__Header">
-      {props.onBack && <img src={back} width="8" height="14" className="EventAttendeeList__Header__Back" onClick={handleBack} />}
-      {props.onClose && <img src={close} width="14" height="14" className="EventAttendeeList__Header__Close" onClick={handleClose} />}
+      {props.onBack && <img src={backIcon} width="8" height="14" className="EventAttendeeList__Header__Back" onClick={handleBack} />}
+      {props.onClose && <img src={closeIcon} width="14" height="14" className="EventAttendeeList__Header__Close" onClick={handleClose} />}
       <SubTitle>People going</SubTitle>
     </div>
     {!list && <Loader size="massive" />}

@@ -5,8 +5,7 @@ import { auth, WithAuth } from "decentraland-gatsby/dist/entities/Auth/middlewar
 import { sign, verify } from "decentraland-gatsby/dist/utils/sign";
 import { Response, Request } from "express";
 import ProfileSettingsModel from "./model";
-import RequestError from "decentraland-gatsby/dist/entities/Route/error";
-import { editableAttributes, ProfileSettingsAttributes, EmailSubscriptionStatus, EmailSubscription, DATA_PARAM, SUBSCRIPTION_PATH } from './types';
+import { editableAttributes, ProfileSettingsAttributes, EmailSubscriptionStatus, EmailSubscription, DATA_PARAM, SUBSCRIPTION_PATH, profileSettingsSchema } from './types';
 import isEmail from 'validator/lib/isEmail';
 import { sendEmailVerification } from '../Notification/utils';
 import { requiredEnv } from 'decentraland-gatsby/dist/utils/env';
@@ -14,6 +13,7 @@ import ProfileSubscriptionModel from '../ProfileSubscription/model';
 import EventAttendeeModel from '../EventAttendee/model';
 import Time from 'decentraland-gatsby/dist/utils/date/Time';
 import isEthereumAddress from 'validator/lib/isEthereumAddress';
+import { createValidator } from 'decentraland-gatsby/dist/entities/Route/validate';
 
 const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
 const SIGN_SECRET = requiredEnv('SIGN_SECRET')
@@ -58,16 +58,12 @@ export async function getMyProfileSettings(req: WithAuth) {
   }
 }
 
+const validateProfileSettings = createValidator<ProfileSettingsAttributes>(profileSettingsSchema)
 export async function updateProfileSettings(req: WithAuth) {
   const now = new Date()
   const user = req.auth!
   const profile = await getProfileSettings(user)
-  const updateAttributes = utils.pick(req.body || {}, editableAttributes) as ProfileSettingsAttributes
-
-  const errors = ProfileSettingsModel.validate(updateAttributes)
-  if (errors) {
-    throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, update: updateAttributes, body: req.body })
-  }
+  const updateAttributes = validateProfileSettings(utils.pick(req.body || {}, editableAttributes))
 
   let emailVerificationRequired = false
   const newProfile: ProfileSettingsAttributes = {

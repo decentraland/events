@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed'
@@ -10,53 +10,66 @@ import AttendingButtons from '../../Button/AttendingButtons'
 import './EventCard.css'
 import EventDate from '../EventDate/EventDate'
 import StartIn from '../../Badge/StartIn'
-import { navigate } from 'gatsby-plugin-intl'
+import { navigate } from 'decentraland-gatsby/dist/plugins/intl'
 import locations from '../../../modules/locations'
 
 const EVENTS_LIST = 3
 
 export type EventCardProps = {
-  event: SessionEventAttributes,
+  event?: SessionEventAttributes,
+  loading?: boolean
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>, data: SessionEventAttributes) => void,
 }
 
-export default function EventCard(props: EventCardProps) {
+export default React.memo(function EventCard(props: EventCardProps) {
   const event = props.event
-  const nextStartAt = useMemo(() => new Date(Date.parse(event.next_start_at.toString())), [event.next_start_at])
+  const onClick = props.onClick
+  const href = useMemo(() => event && locations.event(event.id), [ event ])
+  const nextStartAt = useMemo(() => new Date(event ? Date.parse(event.next_start_at.toString()) : Date.now()), [event?.next_start_at])
+  const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event) {
+      if (onClick) {
+        onClick(e, event)
+      }
 
-  function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (props.onClick) {
-      props.onClick(e, props.event)
+      if (!e.defaultPrevented) {
+        navigate(locations.event(event.id))
+      }
     }
-
-    if (!e.defaultPrevented) {
-      navigate(locations.event(event.id))
-    }
-  }
+  }, [event, onClick])
 
   return (
-    <Card link className={TokenList.join(['EventCard', !event.approved && 'pending'])} href={locations.event(event.id)} onClick={handleClick} >
+    <Card link className={TokenList.join([
+        'EventCard',
+        props.loading && 'loading',
+        event && !event.approved && 'pending'
+      ])}
+      href={href}
+      onClick={handleClick}
+    >
       <div />
-      <StartIn date={nextStartAt} />
-      {event.total_attendees > 0 && <div className="EventCard__Attendees">
+      {event && <StartIn date={nextStartAt} />}
+      {event && event.total_attendees > 0 && <div className="EventCard__Attendees">
         {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => <Avatar size="mini" key={address} address={address} />)}
         {event.total_attendees > EVENTS_LIST && <div className="EventCard__Attendees__More">
           <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
         </div>}
       </div>}
-      <ImgFixed src={event.image || ''} dimension="wide" />
+      <div className="EventCard__Cover">
+        <ImgFixed src={event?.image || ''} dimension="wide" />
+      </div>
       <Card.Content>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <EventDate event={event} />
+          {event && <EventDate event={event} />}
           <div>
             <JumpInPosition event={event} onClick={(e) => e.stopPropagation()} />
           </div>
         </div>
 
-        <Card.Header>{event.name}</Card.Header>
+        <Card.Header>{event?.name || ' '}</Card.Header>
         <Card.Description>
           <AttendingButtons event={event} />
         </Card.Description>
       </Card.Content>
     </Card>)
-}
+})

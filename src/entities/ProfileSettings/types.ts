@@ -1,3 +1,5 @@
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+
 export type ProfileSettingsAttributes = {
   user: string
   email: string | null
@@ -38,7 +40,7 @@ export type EmailSubscription = {
   exp: number
 }
 
-export const profileSettingsSchema = {
+export const profileSettingsSchema: AjvObjectSchema = {
   type: 'object',
   additionalProperties: false,
   required: [],

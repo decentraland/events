@@ -105,7 +105,7 @@ async function ensure() {
       BUCKET_CHECKED = true
     } catch (err) {
       BUCKET_CHECKED_JOB = null
-      throw new RequestError(`Service unavailable`, RequestError.ServiceUnavailable, { ...err })
+      throw new RequestError(`Service unavailable`, RequestError.ServiceUnavailable, { ...(err as any) })
     }
   })()
 

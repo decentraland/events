@@ -1,6 +1,5 @@
 
-import schema from 'decentraland-gatsby/dist/entities/Schema'
-import { ProfileSubscriptionAttributes, profileSubscriptionSchema } from './types'
+import { ProfileSubscriptionAttributes } from './types'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { SQL, table, values } from 'decentraland-gatsby/dist/entities/Database/utils'
 import { Model } from 'decentraland-gatsby/dist/entities/Database/model'
@@ -9,7 +8,6 @@ export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionA
   static tableName = 'profile_subscriptions'
   static primaryKey = 'endpoint'
   static withTimestamps = false
-  static validator = schema.compile(profileSubscriptionSchema)
 
   static async deleteAll(subscriptions: ProfileSubscriptionAttributes[]) {
     if (subscriptions.length === 0) {
@@ -37,19 +35,5 @@ export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionA
 
     const subscriptions = await this.find<ProfileSubscriptionAttributes>({ user })
     return subscriptions.map((subscriptions) => subscriptions.endpoint)
-  }
-
-  static validate(event: ProfileSubscriptionAttributes): string[] | null {
-    if (!this.isValid(event) && this.validator.errors && this.validator.errors.length > 0) {
-      return this.validator.errors
-        .map((error) => `${error.dataPath.slice(1)} ${error.message!}`)
-        .filter(Boolean)
-    }
-
-    return null
-  }
-
-  static isValid(event: Partial<ProfileSubscriptionAttributes>) {
-    return this.validator(event) as boolean
   }
 }

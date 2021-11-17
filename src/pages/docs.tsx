@@ -10,12 +10,13 @@ import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Table } from "decentraland-ui/dist/components/Table/Table"
 import { Card } from 'decentraland-ui/dist/components/Card/Card'
 import { Stats } from 'decentraland-ui/dist/components/Stats/Stats'
-import Accordion from "../components/Doc/Accordion"
 
+import ApiCard from "decentraland-gatsby/dist/components/Docs/ApiCard"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Code from "decentraland-gatsby/dist/components/Text/Code"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import RequestTable from "decentraland-gatsby/dist/components/Docs/RequestTable"
 import Navigation from "../components/Layout/Navigation"
 import { useEventsContext, useEventSorter } from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
@@ -89,122 +90,87 @@ export default function IndexPage(props: any) {
   return (<>
       <Navigation />
       <Container>
-        <Card style={{width: '100%'}}>
-          <Card.Content>
-            <Accordion
-              id="api-events"
-              title={<Stats title="get">/api/events</Stats>}
-              description={<Paragraph secondary small>Returns the list of the upcoming events</Paragraph>}
-            />
-          </Card.Content>
-        </Card>
-        <Card style={{width: '100%'}}>
-          <Card.Content>
-            <Accordion
-              id="api-events"
-              title={<Stats title="get">/api/events/:event_id</Stats>}
-              description={<Paragraph secondary small>Returns information about an event by ID</Paragraph>}
-            />
-          </Card.Content>
-        </Card>
-        <Card style={{width: '100%'}}>
-          <Card.Content>
-            <Accordion
-              id="api-events"
-              title={<Stats title="get">/api/events/:event_id/attendees</Stats>}
-              description={<Paragraph secondary small>Returns the list of addresses register for attending an event by ID</Paragraph>}
-            />
-          </Card.Content>
-        </Card>
-        <Card style={{width: '100%'}}>
-          <Card.Content>
-            <Accordion
-              id="api-message"
-              title={<Stats title="post">/api/message</Stats>}
-              description={<Paragraph secondary small>Apply an action in name of a user using their sign</Paragraph>}
-            >
-              <Divider size="tiny" />
-              <SubTitle>Request</SubTitle>
-              <Table basic="very">
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>name</Table.HeaderCell>
-                    <Table.HeaderCell>type</Table.HeaderCell>
-                    <Table.HeaderCell>place</Table.HeaderCell>
-                    <Table.HeaderCell>description</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  <Table.Row>
-                    <Table.Cell><Code inline>address</Code></Table.Cell>
-                    <Table.Cell><Code inline>string</Code></Table.Cell>
-                    <Table.Cell><Code inline>body</Code></Table.Cell>
-                    <Table.Cell>user wallet</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell><Code inline>message</Code></Table.Cell>
-                    <Table.Cell><Code inline>string</Code></Table.Cell>
-                    <Table.Cell><Code inline>body</Code></Table.Cell>
-                    <Table.Cell>action to execute</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell><Code inline>signature</Code></Table.Cell>
-                    <Table.Cell><Code inline>string</Code></Table.Cell>
-                    <Table.Cell><Code inline>body</Code></Table.Cell>
-                    <Table.Cell>message signed by the user address</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-              <Code note="request body" language="json">
-                {JSON.stringify({
-                  address: "0x0000000000000000000000000000000000000000",
-                  message: '{"type":"message", ... }',
-                  signature: '0x00000...00000'
-                }, null, 4)}
-              </Code>
-              <Divider size="tiny" />
-              <SubTitle>Response</SubTitle>
-              <Table basic="very">
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>name</Table.HeaderCell>
-                    <Table.HeaderCell>type</Table.HeaderCell>
-                    <Table.HeaderCell>place</Table.HeaderCell>
-                    <Table.HeaderCell>description</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  <Table.Row>
-                    <Table.Cell><Code inline>ok</Code></Table.Cell>
-                    <Table.Cell><Code inline>boolean</Code></Table.Cell>
-                    <Table.Cell><Code inline>response</Code></Table.Cell>
-                    <Table.Cell></Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell><Code inline>data</Code></Table.Cell>
-                    <Table.Cell><Code inline>any</Code></Table.Cell>
-                    <Table.Cell><Code inline>response</Code></Table.Cell>
-                    <Table.Cell>depends on the message type</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-              <Code note="response body" language="json">
-                {JSON.stringify({
-                  ok: true,
-                  data: true
-                }, null, 4)}
-              </Code>
-            </Accordion>
-          </Card.Content>
-        </Card>
-        <Card style={{width: '100%'}}>
-          <Card.Content>
-            <Accordion
-              id="api-message-attend"
-              title={<Stats title="post">/api/message (type: attend)</Stats>}
-              description={<Paragraph secondary small>Register/Unregister an attend to an event</Paragraph>}
-            >
+        <ApiCard id="get-events" method="GET" path="/api/events" description="Returns the list of the upcoming events">
+          <RequestTable />
+        </ApiCard>
+        <ApiCard id="get-event" method="GET" path="/api/events/{event_id}" description="Returns information about an event by ID" />
+        <ApiCard id="get-attendees" method="GET" path="/api/events/{event_id}/attendees" description="Returns the list of addresses register for attending an event by ID" />
+        <ApiCard id="api-message" deprecated method="POST" path="/api/message" description="Apply an action in name of a user using their sign">
             <Divider size="tiny" />
+            <SubTitle>Request</SubTitle>
+            <Table basic="very">
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>name</Table.HeaderCell>
+                  <Table.HeaderCell>type</Table.HeaderCell>
+                  <Table.HeaderCell>place</Table.HeaderCell>
+                  <Table.HeaderCell>description</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell><Code inline>address</Code></Table.Cell>
+                  <Table.Cell><Code inline>string</Code></Table.Cell>
+                  <Table.Cell><Code inline>body</Code></Table.Cell>
+                  <Table.Cell>user wallet</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell><Code inline>message</Code></Table.Cell>
+                  <Table.Cell><Code inline>string</Code></Table.Cell>
+                  <Table.Cell><Code inline>body</Code></Table.Cell>
+                  <Table.Cell>action to execute</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell><Code inline>signature</Code></Table.Cell>
+                  <Table.Cell><Code inline>string</Code></Table.Cell>
+                  <Table.Cell><Code inline>body</Code></Table.Cell>
+                  <Table.Cell>message signed by the user address</Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+            <Code note="request body" language="json">
+              {JSON.stringify({
+                address: "0x0000000000000000000000000000000000000000",
+                message: '{"type":"message", ... }',
+                signature: '0x00000...00000'
+              }, null, 4)}
+            </Code>
+            <Divider size="tiny" />
+            <SubTitle>Response</SubTitle>
+            <Table basic="very">
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>name</Table.HeaderCell>
+                  <Table.HeaderCell>type</Table.HeaderCell>
+                  <Table.HeaderCell>place</Table.HeaderCell>
+                  <Table.HeaderCell>description</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell><Code inline>ok</Code></Table.Cell>
+                  <Table.Cell><Code inline>boolean</Code></Table.Cell>
+                  <Table.Cell><Code inline>response</Code></Table.Cell>
+                  <Table.Cell></Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell><Code inline>data</Code></Table.Cell>
+                  <Table.Cell><Code inline>any</Code></Table.Cell>
+                  <Table.Cell><Code inline>response</Code></Table.Cell>
+                  <Table.Cell>depends on the message type</Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+            <Code note="response body" language="json">
+              {JSON.stringify({
+                ok: true,
+                data: true
+              }, null, 4)}
+            </Code>
+        </ApiCard>
+        <ApiCard id="api-message-attend" deprecated method="POST" path="/api/message (type: attend)" description="Register/Unregister an attend to an event">
+
+        <Divider size="tiny" />
             <SubTitle>Message</SubTitle>
             <Table basic="very">
               <Table.Header>
@@ -316,9 +282,7 @@ export default function IndexPage(props: any) {
                   data: true
                 }, null, 4)}
               </Code>
-            </Accordion>
-          </Card.Content>
-        </Card>
+        </ApiCard>
       </Container>
     </>)
 }

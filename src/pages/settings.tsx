@@ -18,15 +18,16 @@ import isEmail from "validator/lib/isEmail"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
-import './settings.css'
+import check from '../images/check.svg'
 import Navigation from "../components/Layout/Navigation"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { useEffect } from "react"
 import Helmet from "react-helmet"
+import './settings.css'
 
-const check = require('../images/check.svg')
+
 export default function SettingsPage(props: any) {
   const l = useFormatMessage()
   const [account, accountState] = useAuthContext()

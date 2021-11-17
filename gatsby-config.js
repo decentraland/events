@@ -10,15 +10,10 @@ module.exports = {
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `images`,
-        path: `${__dirname}/src/images`,
-      },
-    },
-    `gatsby-transformer-sharp`,
+    `gatsby-plugin-postcss`,
+    `gatsby-plugin-image`,
     `gatsby-plugin-sharp`,
+    `gatsby-transformer-sharp`,
     {
       resolve: 'gatsby-plugin-sri',
       options: {
@@ -38,29 +33,30 @@ module.exports = {
         icon: `node_modules/decentraland-gatsby/static/decentraland.svg`, // This path is relative to the root of the site.
       },
     },
-    {
-      resolve: `gatsby-plugin-typescript`,
-      options: {
-        isTSX: true, // defaults to false
-        // jsxPragma: `jsx`, // defaults to `React`
-        allExtensions: true, // defaults to false,
-      },
-    },
+    // {
+    //   resolve: `gatsby-plugin-typescript`,
+    //   options: {
+    //     isTSX: true, // defaults to false
+    //     // jsxPragma: `jsx`, // defaults to `React`
+    //     allExtensions: true, // defaults to false,
+    //   },
+    // },
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,
-    // `gatsby-plugin-i18n`,
+    // `@mediacurrent/gatsby-plugin-silence-css-order-warning`,
     {
-      resolve: `gatsby-plugin-intl`,
+      resolve: `decentraland-gatsby/dist/plugins/intl`,
       options: {
         // language JSON resource path
-        path: `${__dirname}/src/intl`,
+        paths: [
+          `${__dirname}/src/intl`
+        ],
         // supported language
-        languages: [`en` /*, `es`, `zh` */],
+        locales: [`en` /*, `es`, `zh` */],
         // language file path
-        defaultLanguage: `en`,
+        defaultLocale: `en`,
         // option to redirect to `/ko` when connecting `/`
-        redirect: false,
       },
     },
   ],

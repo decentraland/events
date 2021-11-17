@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-fetch'
-import { resolve } from 'url'
 import isURL from 'validator/lib/isURL';
 import env from 'decentraland-gatsby/dist/utils/env';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
@@ -129,7 +128,7 @@ export async function notifyEventError(user: Avatar, error: RequestError) {
 }
 
 function url(event: DeprecatedEventAttributes) {
-  return resolve(EVENTS_URL, `/en/?event=${event.id}`)
+  return new URL(`/?event=${event.id}`, EVENTS_URL).toString()
 }
 
 async function sendToSlack(body: object) {
@@ -152,6 +151,8 @@ async function sendToSlack(body: object) {
       logger.error(`Slack bad request: ${data} (${response.status})`)
     }
   } catch (error) {
-    logger.error(`Slack service error: ` + error.message, error)
+    if (error instanceof Error) {
+      logger.error(`Slack service error: ` + error.message, error)
+    }
   }
 }

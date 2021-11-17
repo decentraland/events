@@ -2,7 +2,7 @@ import React from "react"
 import { Back } from "decentraland-ui/dist/components/Back/Back"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import locations from "../../modules/locations"
-import { navigate } from "gatsby-plugin-intl"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 type ItemLayoutState = {
   children?: React.ReactNode

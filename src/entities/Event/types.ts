@@ -95,7 +95,7 @@ export type EventAttributes = {
   all_day: boolean
   x: number
   y: number
-  realm: string | null
+  server: string | null
   url: string | null
   user: string
   estate_id: string | null
@@ -121,6 +121,10 @@ export type EventAttributes = {
   details: string | null
   total_attendees: number
   latest_attendees: string[]
+}
+
+export type GetEventParams = {
+  event_id: string
 }
 
 export type DeprecatedEventAttributes = EventAttributes & {
@@ -174,7 +178,7 @@ export const editableAttributes: (keyof EventAttributes)[] = [
   'all_day',
   'x',
   'y',
-  'realm',
+  'server',
   'recurrent',
   'recurrent_frequency',
   'recurrent_setpos',
@@ -199,115 +203,3 @@ export const adminPatchAttributes: (keyof EventAttributes)[] = editableAttribute
 ])
 
 export const SITEMAP_ITEMS_PER_PAGE = 100
-
-export const eventSchema = {
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'name',
-    'start_at',
-    'duration',
-    'x',
-    'y',
-  ],
-  properties: {
-    name: {
-      type: 'string',
-      minLength: 0,
-      maxLength: 150,
-    },
-    description: {
-      type: ['string', 'null'],
-      minLength: 0,
-      maxLength: 5000,
-    },
-    approved: {
-      type: 'boolean'
-    },
-    rejected: {
-      type: 'boolean'
-    },
-    highlighted: {
-      type: 'boolean'
-    },
-    trending: {
-      type: 'boolean'
-    },
-    image: {
-      type: ['string', 'null'],
-      format: 'url',
-      optional: true,
-    },
-    start_at: {
-      type: 'string',
-      format: 'date-time'
-    },
-    duration: {
-      type: 'number',
-      minimum: 0,
-    },
-    all_day: {
-      type: 'boolean'
-    },
-    recurrent: {
-      type: 'boolean'
-    },
-    recurrent_frequency: {
-      type: ['string', 'null'],
-      enum: [...Frequencies, null]
-    },
-    recurrent_setpos: {
-      type: ['number', 'null'],
-      minimum: 0
-    },
-    recurrent_monthday: {
-      type: ['number', 'null']
-    },
-    recurrent_weekday_mask: {
-      type: 'number',
-      minimum: 0
-    },
-    recurrent_month_mask: {
-      type: 'number',
-      minimum: 0
-    },
-    recurrent_interval: {
-      type: 'number',
-      minimum: 0
-    },
-    recurrent_count: {
-      type: ['number', 'null']
-    },
-    recurrent_until: {
-      type: ['string', 'null'],
-      format: 'date-time'
-    },
-    x: {
-      type: 'number',
-      maximum: 150,
-      minimum: -150,
-    },
-    y: {
-      type: 'number',
-      maximum: 150,
-      minimum: -150,
-    },
-    realm: {
-      type: ['string', 'null'],
-    },
-    contact: {
-      type: ['string', 'null'],
-      minLength: 0,
-      maxLength: 100,
-    },
-    details: {
-      type: ['string', 'null'],
-      minLength: 0,
-      maxLength: 5000,
-    },
-    url: {
-      type: 'string',
-      format: 'url',
-    }
-  }
-}

@@ -3,13 +3,12 @@ import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList";
 import track from "decentraland-gatsby/dist/utils/development/segment";
 import { EventAttributes } from "../../entities/Event/types";
 
-import './JumpInPosition.css'
 import { eventTargetUrl } from "../../entities/Event/utils";
 import { SegmentEvent } from "../../modules/segment";
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext";
-
-const primaryJumpIn = require('../../images/primary-jump-in.svg')
-const secondaryPin = require('../../images/secondary-pin-small.svg')
+import primaryJumpInIcon from '../../images/primary-jump-in.svg'
+import secondaryPinIcon from '../../images/secondary-pin-small.svg'
+import './JumpInPosition.css'
 
 export type JumpInPositionProps = React.HTMLProps<HTMLAnchorElement> & {
   event?: EventAttributes
@@ -22,6 +21,7 @@ export default function JumpInPosition({ event, href, compact,  ...props }: Jump
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : 'HTTP'
   const ethAddress = address
+  console.log(primaryJumpInIcon)
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     if (props.onClick) {
@@ -35,11 +35,11 @@ export default function JumpInPosition({ event, href, compact,  ...props }: Jump
 
   return <a {...props} target="_blank" onClick={handleClick} href={to} className={TokenList.join(['JumpInPosition', compact && 'JumpInPosition--compact', props.className])}>
     <span className="JumpInPosition__Position">
-      {isPosition && <img src={secondaryPin} width="16" height="16" />}
+      {isPosition && <img src={secondaryPinIcon} width="16" height="16" />}
       <span>{position}</span>
     </span>
     <span className="JumpInPosition__Icon">
-      <img src={primaryJumpIn} width={16} height={16} />
+      <img src={primaryJumpInIcon} width={16} height={16} />
     </span>
   </a>
 }

@@ -3,9 +3,10 @@ import handle from "decentraland-gatsby/dist/entities/Route/handle";
 import { auth, WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware";
 import ProfileSubscriptionModel from "./model";
 import RequestError from "decentraland-gatsby/dist/entities/Route/error";
-import { ProfileSubscriptionAttributes } from "./types";
+import { ProfileSubscriptionAttributes, profileSubscriptionSchema } from "./types";
 import ProfileSettingsModel from "../ProfileSettings/model";
 import { ProfileSettingsAttributes } from "../ProfileSettings/types";
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate";
 
 export default routes((router) => {
   const withAuth = auth()
@@ -19,14 +20,10 @@ export async function getProfileSubscription(req: WithAuth) {
   return ProfileSubscriptionModel.find({ user })
 }
 
+const validateProfileSubscription = createValidator<ProfileSubscriptionAttributes>(profileSubscriptionSchema)
 export async function createProfileSubscription(req: WithAuth) {
   const user = req.auth!
-  const data = req.body || {}
-
-  const errors = ProfileSubscriptionModel.validate(data)
-  if (errors) {
-    throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, body: data })
-  }
+  const data = validateProfileSubscription(req.body)
 
   const subscription: ProfileSubscriptionAttributes = {
     user,

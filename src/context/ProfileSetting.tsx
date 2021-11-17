@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react'
+import React, { createContext, useContext, useMemo } from 'react'
 import useAuthContext from 'decentraland-gatsby/dist/context/Auth/useAuthContext'
 import useAsyncMemo from 'decentraland-gatsby/dist/hooks/useAsyncMemo'
 import track from "decentraland-gatsby/dist/utils/development/segment"
@@ -31,28 +31,28 @@ const defaultProfileSettings = [
 const UserSettingsContext = createContext(defaultProfileSettings)
 
 function useProfileSettings() {
-  const [ account ] = useAuthContext()
-  const [pushSubscription, pushSubscriptionState ] = usePushSubscription()
+  const [account] = useAuthContext()
+  const [pushSubscription, pushSubscriptionState] = usePushSubscription()
   const isNotificationSupported = useFeatureSupported("Notification")
   const isServiceWorkerSupported = useFeatureSupported("ServiceWorker")
   const isPushSupported = useFeatureSupported("PushManager")
   const isPushNotificationSupported = isNotificationSupported && isServiceWorkerSupported && isPushSupported
 
-  const [ settings, state ] = useAsyncMemo(async () => {
+  const [settings, state] = useAsyncMemo(async () => {
     if (!account) {
       return null
     }
 
     return Events.get().getMyProfileSettings()
-  }, [ account ])
+  }, [account])
 
-  const [ updating, update ] = useAsyncTask(async (settings: Partial<ProfileSettingsAttributes>) => {
+  const [updating, update] = useAsyncTask(async (settings: Partial<ProfileSettingsAttributes>) => {
     const newSettings = await Events.get().updateProfileSettings(settings)
     track((analytics) => analytics.track(SegmentEvent.Settings, settings))
     state.set(newSettings)
-  })
+  }, [state])
 
-  const [ unsubscribing, unsubscribe ] = useAsyncTask(async () => {
+  const [unsubscribing, unsubscribe] = useAsyncTask(async () => {
     if (!pushSubscription) {
       return
     }
@@ -60,9 +60,9 @@ function useProfileSettings() {
     await pushSubscriptionState.unsubscribe()
     await API.catch(Events.get().removeSubscriptions())
     state.reload()
-  })
+  }, [state])
 
-  const [ subscribing, subscribe ] = useAsyncTask(async () => {
+  const [subscribing, subscribe] = useAsyncTask(async () => {
     if (
       !Notification ||
       !Notification.permission ||
@@ -91,19 +91,29 @@ function useProfileSettings() {
 
     await API.catch(Events.get().createSubscription(options))
     state.reload()
-  })
+  }, [state])
+
+  const profileState = useMemo(() => ({
+    ...state,
+    loading: state.loading || updating || subscribing || unsubscribing,
+    subscriptionSupported: isPushNotificationSupported,
+    subscribed: !!pushSubscription,
+    unsubscribe,
+    subscribe,
+    update
+  }), [
+    state,
+    state.loading || updating || subscribing || unsubscribing,
+    isPushNotificationSupported,
+    !!pushSubscription,
+    unsubscribe,
+    subscribe,
+    update
+  ])
 
   return [
     settings,
-    {
-      ...state,
-      loading: state.loading || updating || subscribing || unsubscribing,
-      subscriptionSupported: isPushNotificationSupported,
-      subscribed: !!pushSubscription,
-      unsubscribe,
-      subscribe,
-      update
-    }
+    profileState
   ] as const
 }
 

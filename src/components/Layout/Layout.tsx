@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState } from "react"
 import { DropdownProps } from "semantic-ui-react/dist/commonjs/modules/Dropdown/Dropdown"
-import { /* Link, */ changeLocale } from "gatsby-plugin-intl"
+import { /* Link, */ changeLocale } from "decentraland-gatsby/dist/plugins/intl"
 
 import 'semantic-ui-css/semantic.min.css'
 import 'balloon-css/balloon.min.css'
@@ -46,7 +46,7 @@ export default function Layout({ children, ...props }: any) {
     data: DropdownProps
   ) {
     const newLanguage = data.value as Locale
-    changeLocale(newLanguage, currentPath)
+    changeLocale(newLanguage)
   }
 
   useEffect(() => {

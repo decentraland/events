@@ -1,14 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Tabs } from 'decentraland-ui/dist/components/Tabs/Tabs'
 import SubmitButton from '../Button/SubmitButton';
 import useAuthContext from 'decentraland-gatsby/dist/context/Auth/useAuthContext';
-import { Link } from 'gatsby-plugin-intl';
+import { Link } from 'decentraland-gatsby/dist/plugins/intl';
 import locations from '../../modules/locations';
 import { useEventsContext } from '../../context/Event';
 
-import './Navigation.css'
-import { useMemo } from 'react';
 import useFormatMessage from 'decentraland-gatsby/dist/hooks/useFormatMessage';
+import './Navigation.css'
 
 export enum NavigationTab {
   Events = 'events',
@@ -27,17 +26,17 @@ export default function Navigation(props: NavigationProps) {
   const hasPendingEvents = useMemo(() => events.some(event => !event.approved && !event.rejected), [ events ])
 
   return <Tabs>
-    <Link to={locations.events()}>
+    <Link href={locations.events()}>
       <Tabs.Tab active={props.activeTab === NavigationTab.Events}>
         {l('navigation.events')}
       </Tabs.Tab>
     </Link>
-    {account && <Link to={locations.myEvents()}>
+    {account && <Link href={locations.myEvents()}>
       <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
         {l('navigation.my_events')}
       </Tabs.Tab>
     </Link>}
-    {hasPendingEvents && <Link to={locations.pendingEvents()}>
+    {hasPendingEvents && <Link href={locations.pendingEvents()}>
       <Tabs.Tab active={props.activeTab === NavigationTab.PendingEvents}>
         {l('navigation.pending_events')}
       </Tabs.Tab>

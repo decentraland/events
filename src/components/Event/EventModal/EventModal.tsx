@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal";
+import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed';
 import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList';
 import { SessionEventAttributes } from "../../../entities/Event/types";
 import EventAttendeeList from './EventAttendeeList/EventAttendeeList';
@@ -7,11 +8,10 @@ import EventDetail from './EventDetail/EventDetail';
 import AttendingButtons from '../../Button/AttendingButtons';
 import EditButtons from '../../Button/EditButtons';
 import EventSection from '../EventSection';
+import closeIcon from '../../../images/remove.svg'
 
 import './EventModal.css'
-import ImgFixed from 'decentraland-gatsby/dist/components/Image/ImgFixed';
 
-const close = require('../../../images/remove.svg')
 
 export type EventModalProps = Omit<ModalProps, 'open' | 'children'> & {
   event?: SessionEventAttributes | null
@@ -29,7 +29,7 @@ export default function EventModal({ event, onClose, className, ...props }: Even
 
     {showEvent && <div className="EventModal__Action" onClick={onClose}>
       <div className="EventModal__Action__Background" />
-      <img src={close} width="14" height="14" />
+      <img src={closeIcon} width="14" height="14" />
     </div>}
     {showEvent && <ImgFixed src={event!.image || ''} dimension="wide" />}
     {showEvent && <EventDetail event={event!} onClickAttendees={() => setAttendees(true)} />}

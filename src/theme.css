@@ -14,3 +14,9 @@ body {
 .ui.container > .SignIn {
   position: relative;
 }
+
+@keyframes loading {
+  to {
+    background-position-x: -200%;
+  }
+}

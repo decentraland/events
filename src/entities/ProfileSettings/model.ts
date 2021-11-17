@@ -1,6 +1,5 @@
 
-import schema from 'decentraland-gatsby/dist/entities/Schema'
-import { ProfileSettingsAttributes, profileSettingsSchema } from './types'
+import { ProfileSettingsAttributes } from './types'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import isEmail from 'validator/lib/isEmail'
 import { SQL, table, values } from 'decentraland-gatsby/dist/entities/Database/utils'
@@ -10,7 +9,6 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
   static tableName = 'profile_settings'
   static primaryKey = 'user'
   static withTimestamps = false
-  static validator = schema.compile(profileSettingsSchema)
 
   static async findByUsers(users: string[]) {
     if (users.length === 0) {
@@ -65,19 +63,5 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     }
 
     return true
-  }
-
-  static validate(event: ProfileSettingsAttributes): string[] | null {
-    if (!this.isValid(event) && this.validator.errors && this.validator.errors.length > 0) {
-      return this.validator.errors
-        .map((error) => `${error.dataPath.slice(1)} ${error.message!}`)
-        .filter(Boolean)
-    }
-
-    return null
-  }
-
-  static isValid(event: Partial<ProfileSettingsAttributes>) {
-    return this.validator(event) as boolean
   }
 }

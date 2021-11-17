@@ -8,23 +8,19 @@ import Italic from 'decentraland-gatsby/dist/components/Text/Italic'
 import Link from 'decentraland-gatsby/dist/components/Text/Link'
 import Avatar from 'decentraland-gatsby/dist/components/Profile/Avatar'
 import DateBox from 'decentraland-gatsby/dist/components/Date/DateBox'
+import prevent from 'decentraland-gatsby/dist/utils/react/prevent'
+import { navigate } from 'decentraland-gatsby/dist/plugins/intl'
 import { SessionEventAttributes } from '../../../../entities/Event/types'
 import JumpInButton from '../../../Button/JumpInPosition'
 import EventSection from '../../EventSection'
 import EventDateDetail from './EventDateDetail'
-
-import './EventDetail.css'
+import extraIcon from '../../../../images/info.svg'
+import infoIcon from '../../../../images/secondary-info.svg'
+import pinIcon from '../../../../images/secondary-pin.svg'
+import friendsIcon from '../../../../images/secondary-friends.svg'
 import { useProfileSettingsContext } from '../../../../context/ProfileSetting'
 import locations from '../../../../modules/locations'
-import prevent from 'decentraland-gatsby/dist/utils/react/prevent'
-import { navigate } from 'gatsby-plugin-intl'
-
-const icons = {
-  extra: require('../../../../images/info.svg'),
-  info: require('../../../../images/secondary-info.svg'),
-  pin: require('../../../../images/secondary-pin.svg'),
-  friends: require('../../../../images/secondary-friends.svg'),
-}
+import './EventDetail.css'
 
 const ATTENDEES_PREVIEW_LIMIT = 12
 
@@ -77,12 +73,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* DESCRIPTION */}
       {props.showDescription !== false && <EventSection.Divider />}
       {props.showDescription !== false && <EventSection>
-        <EventSection.Icon src={icons.info} width="16" height="16" />
+        <EventSection.Icon src={infoIcon} width="16" height="16" />
         <EventSection.Detail >
           {!event.description && <Paragraph secondary={!event.description} >
             <Italic>No description</Italic>
           </Paragraph>}
-          {event.description && <Markdown source={event.description} />}
+          {event.description && <Markdown children={event.description} />}
         </EventSection.Detail>
         <EventSection.Action />
       </EventSection>}
@@ -105,7 +101,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* PLACE */}
       {props.showPlace !== false && <EventSection.Divider />}
       {props.showPlace !== false && <EventSection>
-        <EventSection.Icon src={icons.pin} width="16" height="16" />
+        <EventSection.Icon src={pinIcon} width="16" height="16" />
         <EventSection.Detail>
           <Paragraph bold>
             {event.scene_name || 'Decentraland'}
@@ -119,7 +115,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* ATTENDEES */}
       {props.showAttendees !== false && <EventSection.Divider />}
       {props.showAttendees !== false && <EventSection>
-        <EventSection.Icon src={icons.friends} width="16x" height="16" center />
+        <EventSection.Icon src={friendsIcon} width="16x" height="16" center />
         <EventSection.Detail style={{ display: 'flex', justifyContent: attendeesDiff > 0 ? 'space-around' : '' }}>
           {(event.latest_attendees || []).slice(0, ATTENDEES_PREVIEW_LIMIT).map((address) => <div key={address} style={attendeesDiff <= 0 ? { margin: '0 .4rem' } : {}}>
             <Avatar key={address} size="small" address={address} />
@@ -136,7 +132,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* CONTACT */}
       {props.showContact !== false && !event.approved && advance && <EventSection.Divider />}
       {props.showContact !== false && !event.approved && advance && <EventSection highlight>
-        <EventSection.Icon src={icons.extra} width="16" height="16" />
+        <EventSection.Icon src={extraIcon} width="16" height="16" />
         <EventSection.Detail>
           {event.contact && !isEmail(event.contact) && <Paragraph>{event.contact}</Paragraph>}
           {event.contact && isEmail(event.contact) && <Paragraph>
@@ -152,7 +148,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* DETAILS */}
       {props.showContact !== false && !event.approved && advance && <EventSection.Divider />}
       {props.showContact !== false && !event.approved && advance && <EventSection highlight>
-        <EventSection.Icon src={icons.extra} width="16" height="16" />
+        <EventSection.Icon src={extraIcon} width="16" height="16" />
         <EventSection.Detail>
           {event.details && <Paragraph>{event.details}</Paragraph>}
           {!event.details && <Paragraph secondary={!event.details} >

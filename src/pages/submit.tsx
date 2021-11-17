@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react"
-import { useLocation } from '@reach/router'
+import { useLocation } from '@gatsbyjs/reach-router'
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
@@ -18,13 +18,10 @@ import Markdown from 'decentraland-gatsby/dist/components/Text/Markdown'
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { navigate } from 'gatsby-plugin-intl'
-
+import { navigate } from 'decentraland-gatsby/dist/plugins/intl'
 import useEventEditor from "../hooks/useEventEditor"
-import BackButton from "../components/Button/BackButton"
 import AddCoverButton from "../components/Button/AddCoverButton"
 import ConfirmModal from "../components/Modal/ConfirmModal"
-
 import ImageInput from "../components/Form/ImageInput"
 import Textarea from "../components/Form/Textarea"
 import Label from "../components/Form/Label"
@@ -33,9 +30,6 @@ import Events, { EditEvent } from "../api/Events"
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
 import { Frequency, WeekdayMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types"
 import { isLatestRecurrentSetpos, toRecurrentSetposName, toRRuleDates } from "../entities/Event/utils"
-import { getRealms, getRealmsOptions } from "../modules/realms"
-
-import './submit.css'
 import { useEventIdContext, useEventsContext } from "../context/Event"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import locations from "../modules/locations"
@@ -44,10 +38,9 @@ import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import Helmet from "react-helmet"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import ItemLayout from "../components/Layout/ItemLayout"
-
-const info = require('../images/info.svg')
-
-let GLOBAL_LOADING = false;
+import { getServerOptions, getServers } from "../modules/servers"
+import infoIcon from '../images/info.svg'
+import './submit.css'
 
 type SubmitPageState = {
   loading?: boolean,
@@ -83,12 +76,12 @@ export default function SubmitPage() {
   const location = useLocation()
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
-  const [realms] = useAsyncMemo(getRealms)
+  const [servers] = useAsyncMemo(getServers)
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
   const [original, eventState] = useEventIdContext(params.get('event'))
-  const realmOptions = useMemo(() => getRealmsOptions(realms || []), [realms])
+  const serverOptions = useMemo(() => getServerOptions(servers || []), [servers])
   const loading = accountState.loading && eventState.loading
 
   const recurrent_date = useMemo(() => toRRuleDates(editing, (_, i) => i < MAX_EVENT_RECURRENT), [
@@ -114,7 +107,7 @@ export default function SubmitPage() {
         description: original.description,
         x: original.x,
         y: original.y,
-        realm: original.realm,
+        server: original.server,
         start_at: original.start_at,
         duration: original.duration,
         all_day: original.all_day,
@@ -149,10 +142,10 @@ export default function SubmitPage() {
         const poster = await Events.get().uploadPoster(file)
         editActions.setValue('image', poster.url)
       } catch (err) {
-        patchState({ errorImageServer: err.message })
+        patchState({ errorImageServer: (err as any).message })
       }
     }
-  })
+  }, [ state ])
 
   const [submitting, submit] = useAsyncTask(async () => {
     if (!editActions.validate()) {
@@ -168,9 +161,9 @@ export default function SubmitPage() {
       eventsState.add(submitted)
       navigate(locations.event(submitted.id))
     } catch (err) {
-      patchState({ loading: false, error: err.body?.error || err.message })
+      patchState({ loading: false, error: (err as any).body?.error || (err as any).message })
     }
-  })
+  }, [original])
 
   const [removing, remove] = useAsyncTask(async () => {
     if (original) {
@@ -178,13 +171,13 @@ export default function SubmitPage() {
       eventsState.add(event)
       navigate(locations.events())
     }
-  })
+  }, [original])
 
   const [notifying, notify] = useAsyncTask(async () => {
     if (original) {
       await Events.get().notifyEvent(original.id)
     }
-  })
+  }, [ original ])
 
   function handleReject() {
     if (original && (original.owned || original.editable)) {
@@ -303,7 +296,7 @@ export default function SubmitPage() {
               <Radio toggle label="PREVIEW" checked={state.previewingDescription} onChange={(_, ctx) => patchState({ previewingDescription: ctx.checked })} style={{ position: 'absolute', right: 0 }} />
               {!state.previewingDescription && <Textarea minHeight={72} maxHeight={500} label="Description" placeholder="Keep it short but keep it interesting!" name="description" error={!!errors['description']} message={errors['description']} value={editing.description} onChange={editActions.handleChange} />}
               {state.previewingDescription && <Label>Description</Label>}
-              {state.previewingDescription && <div style={{ minHeight: '72px', paddingTop: '4px', paddingBottom: '12px' }}><Markdown source={editing.description} /></div>}
+              {state.previewingDescription && <div style={{ minHeight: '72px', paddingTop: '4px', paddingBottom: '12px' }}><Markdown children={editing.description} /></div>}
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
@@ -414,7 +407,7 @@ export default function SubmitPage() {
               <Field label="Longitude (Y)" type="number" name="y" min="-150" max="150" error={!!errors['y']} message={errors['y']} value={editing.y} onChange={editActions.handleChange} />
             </Grid.Column>
             <Grid.Column mobile="8">
-              <SelectField label="Realm" placeholder="any realm" name="realm" error={!!errors['realm']} message={errors['realm']} options={realmOptions} value={editing.realm || ''} onChange={editActions.handleChange} />
+              <SelectField label="Server" placeholder="any server" name="server" error={!!errors['server']} message={errors['server']} options={serverOptions} value={editing.server || ''} onChange={editActions.handleChange} />
             </Grid.Column>
           </Grid.Row>
 
@@ -459,7 +452,7 @@ export default function SubmitPage() {
           <Grid.Row>
             <Grid.Column mobile="16">
               <Paragraph secondary tiny>
-                <img src={info} width="16" height="16" style={{ verticalAlign: 'middle', marginRight: '.5rem' }} />
+                <img src={infoIcon} width="16" height="16" style={{ verticalAlign: 'middle', marginRight: '.5rem' }} />
                 The event submission will be reviewed by our team, you’ll be notified by email
               </Paragraph>
             </Grid.Column>

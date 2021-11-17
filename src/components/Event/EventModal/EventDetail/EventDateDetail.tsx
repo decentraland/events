@@ -8,8 +8,8 @@ import AddToCalendarButton from '../../../Button/AddToCalendarButton'
 import Live from '../../../Badge/Live'
 import EventSection from '../../EventSection'
 import { useProfileSettingsContext } from '../../../../context/ProfileSetting';
+import clockIcon from '../../../../images/secondary-clock.svg'
 
-const clock = require('../../../../images/secondary-clock.svg')
 
 export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {
   event: SessionEventAttributes,
@@ -28,7 +28,7 @@ export default React.memo(function EventDateDetail({ event, startAt, secondary, 
   const isLive = now.isBetween(start_at, finish_at)
 
   return <EventSection {...props}>
-    <EventSection.Icon src={secondary ? '' : clock} width="16" height="16" />
+    <EventSection.Icon src={secondary ? '' : clockIcon} width="16" height="16" />
     <EventSection.Detail>
       {isLive && <Paragraph secondary={secondary}>Started: {start_at.fromNow()}</Paragraph>}
       {!isLive && countdown && <Paragraph secondary={secondary}>Starts in {start_at.fromNow(true)}</Paragraph>}

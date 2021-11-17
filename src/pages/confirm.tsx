@@ -1,6 +1,6 @@
 
 import React from "react"
-import { useLocation } from "@reach/router"
+import { useLocation } from "@gatsbyjs/reach-router"
 
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"

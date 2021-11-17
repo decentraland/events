@@ -1,7 +1,7 @@
 
 import React, { useMemo, useState, Fragment } from "react"
 import Helmet from "react-helmet"
-import { useLocation } from "@reach/router"
+import { useLocation } from "@gatsbyjs/reach-router"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"

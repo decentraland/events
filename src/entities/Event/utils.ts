@@ -17,13 +17,13 @@ export function eventUrl(event: Pick<EventAttributes, 'id'>): string {
   return target.toString()
 }
 
-export function eventTargetUrl(event: Pick<EventAttributes, 'x' | 'y' | 'realm'>): string {
+export function eventTargetUrl(event: Pick<EventAttributes, 'x' | 'y' | 'server'>): string {
   const target = new URL(DECENTRALAND_URL)
   target.pathname = ''
   target.searchParams.set('position', [event.x || 0, event.y || 0].join(','))
 
-  if (event.realm) {
-    target.searchParams.set('realm', event.realm)
+  if (event.server) {
+    target.searchParams.set('server', event.server)
   }
 
   return target.toString()

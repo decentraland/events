@@ -1,3 +1,5 @@
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+
 export type ProfileSubscriptionAttributes = {
   user: string
   endpoint: string
@@ -5,7 +7,7 @@ export type ProfileSubscriptionAttributes = {
   auth: string
 }
 
-export const profileSubscriptionSchema = {
+export const profileSubscriptionSchema: AjvObjectSchema = {
   type: 'object',
   additionalProperties: false,
   required: [

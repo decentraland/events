@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react'
+import React, { createContext, useContext, useCallback } from 'react'
 import useAuthContext from 'decentraland-gatsby/dist/context/Auth/useAuthContext'
 import useAsyncTasks from 'decentraland-gatsby/dist/hooks/useAsyncTasks'
 import useAsyncMemo from 'decentraland-gatsby/dist/hooks/useAsyncMemo'
@@ -41,7 +41,7 @@ export function useEvents() {
     return Events.get().getEvents()
   }, [ account, accountState.loading ], { initialValue: [] as SessionEventAttributes[] })
 
-  function add(newEvent: SessionEventAttributes) {
+  const add = useCallback(function (newEvent: SessionEventAttributes) {
     eventsState.set((events) => {
       let replaced = false
       const list = events.map((event) => {
@@ -60,9 +60,10 @@ export function useEvents() {
 
       return list
     })
-  }
+  }, [ eventsState ])
 
-  async function updateEventState(id: string, changes: Pick<SessionEventAttributes, 'approved' | 'rejected'>) {
+
+  const updateEventState = useCallback(async function (id: string, changes: Pick<SessionEventAttributes, 'approved' | 'rejected'>) {
     if (!account) {
       return accountState.select()
     }
@@ -70,14 +71,13 @@ export function useEvents() {
     const newEvent = await Events.get().updateEvent(id as string, changes)
     track((analytics) => analytics.track(SegmentEvent.EditEvent, { event: newEvent }))
     add(newEvent)
-  }
+  }, [ account, accountState, add ])
 
+  const [ approving, approve ] =  useAsyncTasks((id) => updateEventState(id as string, { approved: true, rejected: false }), [ updateEventState ])
+  const [ rejecting, reject ] = useAsyncTasks((id) => updateEventState(id as string, { approved: false, rejected: true }), [ updateEventState ])
+  const [ restoring, restore ] = useAsyncTasks((id) => updateEventState(id as string, { approved: false, rejected: false }), [ updateEventState ])
 
-  const [ approving, approve ] =  useAsyncTasks((id) => updateEventState(id as string, { approved: true, rejected: false }))
-  const [ rejecting, reject ] = useAsyncTasks((id) => updateEventState(id as string, { approved: false, rejected: true }))
-  const [ restoring, restore ] = useAsyncTasks((id) => updateEventState(id as string, { approved: false, rejected: false }))
-
- async function updateAttendee(id: string, updateAttendee: () => Promise<EventAttendeeAttributes[]>) {
+  const updateAttendee = useCallback(async (id: string, updateAttendee: () => Promise<EventAttendeeAttributes[]>) => {
     if (!account) {
       return accountState.select()
     }
@@ -105,21 +105,20 @@ export function useEvents() {
       return event
     } catch (error) {
       console.error(error)
-      track((analytics) => analytics.track(SegmentEvent.Error, { error: error.message, eventId: id, ...error }))
+      track((analytics) => analytics.track(SegmentEvent.Error, { error: (error as any).message, eventId: id, ...(error as any) }))
       throw error
     }
-  }
+  }, [ account, accountState, events, add ])
 
   const [ attending, attend ] = useAsyncTasks(async (id, attending: boolean) => {
     await updateAttendee(id, () => Events.get().setEventAttendee(id, attending))
-  })
+  }, [ updateAttendee ])
 
   const [ notifying, notify ] = useAsyncTasks(async (id, notify: boolean) => {
     await updateAttendee(id, () => Events.get().updateEventAttendee(id, { notify }))
-  })
+  }, [ updateAttendee ])
 
   const modifying = useMemo(() => new Set([ ...approving, ...rejecting, ...restoring, ...attending, ...notifying ]), [approving, rejecting, restoring, attending, notifying ])
-
 
   return [
     events,

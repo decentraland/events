@@ -1,13 +1,12 @@
 
-import React, { useMemo, useState, Fragment } from "react"
+import React, { useMemo, useState, Fragment, useCallback } from "react"
 import Helmet from "react-helmet"
-import { useLocation } from "@reach/router"
-import { navigate } from "gatsby-plugin-intl"
+import { useLocation } from "@gatsbyjs/reach-router"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
@@ -26,15 +25,16 @@ import useListEventsByMonth from '../hooks/useListEventsByMonth'
 import locations from "../modules/locations"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import { useEventIdContext, useEventsContext, useEventSorter } from "../context/Event"
-import './index.css'
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { SessionEventAttributes } from "../entities/Event/types"
+import './index.css'
 
 export type IndexPageState = {
   updating: Record<string, boolean>
 }
 
-export default function IndexPage(props: any) {
+export default function IndexPage() {
   const now = Date.now()
   const l = useFormatMessage()
   const [ , accountState ] = useAuthContext()
@@ -58,6 +58,11 @@ export default function IndexPage(props: any) {
   )
 
   const [enabledNotification, setEnabledNotification] = useState(false)
+  const handleEventClick = useCallback((e: React.MouseEvent<any>, event: SessionEventAttributes) => {
+    e.stopPropagation()
+    e.preventDefault()
+    navigate(locations.event(event.id))
+  }, [])
 
   return (<>
       <Helmet>
@@ -81,26 +86,35 @@ export default function IndexPage(props: any) {
       <Navigation activeTab={NavigationTab.Events} />
       <Container>
 
-        {loading && <div>
-          <Divider />
-          <Loader active size="massive" style={{ position: 'relative' }} />
-          <Divider />
-        </div>}
-
         {!loading && events.length === 0 && <div>
           <Divider />
           <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
           <Divider />
         </div>}
 
-        {!loading && events.length > 0 && mainEvents.length > 0 && <div>
+        {loading && <div>
           <Carousel>
-            {mainEvents.map(event => <EventCardBig
-              key={'live:' + event.id}
-              event={event}
-              onClick={prevent(() => navigate(locations.event(event.id)))}
-            />)}
-        </Carousel>
+            <EventCardBig loading />
+          </Carousel>
+        </div>}
+
+        {!loading && events.length > 0 && mainEvents.length > 0 && <div>
+            <Carousel>
+              {mainEvents.map(event => <EventCardBig
+                key={'live:' + event.id}
+                event={event}
+                onClick={handleEventClick}
+              />)}
+          </Carousel>
+        </div>}
+
+        {loading && <div>
+          <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
+          <Card.Group>
+            <EventCardMini loading={true}/>
+            <EventCardMini loading={true}/>
+            <EventCardMini loading={true}/>
+          </Card.Group>
         </div>}
 
         {!loading && events.length > 0 && trendingEvents.length > 0 && <div>
@@ -109,9 +123,23 @@ export default function IndexPage(props: any) {
             {trendingEvents.map(event => <EventCardMini
               key={'trending:' + event.id}
               event={event}
-              onClick={prevent(() => navigate(locations.event(event.id)))}
+              onClick={handleEventClick}
             />)}
           </Card.Group></div>}
+
+        {loading && <>
+          <div className="GroupTitle">
+            <SubTitle>{Time.from(Date.now(), { utc: !settings?.use_local_time }).format('MMMM')}</SubTitle>
+          </div>
+          <Card.Group>
+            <EventCard loading={true} />
+            <EventCard loading={true} />
+            <EventCard loading={true} />
+            <EventCard loading={true} />
+            <EventCard loading={true} />
+            <EventCard loading={true} />
+          </Card.Group>
+        </>}
 
         {!loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
           <div className="GroupTitle">
@@ -121,7 +149,7 @@ export default function IndexPage(props: any) {
             {events.map((event) => <EventCard
               key={'event:' + event.id}
               event={event}
-              onClick={prevent(() => navigate(locations.event(event.id)))}
+              onClick={handleEventClick}
             />)}
           </Card.Group>
         </Fragment>)}

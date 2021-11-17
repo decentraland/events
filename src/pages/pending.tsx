@@ -1,7 +1,7 @@
 
 import React, { useMemo, useState } from "react"
-import { useLocation } from "@reach/router"
-import { navigate } from "gatsby-plugin-intl"
+import { useLocation } from "@gatsbyjs/reach-router"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"

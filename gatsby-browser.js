@@ -5,22 +5,24 @@
  */
 
 // You can delete this file if you're not using it
-import React from "react"
-import { navigate } from "gatsby-plugin-intl"
+import React from 'react'
+import 'core-js/features/set-immediate'
 import 'semantic-ui-css/semantic.min.css'
 import 'balloon-css/balloon.min.css'
 import 'decentraland-ui/dist/themes/base-theme.css'
 import 'decentraland-ui/dist/themes/alternative/light-theme.css'
 import './src/theme.css'
 
-// import Helmet from "react-helmet"
-import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
-// import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
-import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
-import UserMenu from "decentraland-gatsby/dist/components/User/UserMenu"
-import segment from "decentraland-gatsby/dist/utils/development/segment"
-import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
+// import Helmet from 'react-helmet'
+// import { RawIntlProvider, createIntl } from 'react-intl'
+import { navigate, IntlProvider } from 'decentraland-gatsby/dist/plugins/intl'
+import AuthProvider from 'decentraland-gatsby/dist/context/Auth/AuthProvider'
+// import FeatureFlagProvider from 'decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider'
+import Layout from 'decentraland-gatsby/dist/components/Layout/Layout'
+import UserMenu from 'decentraland-gatsby/dist/components/User/UserMenu'
+import segment from 'decentraland-gatsby/dist/utils/development/segment'
+import MenuItem from 'semantic-ui-react/dist/commonjs/collections/Menu/MenuItem'
+import Icon from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import ProfileSettings from './src/context/ProfileSetting'
 import Events from './src/context/Event'
 import locations from './src/modules/locations'
@@ -40,17 +42,22 @@ export const wrapRootElement = ({ element }) => (<>
 </>)
 
 export const wrapPageElement = ({ element, props }) => {
-  return <Layout
-    {...props}
-    rightMenu={<UserMenu
-      onClickSettings={() => navigate(locations.settings())}
-      menuItems={<>
-        <MenuItem onClick={() => navigate(locations.docs())}><Icon name="code" />&nbsp;API</MenuItem>
-      </>}
-    />}
-    >
-    {element}
-  </Layout>
+  return <IntlProvider {...props.pageContext.intl}>
+    <Layout
+      {...props}
+      rightMenu={<UserMenu
+        onClickSettings={() => navigate(locations.settings())}
+        menuItems={<>
+          <MenuItem onClick={() => navigate(locations.docs())}>
+            <Icon name="code" />
+            &nbsp;API
+          </MenuItem>
+        </>}
+      />}
+      >
+      {element}
+    </Layout>
+  </IntlProvider>
 }
 
 export const onClientEntry = () => {

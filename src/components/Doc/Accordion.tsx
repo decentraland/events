@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
+import nextIcon from '../../images/next.svg'
 import './Accordion.css'
 
-const next = require('../../images/next.svg')
 
 export type AccordionProps = {
   open?: boolean,
@@ -60,7 +60,7 @@ export default React.memo(function Accordion(props: AccordionProps) {
         {props.description}
       </div>}
       {withContent && <div className={"Accordion__Title__Action"}>
-        <img src={next} width="48" height="48" />
+        <img src={nextIcon} width="48" height="48" />
       </div>}
     </div>
     <div style={{ height }} className={TokenList.join([ 'Accordion__Content' ])}>

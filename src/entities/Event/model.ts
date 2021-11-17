@@ -3,15 +3,13 @@ import { utils } from 'decentraland-commons';
 import { SQL, table, conditional, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils';
 import { Model } from 'decentraland-gatsby/dist/entities/Database/model';
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin";
-import schema from 'decentraland-gatsby/dist/entities/Schema'
 import Time from 'decentraland-gatsby/dist/utils/date/Time'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import { EventAttributes, SessionEventAttributes, EventListOptions, eventSchema, DeprecatedEventAttributes, SITEMAP_ITEMS_PER_PAGE } from './types'
+import { EventAttributes, SessionEventAttributes, EventListOptions, DeprecatedEventAttributes, SITEMAP_ITEMS_PER_PAGE } from './types'
 import EventAttendee from '../EventAttendee/model'
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = 'events'
-  static validator = schema.compile(eventSchema)
 
   static selectNextStartAt(duration: number, next_start_at: Date | null, recurrent_dates: Date[]): Date {
     const now = Date.now()
@@ -142,33 +140,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       LEFT JOIN ${table(EventAttendee)} a on e.id = a.event_id AND a.user = ${user}
       WHERE e.finish_at > now() AND e.rejected IS FALSE
     `))
-  }
-
-  static validate(event: EventAttributes): string[] | null {
-    if (!this.isValid(event) && this.validator.errors && this.validator.errors.length > 0) {
-      return this.validator.errors
-        .map((error) => `${error.dataPath.slice(1)} ${error.message!}`)
-        .filter(Boolean)
-    }
-
-    const errors: string[] = []
-    const start_at = Time.date(event.start_at.toString())
-    const recurrent_until = event.recurrent_until && Time.date(event.recurrent_until.toString())
-
-    if (recurrent_until && start_at.getTime() > recurrent_until.getTime() + 1000 * 60 * 60 * 24) {
-      errors.push(`recurrent must finish after the start date`)
-    }
-
-    if (errors.length) {
-      return errors
-    }
-
-    return null
-  }
-
-  static isValid(event: Partial<EventAttributes>) {
-    // return this.validator(event) as boolean
-    return this.validator(JSON.parse(JSON.stringify(event))) as boolean
   }
 
   static toPublic(event: DeprecatedEventAttributes & { attending?: boolean, notify?: boolean }, user?: string | null): SessionEventAttributes {

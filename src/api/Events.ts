@@ -5,9 +5,7 @@ import { EventAttributes, SessionEventAttributes } from '../entities/Event/types
 import Options from 'decentraland-gatsby/dist/utils/api/Options'
 import { EventAttendeeAttributes } from '../entities/EventAttendee/types'
 import { PosterAttributes } from '../entities/Poster/types'
-import { Realm } from '../entities/Realm/types'
 import { ProfileSettingsAttributes } from '../entities/ProfileSettings/types'
-import Catalyst, { CommsStatusWithLayers } from 'decentraland-gatsby/dist/utils/api/Catalyst'
 
 export type EditEvent = Pick<EventAttributes,
   'name' |
@@ -18,7 +16,7 @@ export type EditEvent = Pick<EventAttributes,
   'all_day' |
   'x' |
   'y' |
-  'realm' |
+  'server' |
   'url' |
   'approved' |
   'rejected' |
@@ -115,7 +113,7 @@ export default class Events extends API {
     return this.fetch<{}>(
       '/profile/subscription',
       this.options()
-        .authorization()
+        .authorization({ sign: true })
         .json(subscription)
         .method('POST')
     )
@@ -125,7 +123,7 @@ export default class Events extends API {
     return this.fetch<{}>(
       '/profile/subscription',
       this.options()
-        .authorization()
+        .authorization({ sign: true })
         .method('DELETE')
     )
   }
@@ -134,7 +132,7 @@ export default class Events extends API {
     const data = await this.fetch<ProfileSettingsAttributes>(
       '/profile/settings',
       this.options()
-        .authorization()
+        .authorization({ sign: true })
     )
 
     return Events.parseSettings(data)
@@ -145,31 +143,19 @@ export default class Events extends API {
       '/profile/settings',
       this.options()
         .method('PATCH')
-        .authorization()
+        .authorization({ sign: true })
         .json(settings)
     )
 
     return Events.parseSettings(data)
   }
 
-  async getRealms() {
-    const servers = await Catalyst.get().getServers()
-    return Promise.all(servers
-      .map(server => {
-        return API.catch(Catalyst.from(server.address).getCommsStatus(true))
-      })
-    )
-      .then(statuses => {
-        return statuses.filter(Boolean) as CommsStatusWithLayers[]
-      })
-  }
-
   async getEvents() {
-    return this.fetchMany(`/events`, this.options().authorization())
+    return this.fetchMany(`/events`, this.options().authorization({ sign: true, optional: true }))
   }
 
   async getUserAttendingEvent() {
-    return this.fetchMany(`/events/attending`, this.options().authorization())
+    return this.fetchMany(`/events/attending`, this.options().authorization({ sign: true, optional: true }))
   }
 
   async getEventAttending(eventId: string) {
@@ -181,7 +167,7 @@ export default class Events extends API {
       '/events',
       this.options()
         .method('POST')
-        .authorization()
+        .authorization({ sign: true })
         .json(event)
     )
   }
@@ -190,7 +176,7 @@ export default class Events extends API {
     return this.fetchOne(
       `/events/${eventId}`,
       this.options({ method: 'PATCH' })
-        .authorization()
+        .authorization({ sign: true })
         .json(event)
     )
   }
@@ -199,7 +185,7 @@ export default class Events extends API {
     return this.fetch<{}>(
       `/events/${eventId}`,
       this.options({ method: 'DELETE' })
-        .authorization()
+        .authorization({ sign: true })
     )
   }
 
@@ -207,7 +193,7 @@ export default class Events extends API {
     return this.fetch<{}>(
       `/events/${eventId}/notifications`,
       this.options({ method: 'POST' })
-        .authorization()
+        .authorization({ sign: true })
     )
   }
 
@@ -223,7 +209,7 @@ export default class Events extends API {
     return this.fetch<EventAttendeeAttributes[]>(
       `/events/${eventId}/attendees`,
       this.options({ method: 'POST' })
-        .authorization()
+        .authorization({ sign: true })
     )
   }
 
@@ -232,7 +218,7 @@ export default class Events extends API {
       `/events/${eventId}/attendees`,
       this.options({ method: 'PATCH' })
         .json(attendee)
-        .authorization()
+        .authorization({ sign: true })
     )
   }
 
@@ -240,17 +226,17 @@ export default class Events extends API {
     return this.fetch<EventAttendeeAttributes[]>(
       `/events/${eventId}/attendees`,
       this.options({ method: 'DELETE' })
-        .authorization()
+        .authorization({ sign: true })
     )
   }
 
   async getEventById(eventId: string) {
-    return this.fetchOne(`/events/${eventId}`, this.options().authorization())
+    return this.fetchOne(`/events/${eventId}`, this.options().authorization({ sign: true, optional: true }))
   }
 
   async uploadPoster(file: File): Promise<PosterAttributes> {
     const body = new FormData()
     body.append('poster', file)
-    return this.fetch(`/poster`, this.options({ method: 'POST', body }).authorization())
+    return this.fetch(`/poster`, this.options({ method: 'POST', body }).authorization({ sign: true }))
   }
 }

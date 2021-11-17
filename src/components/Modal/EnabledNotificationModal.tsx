@@ -7,10 +7,10 @@ import './EnabledNotificationModal.css'
 import Title from 'decentraland-gatsby/dist/components/Text/Title';
 import Paragraph from 'decentraland-gatsby/dist/components/Text/Paragraph';
 import prevent from 'decentraland-gatsby/dist/utils/react/prevent';
-import { navigate } from 'gatsby-plugin-intl';
+import { navigate } from 'decentraland-gatsby/dist/plugins/intl';
 import locations from '../../modules/locations';
 
-const close = require('../../images/popup-close.svg')
+import closeIcon from '../../images/popup-close.svg'
 
 export default function EnabledNotificationModal(props: Omit<ModalProps, 'children'>) {
   function handleClose(event: React.MouseEvent<HTMLElement>) {
@@ -21,7 +21,7 @@ export default function EnabledNotificationModal(props: Omit<ModalProps, 'childr
 
   return <Modal {...props} className={TokenList.join(['EnabledNotificationModal', props.className])}>
     {props.onClose && <div className="EnabledNotificationModal__Close" onClick={handleClose}>
-      <img src={close} width="14" height="14" />
+      <img src={closeIcon} width="14" height="14" />
     </div>}
     <Title>Notifications</Title>
     <Paragraph>Go to settings and setup your notifications preferences!</Paragraph>
