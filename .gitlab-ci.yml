@@ -27,7 +27,7 @@ build:code:
     - git config url."https://github.com/".insteadOf "ssh://git@github.com/"
 
     # install dependencies
-    - npm ci --cache .npm --prefer-offline
+    - npm ci --cache .npm --prefer-offline --unsafe-perm
 
     # setup dcl environment
     - export PATH="$PATH:$HOME/.pulumi/bin"
