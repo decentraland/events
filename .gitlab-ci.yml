@@ -24,6 +24,8 @@ build:code:
     - release
   script:
 
+    - git config url."https://github.com/".insteadOf "ssh://git@github.com/"
+
     # install dependencies
     - npm ci --cache .npm --prefer-offline
 
