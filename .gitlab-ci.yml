@@ -25,7 +25,8 @@ build:code:
   script:
 
     # install dependencies
-    - npm ci --cache .npm --prefer-offline
+    # - npm ci --cache .npm --prefer-offline
+    - npm i decentraland-gatsby-deploy
 
     # setup dcl environment
     - export PATH="$PATH:$HOME/.pulumi/bin"
@@ -43,14 +44,21 @@ build:code:
 
     - source ./node_modules/.bin/setup-environment
 
+    - env | grep GATSBY_ > .env
+    - echo .env
+
+    - docker build -t events .
+    - docker cp "events:/app/public" "./public"
+    - ls -alh "./public"
     # build source
-    - npm run build
+    # - npm run build
 
     # push server
-    - dcl-lock-sync
-    - dcl-up $PULUMI_STACK
-    - dcl-sync-release
+    # - dcl-lock-sync
+    # - dcl-up $PULUMI_STACK
+    # - dcl-sync-release
 
-    # push static
-    - ./node_modules/.bin/setup-bucket public
-    - dcl-cache-invalidation
+    # # push static
+    # - docker cp "$(pulumi stack output serviceImage):/app/public" "./public"
+    # - ./node_modules/.bin/setup-bucket public
+    # - dcl-cache-invalidation

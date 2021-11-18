@@ -70,7 +70,9 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "concurrently -c blue,green -n SERVER,FRONT 'tsc -p .' 'gatsby build'",
+    "build": "npm run build:server && npm run build:front",
+    "build:server": "tsc -p .",
+    "build:front": "gatsby build",
     "develop": "gatsby develop --https -H 0.0.0.0",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "concurrently -c blue,green -n SERVER,FRONT 'npm run serve' 'npm run develop'",
