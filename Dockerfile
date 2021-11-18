@@ -24,6 +24,7 @@ COPY ./package.json         /app/package.json
 RUN npm ci
 
 COPY ./src                  /app/src
+COPY ./static               /app/static
 COPY ./templates            /app/templates
 COPY ./.env                 /app/.env.production
 COPY ./gatsby-browser.js    /app/gatsby-browser.js
