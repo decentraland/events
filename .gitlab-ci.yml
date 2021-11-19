@@ -46,7 +46,7 @@ build:code:
 
     - mkdir ./public
     # - docker cp "events:/app/public" "./public"
-    - docker run -v $PWD/public:/data --rm --entrypoint ls events -alh '/app/public'
+    - docker run -v $PWD/public:/data --rm --entrypoint cp events -r '/app/public' '/data'
     - ls -alh "./public"
     # build source
     # - npm run build

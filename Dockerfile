@@ -1,4 +1,4 @@
-FROM node:16-alpine as compiler
+FROM node:16-alpine as builder
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -16,6 +16,10 @@ RUN apk add --no-cache --virtual native-deps \
   zlib-dev \
   file \
   pkgconf
+
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
 
 WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
@@ -41,13 +45,14 @@ RUN npm prune --production
 FROM node:16-alpine
 WORKDIR /app
 
-COPY --from=compiler /app/package.json         /app/package.json
-COPY --from=compiler /app/package-lock.json    /app/package-lock.json
-COPY --from=compiler /app/lib                  /app/lib
-COPY --from=compiler /app/public               /app/public
-COPY --from=compiler /app/static               /app/static
-COPY --from=compiler /app/templates            /app/templates
-COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
+COPY --from=builderenv /tini /tini
+COPY --from=builder /app/package.json         /app/package.json
+COPY --from=builder /app/package-lock.json    /app/package-lock.json
+COPY --from=builder /app/lib                  /app/lib
+COPY --from=builder /app/public               /app/public
+COPY --from=builder /app/static               /app/static
+COPY --from=builder /app/templates            /app/templates
+COPY --from=builder /app/entrypoint.sh        /app/entrypoint.sh
 
 VOLUME [ "/data" ]
 
