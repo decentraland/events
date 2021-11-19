@@ -42,22 +42,13 @@ build:code:
     - env | grep GATSBY_ > .env
     - echo .env
 
-    - docker build -t events .
-    - docker images
-
-    - mkdir ./public
-    # - docker cp "events:/app/public" "./public"
-    - docker run -v $PWD:/data --rm --entrypoint cp events -r '/app/public' '/data'
-    - ls -alh "./public"
-    # build source
-    # - npm run build
-
     # push server
-    # - dcl-lock-sync
-    # - dcl-up $PULUMI_STACK
-    # - dcl-sync-release
+    - dcl-lock-sync
+    - dcl-up $PULUMI_STACK
+    - dcl-sync-release
 
     # # push static
-    # - docker cp "$(pulumi stack output serviceImage):/app/public" "./public"
-    # - ./node_modules/.bin/setup-bucket public
-    # - dcl-cache-invalidation
+    - mkdir ./public
+    - docker run -v $PWD:/data --rm --entrypoint cp $(pulumi stack output serviceImage) -r '/app/public' '/data'
+    - ./node_modules/.bin/setup-bucket public
+    - dcl-cache-invalidation
