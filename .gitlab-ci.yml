@@ -48,6 +48,8 @@ build:code:
     - echo .env
 
     - docker build -t events .
+    - docker images
+
     - docker cp "events:/app/public" "./public"
     - ls -alh "./public"
     # build source
