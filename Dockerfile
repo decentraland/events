@@ -1,4 +1,4 @@
-FROM node:16-alpine as builder
+FROM node:16-alpine as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -45,14 +45,14 @@ RUN npm prune --production
 FROM node:16-alpine
 WORKDIR /app
 
-COPY --from=builderenv /tini /tini
-COPY --from=builder /app/package.json         /app/package.json
-COPY --from=builder /app/package-lock.json    /app/package-lock.json
-COPY --from=builder /app/lib                  /app/lib
-COPY --from=builder /app/public               /app/public
-COPY --from=builder /app/static               /app/static
-COPY --from=builder /app/templates            /app/templates
-COPY --from=builder /app/entrypoint.sh        /app/entrypoint.sh
+COPY --from=compiler /tini /tini
+COPY --from=compiler /app/package.json         /app/package.json
+COPY --from=compiler /app/package-lock.json    /app/package-lock.json
+COPY --from=compiler /app/lib                  /app/lib
+COPY --from=compiler /app/public               /app/public
+COPY --from=compiler /app/static               /app/static
+COPY --from=compiler /app/templates            /app/templates
+COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
 
 VOLUME [ "/data" ]
 
