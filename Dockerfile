@@ -36,15 +36,13 @@ COPY ./tsconfig.json        /app/tsconfig.json
 
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:server
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front
+RUN npm prune --production
 
 FROM node:16-alpine
 WORKDIR /app
 
 COPY --from=compiler /app/package.json         /app/package.json
 COPY --from=compiler /app/package-lock.json    /app/package-lock.json
-
-RUN NODE_ENV=production npm ci
-
 COPY --from=compiler /app/lib                  /app/lib
 COPY --from=compiler /app/public               /app/public
 COPY --from=compiler /app/static               /app/static
