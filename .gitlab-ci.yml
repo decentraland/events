@@ -50,7 +50,9 @@ build:code:
     - docker build -t events .
     - docker images
 
-    - docker cp "events:/app/public" "./public"
+    - mkdir ./public
+    # - docker cp "events:/app/public" "./public"
+    - docker run -v $PWD/public:/data --rm --entrypoint sh events cp -r '/app/public/*' '/data'
     - ls -alh "./public"
     # build source
     # - npm run build
