@@ -20,6 +20,7 @@ build:code:
 
     # install dependencies
     # - npm ci --cache .npm --prefer-offline
+    - npm i -g npm@8
     - npm i decentraland-gatsby-deploy
 
     # setup dcl environment
