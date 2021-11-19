@@ -7,12 +7,6 @@ stages:
 services:
   - docker:dind
 
-# Cache modules in between jobs
-cache:
-  key: ${CI_PROJECT_NAME}
-  paths:
-    - .npm/
-
 build:code:
   stage: install
   image: decentraland/ci-node:latest
@@ -52,7 +46,7 @@ build:code:
 
     - mkdir ./public
     # - docker cp "events:/app/public" "./public"
-    - docker run -v $PWD/public:/data --rm --entrypoint ls events -alh '/app'
+    - docker run -v $PWD/public:/data --rm --entrypoint ls events -alh '/app/public'
     - ls -alh "./public"
     # build source
     # - npm run build
