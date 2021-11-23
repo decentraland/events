@@ -21,6 +21,7 @@ build:code:
     # install dependencies
     # - npm ci --cache .npm --prefer-offline
     - npm i -g npm@8
+    - ls node_modules
     - npm i decentraland-gatsby-deploy
     - ls node_modules
     - ls node_modules/@pulumi
