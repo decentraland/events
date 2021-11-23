@@ -20,22 +20,44 @@ export const getEventListQuery = {
     position: {
       type: 'string',
       format: /^-?\d{1,3},-?\d{1,3}$/,
-      description: 'Position where the events will happend'
+      description: 'Filter events that will happend in a specific position'
     },
     estate_id: {
       type: 'string',
       format: 'int32',
-      description: 'Estate where the events will happend'
+      description: 'Filter events that will happend in a specific estate'
     },
     creator: {
       type: 'string',
       format: 'address',
-      description: 'User address that create the events'
+      description: 'Filter events created by a user'
     },
     only_attendee: {
       type: TruthyEnum,
-      description: 'Return events ths'
-    }.
+      description: 'Filter events that user will go (requires authentication)'
+    },
+    list: {
+      description: 'Filter event using one of the following list',
+      default: 'active',
+      oneOf: [
+        {
+          enum: 'all',
+          description: 'All events',
+        },
+        {
+          enum: 'active',
+          description: 'Only current and future events'
+        },
+        {
+          enum: 'live',
+          description: 'Only current events'
+        },
+        {
+          enum: 'upcoming',
+          description: 'Only future events'
+        },
+      ],
+    },
   }
 }
 
