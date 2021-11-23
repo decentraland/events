@@ -12,7 +12,7 @@
 .ui.card.EventCardMini .content,
 .ui.card.EventCardMini .EventCardMini__Cover .dg.ImgFixed {
   opacity: 1;
-  transition: opacity ease .3s;
+  transition: opacity ease 0.3s;
 }
 
 .ui.card.EventCardMini.loading .content,

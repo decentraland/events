@@ -15,11 +15,11 @@ module.exports = {
     `gatsby-plugin-sharp`,
     `gatsby-transformer-sharp`,
     {
-      resolve: 'gatsby-plugin-sri',
+      resolve: "gatsby-plugin-sri",
       options: {
-        hash: 'sha512', // 'sha256', 'sha384' or 'sha512' ('sha512' = default)
-        crossorigin: false // Optional
-      }
+        hash: "sha512", // 'sha256', 'sha384' or 'sha512' ('sha512' = default)
+        crossorigin: false, // Optional
+      },
     },
     {
       resolve: `gatsby-plugin-manifest`,
@@ -49,9 +49,7 @@ module.exports = {
       resolve: `decentraland-gatsby/dist/plugins/intl`,
       options: {
         // language JSON resource path
-        paths: [
-          `${__dirname}/src/intl`
-        ],
+        paths: [`${__dirname}/src/intl`],
         // supported language
         locales: [`en` /*, `es`, `zh` */],
         // language file path

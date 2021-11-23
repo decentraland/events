@@ -8,22 +8,18 @@ export type ProfileSubscriptionAttributes = {
 }
 
 export const profileSubscriptionSchema: AjvObjectSchema = {
-  type: 'object',
+  type: "object",
   additionalProperties: false,
-  required: [
-    'endpoint',
-    'p256dh',
-    'auth',
-  ],
+  required: ["endpoint", "p256dh", "auth"],
   properties: {
     endpoint: {
-      type: 'string',
+      type: "string",
     },
     p256dh: {
-      type: 'string'
+      type: "string",
     },
     auth: {
-      type: 'string'
-    }
-  }
+      type: "string",
+    },
+  },
 }

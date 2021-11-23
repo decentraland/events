@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, Fragment, useCallback } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
@@ -20,15 +19,19 @@ import EventCardBig from "../components/Event/EventCardBig/EventCardBig"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 
-import useListEventsByMonth from '../hooks/useListEventsByMonth'
+import useListEventsByMonth from "../hooks/useListEventsByMonth"
 
 import locations from "../modules/locations"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { useEventIdContext, useEventsContext, useEventSorter } from "../context/Event"
+import {
+  useEventIdContext,
+  useEventsContext,
+  useEventSorter,
+} from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { SessionEventAttributes } from "../entities/Event/types"
-import './index.css'
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -37,122 +40,205 @@ export type IndexPageState = {
 export default function IndexPage() {
   const now = Date.now()
   const l = useFormatMessage()
-  const [ , accountState ] = useAuthContext()
+  const [, accountState] = useAuthContext()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
-  const [ event ] = useEventIdContext(params.get('event'))
-  const [ settings ] = useProfileSettingsContext()
-  const [ all, state ] = useEventsContext()
+  const [event] = useEventIdContext(params.get("event"))
+  const [settings] = useProfileSettingsContext()
+  const [all, state] = useEventsContext()
   const events = useEventSorter(all)
   const loading = accountState.loading || state.loading
 
   const eventsByMonth = useListEventsByMonth(events)
-  const trendingEvents = useMemo(() => events.filter((event) => !!event.trending), [events])
+  const trendingEvents = useMemo(
+    () => events.filter((event) => !!event.trending),
+    [events]
+  )
   const mainEvents = useMemo(
-    () => events
-      .filter((event) => event.approved && event.highlighted && event.finish_at.getTime() > now)
-      .sort((eventA, eventB) => {
-        return Math.abs(now - eventA.next_start_at.getTime()) - Math.abs(now - eventB.next_start_at.getTime())
-      }),
+    () =>
+      events
+        .filter(
+          (event) =>
+            event.approved &&
+            event.highlighted &&
+            event.finish_at.getTime() > now
+        )
+        .sort((eventA, eventB) => {
+          return (
+            Math.abs(now - eventA.next_start_at.getTime()) -
+            Math.abs(now - eventB.next_start_at.getTime())
+          )
+        }),
     [events]
   )
 
   const [enabledNotification, setEnabledNotification] = useState(false)
-  const handleEventClick = useCallback((e: React.MouseEvent<any>, event: SessionEventAttributes) => {
-    e.stopPropagation()
-    e.preventDefault()
-    navigate(locations.event(event.id))
-  }, [])
+  const handleEventClick = useCallback(
+    (e: React.MouseEvent<any>, event: SessionEventAttributes) => {
+      e.stopPropagation()
+      e.preventDefault()
+      navigate(locations.event(event.id))
+    },
+    []
+  )
 
-  return (<>
+  return (
+    <>
       <Helmet>
-        <title>{event?.name || l('social.home.title') || ''}</title>
-        <meta name="description" content={event?.description || l('social.home.description') || ''} />
+        <title>{event?.name || l("social.home.title") || ""}</title>
+        <meta
+          name="description"
+          content={event?.description || l("social.home.description") || ""}
+        />
 
-        <meta property="og:title" content={event?.name || l('social.home.title') || ''} />
-        <meta property="og:description" content={event?.description || l('social.home.description') || ''} />
-        <meta property="og:image" content={event?.image || l('social.home.image') || ''} />
-        <meta property="og:site" content={l('social.home.site') || ''} />
+        <meta
+          property="og:title"
+          content={event?.name || l("social.home.title") || ""}
+        />
+        <meta
+          property="og:description"
+          content={event?.description || l("social.home.description") || ""}
+        />
+        <meta
+          property="og:image"
+          content={event?.image || l("social.home.image") || ""}
+        />
+        <meta property="og:site" content={l("social.home.site") || ""} />
 
-        <meta name="twitter:title" content={event?.description || l('social.home.title') || ''} />
-        <meta name="twitter:description" content={event?.description || l('social.home.description') || ''} />
-        <meta name="twitter:image" content={event?.image || l('social.home.image') || ''} />
-        <meta name="twitter:card" content={event ? 'summary_large_image' : l('social.home.card') || ''} />
-        <meta name="twitter:creator" content={l('social.home.creator') || ''} />
-        <meta name="twitter:site" content={l('social.home.site') || ''} />
+        <meta
+          name="twitter:title"
+          content={event?.description || l("social.home.title") || ""}
+        />
+        <meta
+          name="twitter:description"
+          content={event?.description || l("social.home.description") || ""}
+        />
+        <meta
+          name="twitter:image"
+          content={event?.image || l("social.home.image") || ""}
+        />
+        <meta
+          name="twitter:card"
+          content={event ? "summary_large_image" : l("social.home.card") || ""}
+        />
+        <meta name="twitter:creator" content={l("social.home.creator") || ""} />
+        <meta name="twitter:site" content={l("social.home.site") || ""} />
       </Helmet>
-      <EnabledNotificationModal open={enabledNotification} onClose={() => setEnabledNotification(false)} />
-      <EventModal event={event} onClose={prevent(() => navigate(locations.events()))} />
+      <EnabledNotificationModal
+        open={enabledNotification}
+        onClose={() => setEnabledNotification(false)}
+      />
+      <EventModal
+        event={event}
+        onClose={prevent(() => navigate(locations.events()))}
+      />
       <Navigation activeTab={NavigationTab.Events} />
       <Container>
+        {!loading && events.length === 0 && (
+          <div>
+            <Divider />
+            <Paragraph secondary style={{ textAlign: "center" }}>
+              No events planned yet.
+            </Paragraph>
+            <Divider />
+          </div>
+        )}
 
-        {!loading && events.length === 0 && <div>
-          <Divider />
-          <Paragraph secondary style={{ textAlign: 'center' }}>No events planned yet.</Paragraph>
-          <Divider />
-        </div>}
-
-        {loading && <div>
-          <Carousel>
-            <EventCardBig loading />
-          </Carousel>
-        </div>}
-
-        {!loading && events.length > 0 && mainEvents.length > 0 && <div>
+        {loading && (
+          <div>
             <Carousel>
-              {mainEvents.map(event => <EventCardBig
-                key={'live:' + event.id}
-                event={event}
-                onClick={handleEventClick}
-              />)}
-          </Carousel>
-        </div>}
-
-        {loading && <div>
-          <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
-          <Card.Group>
-            <EventCardMini loading={true}/>
-            <EventCardMini loading={true}/>
-            <EventCardMini loading={true}/>
-          </Card.Group>
-        </div>}
-
-        {!loading && events.length > 0 && trendingEvents.length > 0 && <div>
-          <div className="GroupTitle"><SubTitle>TRENDING</SubTitle></div>
-          <Card.Group>
-            {trendingEvents.map(event => <EventCardMini
-              key={'trending:' + event.id}
-              event={event}
-              onClick={handleEventClick}
-            />)}
-          </Card.Group></div>}
-
-        {loading && <>
-          <div className="GroupTitle">
-            <SubTitle>{Time.from(Date.now(), { utc: !settings?.use_local_time }).format('MMMM')}</SubTitle>
+              <EventCardBig loading />
+            </Carousel>
           </div>
-          <Card.Group>
-            <EventCard loading={true} />
-            <EventCard loading={true} />
-            <EventCard loading={true} />
-            <EventCard loading={true} />
-            <EventCard loading={true} />
-            <EventCard loading={true} />
-          </Card.Group>
-        </>}
+        )}
 
-        {!loading && eventsByMonth.length > 0 && eventsByMonth.map(([date, events]) => <Fragment key={'month:' + date.toJSON()}>
-          <div className="GroupTitle">
-            <SubTitle>{Time.from(date, { utc: !settings?.use_local_time }).format('MMMM')}</SubTitle>
+        {!loading && events.length > 0 && mainEvents.length > 0 && (
+          <div>
+            <Carousel>
+              {mainEvents.map((event) => (
+                <EventCardBig
+                  key={"live:" + event.id}
+                  event={event}
+                  onClick={handleEventClick}
+                />
+              ))}
+            </Carousel>
           </div>
-          <Card.Group>
-            {events.map((event) => <EventCard
-              key={'event:' + event.id}
-              event={event}
-              onClick={handleEventClick}
-            />)}
-          </Card.Group>
-        </Fragment>)}
+        )}
+
+        {loading && (
+          <div>
+            <div className="GroupTitle">
+              <SubTitle>TRENDING</SubTitle>
+            </div>
+            <Card.Group>
+              <EventCardMini loading={true} />
+              <EventCardMini loading={true} />
+              <EventCardMini loading={true} />
+            </Card.Group>
+          </div>
+        )}
+
+        {!loading && events.length > 0 && trendingEvents.length > 0 && (
+          <div>
+            <div className="GroupTitle">
+              <SubTitle>TRENDING</SubTitle>
+            </div>
+            <Card.Group>
+              {trendingEvents.map((event) => (
+                <EventCardMini
+                  key={"trending:" + event.id}
+                  event={event}
+                  onClick={handleEventClick}
+                />
+              ))}
+            </Card.Group>
+          </div>
+        )}
+
+        {loading && (
+          <>
+            <div className="GroupTitle">
+              <SubTitle>
+                {Time.from(Date.now(), {
+                  utc: !settings?.use_local_time,
+                }).format("MMMM")}
+              </SubTitle>
+            </div>
+            <Card.Group>
+              <EventCard loading={true} />
+              <EventCard loading={true} />
+              <EventCard loading={true} />
+              <EventCard loading={true} />
+              <EventCard loading={true} />
+              <EventCard loading={true} />
+            </Card.Group>
+          </>
+        )}
+
+        {!loading &&
+          eventsByMonth.length > 0 &&
+          eventsByMonth.map(([date, events]) => (
+            <Fragment key={"month:" + date.toJSON()}>
+              <div className="GroupTitle">
+                <SubTitle>
+                  {Time.from(date, { utc: !settings?.use_local_time }).format(
+                    "MMMM"
+                  )}
+                </SubTitle>
+              </div>
+              <Card.Group>
+                {events.map((event) => (
+                  <EventCard
+                    key={"event:" + event.id}
+                    event={event}
+                    onClick={handleEventClick}
+                  />
+                ))}
+              </Card.Group>
+            </Fragment>
+          ))}
       </Container>
-    </>)
+    </>
+  )
 }

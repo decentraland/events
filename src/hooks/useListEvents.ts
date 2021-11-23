@@ -1,7 +1,9 @@
-import { SessionEventAttributes } from "../entities/Event/types";
-import { useMemo } from "react";
+import { SessionEventAttributes } from "../entities/Event/types"
+import { useMemo } from "react"
 
-export default function useListEvents(events?: Record<string, SessionEventAttributes>) {
+export default function useListEvents(
+  events?: Record<string, SessionEventAttributes>
+) {
   return useMemo(() => {
     if (!events) {
       return []
@@ -9,7 +11,7 @@ export default function useListEvents(events?: Record<string, SessionEventAttrib
 
     const now = Date.now()
     return Object.values(events)
-      .filter(event => {
+      .filter((event) => {
         if (event.rejected) {
           return false
         }

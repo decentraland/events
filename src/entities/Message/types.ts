@@ -1,18 +1,17 @@
 export type MessageAttributes = {
-  address: string,
-  message: string,
+  address: string
+  message: string
   signature: string
 }
 
 export enum PayloadType {
-  Attend = 'attend'
+  Attend = "attend",
 }
 
-export type PayloadAttributes =
-  | AttendPayloadAttributes
+export type PayloadAttributes = AttendPayloadAttributes
 
 export type AttendPayloadAttributes = {
-  type: PayloadType.Attend,
+  type: PayloadType.Attend
   timestamp: string
   event: string
   attend?: boolean

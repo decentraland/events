@@ -1,22 +1,23 @@
-import API from 'decentraland-gatsby/dist/utils/api/API'
-import Catalyst, { CommsStatus, CommsStatusWithLayers } from 'decentraland-gatsby/dist/utils/api/Catalyst'
-import once from 'decentraland-gatsby/dist/utils/function/once'
+import API from "decentraland-gatsby/dist/utils/api/API"
+import Catalyst, {
+  CommsStatus,
+  CommsStatusWithLayers,
+} from "decentraland-gatsby/dist/utils/api/Catalyst"
+import once from "decentraland-gatsby/dist/utils/function/once"
 
 export const getServers = once(async () => {
   const servers = await Catalyst.get().getServers()
-  return Promise.all(servers
-    .map(server => {
+  return Promise.all(
+    servers.map((server) => {
       return API.catch(Catalyst.from(server.address).getCommsStatus())
     })
   )
 })
 
-export type Option = { key: string, value: string, text: string }
+export type Option = { key: string; value: string; text: string }
 
 export function getServerOptions(servers: (CommsStatus | null)[]): Option[] {
-  const result: Option[] = [
-    { key: 'default', value: '', text: 'any server' }
-  ]
+  const result: Option[] = [{ key: "default", value: "", text: "any server" }]
 
   const names = new Set<string>()
   if (servers) {

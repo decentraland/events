@@ -1,1 +1,1 @@
-export { up, down } from 'decentraland-gatsby/dist/entities/Job/migration'
+export { up, down } from "decentraland-gatsby/dist/entities/Job/migration"

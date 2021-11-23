@@ -1,14 +1,14 @@
-import { Request } from "express";
-import { Authenticator } from 'dcl-crypto';
-import { ChainId } from '@dcl/schemas';
-import handleAPI from "decentraland-gatsby/dist/entities/Route/handle";
-import routes from "decentraland-gatsby/dist/entities/Route/routes";
-import isEthereumAddress from "validator/lib/isEthereumAddress";
-import RequestError from "decentraland-gatsby/dist/entities/Route/error";
+import { Request } from "express"
+import { Authenticator } from "dcl-crypto"
+import { ChainId } from "@dcl/schemas"
+import handleAPI from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 // import { getProvider } from "decentraland-gatsby/dist/entities/Blockchain/provider";
-import { MessageAttributes, PayloadAttributes, PayloadType } from './types'
-import { handleAttendMessage } from "../EventAttendee/routes";
-import Time from "decentraland-gatsby/dist/utils/date/Time";
+import { MessageAttributes, PayloadAttributes, PayloadType } from "./types"
+import { handleAttendMessage } from "../EventAttendee/routes"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 export default routes((router) => {
   // router.post('/message', handleAPI(handleSignedMessage))

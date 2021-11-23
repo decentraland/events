@@ -1,11 +1,11 @@
 export enum Frequency {
-  YEARLY = 'YEARLY',
-  MONTHLY = 'MONTHLY',
-  WEEKLY = 'WEEKLY',
-  DAILY = 'DAILY',
-  HOURLY = 'HOURLY',
-  MINUTELY = 'MINUTELY',
-  SECONDLY = 'SECONDLY',
+  YEARLY = "YEARLY",
+  MONTHLY = "MONTHLY",
+  WEEKLY = "WEEKLY",
+  DAILY = "DAILY",
+  HOURLY = "HOURLY",
+  MINUTELY = "MINUTELY",
+  SECONDLY = "SECONDLY",
 }
 
 export const Frequencies = [
@@ -54,7 +54,7 @@ export enum MonthMask {
   OCTOBER = 1 << 9,
   NOVEMBER = 1 << 10,
   DECEMBER = 1 << 11,
-  ALL = 0b111111111111
+  ALL = 0b111111111111,
 }
 
 export const Months = [
@@ -78,7 +78,7 @@ export enum Position {
   THIRD = 3,
   FOURTH = 4,
   FIFTH = 5,
-  LAST = -1
+  LAST = -1,
 }
 
 export const MAX_EVENT_RECURRENT = 10
@@ -107,7 +107,7 @@ export type EventAttributes = {
   trending: boolean
   created_at: Date
   updated_at: Date
-  recurrent: boolean,
+  recurrent: boolean
   recurrent_frequency: Frequency | null
   recurrent_setpos: Position | null
   recurrent_monthday: number | null
@@ -143,63 +143,57 @@ export type SessionEventAttributes = DeprecatedEventAttributes & {
 
 export type RecurrentEventAttributes = Pick<
   DeprecatedEventAttributes,
-  'start_at' |
-  'recurrent' |
-  'recurrent_interval' |
-  'recurrent_frequency' |
-  'recurrent_setpos' |
-  'recurrent_monthday' |
-  'recurrent_weekday_mask' |
-  'recurrent_month_mask' |
-  'recurrent_until' |
-  'recurrent_count'
+  | "start_at"
+  | "recurrent"
+  | "recurrent_interval"
+  | "recurrent_frequency"
+  | "recurrent_setpos"
+  | "recurrent_monthday"
+  | "recurrent_weekday_mask"
+  | "recurrent_month_mask"
+  | "recurrent_until"
+  | "recurrent_count"
 >
 
 export type EventListOptions = {
-  currentUser: string | null | undefined,
-  user: string | null | undefined,
-  limit: number | null | undefined,
-  offset: number | null | undefined,
-  x: number | null | undefined,
-  y: number | null | undefined,
-  startIn: number | null | undefined,
-  estateId: string | null | undefined,
+  currentUser: string | null | undefined
+  user: string | null | undefined
+  limit: number | null | undefined
+  offset: number | null | undefined
+  x: number | null | undefined
+  y: number | null | undefined
+  startIn: number | null | undefined
+  estateId: string | null | undefined
   onlyAttendee: boolean
   onlyUpcoming: boolean
 }
 
 export const editableAttributes: (keyof EventAttributes)[] = [
-  'image',
-  'rejected',
-  'name',
-  'description',
-  'start_at',
-  'duration',
-  'all_day',
-  'x',
-  'y',
-  'server',
-  'recurrent',
-  'recurrent_frequency',
-  'recurrent_setpos',
-  'recurrent_monthday',
-  'recurrent_weekday_mask',
-  'recurrent_month_mask',
-  'recurrent_interval',
-  'recurrent_count',
-  'recurrent_until',
+  "image",
+  "rejected",
+  "name",
+  "description",
+  "start_at",
+  "duration",
+  "all_day",
+  "x",
+  "y",
+  "server",
+  "recurrent",
+  "recurrent_frequency",
+  "recurrent_setpos",
+  "recurrent_monthday",
+  "recurrent_weekday_mask",
+  "recurrent_month_mask",
+  "recurrent_interval",
+  "recurrent_count",
+  "recurrent_until",
 ]
 
-export const patchAttributes: (keyof EventAttributes)[] = editableAttributes.concat([
-  'contact',
-  'details',
-])
+export const patchAttributes: (keyof EventAttributes)[] =
+  editableAttributes.concat(["contact", "details"])
 
-export const adminPatchAttributes: (keyof EventAttributes)[] = editableAttributes.concat([
-  'approved',
-  'highlighted',
-  'trending',
-  'url',
-])
+export const adminPatchAttributes: (keyof EventAttributes)[] =
+  editableAttributes.concat(["approved", "highlighted", "trending", "url"])
 
 export const SITEMAP_ITEMS_PER_PAGE = 100

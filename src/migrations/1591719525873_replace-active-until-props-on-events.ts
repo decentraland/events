@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import Model from '../entities/Event/model'
+import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import Model from "../entities/Event/model"
 
-export const shorthands: ColumnDefinitions | undefined = undefined;
-
+export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropIndex(Model.tableName, ['active_until'], { ifExists: true })
-  pgm.dropColumn(Model.tableName, 'active_until', { ifExists: true })
+  pgm.dropIndex(Model.tableName, ["active_until"], { ifExists: true })
+  pgm.dropColumn(Model.tableName, "active_until", { ifExists: true })
   pgm.addColumns(Model.tableName, {
     duration: {
-      type: 'INTEGER',
+      type: "INTEGER",
       notNull: true,
-      default: '0'
+      default: "0",
     },
     recurrent_dates: {
-      type: 'TIMESTAMP[]',
+      type: "TIMESTAMP[]",
       notNull: true,
-      default: '{}'
-    }
+      default: "{}",
+    },
   })
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumns(Model.tableName, ['duration', 'recurrent_dates'])
+  pgm.dropColumns(Model.tableName, ["duration", "recurrent_dates"])
 }

@@ -1,13 +1,16 @@
-
-import { ProfileSettingsAttributes } from './types'
-import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import isEmail from 'validator/lib/isEmail'
-import { SQL, table, values } from 'decentraland-gatsby/dist/entities/Database/utils'
-import { Model } from 'decentraland-gatsby/dist/entities/Database/model'
+import { ProfileSettingsAttributes } from "./types"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+import isEmail from "validator/lib/isEmail"
+import {
+  SQL,
+  table,
+  values,
+} from "decentraland-gatsby/dist/entities/Database/utils"
+import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 
 export default class ProfileSettingsModel extends Model<ProfileSettingsAttributes> {
-  static tableName = 'profile_settings'
-  static primaryKey = 'user'
+  static tableName = "profile_settings"
+  static primaryKey = "user"
   static withTimestamps = false
 
   static async findByUsers(users: string[]) {
@@ -15,7 +18,9 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
       return []
     }
 
-    const query = SQL`SELECT * FROM ${table(ProfileSettingsModel)} WHERE "user" IN ${values(users)}`
+    const query = SQL`SELECT * FROM ${table(
+      ProfileSettingsModel
+    )} WHERE "user" IN ${values(users)}`
     return this.query<ProfileSettingsAttributes>(query)
   }
 
@@ -34,7 +39,10 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     }
 
     if (!profile.notify_by_email) {
-      await this.update<ProfileSettingsAttributes>({ notify_by_email: false }, { user })
+      await this.update<ProfileSettingsAttributes>(
+        { notify_by_email: false },
+        { user }
+      )
     }
 
     return true
@@ -55,11 +63,14 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     }
 
     if (!profile.email_verified) {
-      await this.update<ProfileSettingsAttributes>({
-        email_verified: true,
-        notify_by_email: true,
-        email_verified_at: new Date()
-      }, { user })
+      await this.update<ProfileSettingsAttributes>(
+        {
+          email_verified: true,
+          notify_by_email: true,
+          email_verified_at: new Date(),
+        },
+        { user }
+      )
     }
 
     return true

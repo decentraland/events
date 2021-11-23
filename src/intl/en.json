@@ -48,7 +48,7 @@
       "email_verified": "Verified",
       "email_verifying": "Pending",
       "email_reverifying": "Send again",
-      "email_verifying_message":  "we sent you a verification email. try again in {seconds} {seconds, plural, one {second} other {seconds}}",
+      "email_verifying_message": "we sent you a verification email. try again in {seconds} {seconds, plural, one {second} other {seconds}}",
       "email_reverifying_message": "didn't receive our email? try it again"
     },
     "event_section": {

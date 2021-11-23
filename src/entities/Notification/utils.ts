@@ -1,47 +1,57 @@
-import sender from './sender'
-import { SendMailOptions } from './types'
-import { EventAttributes } from '../Event/types'
-import { eventUrl, eventFacebookUrl, eventTwitterUrl, eventTargetUrl } from '../Event/utils'
-import { ProfileSettingsAttributes } from '../ProfileSettings/types'
-import Land from 'decentraland-gatsby/dist/utils/api/Land'
+import sender from "./sender"
+import { SendMailOptions } from "./types"
+import { EventAttributes } from "../Event/types"
+import {
+  eventUrl,
+  eventFacebookUrl,
+  eventTwitterUrl,
+  eventTargetUrl,
+} from "../Event/utils"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
+import Land from "decentraland-gatsby/dist/utils/api/Land"
 
 export async function sendEmailVerification(email: string, verify_url: string) {
-  const options: SendMailOptions<'validate_email_v3'> = {
+  const options: SendMailOptions<"validate_email_v3"> = {
     template: "validate_email_v3",
     destinations: [
       {
         email,
         replacement: {
-          verify_url
-        }
-      }
+          verify_url,
+        },
+      },
     ],
     defaultReplacement: {
-      verify_url
-    }
+      verify_url,
+    },
   }
 
   return sender.send(options)
 }
 
-export async function sendEmailUpcomingEvent(event: EventAttributes, settings: ProfileSettingsAttributes[]) {
+export async function sendEmailUpcomingEvent(
+  event: EventAttributes,
+  settings: ProfileSettingsAttributes[]
+) {
   const replacement = {
     event_name: event.name,
     event_url: eventUrl(event),
     event_target_url: eventTargetUrl(event),
-    event_img: event.image || event.estate_id && Land.get().getEstateImage(event.estate_id) || Land.get().getParcelImage([event.x, event.y]),
+    event_img:
+      event.image ||
+      (event.estate_id && Land.get().getEstateImage(event.estate_id)) ||
+      Land.get().getParcelImage([event.x, event.y]),
     share_on_facebook: eventFacebookUrl(event),
-    share_on_twitter: eventTwitterUrl(event)
+    share_on_twitter: eventTwitterUrl(event),
   }
 
-  const options: SendMailOptions<'upcoming_event_v3'> = {
+  const options: SendMailOptions<"upcoming_event_v3"> = {
     template: "upcoming_event_v3",
-    destinations: settings
-      .map(profile => ({
-        email: profile.email!,
-        replacement
-      })),
-    defaultReplacement: replacement
+    destinations: settings.map((profile) => ({
+      email: profile.email!,
+      replacement,
+    })),
+    defaultReplacement: replacement,
   }
 
   return sender.send(options)

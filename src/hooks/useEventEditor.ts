@@ -1,11 +1,17 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from "react"
 import { isInsideWorldLimits } from "@dcl/schemas"
-import isURL from "validator/lib/isURL";
-import Time from "decentraland-gatsby/dist/utils/date/Time";
-import { Frequency, WeekdayMask, MonthMask, Position, MAX_EVENT_RECURRENT } from "../entities/Event/types";
-import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils";
-import { EditEvent } from "../api/Events";
-import { newEventSchema } from "../entities/Event/schemas";
+import isURL from "validator/lib/isURL"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import {
+  Frequency,
+  WeekdayMask,
+  MonthMask,
+  Position,
+  MAX_EVENT_RECURRENT,
+} from "../entities/Event/types"
+import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
+import { EditEvent } from "../api/Events"
+import { newEventSchema } from "../entities/Event/schemas"
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
 
@@ -13,40 +19,44 @@ type EventEditorState = EditEvent & {
   errors: Record<string, string>
 }
 
-function getName(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any): string {
-  return props && props.name || event.target.name
+function getName(
+  event: React.ChangeEvent<any>,
+  props?: { name: string; value: string; type: string; checked: boolean } | any
+): string {
+  return (props && props.name) || event.target.name
 }
 
-function getValue(event: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any) {
+function getValue(
+  event: React.ChangeEvent<any>,
+  props?: { name: string; value: string; type: string; checked: boolean } | any
+) {
   if (props) {
     switch (props.type) {
-      case 'radio':
+      case "radio":
         return props.checked
 
       default:
-        return props.value || ''
+        return props.value || ""
     }
-
   } else {
     return event.target.value
   }
 }
 
 export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
-
   const utc = true
   const currentDate = useMemo(() => Time.utc().seconds(0).milliseconds(0), [])
 
   const [event, setEvent] = useState<EventEditorState>({
-    name: defaultEvent.name || '',
-    description: defaultEvent.description || '',
-    contact: defaultEvent.contact || '',
-    details: defaultEvent.details || '',
-    image: defaultEvent.image || '',
+    name: defaultEvent.name || "",
+    description: defaultEvent.description || "",
+    contact: defaultEvent.contact || "",
+    details: defaultEvent.details || "",
+    image: defaultEvent.image || "",
     x: defaultEvent.x || 0,
     y: defaultEvent.x || 0,
     server: defaultEvent.server || null,
-    url: defaultEvent.url || '',
+    url: defaultEvent.url || "",
     start_at: defaultEvent.start_at || currentDate.toDate(),
     duration: defaultEvent.duration || DEFAULT_EVENT_DURATION,
     all_day: defaultEvent.all_day || false,
@@ -66,12 +76,18 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     recurrent_until: null,
     recurrent_count: null,
 
-    errors: {}
+    errors: {},
   })
 
   // const finish_at = useMemo(() => new Datetime(new Date(event.start_at.getTime() + event.duration), options), [event.start_at.getTime(), event.duration])
-  const finish_at = useMemo(() => Time.from(event.start_at.getTime() + event.duration, { utc }), [event.start_at.getTime(), event.duration])
-  const start_at = useMemo(() => Time.from(event.start_at.getTime(), { utc }), [event.start_at.getTime()])
+  const finish_at = useMemo(
+    () => Time.from(event.start_at.getTime() + event.duration, { utc }),
+    [event.start_at.getTime(), event.duration]
+  )
+  const start_at = useMemo(
+    () => Time.from(event.start_at.getTime(), { utc }),
+    [event.start_at.getTime()]
+  )
 
   function getStartDate() {
     // return start_at.toInputDate()
@@ -99,8 +115,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         ...current,
         errors: {
           ...current.errors,
-          [key]: description
-        }
+          [key]: description,
+        },
       }
     })
   }
@@ -109,7 +125,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setEvent((current) => {
       return {
         ...current,
-        errors: errors
+        errors: errors,
       }
     })
   }
@@ -122,7 +138,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return {
         ...current,
         [key]: value,
-        errors
+        errors,
       }
     })
   }
@@ -138,7 +154,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return {
         ...current,
         ...event,
-        errors
+        errors,
       }
     })
   }
@@ -148,11 +164,17 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return
     }
 
-    const start_at = Time.from(value, { utc, format: Time.Formats.InputDate }).toDate()
+    const start_at = Time.from(value, {
+      utc,
+      format: Time.Formats.InputDate,
+    }).toDate()
 
     if (start_at.getTime() !== event.start_at.getTime()) {
       let recurrent_until = event.recurrent_until
-      if (recurrent_until !== null && recurrent_until.getTime() < start_at.getTime()) {
+      if (
+        recurrent_until !== null &&
+        recurrent_until.getTime() < start_at.getTime()
+      ) {
         // recurrent_until = Datetime.fromInputTime('00:00', start_at, options).date
         recurrent_until = Time.from(start_at, { utc }).toDate()
       }
@@ -172,9 +194,11 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return
     }
 
-    const start_date = Time.utc(event.start_at).startOf('day')
+    const start_date = Time.utc(event.start_at).startOf("day")
     const start_time = Time.utc(value, Time.Formats.InputTime)
-    const start_at = Time.utc(start_date.getTime() + start_time.getTime()).toDate()
+    const start_at = Time.utc(
+      start_date.getTime() + start_time.getTime()
+    ).toDate()
     if (start_at.getTime() !== event.start_at.getTime()) {
       setValues({ start_at })
     }
@@ -185,9 +209,15 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return
     }
 
-    const finish_time = Time.utc(finish_at.format('HH:mm'), Time.Formats.InputTime)
+    const finish_time = Time.utc(
+      finish_at.format("HH:mm"),
+      Time.Formats.InputTime
+    )
     const finish_date = Time.utc(value, Time.Formats.InputDate)
-    const duration = Math.max(0, finish_date.getTime() + finish_time.getTime() - event.start_at.getTime())
+    const duration = Math.max(
+      0,
+      finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
+    )
     if (duration !== event.duration) {
       setValues({ duration })
     }
@@ -199,8 +229,11 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     }
 
     const finish_time = Time.utc(value, Time.Formats.InputTime)
-    const finish_date = Time.utc(finish_at).startOf('day')
-    const duration = Math.max(0, finish_date.getTime() + finish_time.getTime() - event.start_at.getTime())
+    const finish_date = Time.utc(finish_at).startOf("day")
+    const duration = Math.max(
+      0,
+      finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
+    )
     if (duration !== event.duration) {
       setValues({ duration })
     }
@@ -208,13 +241,13 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
   function handleChangeAllDay(value?: boolean) {
     if (!value) {
-      setValue('all_day', false)
+      setValue("all_day", false)
     } else {
-      let finish_at_tmp = finish_at.startOf('day')
-      const start_at_tmp = start_at.startOf('day')
+      let finish_at_tmp = finish_at.startOf("day")
+      const start_at_tmp = start_at.startOf("day")
 
       while (finish_at_tmp.getTime() <= start_at_tmp.getTime()) {
-        finish_at_tmp = finish_at_tmp.add(1, 'day')
+        finish_at_tmp = finish_at_tmp.add(1, "day")
       }
 
       setValues({
@@ -225,21 +258,21 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     }
   }
 
-  function handleChangePosition(name: 'x' | 'y', value?: string) {
+  function handleChangePosition(name: "x" | "y", value?: string) {
     const position = Number(value)
-    if (value === '') {
+    if (value === "") {
       setValue(name, value as any)
     } else {
       let x = event.x
       let y = event.y
 
       switch (name) {
-        case 'x':
+        case "x":
           x = position
-          break;
-        case 'y':
+          break
+        case "y":
           y = position
-          break;
+          break
       }
 
       if (isInsideWorldLimits(x, y)) {
@@ -258,7 +291,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         recurrent_weekday_mask: 0,
         recurrent_setpos: null,
         recurrent_monthday: null,
-        recurrent_until: start_at.startOf('day').toDate(),
+        recurrent_until: start_at.startOf("day").toDate(),
         recurrent_count: null,
       })
     } else {
@@ -278,10 +311,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
   function handleChangeInterval(value?: string) {
     const interval = Number(value)
-    if (value === '') {
-      setValue('recurrent_interval', value as any)
+    if (value === "") {
+      setValue("recurrent_interval", value as any)
     } else if (interval >= 1) {
-      setValue('recurrent_interval', interval)
+      setValue("recurrent_interval", interval)
     }
   }
 
@@ -344,14 +377,14 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     })
   }
 
-  function handleChangeRecurrentEnd(value: 'until' | 'count') {
+  function handleChangeRecurrentEnd(value: "until" | "count") {
     switch (value) {
-      case 'until':
+      case "until":
         return setValues({
-          recurrent_until: start_at.startOf('day').toDate(),
+          recurrent_until: start_at.startOf("day").toDate(),
           recurrent_count: null,
         })
-      case 'count':
+      case "count":
         return setValues({
           recurrent_until: null,
           recurrent_count: 1,
@@ -364,106 +397,155 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
   function handleChangeRecurrentCount(value?: string) {
     const recurrent_count = Number(value)
-    if (value === '') {
-      setValue('recurrent_count', value as any)
+    if (value === "") {
+      setValue("recurrent_count", value as any)
     } else if (recurrent_count > 0 && recurrent_count <= MAX_EVENT_RECURRENT) {
-      setValue('recurrent_count', recurrent_count)
+      setValue("recurrent_count", recurrent_count)
     }
   }
 
   function handleChangeRecurrentUntil(value: string) {
     // const recurrent_until = Datetime.fromInputDate(value, event.recurrent_until || event.start_at).date
-    const recurrent_until = Time.from(value, { utc, format: Time.Formats.InputDate }).toDate()
-    setValue('recurrent_until', recurrent_until)
+    const recurrent_until = Time.from(value, {
+      utc,
+      format: Time.Formats.InputDate,
+    }).toDate()
+    setValue("recurrent_until", recurrent_until)
   }
 
-  function handleChange(e: React.ChangeEvent<any>, props?: { name: string, value: string, type: string, checked: boolean } | any) {
+  function handleChange(
+    e: React.ChangeEvent<any>,
+    props?:
+      | { name: string; value: string; type: string; checked: boolean }
+      | any
+  ) {
     const name = getName(e, props)
     const value = getValue(e, props)
 
     switch (name) {
-      case 'name':
-      case 'description':
-      case 'details':
-      case 'contact':
-        return setValue(name, String(value || '').slice(0, newEventSchema.properties[name].maxLength))
+      case "name":
+      case "description":
+      case "details":
+      case "contact":
+        return setValue(
+          name,
+          String(value || "").slice(
+            0,
+            newEventSchema.properties[name].maxLength
+          )
+        )
 
-      case 'image':
-      case 'url':
-      case 'server':
+      case "image":
+      case "url":
+      case "server":
         return setValue(name, value)
 
-      case 'highlighted':
-      case 'trending':
-      case 'rejected':
-      case 'approved':
+      case "highlighted":
+      case "trending":
+      case "rejected":
+      case "approved":
         return setValue(name, !!value)
 
-      case 'x':
-      case 'y':
+      case "x":
+      case "y":
         return handleChangePosition(name, value)
 
-      case 'start_date':
+      case "start_date":
         return handleChangeStartDate(value)
 
-      case 'start_time':
+      case "start_time":
         return handleChangeStartTime(value)
 
-      case 'finish_date':
+      case "finish_date":
         return handleChangeFinishDate(value)
 
-      case 'finish_time':
+      case "finish_time":
         return handleChangeFinishTime(value)
 
-      case 'all_day':
+      case "all_day":
         return handleChangeAllDay(value)
 
-      case 'recurrent':
+      case "recurrent":
         return handleChangeRecurrent(value)
 
-      case 'recurrent_interval':
+      case "recurrent_interval":
         return handleChangeInterval(value)
 
-      case 'recurrent_frequency':
+      case "recurrent_frequency":
         return handleChangeFrequency(value)
 
-      case 'recurrent_weekday_mask[MONDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.MONDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.MONDAY))
+      case "recurrent_weekday_mask[MONDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.MONDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.MONDAY
+        )
 
-      case 'recurrent_weekday_mask[TUESDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.TUESDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.TUESDAY))
+      case "recurrent_weekday_mask[TUESDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.TUESDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.TUESDAY
+        )
 
-      case 'recurrent_weekday_mask[WEDNESDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.WEDNESDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.WEDNESDAY))
+      case "recurrent_weekday_mask[WEDNESDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.WEDNESDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.WEDNESDAY
+        )
 
-      case 'recurrent_weekday_mask[THURSDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.THURSDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.THURSDAY))
+      case "recurrent_weekday_mask[THURSDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.THURSDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.THURSDAY
+        )
 
-      case 'recurrent_weekday_mask[FRIDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.FRIDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.FRIDAY))
+      case "recurrent_weekday_mask[FRIDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.FRIDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.FRIDAY
+        )
 
-      case 'recurrent_weekday_mask[SATURDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.SATURDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.SATURDAY))
+      case "recurrent_weekday_mask[SATURDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.SATURDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.SATURDAY
+        )
 
-      case 'recurrent_weekday_mask[SUNDAY]':
-        return setValue('recurrent_weekday_mask', value ? (event.recurrent_weekday_mask || 0) | WeekdayMask.SUNDAY : (event.recurrent_weekday_mask || 0) & (~WeekdayMask.SUNDAY))
+      case "recurrent_weekday_mask[SUNDAY]":
+        return setValue(
+          "recurrent_weekday_mask",
+          value
+            ? (event.recurrent_weekday_mask || 0) | WeekdayMask.SUNDAY
+            : (event.recurrent_weekday_mask || 0) & ~WeekdayMask.SUNDAY
+        )
 
-      case 'recurrent_monthday[current]':
+      case "recurrent_monthday[current]":
         return handleChangeMonthlyDayRepeat()
 
-      case 'recurrent_setpos[current]':
+      case "recurrent_setpos[current]":
         return handleChangeMonthlyPositionRepeat()
 
-      case 'recurrent_setpos[last]':
+      case "recurrent_setpos[last]":
         return handleChangeMonthlyLastPositionRepeat()
 
-      case 'recurrent_end':
+      case "recurrent_end":
         return handleChangeRecurrentEnd(value)
 
-      case 'recurrent_count':
+      case "recurrent_count":
         return handleChangeRecurrentCount(value)
 
-      case 'recurrent_until':
+      case "recurrent_until":
         return handleChangeRecurrentUntil(value)
 
       default:
@@ -475,33 +557,37 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const errors: Record<string, string> = {}
 
     if (!event.name) {
-      errors['name'] = 'Event name is required'
+      errors["name"] = "Event name is required"
     }
 
     if (event.url && !isURL(event.url)) {
-      errors['url'] = 'Event URL is invalid'
+      errors["url"] = "Event URL is invalid"
     }
 
     if (event.image && !isURL(event.image)) {
-      errors['image'] = 'Event image is invalid'
+      errors["image"] = "Event image is invalid"
     }
 
-    if (event.x as any === '') {
-      errors['x'] = 'Latitude is required'
+    if ((event.x as any) === "") {
+      errors["x"] = "Latitude is required"
     }
 
-    if (event.y as any === '') {
-      errors['y'] = 'Longitude is required'
+    if ((event.y as any) === "") {
+      errors["y"] = "Longitude is required"
     }
 
-    if (event.recurrent_interval as any === '') {
-      errors['recurrent_interval'] = 'Interval is invalid'
+    if ((event.recurrent_interval as any) === "") {
+      errors["recurrent_interval"] = "Interval is invalid"
     }
 
-    if (event.recurrent && event.recurrent_until === null && event.recurrent_count === null) {
-      errors['recurrent_end'] = 'Missing recurrent end'
-    } else if (event.recurrent_count as any === '') {
-      errors['recurrent_count'] = 'Invalid count'
+    if (
+      event.recurrent &&
+      event.recurrent_until === null &&
+      event.recurrent_count === null
+    ) {
+      errors["recurrent_end"] = "Missing recurrent end"
+    } else if ((event.recurrent_count as any) === "") {
+      errors["recurrent_count"] = "Invalid count"
     }
 
     if (Object.values(errors).filter(Boolean).length) {
@@ -532,7 +618,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setErrors,
     handleChange,
     validate,
-    toObject
+    toObject,
   }
 
   return [event, actions] as const
