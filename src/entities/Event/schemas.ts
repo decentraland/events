@@ -1,4 +1,4 @@
-import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types";
+import { AjvObjectSchema, TruthyEnum } from "decentraland-gatsby/dist/entities/Schema/types";
 import { Frequencies } from "./types";
 
 export const getEventParamsSchema: AjvObjectSchema = {
@@ -10,6 +10,32 @@ export const getEventParamsSchema: AjvObjectSchema = {
       format: 'uuid',
       description: 'Event ID'
     }
+  }
+}
+
+export const getEventListQuery = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    position: {
+      type: 'string',
+      format: /^-?\d{1,3},-?\d{1,3}$/,
+      description: 'Position where the events will happend'
+    },
+    estate_id: {
+      type: 'string',
+      format: 'int32',
+      description: 'Estate where the events will happend'
+    },
+    creator: {
+      type: 'string',
+      format: 'address',
+      description: 'User address that create the events'
+    },
+    only_attendee: {
+      type: TruthyEnum,
+      description: 'Return events ths'
+    }.
   }
 }
 
