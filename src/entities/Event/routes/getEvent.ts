@@ -1,17 +1,21 @@
 import EventModel from '../model';
 import EventAttendee from '../../EventAttendee/model';
-import { WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
 import { validateGetEventParams } from '../middleware';
 import isUUID from 'validator/lib/isUUID';
 import RequestError from 'decentraland-gatsby/dist/entities/Route/error';
 import { EventAttributes, SessionEventAttributes } from '../types';
 import isAdmin from 'decentraland-gatsby/dist/entities/Auth/isAdmin';
+import { Request } from 'express';
 
 type WithEvent = {
   event?: SessionEventAttributes
 }
 
-export async function getEvent(req: WithAuth & WithEvent) {
+type WithAuth = {
+  auth?: string
+}
+
+export async function getEvent(req: Request & WithAuth & WithEvent) {
   if (req.event) {
     return req.event
   }

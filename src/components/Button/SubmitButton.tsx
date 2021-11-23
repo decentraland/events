@@ -3,9 +3,7 @@ import { Button, ButtonProps } from 'decentraland-ui/dist/components/Button/Butt
 import useFormatMessage from 'decentraland-gatsby/dist/hooks/useFormatMessage';
 import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList';
 import invertedAddIcon from '../../images/inverted-add.svg'
-
 import './SubmitButton.css'
-
 
 export default function SubmitButton(props: ButtonProps) {
   const l = useFormatMessage()

@@ -19,25 +19,23 @@ import { createEvent } from './createEvent';
 import { updateEvent } from './updateEvent';
 
 export const DECENTRALAND_URL = env('DECENTRALAND_URL', '')
-export const BASE_PATH = '/events/:event_id'
 
 export default routes((router) => {
   const withAuth = auth()
   const withOptionalAuth = auth({ optional: true })
-  const withEventExists = withEvent()
   const withPublicAccess = withCors({ cors: '*' })
   router.get('/events', withPublicAccess, withOptionalAuth, handle(getEventList as any))
   router.post('/events', withAuth, withAuthProfile(), handle(createEvent))
   router.get('/events/attending', withPublicAccess, withAuth, handle(getAttendingEventList))
-  router.get('/events/:event_id', withPublicAccess, withOptionalAuth, withEventExists, handle(getEvent))
+  router.get('/events/:event_id', withPublicAccess, withOptionalAuth, handle(getEvent))
   router.patch('/events/:event_id', withAuth, handle(updateEvent))
-  router.post('/events/:event_id/notifications', withAuth, withAuthProfile(), withEventExists, handle(notifyEvent))
+  router.post('/events/:event_id/notifications', withAuth, withAuthProfile(), handle(notifyEvent))
 })
 
-async function notifyEvent(req: WithEvent<WithAuthProfile<WithAuth>>) {
+async function notifyEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const profile = req.authProfile!
-  const event = req.event!
+  const event = await getEvent(req)
   if (!isAdmin(user)) {
     return {}
   }

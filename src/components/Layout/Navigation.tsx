@@ -41,6 +41,6 @@ export default function Navigation(props: NavigationProps) {
         {l('navigation.pending_events')}
       </Tabs.Tab>
     </Link>}
-    <SubmitButton as={Link} to={locations.submit()} />
+    <SubmitButton as={Link} href={locations.submit()} />
   </Tabs>
 }

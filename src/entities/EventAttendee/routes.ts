@@ -1,6 +1,5 @@
 import routes from "decentraland-gatsby/dist/entities/Route/routes";
 import { auth, WithAuth } from 'decentraland-gatsby/dist/entities/Auth/middleware';
-import { BASE_PATH } from '../Event/routes';
 import { requireEvent, withEvent, WithEvent } from "../Event/middleware";
 import { EventAttendeeAttributes } from './types';
 import handle from 'decentraland-gatsby/dist/entities/Route/handle';
@@ -11,28 +10,31 @@ import { AttendPayloadAttributes } from "../Message/types";
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst";
 import API from "decentraland-gatsby/dist/utils/api/API";
 import EventAttendeeModel from "../EventAttendee/model";
+import { getEvent } from "../Event/routes/getEvent";
+import { Request } from "express";
 
 export default routes((router) => {
   const withAuth = auth({ optional: true })
-  const withEventExists = withEvent()
   const withUserProfile = withAuthProfile({ optional: true })
 
-  router.get(BASE_PATH + '/attendees', withEventExists, handle(getEventAttendees))
-  router.post(BASE_PATH + '/attendees', withAuth, withUserProfile, withEventExists, handle(createEventAttendee))
-  router.patch(BASE_PATH + '/attendees', withAuth, withEventExists, handle(updateEventAttendee))
-  router.delete(BASE_PATH + '/attendees', withAuth, withEventExists, handle(deleteEventAttendee))
+  router.get('/events/:event_id/attendees', handle(getEventAttendees))
+  router.post('/events/:event_id/attendees', withAuth, withUserProfile, handle(createEventAttendee))
+  router.patch('/events/:event_id/attendees', withAuth, handle(updateEventAttendee))
+  router.delete('/events/:event_id/attendees', withAuth, handle(deleteEventAttendee))
 })
 
 export async function getEventAttendeeList(event_id: string) {
   return EventAttendeeModel.listByEventId(event_id)
 }
 
-export async function getEventAttendees(req: WithEvent) {
-  return getEventAttendeeList(req.event.id)
+export async function getEventAttendees(req: Request) {
+  const event = await getEvent(req)
+  return getEventAttendeeList(event.id)
 }
 
-export async function updateEventAttendees(req: WithEvent) {
-  return updateEventAttendeesById(req.event.id)
+export async function updateEventAttendees(req: Request) {
+  const event = await getEvent(req)
+  return updateEventAttendeesById(event.id)
 }
 
 async function updateEventAttendeesById(event_id: string) {
@@ -44,12 +46,13 @@ async function updateEventAttendeesById(event_id: string) {
   return EventModel.update({ total_attendees, latest_attendees }, { id: event_id })
 }
 
-export async function createEventAttendee(req: WithAuthProfile<WithEvent<WithAuth>>) {
+export async function createEventAttendee(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const user_name = req.authProfile?.name || null
+  const event = await getEvent(req)
   const settings = await getProfileSettings(user)
   await EventAttendeeModel.create<EventAttendeeAttributes>({
-    event_id: req.event.id,
+    event_id: event.id,
     user,
     user_name,
     notify: settings.notify_by_email,
@@ -57,23 +60,25 @@ export async function createEventAttendee(req: WithAuthProfile<WithEvent<WithAut
     created_at: new Date(),
   })
 
-  await updateEventAttendeesById(req.event.id)
-  return getEventAttendeeList(req.event.id)
+  await updateEventAttendeesById(event.id)
+  return getEventAttendeeList(event.id)
 }
 
-export async function updateEventAttendee(req: WithEvent<WithAuth>) {
+export async function updateEventAttendee(req: WithAuth) {
   const user = req.auth!
-  const identify = { event_id: req.event.id, user }
+  const event = await getEvent(req)
+  const identify = { event_id: event.id, user }
   const notify = Boolean(req.body && req.body.notify)
   await EventAttendeeModel.update({ notify }, identify)
-  return getEventAttendeeList(req.event.id)
+  return getEventAttendeeList(event.id)
 }
 
-export async function deleteEventAttendee(req: WithEvent<WithAuth>) {
+export async function deleteEventAttendee(req: WithAuth) {
   const user = req.auth!
-  await EventAttendeeModel.delete<EventAttendeeAttributes>({ event_id: req.event.id, user })
-  await updateEventAttendeesById(req.event.id)
-  return getEventAttendeeList(req.event.id)
+  const event = await getEvent(req)
+  await EventAttendeeModel.delete<EventAttendeeAttributes>({ event_id: event.id, user })
+  await updateEventAttendeesById(event.id)
+  return getEventAttendeeList(event.id)
 }
 
 export async function handleAttendMessage(payload: AttendPayloadAttributes & { address: string }) {

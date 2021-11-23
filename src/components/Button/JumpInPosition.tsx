@@ -21,7 +21,6 @@ export default function JumpInPosition({ event, href, compact,  ...props }: Jump
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : 'HTTP'
   const ethAddress = address
-  console.log(primaryJumpInIcon)
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     if (props.onClick) {

@@ -16,8 +16,6 @@ export default function JumpInButton(props: ButtonProps) {
   const event: SessionEventAttributes = props.event
   const href = useMemo(() => eventTargetUrl(event), [ event ])
 
-  console.log(primaryJumpInIcon)
-
   return <Button primary className="fluid" href={href} target="_blank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
     <span>JUMP IN</span>
     <img src={primaryJumpInIcon} width={14} height={14} style={{ marginLeft: '.5rem' }} />

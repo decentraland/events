@@ -16,11 +16,13 @@ import { DECENTRALAND_URL } from './index';
 import { createValidator } from 'decentraland-gatsby/dist/entities/Route/validate';
 import { newEventSchema } from '../schemas';
 import { AjvObjectSchema } from 'decentraland-gatsby/dist/entities/Schema/types';
+import { getEvent } from './getEvent';
+import Time from 'decentraland-gatsby/dist/utils/date/Time';
 
-const validateUpdateEvent = createValidator<EventAttributes>(newEventSchema as AjvObjectSchema)
-export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
+const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(newEventSchema as AjvObjectSchema)
+export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!;
-  const event = req.event;
+  const event = await getEvent(req)
   const attributes = isAdmin(user) ? adminPatchAttributes : patchAttributes;
   let updatedAttributes = {
     ...utils.pick(event, attributes),
@@ -31,7 +33,12 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     updatedAttributes.url = eventTargetUrl(updatedAttributes);
   }
 
-  updatedAttributes = validateUpdateEvent(updatedAttributes) as any;
+  updatedAttributes = validateUpdateEvent({
+    ...updatedAttributes,
+    start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
+    recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
+  });
+
   const userProfiles = await Catalyst.get().getProfiles([event.user]);
   if (userProfiles && userProfiles[0] && userProfiles[0].name && event.user_name !== userProfiles[0].name) {
     updatedAttributes.user_name = userProfiles[0].name;
@@ -65,7 +72,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth<WithEvent>>) {
     notify: !!attendee?.notify
   };
 
-  if (!req.event.approved && updatedEvent.approved) {
+  if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent);
   } else if (!isAdmin(user)) {
     notifyEditedEvent(updatedEvent);
