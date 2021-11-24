@@ -1,17 +1,17 @@
-import JobContext from "decentraland-gatsby/dist/entities/Job/context";
-import logger from "decentraland-gatsby/dist/entities/Development/logger";
-import EventModel from "./model";
-import EventAttendeeModel from "../EventAttendee/model";
-import ProfileSettingsModel from "../ProfileSettings/model";
-import ProfileSubscriptionModel from "../ProfileSubscription/model";
-import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types";
-import { sendEmailUpcomingEvent } from "../Notification/utils";
-import { ProfileSettingsAttributes } from "../ProfileSettings/types";
-import push from "../Notification/push";
-import { eventUrl, calculateRecurrentProperties } from "./utils";
-import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils";
-import { EventAttributes } from "./types";
-import { EventAttendeeAttributes } from "../EventAttendee/types";
+import JobContext from "decentraland-gatsby/dist/entities/Job/context"
+import logger from "decentraland-gatsby/dist/entities/Development/logger"
+import EventModel from "./model"
+import EventAttendeeModel from "../EventAttendee/model"
+import ProfileSettingsModel from "../ProfileSettings/model"
+import ProfileSubscriptionModel from "../ProfileSubscription/model"
+import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types"
+import { sendEmailUpcomingEvent } from "../Notification/utils"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
+import push from "../Notification/push"
+import { eventUrl, calculateRecurrentProperties } from "./utils"
+import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
+import { EventAttributes } from "./types"
+import { EventAttendeeAttributes } from "../EventAttendee/types"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()
@@ -19,7 +19,11 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
   for (const event of events) {
     const update = {
       ...calculateRecurrentProperties(event),
-      next_start_at: EventModel.selectNextStartAt(event.duration, event.start_at, event.recurrent_dates)
+      next_start_at: EventModel.selectNextStartAt(
+        event.duration,
+        event.start_at,
+        event.recurrent_dates
+      ),
     }
 
     ctx.log(`updating next_start_at for event: "${event.id}"`)
@@ -36,29 +40,45 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   }
 
   // const eventMap = new Map(events.map(event => [event.id, event] as const))
-  const attendees = await EventAttendeeModel.getPendingNotification(events.map(event => event.id))
+  const attendees = await EventAttendeeModel.getPendingNotification(
+    events.map((event) => event.id)
+  )
   ctx.log(`${attendees.length} attendees to notify`)
 
   if (attendees.length === 0) {
     return
   }
 
-  const user = attendees.map(attendee => attendee.user)
+  const user = attendees.map((attendee) => attendee.user)
   const [settings, subscriptions] = await Promise.all([
     ProfileSettingsModel.findByUsers(user),
     ProfileSubscriptionModel.findByUsers(user),
   ])
 
-  const settingMap = Object.fromEntries(settings.map(setting => [setting.user, setting] as const))
-  const subscriptionMap = Object.fromEntries(subscriptions.map(subscription => [subscription.user, subscription] as const))
+  const settingMap = Object.fromEntries(
+    settings.map((setting) => [setting.user, setting] as const)
+  )
+  const subscriptionMap = Object.fromEntries(
+    subscriptions.map(
+      (subscription) => [subscription.user, subscription] as const
+    )
+  )
   let expiredSubscriptions: ProfileSubscriptionAttributes[] = []
 
   for (const event of events) {
-    const eventAttendees = attendees.filter(attendee => attendee.event_id === event.id);
+    const eventAttendees = attendees.filter(
+      (attendee) => attendee.event_id === event.id
+    )
 
-    const result = await notify(event, eventAttendees, settingMap, subscriptionMap)
-    ctx.log(`Notified event ${event.id} (email: ${result.email.length}, web: ${result.browser.length})`)
-
+    const result = await notify(
+      event,
+      eventAttendees,
+      settingMap,
+      subscriptionMap
+    )
+    ctx.log(
+      `Notified event ${event.id} (email: ${result.email.length}, web: ${result.browser.length})`
+    )
 
     if (result.email.length + result.browser.length) {
       await notifyBySlack(event, result.email.length, result.browser.length)
@@ -75,7 +95,6 @@ export async function notify(
   settings: Record<string, ProfileSettingsAttributes> = {},
   subscriptions: Record<string, ProfileSubscriptionAttributes> = {}
 ) {
-
   const email: ProfileSettingsAttributes[] = []
   const browser: ProfileSubscriptionAttributes[] = []
   const expired: ProfileSubscriptionAttributes[] = []
@@ -100,14 +119,15 @@ export async function notify(
     image: event.image!,
   }
 
-  const proms: Promise<any>[] = browser
-    .map(async (subscription) => {
-      return push(subscription, data)
-        .catch((error) => {
-          logger.error(`Error sending push notification to user "${subscription.user}"`, { subscription, data })
-          error.statusCode === 410 && expired.push(subscription)
-        })
+  const proms: Promise<any>[] = browser.map(async (subscription) => {
+    return push(subscription, data).catch((error) => {
+      logger.error(
+        `Error sending push notification to user "${subscription.user}"`,
+        { subscription, data }
+      )
+      error.statusCode === 410 && expired.push(subscription)
     })
+  })
 
   proms.push(sendEmailUpcomingEvent(event, email))
   const notifications = await Promise.all(proms)
@@ -117,6 +137,6 @@ export async function notify(
     email,
     browser,
     expired,
-    notifications
+    notifications,
   }
 }

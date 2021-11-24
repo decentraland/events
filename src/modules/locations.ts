@@ -1,14 +1,14 @@
-import API from 'decentraland-gatsby/dist/utils/api/API'
+import API from "decentraland-gatsby/dist/utils/api/API"
 
-const GATSBY_BASE_URL = process.env.GATSBY_BASE_URL || '/'
+const GATSBY_BASE_URL = process.env.GATSBY_BASE_URL || "/"
 
 export enum EventView {
-  Attendees = 'attendees',
+  Attendees = "attendees",
 }
 
 export enum SubmitView {
-  Edit = 'edit',
-  Clone = 'clone',
+  Edit = "edit",
+  Clone = "clone",
 }
 
 function url(path: string, query?: Record<string, string> | URLSearchParams) {
@@ -16,16 +16,16 @@ function url(path: string, query?: Record<string, string> | URLSearchParams) {
 }
 
 export default {
-  events: () => url('/'),
-  event: (id: string) => url('/event/', { id }),
-  myEvents: () => url('/me/'),
-  pendingEvents: () => url('/pending/'),
+  events: () => url("/"),
+  event: (id: string) => url("/event/", { id }),
+  myEvents: () => url("/me/"),
+  pendingEvents: () => url("/pending/"),
 
-  submit: () => url('/submit/'),
-  edit: (event: string) => url('/submit/', { event, view: SubmitView.Edit }),
-  clone: (event: string) => url('/submit/', { event, view: SubmitView.Clone }),
+  submit: () => url("/submit/"),
+  edit: (event: string) => url("/submit/", { event, view: SubmitView.Edit }),
+  clone: (event: string) => url("/submit/", { event, view: SubmitView.Clone }),
 
-  settings: () => url('/settings/'),
+  settings: () => url("/settings/"),
 
-  docs: () => url('/docs/'),
+  docs: () => url("/docs/"),
 }

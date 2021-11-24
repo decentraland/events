@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import Model from '../entities/Event/model'
+import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import Model from "../entities/Event/model"
 
-export const shorthands: ColumnDefinitions | undefined = undefined;
+export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns(Model.tableName, {
     total_attendees: {
-      type: 'INT',
+      type: "INT",
       notNull: true,
-      default: 0
+      default: 0,
     },
     latest_attendees: {
-      type: 'TEXT[]',
+      type: "TEXT[]",
       notNull: true,
-      default: '{0,0}'
+      default: "{0,0}",
     },
   })
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumns(Model.tableName, ['total_attendees', 'latest_attendees'])
+  pgm.dropColumns(Model.tableName, ["total_attendees", "latest_attendees"])
 }

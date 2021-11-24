@@ -1,18 +1,21 @@
-import React, { useRef, useEffect } from 'react'
-import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
-import { FieldProps } from 'decentraland-ui/dist/components/Field/Field'
+import React, { useRef, useEffect } from "react"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { FieldProps } from "decentraland-ui/dist/components/Field/Field"
 
-import './Textarea.css'
+import "./Textarea.css"
 
-export type TextareaProps = Omit<FieldProps, 'onAction'> & {
+export type TextareaProps = Omit<FieldProps, "onAction"> & {
   disabled?: boolean
   readOnly?: boolean
   minHeight?: number
   maxHeight?: number
 }
 
-export default function Textarea({ minHeight, maxHeight, ...props }: TextareaProps) {
-
+export default function Textarea({
+  minHeight,
+  maxHeight,
+  ...props
+}: TextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null)
 
   function handleRowChange() {
@@ -21,7 +24,7 @@ export default function Textarea({ minHeight, maxHeight, ...props }: TextareaPro
     }
 
     const textarea = ref.current
-    textarea.style.height = 0 + 'px'
+    textarea.style.height = 0 + "px"
     let height = textarea.scrollHeight
     if (minHeight !== undefined && height < minHeight) {
       height = minHeight
@@ -31,7 +34,7 @@ export default function Textarea({ minHeight, maxHeight, ...props }: TextareaPro
       height = maxHeight
     }
 
-    textarea.style.height = height + 2 + 'px'
+    textarea.style.height = height + 2 + "px"
   }
 
   function handleChange(event: React.ChangeEvent<any>) {
@@ -45,12 +48,23 @@ export default function Textarea({ minHeight, maxHeight, ...props }: TextareaPro
 
   const { error, label, message, ...extra } = props
 
-  return <div className={TokenList.join(['dcl field', props.error && 'error', props.disabled && 'disabled', 'Textarea'])}>
-    <div className="ui sub header">{props.label}</div>
-    <div className="ui input">
-      {props.error && <i aria-hidden="true" className="warning circle icon" />}
-      <textarea {...extra} ref={ref} onChange={handleChange} />
+  return (
+    <div
+      className={TokenList.join([
+        "dcl field",
+        props.error && "error",
+        props.disabled && "disabled",
+        "Textarea",
+      ])}
+    >
+      <div className="ui sub header">{props.label}</div>
+      <div className="ui input">
+        {props.error && (
+          <i aria-hidden="true" className="warning circle icon" />
+        )}
+        <textarea {...extra} ref={ref} onChange={handleChange} />
+      </div>
+      <p className="message">{props.message}&nbsp;</p>
     </div>
-    <p className="message">{props.message}&nbsp;</p>
-  </div>
+  )
 }

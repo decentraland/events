@@ -1,98 +1,109 @@
-
 export default {
-
-  toUrl(pathname: string, params: string = '', hash: string = '') {
-    if (pathname.slice(-1) !== '/') {
-      pathname = pathname + '/'
+  toUrl(pathname: string, params: string = "", hash: string = "") {
+    if (pathname.slice(-1) !== "/") {
+      pathname = pathname + "/"
     }
 
-    if (params && params[0] !== '?') {
-      params = '?' + params
+    if (params && params[0] !== "?") {
+      params = "?" + params
     }
 
-    if (hash && hash[0] !== '#') {
-      hash = '#' + hash
+    if (hash && hash[0] !== "#") {
+      hash = "#" + hash
     }
 
     return pathname + params + hash
   },
 
   toMyEvents(location: Location) {
-    return this.toUrl('/me')
+    return this.toUrl("/me")
   },
 
   toSubmit(location: Location) {
-    return this.toUrl('/submit')
+    return this.toUrl("/submit")
   },
 
   toSettings(location: Location) {
-    return this.toUrl('/settings')
+    return this.toUrl("/settings")
   },
 
   toHome(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
-    targetSearchParams.delete('event')
-    targetSearchParams.delete('view')
-    return this.toUrl('/', targetSearchParams.toString())
+    targetSearchParams.delete("event")
+    targetSearchParams.delete("view")
+    return this.toUrl("/", targetSearchParams.toString())
   },
 
   isHome(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
-    return !targetSearchParams.has('event') && !targetSearchParams.has('view')
+    return !targetSearchParams.has("event") && !targetSearchParams.has("view")
   },
 
   toEvent(location: Location, eventId: string, myEvents: boolean = false) {
-    const path = myEvents ? '/me/' : '/'
+    const path = myEvents ? "/me/" : "/"
     const targetSearchParams = new URLSearchParams(location.search)
-    targetSearchParams.set('event', eventId)
-    targetSearchParams.delete('view')
+    targetSearchParams.set("event", eventId)
+    targetSearchParams.delete("view")
     return this.toUrl(path, targetSearchParams.toString())
   },
 
   isEvent(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
-    return targetSearchParams.has('event') && !targetSearchParams.has('view')
+    return targetSearchParams.has("event") && !targetSearchParams.has("view")
   },
 
   getEventId(location: Location) {
     const searchParams = new URLSearchParams(location.search)
-    return location && searchParams.get('event') || null
+    return (location && searchParams.get("event")) || null
   },
 
   toEventEdit(location: Location, eventId: string) {
     const targetSearchParams = new URLSearchParams(location.search)
-    targetSearchParams.set('event', eventId)
-    targetSearchParams.set('view', 'edit')
-    return this.toUrl('/submit', targetSearchParams.toString())
+    targetSearchParams.set("event", eventId)
+    targetSearchParams.set("view", "edit")
+    return this.toUrl("/submit", targetSearchParams.toString())
   },
 
   isEventEdit(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
-    return targetSearchParams.has('event') && targetSearchParams.get('view') === 'edit'
+    return (
+      targetSearchParams.has("event") &&
+      targetSearchParams.get("view") === "edit"
+    )
   },
 
   toEventClone(location: Location, eventId: string) {
     const targetSearchParams = new URLSearchParams(location.search)
-    targetSearchParams.set('event', eventId)
-    targetSearchParams.set('view', 'clone')
-    return this.toUrl('/submit', targetSearchParams.toString())
+    targetSearchParams.set("event", eventId)
+    targetSearchParams.set("view", "clone")
+    return this.toUrl("/submit", targetSearchParams.toString())
   },
 
   isEventClone(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
-    return targetSearchParams.has('event') && targetSearchParams.get('view') === 'clone'
+    return (
+      targetSearchParams.has("event") &&
+      targetSearchParams.get("view") === "clone"
+    )
   },
 
-  toEventAttendees(location: Location, eventId: string, myEvents: boolean = false) {
-    const path = myEvents ? '/me/' : '/'
+  toEventAttendees(
+    location: Location,
+    eventId: string,
+    myEvents: boolean = false
+  ) {
+    const path = myEvents ? "/me/" : "/"
     const targetSearchParams = new URLSearchParams(location.search)
-    targetSearchParams.set('event', eventId)
-    targetSearchParams.set('view', 'attendees')
+    targetSearchParams.set("event", eventId)
+    targetSearchParams.set("view", "attendees")
     return this.toUrl(path, targetSearchParams.toString())
   },
 
   isEventAttendees(location: Location) {
     const targetSearchParams = new URLSearchParams(location.search)
-    return targetSearchParams.has('event') && targetSearchParams.get('view') === 'attendees'
+    return (
+      targetSearchParams.has("event") &&
+      targetSearchParams.get("view") === "attendees"
+    )
   },
 }

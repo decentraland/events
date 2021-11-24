@@ -1,22 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react'
-import TokenList from 'decentraland-gatsby/dist/utils/dom/TokenList'
-import './Accordion.css'
-
-const next = require('../../images/next.svg')
+import React, { useState, useRef, useEffect } from "react"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import nextIcon from "../../images/next.svg"
+import "./Accordion.css"
 
 export type AccordionProps = {
-  open?: boolean,
-  id?: string,
+  open?: boolean
+  id?: string
   className?: string
   children?: React.ReactNode
-  title?: React.ReactNode,
-  description?: React.ReactNode,
+  title?: React.ReactNode
+  description?: React.ReactNode
 }
 
 export default React.memo(function Accordion(props: AccordionProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const [ open, setOpen ] = useState(false)
-  const [ height, setHeight ] = useState(0)
+  const [open, setOpen] = useState(false)
+  const [height, setHeight] = useState(0)
   const withContent = !!props.children
   const isOpen = Boolean(props.open ?? open)
 
@@ -24,11 +23,11 @@ export default React.memo(function Accordion(props: AccordionProps) {
     if (ref.current !== null) {
       if (isOpen && height === 0) {
         setHeight(ref.current.offsetHeight)
-      } else if (!isOpen && height !==0) {
+      } else if (!isOpen && height !== 0) {
         setHeight(0)
       }
     }
-  }, [ props.open, open ])
+  }, [props.open, open])
 
   useEffect(() => {
     let interval: number
@@ -43,7 +42,7 @@ export default React.memo(function Accordion(props: AccordionProps) {
     return () => {
       clearInterval(interval)
     }
-  }, [ ref.current, isOpen, height ])
+  }, [ref.current, isOpen, height])
 
   function handleOpen() {
     if (withContent && props.open === undefined) {
@@ -51,22 +50,36 @@ export default React.memo(function Accordion(props: AccordionProps) {
     }
   }
 
-  return <div id={props.id} className={TokenList.join(['Accordion', isOpen ? 'Accordion--open' : 'Accordion--close' , props.className])}>
-    <div className="Accordion__Title" onClick={handleOpen}>
-      <div className="Accordion__Title__Content">
-        {props.title ?? '&nbsp;'}
+  return (
+    <div
+      id={props.id}
+      className={TokenList.join([
+        "Accordion",
+        isOpen ? "Accordion--open" : "Accordion--close",
+        props.className,
+      ])}
+    >
+      <div className="Accordion__Title" onClick={handleOpen}>
+        <div className="Accordion__Title__Content">
+          {props.title ?? "&nbsp;"}
+        </div>
+        {props.description && (
+          <div className="Accordion__Title__Description">
+            {props.description}
+          </div>
+        )}
+        {withContent && (
+          <div className={"Accordion__Title__Action"}>
+            <img src={nextIcon} width="48" height="48" />
+          </div>
+        )}
       </div>
-      {props.description && <div className="Accordion__Title__Description">
-        {props.description}
-      </div>}
-      {withContent && <div className={"Accordion__Title__Action"}>
-        <img src={next} width="48" height="48" />
-      </div>}
-    </div>
-    <div style={{ height }} className={TokenList.join([ 'Accordion__Content' ])}>
-      <div ref={ref}>
-        {props.children}
+      <div
+        style={{ height }}
+        className={TokenList.join(["Accordion__Content"])}
+      >
+        <div ref={ref}>{props.children}</div>
       </div>
     </div>
-  </div>
+  )
 })

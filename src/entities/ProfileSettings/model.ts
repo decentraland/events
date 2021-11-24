@@ -1,23 +1,26 @@
-
-import schema from 'decentraland-gatsby/dist/entities/Schema'
-import { ProfileSettingsAttributes, profileSettingsSchema } from './types'
-import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import isEmail from 'validator/lib/isEmail'
-import { SQL, table, values } from 'decentraland-gatsby/dist/entities/Database/utils'
-import { Model } from 'decentraland-gatsby/dist/entities/Database/model'
+import { ProfileSettingsAttributes } from "./types"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+import isEmail from "validator/lib/isEmail"
+import {
+  SQL,
+  table,
+  values,
+} from "decentraland-gatsby/dist/entities/Database/utils"
+import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 
 export default class ProfileSettingsModel extends Model<ProfileSettingsAttributes> {
-  static tableName = 'profile_settings'
-  static primaryKey = 'user'
+  static tableName = "profile_settings"
+  static primaryKey = "user"
   static withTimestamps = false
-  static validator = schema.compile(profileSettingsSchema)
 
   static async findByUsers(users: string[]) {
     if (users.length === 0) {
       return []
     }
 
-    const query = SQL`SELECT * FROM ${table(ProfileSettingsModel)} WHERE "user" IN ${values(users)}`
+    const query = SQL`SELECT * FROM ${table(
+      ProfileSettingsModel
+    )} WHERE "user" IN ${values(users)}`
     return this.query<ProfileSettingsAttributes>(query)
   }
 
@@ -36,7 +39,10 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     }
 
     if (!profile.notify_by_email) {
-      await this.update<ProfileSettingsAttributes>({ notify_by_email: false }, { user })
+      await this.update<ProfileSettingsAttributes>(
+        { notify_by_email: false },
+        { user }
+      )
     }
 
     return true
@@ -57,27 +63,16 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     }
 
     if (!profile.email_verified) {
-      await this.update<ProfileSettingsAttributes>({
-        email_verified: true,
-        notify_by_email: true,
-        email_verified_at: new Date()
-      }, { user })
+      await this.update<ProfileSettingsAttributes>(
+        {
+          email_verified: true,
+          notify_by_email: true,
+          email_verified_at: new Date(),
+        },
+        { user }
+      )
     }
 
     return true
-  }
-
-  static validate(event: ProfileSettingsAttributes): string[] | null {
-    if (!this.isValid(event) && this.validator.errors && this.validator.errors.length > 0) {
-      return this.validator.errors
-        .map((error) => `${error.dataPath.slice(1)} ${error.message!}`)
-        .filter(Boolean)
-    }
-
-    return null
-  }
-
-  static isValid(event: Partial<ProfileSettingsAttributes>) {
-    return this.validator(event) as boolean
   }
 }

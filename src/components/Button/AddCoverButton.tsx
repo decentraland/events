@@ -1,11 +1,11 @@
-import React from 'react';
-import './AddCoverButton.css'
-
-const add = require('../../images/add-alt@3x.png')
-
+import React from "react"
+import addCoverButton from "../../images/add-alt@3x.png"
+import "./AddCoverButton.css"
 
 export default function AddCoverButton() {
-  return <div className="AddCoverButton">
-    <img src={add} width="32" height="32" />
-  </div>
+  return (
+    <div className="AddCoverButton">
+      <img src={addCoverButton} width="32" height="32" />
+    </div>
+  )
 }

@@ -1,5 +1,5 @@
 body {
-  background: var(--background)
+  background: var(--background);
 }
 
 .dcl.navbar.LayoutNavbarContainer {
@@ -13,4 +13,10 @@ body {
 
 .ui.container > .SignIn {
   position: relative;
+}
+
+@keyframes loading {
+  to {
+    background-position-x: -200%;
+  }
 }

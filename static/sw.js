@@ -1,6 +1,6 @@
-"use strict";
+"use strict"
 
-self.addEventListener("push", function(event) {
+self.addEventListener("push", function (event) {
   const data = (event.data && event.data.json()) || {}
   const exp = data.exp || Infinity
   if (Date.now() > exp) {
@@ -42,7 +42,7 @@ self.addEventListener("push", function(event) {
   event.waitUntil(self.registration.showNotification(title, options))
 })
 
-self.addEventListener("notificationclick", function(event) {
+self.addEventListener("notificationclick", function (event) {
   event.notification.close()
   const data = event.notification.data || {}
   if (data.href) {

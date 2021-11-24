@@ -1,17 +1,27 @@
-import isUUID from 'validator/lib/isUUID'
-import { EventAttendeeAttributes } from './types'
-import { SQL, table, values, join, limit, offset } from 'decentraland-gatsby/dist/entities/Database/utils'
-import { Model } from 'decentraland-gatsby/dist/entities/Database/model'
+import isUUID from "validator/lib/isUUID"
+import { EventAttendeeAttributes } from "./types"
+import {
+  SQL,
+  table,
+  values,
+  join,
+  limit,
+  offset,
+} from "decentraland-gatsby/dist/entities/Database/utils"
+import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 
 const LATEST_EVENT_ATTENDING = 10
 
 export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
-  static tableName = 'event_attendees'
+  static tableName = "event_attendees"
   static withTimestamps = false
-  static primaryKey = 'event_id'
+  static primaryKey = "event_id"
 
   static async unsubscribe(user: string) {
-    return this.update<EventAttendeeAttributes>({ notify: false }, { user, notified: false })
+    return this.update<EventAttendeeAttributes>(
+      { notify: false },
+      { user, notified: false }
+    )
   }
 
   static async setNotified(attendees: EventAttendeeAttributes[]) {
@@ -23,7 +33,13 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
       UPDATE ${table(EventAttendeeModel)}
       SET "notified" = TRUE
       WHERE
-        ${join(attendees.map(attendee => SQL`("event_id" = ${attendee.event_id} AND "user" = ${attendee.user} )`), SQL` OR `)}
+        ${join(
+          attendees.map(
+            (attendee) =>
+              SQL`("event_id" = ${attendee.event_id} AND "user" = ${attendee.user} )`
+          ),
+          SQL` OR `
+        )}
     `
 
     await this.query(query)
@@ -48,7 +64,10 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     return EventAttendeeModel.query<EventAttendeeAttributes>(query)
   }
 
-  static async listByEventId(eventId: string, options: { limit?: number, offset?: number } = {}) {
+  static async listByEventId(
+    eventId: string,
+    options: { limit?: number; offset?: number } = {}
+  ) {
     if (!isUUID(eventId)) {
       return []
     }
@@ -66,7 +85,10 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
   }
 
   static async latest(eventId: string) {
-    const attendees = await this.listByEventId(eventId, { limit: LATEST_EVENT_ATTENDING, offset: 0 })
-    return attendees.map(attendee => attendee.user)
+    const attendees = await this.listByEventId(eventId, {
+      limit: LATEST_EVENT_ATTENDING,
+      offset: 0,
+    })
+    return attendees.map((attendee) => attendee.user)
   }
 }

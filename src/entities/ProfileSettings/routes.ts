@@ -1,31 +1,46 @@
-import { utils } from 'decentraland-commons';
-import routes from "decentraland-gatsby/dist/entities/Route/routes";
-import handle from "decentraland-gatsby/dist/entities/Route/handle";
-import { auth, WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware";
-import { sign, verify } from "decentraland-gatsby/dist/utils/sign";
-import { Response, Request } from "express";
-import ProfileSettingsModel from "./model";
-import RequestError from "decentraland-gatsby/dist/entities/Route/error";
-import { editableAttributes, ProfileSettingsAttributes, EmailSubscriptionStatus, EmailSubscription, DATA_PARAM, SUBSCRIPTION_PATH } from './types';
-import isEmail from 'validator/lib/isEmail';
-import { sendEmailVerification } from '../Notification/utils';
-import { requiredEnv } from 'decentraland-gatsby/dist/utils/env';
-import ProfileSubscriptionModel from '../ProfileSubscription/model';
-import EventAttendeeModel from '../EventAttendee/model';
-import Time from 'decentraland-gatsby/dist/utils/date/Time';
-import isEthereumAddress from 'validator/lib/isEthereumAddress';
+import { utils } from "decentraland-commons"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import {
+  auth,
+  WithAuth,
+} from "decentraland-gatsby/dist/entities/Auth/middleware"
+import { sign, verify } from "decentraland-gatsby/dist/utils/sign"
+import { Response, Request } from "express"
+import ProfileSettingsModel from "./model"
+import {
+  editableAttributes,
+  ProfileSettingsAttributes,
+  EmailSubscriptionStatus,
+  EmailSubscription,
+  DATA_PARAM,
+  SUBSCRIPTION_PATH,
+  profileSettingsSchema,
+} from "./types"
+import isEmail from "validator/lib/isEmail"
+import { sendEmailVerification } from "../Notification/utils"
+import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
+import ProfileSubscriptionModel from "../ProfileSubscription/model"
+import EventAttendeeModel from "../EventAttendee/model"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 
-const EVENTS_URL = process.env.GATSBY_EVENTS_URL || process.env.EVENTS_URL || 'https://events.decentraland.org/api'
-const SIGN_SECRET = requiredEnv('SIGN_SECRET')
+const EVENTS_URL =
+  process.env.GATSBY_EVENTS_URL ||
+  process.env.EVENTS_URL ||
+  "https://events.decentraland.org/api"
+const SIGN_SECRET = requiredEnv("SIGN_SECRET")
 
 export default routes((router) => {
   const withAuth = auth()
-  router.get('/profile/settings', withAuth, handle(getMyProfileSettings))
-  router.patch('/profile/settings', withAuth, handle(updateProfileSettings))
+  router.get("/profile/settings", withAuth, handle(getMyProfileSettings))
+  router.patch("/profile/settings", withAuth, handle(updateProfileSettings))
 })
 
 export async function getProfileSettings(user: string) {
-  const settings = await ProfileSettingsModel.findOne<ProfileSettingsAttributes>({ user })
+  const settings =
+    await ProfileSettingsModel.findOne<ProfileSettingsAttributes>({ user })
 
   if (settings) {
     return settings
@@ -39,7 +54,7 @@ export async function getProfileSettings(user: string) {
     email_updated_at: null,
     use_local_time: false,
     notify_by_email: false,
-    notify_by_browser: false
+    notify_by_browser: false,
   }
 
   await ProfileSettingsModel.create(defaultSettings)
@@ -49,25 +64,25 @@ export async function getProfileSettings(user: string) {
 export async function getMyProfileSettings(req: WithAuth) {
   const [settings, subscriptions] = await Promise.all([
     getProfileSettings(req.auth!),
-    ProfileSubscriptionModel.findByUser(req.auth!)
+    ProfileSubscriptionModel.findByUser(req.auth!),
   ])
 
   return {
     ...settings,
-    subscriptions
+    subscriptions,
   }
 }
 
+const validateProfileSettings = createValidator<ProfileSettingsAttributes>(
+  profileSettingsSchema
+)
 export async function updateProfileSettings(req: WithAuth) {
   const now = new Date()
   const user = req.auth!
   const profile = await getProfileSettings(user)
-  const updateAttributes = utils.pick(req.body || {}, editableAttributes) as ProfileSettingsAttributes
-
-  const errors = ProfileSettingsModel.validate(updateAttributes)
-  if (errors) {
-    throw new RequestError('Invalid event data', RequestError.BadRequest, { errors, update: updateAttributes, body: req.body })
-  }
+  const updateAttributes = validateProfileSettings(
+    utils.pick(req.body || {}, editableAttributes)
+  )
 
   let emailVerificationRequired = false
   const newProfile: ProfileSettingsAttributes = {
@@ -119,15 +134,18 @@ export async function updateProfileSettings(req: WithAuth) {
 async function sendVerification(user: string, email: string) {
   if (isEthereumAddress(user) && isEmail(email)) {
     const verificationData: EmailSubscription = {
-      action: 'verify',
+      action: "verify",
       user: user,
       email: email,
-      exp: Date.now() + 15 * Time.Minute
+      exp: Date.now() + 15 * Time.Minute,
     }
 
     const verificationUrl = new URL(EVENTS_URL)
     verificationUrl.pathname = SUBSCRIPTION_PATH
-    verificationUrl.searchParams.set(DATA_PARAM, sign(verificationData, SIGN_SECRET))
+    verificationUrl.searchParams.set(
+      DATA_PARAM,
+      sign(verificationData, SIGN_SECRET)
+    )
     await sendEmailVerification(email, verificationUrl.toString())
   }
 }
@@ -143,7 +161,7 @@ async function checkSubscription(
 ) {
   const result = (status: EmailSubscriptionStatus) => {
     const target = new URL(EVENTS_URL)
-    target.pathname = '/confirm'
+    target.pathname = "/confirm"
     target.searchParams.set(param, String(status))
     res.redirect(302, target.toString())
   }
@@ -153,7 +171,10 @@ async function checkSubscription(
   }
 
   const now = Date.now()
-  const verification = verify(req.query[DATA_PARAM] as string, SIGN_SECRET) as EmailSubscription | null
+  const verification = verify(
+    req.query[DATA_PARAM] as string,
+    SIGN_SECRET
+  ) as EmailSubscription | null
   if (!verification) {
     return result(EmailSubscriptionStatus.Invalid)
   }
@@ -171,22 +192,35 @@ async function checkSubscription(
 }
 
 export async function removeSubscription(req: Request, res: Response) {
-  return checkSubscription(req, res, 'unsubscribe', async (verification: EmailSubscription) => {
-    if (verification.action !== 'unsubscribe') {
-      return false
-    }
+  return checkSubscription(
+    req,
+    res,
+    "unsubscribe",
+    async (verification: EmailSubscription) => {
+      if (verification.action !== "unsubscribe") {
+        return false
+      }
 
-    await EventAttendeeModel.unsubscribe(verification.user)
-    return ProfileSettingsModel.unsubscribe(verification.user, verification.email)
-  })
+      await EventAttendeeModel.unsubscribe(verification.user)
+      return ProfileSettingsModel.unsubscribe(
+        verification.user,
+        verification.email
+      )
+    }
+  )
 }
 
 export async function verifySubscription(req: Request, res: Response) {
-  return checkSubscription(req, res, 'verify', async (verification: EmailSubscription) => {
-    if (verification.action !== 'verify') {
-      return false
-    }
+  return checkSubscription(
+    req,
+    res,
+    "verify",
+    async (verification: EmailSubscription) => {
+      if (verification.action !== "verify") {
+        return false
+      }
 
-    return ProfileSettingsModel.verify(verification.user, verification.email)
-  })
+      return ProfileSettingsModel.verify(verification.user, verification.email)
+    }
+  )
 }

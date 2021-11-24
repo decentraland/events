@@ -3,7 +3,7 @@
 }
 
 .LayoutMainContainer > .dcl.tabs a {
-  color: var(--text)
+  color: var(--text);
 }
 
 .LayoutMainContainer > .dcl.tabs .ui.container {

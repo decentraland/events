@@ -1,3 +1,5 @@
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+
 export type ProfileSubscriptionAttributes = {
   user: string
   endpoint: string
@@ -5,23 +7,19 @@ export type ProfileSubscriptionAttributes = {
   auth: string
 }
 
-export const profileSubscriptionSchema = {
-  type: 'object',
+export const profileSubscriptionSchema: AjvObjectSchema = {
+  type: "object",
   additionalProperties: false,
-  required: [
-    'endpoint',
-    'p256dh',
-    'auth',
-  ],
+  required: ["endpoint", "p256dh", "auth"],
   properties: {
     endpoint: {
-      type: 'string',
+      type: "string",
     },
     p256dh: {
-      type: 'string'
+      type: "string",
     },
     auth: {
-      type: 'string'
-    }
-  }
+      type: "string",
+    },
+  },
 }
