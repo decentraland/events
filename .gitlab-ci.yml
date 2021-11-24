@@ -27,9 +27,6 @@ build:code:
     - mv package-lock.json.temp package-lock.json
     - mv package.json.temp package.json
 
-    - ls node_modules
-    - ls node_modules/@pulumi
-
     # setup dcl environment
     - export PATH="$PATH:$HOME/.pulumi/bin"
     - source dcl-env
