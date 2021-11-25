@@ -49,6 +49,8 @@ export function onPreRenderHTML(
         trackPage={false}
       />
     )
+  } else {
+    console.warn('Missing GATSBY_SEGMENT_KEY environment')
   }
 
   if (process.env.GATSBY_ROLLBAR_TOKEN) {
@@ -58,6 +60,8 @@ export function onPreRenderHTML(
         src="https://decentraland.org/js/libs/rollbar.js/2.22.0/rollbar.min.js"
       />
     )
+  } else {
+    console.warn('Missing GATSBY_ROLLBAR_TOKEN environment')
   }
 
   replaceHeadComponents(headComponents)
