@@ -1,5 +1,5 @@
 import sender from "./sender"
-import { SendMailOptions } from "./types"
+import { TemplateOptions } from "./types"
 import { EventAttributes } from "../Event/types"
 import {
   eventUrl,
@@ -11,22 +11,23 @@ import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 
 export async function sendEmailVerification(email: string, verify_url: string) {
-  const options: SendMailOptions<"validate_email_v3"> = {
+  const data: TemplateOptions<"validate_email_v3"> = {
     template: "validate_email_v3",
-    destinations: [
-      {
-        email,
-        replacement: {
-          verify_url,
-        },
-      },
-    ],
     defaultReplacement: {
       verify_url,
     },
   }
 
-  return sender.send(options)
+  const destinations = [
+    {
+      email,
+      replacement: {
+        verify_url,
+      },
+    },
+  ]
+
+  return sender.send(destinations, data)
 }
 
 export async function sendEmailUpcomingEvent(
@@ -45,14 +46,15 @@ export async function sendEmailUpcomingEvent(
     share_on_twitter: eventTwitterUrl(event),
   }
 
-  const options: SendMailOptions<"upcoming_event_v3"> = {
+  const destinations = settings.map((profile) => ({
+    email: profile.email!,
+    replacement,
+  }))
+
+  const data: TemplateOptions<"upcoming_event_v3"> = {
     template: "upcoming_event_v3",
-    destinations: settings.map((profile) => ({
-      email: profile.email!,
-      replacement,
-    })),
     defaultReplacement: replacement,
   }
 
-  return sender.send(options)
+  return sender.send(destinations, data)
 }
