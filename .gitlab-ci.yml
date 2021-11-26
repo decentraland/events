@@ -54,5 +54,16 @@ build:code:
     # # push static
     - mkdir ./public
     - docker run -v $PWD:/data --rm --entrypoint cp $(pulumi stack output serviceImage) -r '/app/public' '/data'
-    - ./node_modules/.bin/setup-bucket public
+
+    - >
+      ./node_modules/.bin/setup-bucket public \
+        --exclude '*' \
+        --include 'static/*' \
+        --cache-control 'public,max-age=31536000,immutable'
+
+    - >
+      ./node_modules/.bin/setup-bucket public \
+        --exclude 'static/*' \
+        --cache-control 'max-age=0,must-revalidate'
+
     - dcl-cache-invalidation
