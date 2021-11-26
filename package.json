@@ -69,9 +69,10 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:server && npm run build:front",
+    "build": "npm run build:server && build:sw && npm run build:front",
     "build:server": "tsc -p .",
     "build:front": "gatsby build",
+    "build:sw": "parcel build src/sw.ts --dist-dir static",
     "develop": "gatsby develop --https -H 0.0.0.0",
     "format": "prettier --write '**/*.{ts,tsx,js,jsx,json,md,mdx,css}'",
     "start": "concurrently -c blue,green -n SERVER,FRONT 'npm run serve' 'npm run develop'",

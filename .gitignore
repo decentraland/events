@@ -55,6 +55,7 @@ typings/
 .env*
 
 # gatsby files
+.parcel-cache/
 .cache/
 public
 
@@ -71,9 +72,12 @@ yarn-error.log
 lib
 public
 tmp
+*.tmp
 node_modules
 tsconfig.tsbuildinfo
 static/balloon.min.css
 static/base-theme.css
 static/light-theme.css
 static/semantic.min.css
+static/sw.js
+static/sw.js.map

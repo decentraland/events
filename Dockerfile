@@ -38,8 +38,11 @@ COPY ./gatsby-node.js       /app/gatsby-node.js
 COPY ./gatsby-ssr.js        /app/gatsby-ssr.js
 COPY ./tsconfig.json        /app/tsconfig.json
 
+RUN sed -i.temp '/Pulumi\.ts/d' package.json
+
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:server
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front
+RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:sw
 RUN npm prune --production
 
 FROM node:16-alpine
