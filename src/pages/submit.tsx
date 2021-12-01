@@ -874,8 +874,8 @@ export default function SubmitPage() {
                     label="Latitude (X)"
                     type="number"
                     name="x"
-                    min="-150"
-                    max="150"
+                    min="-170"
+                    max="170"
                     error={!!errors["x"]}
                     message={errors["x"]}
                     value={editing.x}
@@ -887,8 +887,8 @@ export default function SubmitPage() {
                     label="Longitude (Y)"
                     type="number"
                     name="y"
-                    min="-150"
-                    max="150"
+                    min="-170"
+                    max="170"
                     error={!!errors["y"]}
                     message={errors["y"]}
                     value={editing.y}

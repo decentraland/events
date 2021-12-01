@@ -1,4 +1,4 @@
-import { SendOptions } from "decentraland-gatsby/dist/entities/Mail/types"
+import { TemplateAttributes } from "decentraland-gatsby/dist/entities/Mail/types"
 
 export type Templates = {
   upcoming_event: {
@@ -35,7 +35,7 @@ export type Templates = {
   }
 }
 
-export type SendMailOptions<T extends keyof Templates> = SendOptions<
+export type TemplateOptions<T extends keyof Templates> = TemplateAttributes<
   T,
   Templates[T]
 >
