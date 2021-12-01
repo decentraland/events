@@ -1,4 +1,5 @@
 import { utils } from "decentraland-commons"
+import { isInsideWorldLimits } from "@dcl/schemas"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
@@ -23,6 +24,7 @@ import { newEventSchema } from "../schemas"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { getEvent } from "./getEvent"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -61,6 +63,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
 
   const x = updatedAttributes.x
   const y = updatedAttributes.y
+  if (!isInsideWorldLimits(x, y)) {
+    throw new RequestError(`Event is outside the world limits`, RequestError.BadRequest, { body: updatedAttributes })
+  }
+
   const tile = await API.catch(Land.get().getTile([x, y]))
   updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
   updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name

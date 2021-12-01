@@ -1,3 +1,4 @@
+import { isInsideWorldLimits } from "@dcl/schemas"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import Context from "decentraland-gatsby/dist/entities/Route/context"
 import { bool, integer } from "decentraland-gatsby/dist/entities/Route/param"
@@ -17,13 +18,11 @@ export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
       .split(",")
       .slice(0, 2)
       .map(integer)
+
     if (
-      x !== null &&
-      y !== null &&
-      x >= -150 &&
-      x <= 150 &&
-      y >= -150 &&
-      y <= 150
+      Number.isFinite(x) &&
+      Number.isFinite(y) &&
+      isInsideWorldLimits(x as number, y as number)
     ) {
       options.x = x
       options.y = y

@@ -297,13 +297,13 @@ export const newEventSchema = {
     },
     x: {
       type: "number",
-      maximum: 150,
-      minimum: -150,
+      maximum: 170,
+      minimum: -170,
     },
     y: {
       type: "number",
-      maximum: 150,
-      minimum: -150,
+      maximum: 170,
+      minimum: -170,
     },
     server: {
       type: ["string", "null"],

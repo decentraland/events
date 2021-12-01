@@ -1,5 +1,6 @@
-import Land from "decentraland-gatsby/dist/utils/api/Land"
 import { v4 as uuid } from "uuid"
+import { isInsideWorldLimits } from "@dcl/schemas"
+import Land from "decentraland-gatsby/dist/utils/api/Land"
 import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
@@ -43,11 +44,15 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   data = validateNewEvent(data)
 
+  const x = data.x
+  const y = data.y
+  if (!isInsideWorldLimits(x, y)) {
+    throw new RequestError(`Event is outside the world limits`, RequestError.BadRequest, { body: data })
+  }
+
   const recurrent = calculateRecurrentProperties(data)
   const now = new Date()
   const event_id = uuid()
-  const x = data.x
-  const y = data.y
   const tiles = await API.catch(Land.get().getTiles([x, y], [x, y]))
   const tile = tiles && tiles[[x, y].join(",")]
   const estate_id = tile?.estateId || null
