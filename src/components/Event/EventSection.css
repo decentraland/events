@@ -17,10 +17,11 @@
   background-color: #ffeed6;
 }
 
-.EventSection .dg.Paragraph {
+.EventSection .dg.Paragraph,
+.EventSection .dg.List .dg.ListItem {
   font-size: 15px;
-  line-height: 16px;
-  margin: 0 0 0.5em;
+  line-height: 1.4;
+  margin: 0 0 0.8em;
 }
 
 .EventSection .dg.Paragraph.error {
