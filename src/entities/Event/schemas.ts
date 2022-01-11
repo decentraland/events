@@ -16,18 +16,26 @@ export const getEventParamsSchema: AjvObjectSchema = {
   },
 }
 
-export const getEventListQuery = {
+export const getEventListQuery: AjvObjectSchema = {
   type: "object",
   additionalProperties: false,
   properties: {
+    limit: {
+      type: "string",
+      format: 'uint'
+    },
+    offset: {
+      type: "string",
+      format: 'uint'
+    },
     position: {
       type: "string",
-      format: /^-?\d{1,3},-?\d{1,3}$/,
+      pattern: "^-?\\d{1,3},-?\\d{1,3}$",
       description: "Filter events that will happend in a specific position",
     },
     estate_id: {
       type: "string",
-      format: "int32",
+      format: "int",
       description: "Filter events that will happend in a specific estate",
     },
     creator: {
@@ -36,7 +44,7 @@ export const getEventListQuery = {
       description: "Filter events created by a user",
     },
     only_attendee: {
-      type: TruthyEnum,
+      enum: TruthyEnum,
       description: "Filter events that user will go (requires authentication)",
     },
     list: {
@@ -44,23 +52,28 @@ export const getEventListQuery = {
       default: "active",
       oneOf: [
         {
-          enum: "all",
+          enum: [ "all" ],
           description: "All events",
         },
         {
-          enum: "active",
+          enum: [ "active" ],
           description: "Only current and future events",
         },
         {
-          enum: "live",
+          enum: [ "live" ],
           description: "Only current events",
         },
         {
-          enum: "upcoming",
+          enum: [ "upcoming" ],
           description: "Only future events",
         },
       ],
     },
+    order: {
+      description: "List order",
+      default: "asc",
+      enum: ["asc", "desc"]
+    }
   },
 }
 
@@ -98,7 +111,7 @@ export const eventSchema = {
     image: {
       description: "Url to the event cover",
       type: "string",
-      format: "url",
+      format: "uri",
     },
     user: {
       descrioption: "The user who created the event",
@@ -131,7 +144,7 @@ export const eventSchema = {
     url: {
       description: "The url where the event will take place",
       type: "string",
-      format: "url",
+      format: "uri",
     },
     scene_name: {
       description: "The scene name where the event will take place",
@@ -149,6 +162,11 @@ export const eventSchema = {
     },
     next_start_at: {
       description: "The next start of the event",
+      type: "string",
+      format: "date-time",
+    },
+    next_finish_at: {
+      description: "The next finish of the event",
       type: "string",
       format: "date-time",
     },
@@ -250,7 +268,7 @@ export const newEventSchema = {
     },
     image: {
       type: ["string", "null"],
-      format: "url",
+      format: "uri",
     },
     start_at: {
       type: "string",
@@ -320,7 +338,7 @@ export const newEventSchema = {
     },
     url: {
       type: "string",
-      format: "url",
+      format: "uri",
     },
   },
 }

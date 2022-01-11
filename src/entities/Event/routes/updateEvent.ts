@@ -77,11 +77,14 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes,
     calculateRecurrentProperties(updatedAttributes)
   )
+
   updatedAttributes.next_start_at = EventModel.selectNextStartAt(
     updatedAttributes.duration,
     updatedAttributes.start_at,
     updatedAttributes.recurrent_dates
   )
+
+  updatedAttributes.next_finish_at = new Date(updatedAttributes.next_start_at.getTime() + updatedAttributes.duration)
 
   if (updatedAttributes.rejected) {
     updatedAttributes.rejected = true

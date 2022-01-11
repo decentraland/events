@@ -89,8 +89,9 @@ export type EventAttributes = {
   image: string | null
   description: string
   start_at: Date
-  next_start_at: Date
   finish_at: Date
+  next_start_at: Date
+  next_finish_at: Date
   duration: number
   all_day: boolean
   x: number
@@ -155,17 +156,35 @@ export type RecurrentEventAttributes = Pick<
   | "recurrent_count"
 >
 
+export enum EventListType {
+  All = "all",
+  Active = "active",
+  Live = "live",
+  Upcoming= "upcoming",
+}
+
+export type EventListParams = {
+  list?: EventListType
+  creator?: string
+  position?: string
+  estate_id?: string
+  only_attendee?: boolean
+  limit?: number
+  offset?: number
+  order?: "asc" | "desc"
+}
+
 export type EventListOptions = {
-  currentUser: string | null | undefined
-  user: string | null | undefined
-  limit: number | null | undefined
-  offset: number | null | undefined
-  x: number | null | undefined
-  y: number | null | undefined
-  startIn: number | null | undefined
-  estateId: string | null | undefined
-  onlyAttendee: boolean
-  onlyUpcoming: boolean
+  list?: EventListType
+  user?: string
+  creator?: string
+  x?: number
+  y?: number
+  estate_id?: string
+  only_attendee?: boolean
+  limit?: number
+  offset?: number
+  order?: "asc" | "desc"
 }
 
 export const editableAttributes: (keyof EventAttributes)[] = [

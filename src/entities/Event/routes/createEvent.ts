@@ -68,6 +68,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     recurrent.start_at,
     recurrent.recurrent_dates
   )
+  const next_finish_at = new Date(next_start_at.getTime() + recurrent.duration)
 
   const event: DeprecatedEventAttributes = {
     ...data,
@@ -76,6 +77,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     image,
     user: user.toLowerCase(),
     next_start_at,
+    next_finish_at,
     user_name,
     estate_id,
     estate_name,
