@@ -23,7 +23,6 @@ import events from "./entities/Event/routes"
 import attendees from "./entities/EventAttendee/routes"
 import social from "./entities/Social/routes"
 import poster from "./entities/Poster/routes"
-import message from "./entities/Message/routes"
 import sitemap from "./entities/Sitemap/routes"
 import profileSettings, {
   verifySubscription,
@@ -54,7 +53,6 @@ app.use("/api", [
   profileSettings,
   profileSubscription,
   profile,
-  message,
   handle(async () => {
     throw new RequestError("NotFound", RequestError.NotFound)
   }),
