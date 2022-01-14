@@ -23,7 +23,7 @@ build:code:
     # - mv package-lock.json package-lock.json.temp
     # - mv package.json package.json.temp
     - npm i -g npm@8
-    - npm i -D decentraland-gatsby-deploy
+    - npm i --legacy-peer-deps
     # - mv package-lock.json.temp package-lock.json
     # - mv package.json.temp package.json
 
