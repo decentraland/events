@@ -32,6 +32,7 @@ build:code:
     - source dcl-env
 
     # setup project environment
+    - pulumi plugin install resource aws v4.34.0
     - pulumi login -c "s3://$STATE_BUCKET/"
     - >
       if pulumi stack select "$PULUMI_STACK-$ENVIRONMENT"; then
