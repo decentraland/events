@@ -20,12 +20,12 @@ build:code:
 
     # install dependencies
     # - npm ci --cache .npm --prefer-offline
-    - mv package-lock.json package-lock.json.temp
-    - mv package.json package.json.temp
+    # - mv package-lock.json package-lock.json.temp
+    # - mv package.json package.json.temp
     - npm i -g npm@8
-    - npm i decentraland-gatsby-deploy
-    - mv package-lock.json.temp package-lock.json
-    - mv package.json.temp package.json
+    - npm i -D decentraland-gatsby-deploy
+    # - mv package-lock.json.temp package-lock.json
+    # - mv package.json.temp package.json
 
     # setup dcl environment
     - export PATH="$PATH:$HOME/.pulumi/bin"
@@ -55,15 +55,13 @@ build:code:
     - mkdir ./public
     - docker run -v $PWD:/data --rm --entrypoint cp $(pulumi stack output serviceImage) -r '/app/public' '/data'
 
-    - >
-      ./node_modules/.bin/setup-bucket public \
-        --exclude '*' \
-        --include 'static/*' \
-        --cache-control 'public,max-age=31536000,immutable'
+    - export BUCKET_WEBSITE_NAME="$(pulumi stack output bucketName)"
 
     - >
-      ./node_modules/.bin/setup-bucket public \
-        --exclude 'static/*' \
-        --cache-control 'max-age=0,must-revalidate'
+      npx @dcl/cdn-uploader@next \
+            --bucket $BUCKET_WEBSITE_NAME \
+            --local-folder public \
+            --bucket-folder "" \
+            --config "cdn.yml"
 
     - dcl-cache-invalidation
