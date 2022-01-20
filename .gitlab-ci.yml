@@ -33,6 +33,7 @@ build:code:
 
     # setup project environment
     - pulumi plugin install resource aws v4.35.0
+    - pulumi plugin install resource cloudflare v4.3.0
     - pulumi login -c "s3://$STATE_BUCKET/"
     - >
       if pulumi stack select "$PULUMI_STACK-$ENVIRONMENT"; then
