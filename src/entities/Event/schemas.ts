@@ -1,6 +1,8 @@
 import {
   AjvObjectSchema,
   TruthyEnum,
+  apiResultSchema,
+  AjvArraySchema
 } from "decentraland-gatsby/dist/entities/Schema/types"
 import { Frequencies } from "./types"
 
@@ -235,6 +237,13 @@ export const eventSchema = {
     },
   },
 }
+
+export const eventResponseSchema = apiResultSchema(eventSchema as AjvObjectSchema)
+export const eventListResponseSchema = apiResultSchema({
+  type: 'array',
+  description: 'Event list',
+  items: eventSchema
+} as AjvArraySchema)
 
 export const newEventSchema = {
   type: "object",

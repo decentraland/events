@@ -7,18 +7,17 @@ import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Table } from "decentraland-ui/dist/components/Table/Table"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import { Stats } from "decentraland-ui/dist/components/Stats/Stats"
 
 import ApiCard from "decentraland-gatsby/dist/components/Docs/ApiCard"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import ApiDetails from "decentraland-gatsby/dist/components/Docs/ApiDetails"
 import Code from "decentraland-gatsby/dist/components/Text/Code"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import RequestTable from "decentraland-gatsby/dist/components/Docs/RequestTable"
 import Navigation from "../components/Layout/Navigation"
 import { useEventsContext, useEventSorter } from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { getEventListQuery, eventResponseSchema, eventListResponseSchema, getEventParamsSchema } from "../entities/Event/schemas"
+import { eventAttendeeListScheme } from "../entities/EventAttendee/schemas"
 import "./index.css"
 
 export type IndexPageState = {
@@ -39,7 +38,7 @@ const attendOptions = [
   { key: "no", value: false, text: "no" },
 ]
 
-export default function IndexPage(props: any) {
+export default function DocsPage() {
   const [account, accountState] = useAuthContext()
   const [events] = useEventsContext()
   const sortedEvents = useEventSorter(events)
@@ -103,20 +102,46 @@ export default function IndexPage(props: any) {
           path="/api/events"
           description="Returns the list of the upcoming events"
         >
-          <RequestTable />
+          <ApiDetails
+            title="Request"
+            cors="*"
+            query={getEventListQuery} />
+
+          <ApiDetails
+            title="Response"
+            body={eventListResponseSchema} />
         </ApiCard>
+
         <ApiCard
           id="get-event"
           method="GET"
           path="/api/events/{event_id}"
           description="Returns information about an event by ID"
-        />
+        >
+          <ApiDetails
+            title="Request"
+            cors="*"
+            params={getEventParamsSchema} />
+
+          <ApiDetails
+            title="Response"
+            body={eventResponseSchema} />
+        </ApiCard>
         <ApiCard
           id="get-attendees"
           method="GET"
           path="/api/events/{event_id}/attendees"
           description="Returns the list of addresses register for attending an event by ID"
-        />
+        >
+          <ApiDetails
+            title="Request"
+            cors="*"
+            params={getEventParamsSchema} />
+          <ApiDetails
+            title="Response"
+            cors="*"
+            params={eventAttendeeListScheme} />
+        </ApiCard>
         <ApiCard
           id="api-message"
           deprecated
@@ -402,13 +427,12 @@ export default function IndexPage(props: any) {
             {[
               `curl --request POST \\`,
               `    --header "Content-Type: application/json" \\`,
-              `    --data '${
-                attendState.address &&
-                JSON.stringify({
-                  address: attendState.address,
-                  message: attendState.message,
-                  signature: attendState.signature,
-                })
+              `    --data '${attendState.address &&
+              JSON.stringify({
+                address: attendState.address,
+                message: attendState.message,
+                signature: attendState.signature,
+              })
               }' \\`,
               `    ${process.env.GATSBY_EVENTS_URL}/message`,
               ``,

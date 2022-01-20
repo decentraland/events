@@ -146,11 +146,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         )}
       WHERE
         e.rejected IS FALSE
-        AND e.finish_at > now()
-        ${/*conditional(options.list === EventListType.All, SQL``)}
-        ${conditional(options.list === EventListType.Active, SQL`AND lower(e.user) = ${options.creator}`)}
-        ${conditional(options.list === EventListType.Live, SQL`AND lower(e.user) = ${options.creator}`)}
-          ${conditional(options.list === EventListType.Upcoming, SQL`AND lower(e.user) = ${options.creator}`)*/ SQL``}
+        ${conditional(options.list === EventListType.All, SQL``)}
+        ${conditional(options.list === EventListType.Active, SQL`AND e.next_finish_at > now()`)}
+        ${conditional(options.list === EventListType.Live, SQL`AND e.next_finish_at > now() AND e.next_start_at < now()`)}
+        ${conditional(options.list === EventListType.Upcoming, SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`)}
         ${conditional(!!options.creator, SQL`AND lower(e.user) = ${options.creator}`)}
         ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
         ${conditional(
@@ -166,7 +165,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           SQL`AND e.estate_id = ${options.estate_id}`
         )}
       ORDER BY e.next_finish_at ${options.order === 'desc' ? SQL`DESC` : SQL`ASC`}
-      ${limit(options.limit)}
+      ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
     `
 
