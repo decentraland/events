@@ -281,10 +281,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       const yMin = -150
 
       // NOTE: don't use isInsideWorldLimits
-      if (
-        xMax >= x && x >= xMin &&
-        yMax >= y && y >= yMin
-      ) {
+      if (xMax >= x && x >= xMin && yMax >= y && y >= yMin) {
         setValue(name, position)
       }
     }

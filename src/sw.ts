@@ -1,5 +1,9 @@
-import { registerImmutableFiles, registerGatsbyImmutableFiles, registerCatalystImmutableFiles } from 'decentraland-gatsby/dist/utils/webworker/cache'
-import { registerNotification } from 'decentraland-gatsby/dist/utils/webworker/notification'
+import {
+  registerImmutableFiles,
+  registerGatsbyImmutableFiles,
+  registerCatalystImmutableFiles,
+} from "decentraland-gatsby/dist/utils/webworker/cache"
+import { registerNotification } from "decentraland-gatsby/dist/utils/webworker/notification"
 
 registerNotification({
   body: "Event is about to start",
@@ -13,4 +17,8 @@ registerNotification({
 
 registerGatsbyImmutableFiles()
 registerCatalystImmutableFiles()
-registerImmutableFiles(({ url }) => self.location.hostname === url.hostname && url.pathname.startsWith('/poster/'))
+registerImmutableFiles(
+  ({ url }) =>
+    self.location.hostname === url.hostname &&
+    url.pathname.startsWith("/poster/")
+)

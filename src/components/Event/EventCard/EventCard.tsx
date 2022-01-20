@@ -59,21 +59,20 @@ export default React.memo(function EventCard(props: EventCardProps) {
       href={href}
       onClick={handleClick}
     >
-      <div />
-      {event && <StartIn date={nextStartAt} />}
-      {event && event.total_attendees > 0 && (
-        <div className="EventCard__Attendees">
-          {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => (
-            <Avatar size="mini" key={address} address={address} />
-          ))}
-          {event.total_attendees > EVENTS_LIST && (
-            <div className="EventCard__Attendees__More">
-              <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
-            </div>
-          )}
-        </div>
-      )}
       <div className="EventCard__Cover">
+        {event && <StartIn date={nextStartAt} />}
+        {event && event.total_attendees > 0 && (
+          <div className="EventCard__Attendees">
+            {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => (
+              <Avatar size="mini" key={address} address={address} />
+            ))}
+            {event.total_attendees > EVENTS_LIST && (
+              <div className="EventCard__Attendees__More">
+                <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
+              </div>
+            )}
+          </div>
+        )}
         <ImgFixed src={event?.image || ""} dimension="wide" />
       </div>
       <Card.Content>

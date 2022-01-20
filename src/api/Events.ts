@@ -60,6 +60,8 @@ export default class Events extends API {
   static parseEvent(event: SessionEventAttributes): SessionEventAttributes {
     const start_at = event.start_at && Time.date(event.start_at)
     const next_start_at = event.next_start_at && Time.date(event.next_start_at)
+    const next_finish_at =
+      event.next_finish_at && Time.date(event.next_finish_at)
     const finish_at = event.finish_at && Time.date(event.finish_at)
     const created_at = event.created_at && Time.date(event.created_at)
     const updated_at = event.updated_at && Time.date(event.updated_at)
@@ -75,8 +77,9 @@ export default class Events extends API {
     return {
       ...event,
       start_at,
-      next_start_at,
       finish_at,
+      next_start_at,
+      next_finish_at,
       created_at,
       updated_at,
       recurrent_until,

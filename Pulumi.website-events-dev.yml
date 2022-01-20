@@ -6,8 +6,6 @@ config:
   events:AWS_BUCKET_URL: https://events.decentraland.io
   events:CONNECTION_STRING:
     secure: v1:Qnl9UxZmPaJEnQKR:m9O+4z453mTgx6OsHhWXsl+EPIKz85GKp+xX+ALd/CXnf6cpqBpx2YufgyegT1eSzxJ92p7A7RUPo4+uJlW66C9Oi4mhvzJIX2H3uRU56tjxwg9Qv0kGj1f5x3iSUrQEWuXka6YtEeYcIdYJEAFiaGXbrVjR+fC7bCuKZ7j/
-  events:ETHEREUM_ENDPOINTS:
-    secure: v1:KsUyFrgOKJRcNrzR:ZRsfFlx6+EcU/bqEOTMxTCewEWkw5Gu5R31wa0by/KVhB3LiAbGKgaxizPWaziCRLny30/aW/KIkWykBo7MVsBPGU7x/9Pmis+ruKc95G5e+733amnnpTEVYUZ2abdAnEQhKGc65jJNq/Qb96F5iVDnLVr3eop7vsyAWUU7lbWlU/ayS1DK+tb7igJ62kXSUbJX15xyjRU7FBrCYs8uGdJzzRkbvy3tgW6QEu0vJr1I64zxGQLr6HTuQl1x1w3Hc4/8GsGrijGwOXdIdmwzC29WzZc7ty7k+NI/EhUy+bek1m/S5LvUYEotcEuXHY2MmXBTt+6W7nVbX8kXg0nAh0FEbbk/hH3VKxYs0sxjGR7sqsk5rvtX88FDCcWOALZspLRtAU5lZ+phW9aGefr4I9U8RGXYhs+kPjjWF0jjl1U8p4JvvTA==
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
   events:GATSBY_EVENTS_URL: https://events.decentraland.io/api
   events:GATSBY_LAND_URL: https://api.decentraland.org

@@ -13,7 +13,7 @@
     "aws-sdk": "^2.1002.0",
     "core-js": "^3.19.1",
     "cssnano": "^5.0.10",
-    "decentraland-gatsby": "^5.0.10",
+    "decentraland-gatsby": "^5.1.4",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.1.2",
@@ -38,7 +38,7 @@
     "react-dom": "^17.0.0",
     "react-helmet": "^5.2.1",
     "rrule": "^2.6.8",
-    "sharp": "^0.29.2",
+    "sharp": "^0.29.3",
     "uuid": "^7.0.3",
     "web-push": "^3.4.5",
     "xml": "^1.0.1"

@@ -16,6 +16,7 @@ import {
   EventListOptions,
   DeprecatedEventAttributes,
   SITEMAP_ITEMS_PER_PAGE,
+  EventListType,
 } from "./types"
 import EventAttendee from "../EventAttendee/model"
 
@@ -127,54 +128,55 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
   }
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
+    // return []
     const query = SQL`
       SELECT
         e.*
-        ${conditional(
-          !!options.currentUser,
-          SQL`, a.user is not null as attending`
-        )}
-        ${conditional(!!options.currentUser, SQL`, a.notify = TRUE as notify`)}
+        ${conditional(!!options.user, SQL`, a.user is not null as attending`)}
+        ${conditional(!!options.user, SQL`, a.notify = TRUE as notify`)}
       FROM ${table(EventModel)} e
         ${conditional(
-          !!options.currentUser,
+          !!options.user,
           SQL`LEFT JOIN ${table(
             EventAttendee
-          )} a on e.id = a.event_id AND lower(a.user) = ${options.currentUser}`
+          )} a on e.id = a.event_id AND lower(a.user) = ${options.user}`
         )}
       WHERE
         e.rejected IS FALSE
-        AND e.finish_at > now()
-        ${conditional(!!options.onlyUpcoming, SQL`AND e.next_start_at > now()`)}
-        ${conditional(!!options.user, SQL`AND e.user = ${options.user}`)}
-        ${conditional(!options.currentUser, SQL`AND e.approved IS TRUE`)}
+        ${conditional(options.list === EventListType.All, SQL``)}
         ${conditional(
-          !!options.currentUser && !isAdmin(options.currentUser),
-          SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`
+          options.list === EventListType.Active,
+          SQL`AND e.next_finish_at > now()`
         )}
         ${conditional(
-          !!options.onlyAttendee && !isAdmin(options.currentUser),
-          SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.currentUser})`
+          options.list === EventListType.Live,
+          SQL`AND e.next_finish_at > now() AND e.next_start_at < now()`
         )}
         ${conditional(
-          Number.isFinite(options.startIn as number) &&
-            (options.startIn as number) > 0,
-          SQL`AND e.next_start_at < (now() + (${options.startIn} * '1 millisecond'::interval))`
+          options.list === EventListType.Upcoming,
+          SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
         )}
         ${conditional(
-          Number.isFinite(options.y as number),
-          SQL`AND e.y = ${options.y}`
+          !!options.creator,
+          SQL`AND lower(e.user) = ${options.creator}`
+        )}
+        ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
+        ${conditional(
+          !!options.user && !isAdmin(options.user),
+          SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
         )}
         ${conditional(
-          Number.isFinite(options.y as number),
-          SQL`AND e.y = ${options.y}`
+          Number.isFinite(options.x) && Number.isFinite(options.y),
+          SQL`AND e.x = ${options.x} AND e.y = ${options.y}`
         )}
         ${conditional(
-          !!options.estateId,
-          SQL`AND e.estate_id = ${options.estateId}`
+          !!options.estate_id,
+          SQL`AND e.estate_id = ${options.estate_id}`
         )}
-      ORDER BY e.next_start_at ASC
-      ${limit(options.limit)}
+      ORDER BY e.next_finish_at ${
+        options.order === "desc" ? SQL`DESC` : SQL`ASC`
+      }
+      ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
     `
 

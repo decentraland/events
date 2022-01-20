@@ -1,4 +1,4 @@
-install decentraland-gatsby@4
+install decentraland-gatsby@5
 
 ```bash
 npm install gatsby@4 decentraland-gatsby@4

@@ -64,7 +64,11 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const x = updatedAttributes.x
   const y = updatedAttributes.y
   if (!isInsideWorldLimits(x, y)) {
-    throw new RequestError(`Event is outside the world limits`, RequestError.BadRequest, { body: updatedAttributes })
+    throw new RequestError(
+      `Event is outside the world limits`,
+      RequestError.BadRequest,
+      { body: updatedAttributes }
+    )
   }
 
   const tile = await API.catch(Land.get().getTile([x, y]))
@@ -77,10 +81,15 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes,
     calculateRecurrentProperties(updatedAttributes)
   )
+
   updatedAttributes.next_start_at = EventModel.selectNextStartAt(
     updatedAttributes.duration,
     updatedAttributes.start_at,
     updatedAttributes.recurrent_dates
+  )
+
+  updatedAttributes.next_finish_at = new Date(
+    updatedAttributes.next_start_at.getTime() + updatedAttributes.duration
   )
 
   if (updatedAttributes.rejected) {

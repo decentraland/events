@@ -1,7 +1,6 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst, {
   CommsStatus,
-  CommsStatusWithLayers,
 } from "decentraland-gatsby/dist/utils/api/Catalyst"
 import once from "decentraland-gatsby/dist/utils/function/once"
 
@@ -9,7 +8,7 @@ export const getServers = once(async () => {
   const servers = await Catalyst.get().getServers()
   return Promise.all(
     servers.map((server) => {
-      return API.catch(Catalyst.from(server.address).getCommsStatus())
+      return API.catch(Catalyst.from(server.baseUrl).getCommsStatus())
     })
   )
 })

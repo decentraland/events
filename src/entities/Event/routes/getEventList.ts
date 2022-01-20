@@ -1,29 +1,38 @@
-import { isInsideWorldLimits } from "@dcl/schemas"
+import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import Context from "decentraland-gatsby/dist/entities/Route/context"
-import { bool, integer } from "decentraland-gatsby/dist/entities/Route/param"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { bool } from "decentraland-gatsby/dist/entities/Route/param"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 import EventModel from "../model"
-import { EventListOptions } from "../types"
+import { EventListOptions, EventListParams, EventListType } from "../types"
+import { getEventListQuery } from "../schemas"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 
+const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
-  const options: Partial<EventListOptions> = {
-    currentUser: req.auth,
-    offset: integer(req.query["offset"]) ?? 0,
-    limit: integer(req.query["limit"]) ?? 500,
+  const query = validate(req.query)
+  const options: EventListOptions = {
+    user: req.auth,
+    offset: query.offset ? Math.max(Number(query.offset), 0) : 0,
+    limit: query.limit
+      ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
+      : 500,
+    list: query.list || EventListType.Active,
+    order: query.order ?? "asc",
   }
 
-  if (req.query["position"]) {
-    const [x, y] = String(req.query["position"])
-      .split(",")
-      .slice(0, 2)
-      .map(integer)
+  if (options.limit === 0) {
+    return []
+  }
 
-    if (
-      Number.isFinite(x) &&
-      Number.isFinite(y) &&
-      isInsideWorldLimits(x as number, y as number)
-    ) {
+  if (query.position) {
+    const [x, y] = query.position.split(",").slice(0, 2).map(Number) as [
+      number,
+      number
+    ]
+
+    if (Number.isFinite(x) && Number.isFinite(y) && isInsideWorldLimits(x, y)) {
       options.x = x
       options.y = y
     } else {
@@ -32,53 +41,34 @@ export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
     }
   }
 
-  if (req.query["estate_id"]) {
-    const estateId = integer(req.query["estate_id"])
+  if (query.estate_id) {
+    const estateId = Number(query.estate_id)
     if (estateId !== null && Number.isFinite(estateId)) {
-      options.estateId = String(estateId)
+      options.estate_id = String(estateId)
     } else {
       // out of bound
       return []
     }
   }
 
-  if (req.query["user"]) {
-    const user = String(req.query["user"])
-    if (isEthereumAddress(user)) {
-      options.user = user.toLowerCase()
+  if (query.creator) {
+    if (isEthereumAddress(query.creator)) {
+      options.creator = query.creator.toLowerCase()
     } else {
       // invalid user address
       return []
     }
   }
 
-  if (req.query["start_in"]) {
-    const startIn = integer(req.query["start_in"])
-    if (startIn !== null && Number.isFinite(startIn) && startIn > 0) {
-      options.startIn = startIn * 100
-    } else {
-      // out of bound
-      return []
+  if (query.only_attendee) {
+    if (!req.auth) {
+      throw new RequestError(
+        "only_attendee filter requieres autentication",
+        RequestError.Unauthorized
+      )
     }
-  }
 
-  if (
-    ctx.param("onlyAttendee", { defaultValue: false, parser: bool }) || // @deprecated
-    ctx.param("only_attendee", { defaultValue: false, parser: bool })
-  ) {
-    if (req.auth) {
-      options.onlyAttendee = true
-    } else {
-      // attendee without user
-      return []
-    }
-  }
-
-  if (
-    ctx.param("onlyUpcoming", { defaultValue: false, parser: bool }) || // @deprecated
-    ctx.param("only_upcoming", { defaultValue: false, parser: bool })
-  ) {
-    options.onlyUpcoming = true
+    options.only_attendee = bool(query.only_attendee) ?? true
   }
 
   const events = await EventModel.getEvents(options)

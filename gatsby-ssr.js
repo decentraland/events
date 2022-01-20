@@ -50,7 +50,7 @@ export function onPreRenderHTML(
       />
     )
   } else {
-    console.warn('Missing GATSBY_SEGMENT_KEY environment')
+    console.warn("Missing GATSBY_SEGMENT_KEY environment")
   }
 
   if (process.env.GATSBY_ROLLBAR_TOKEN) {
@@ -61,7 +61,7 @@ export function onPreRenderHTML(
       />
     )
   } else {
-    console.warn('Missing GATSBY_ROLLBAR_TOKEN environment')
+    console.warn("Missing GATSBY_ROLLBAR_TOKEN environment")
   }
 
   replaceHeadComponents(headComponents)
