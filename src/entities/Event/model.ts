@@ -132,10 +132,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     const query = SQL`
       SELECT
         e.*
-        ${conditional(
-          !!options.user,
-          SQL`, a.user is not null as attending`
-        )}
+        ${conditional(!!options.user, SQL`, a.user is not null as attending`)}
         ${conditional(!!options.user, SQL`, a.notify = TRUE as notify`)}
       FROM ${table(EventModel)} e
         ${conditional(
@@ -147,10 +144,22 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       WHERE
         e.rejected IS FALSE
         ${conditional(options.list === EventListType.All, SQL``)}
-        ${conditional(options.list === EventListType.Active, SQL`AND e.next_finish_at > now()`)}
-        ${conditional(options.list === EventListType.Live, SQL`AND e.next_finish_at > now() AND e.next_start_at < now()`)}
-        ${conditional(options.list === EventListType.Upcoming, SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`)}
-        ${conditional(!!options.creator, SQL`AND lower(e.user) = ${options.creator}`)}
+        ${conditional(
+          options.list === EventListType.Active,
+          SQL`AND e.next_finish_at > now()`
+        )}
+        ${conditional(
+          options.list === EventListType.Live,
+          SQL`AND e.next_finish_at > now() AND e.next_start_at < now()`
+        )}
+        ${conditional(
+          options.list === EventListType.Upcoming,
+          SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
+        )}
+        ${conditional(
+          !!options.creator,
+          SQL`AND lower(e.user) = ${options.creator}`
+        )}
         ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
         ${conditional(
           !!options.user && !isAdmin(options.user),
@@ -164,7 +173,9 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !!options.estate_id,
           SQL`AND e.estate_id = ${options.estate_id}`
         )}
-      ORDER BY e.next_finish_at ${options.order === 'desc' ? SQL`DESC` : SQL`ASC`}
+      ORDER BY e.next_finish_at ${
+        options.order === "desc" ? SQL`DESC` : SQL`ASC`
+      }
       ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
     `

@@ -2,7 +2,7 @@ import {
   AjvObjectSchema,
   TruthyEnum,
   apiResultSchema,
-  AjvArraySchema
+  AjvArraySchema,
 } from "decentraland-gatsby/dist/entities/Schema/types"
 import { Frequencies } from "./types"
 
@@ -24,11 +24,11 @@ export const getEventListQuery: AjvObjectSchema = {
   properties: {
     limit: {
       type: "string",
-      format: 'uint'
+      format: "uint",
     },
     offset: {
       type: "string",
-      format: 'uint'
+      format: "uint",
     },
     position: {
       type: "string",
@@ -54,19 +54,19 @@ export const getEventListQuery: AjvObjectSchema = {
       default: "active",
       oneOf: [
         {
-          enum: [ "all" ],
+          enum: ["all"],
           description: "All events",
         },
         {
-          enum: [ "active" ],
+          enum: ["active"],
           description: "Only current and future events",
         },
         {
-          enum: [ "live" ],
+          enum: ["live"],
           description: "Only current events",
         },
         {
-          enum: [ "upcoming" ],
+          enum: ["upcoming"],
           description: "Only future events",
         },
       ],
@@ -74,8 +74,8 @@ export const getEventListQuery: AjvObjectSchema = {
     order: {
       description: "List order",
       default: "asc",
-      enum: ["asc", "desc"]
-    }
+      enum: ["asc", "desc"],
+    },
   },
 }
 
@@ -238,11 +238,13 @@ export const eventSchema = {
   },
 }
 
-export const eventResponseSchema = apiResultSchema(eventSchema as AjvObjectSchema)
+export const eventResponseSchema = apiResultSchema(
+  eventSchema as AjvObjectSchema
+)
 export const eventListResponseSchema = apiResultSchema({
-  type: 'array',
-  description: 'Event list',
-  items: eventSchema
+  type: "array",
+  description: "Event list",
+  items: eventSchema,
 } as AjvArraySchema)
 
 export const newEventSchema = {

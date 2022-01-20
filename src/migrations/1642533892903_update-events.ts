@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { SQL, table } from 'decentraland-gatsby/dist/entities/Database/utils';
-import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import EventModel from '../entities/Event/model';
+import { SQL, table } from "decentraland-gatsby/dist/entities/Database/utils"
+import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import EventModel from "../entities/Event/model"
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`

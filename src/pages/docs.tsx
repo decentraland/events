@@ -16,7 +16,12 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import Navigation from "../components/Layout/Navigation"
 import { useEventsContext, useEventSorter } from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import { getEventListQuery, eventResponseSchema, eventListResponseSchema, getEventParamsSchema } from "../entities/Event/schemas"
+import {
+  getEventListQuery,
+  eventResponseSchema,
+  eventListResponseSchema,
+  getEventParamsSchema,
+} from "../entities/Event/schemas"
 import { eventAttendeeListScheme } from "../entities/EventAttendee/schemas"
 import "./index.css"
 
@@ -102,14 +107,9 @@ export default function DocsPage() {
           path="/api/events"
           description="Returns the list of the upcoming events"
         >
-          <ApiDetails
-            title="Request"
-            cors="*"
-            query={getEventListQuery} />
+          <ApiDetails title="Request" cors="*" query={getEventListQuery} />
 
-          <ApiDetails
-            title="Response"
-            body={eventListResponseSchema} />
+          <ApiDetails title="Response" body={eventListResponseSchema} />
         </ApiCard>
 
         <ApiCard
@@ -118,14 +118,9 @@ export default function DocsPage() {
           path="/api/events/{event_id}"
           description="Returns information about an event by ID"
         >
-          <ApiDetails
-            title="Request"
-            cors="*"
-            params={getEventParamsSchema} />
+          <ApiDetails title="Request" cors="*" params={getEventParamsSchema} />
 
-          <ApiDetails
-            title="Response"
-            body={eventResponseSchema} />
+          <ApiDetails title="Response" body={eventResponseSchema} />
         </ApiCard>
         <ApiCard
           id="get-attendees"
@@ -133,14 +128,12 @@ export default function DocsPage() {
           path="/api/events/{event_id}/attendees"
           description="Returns the list of addresses register for attending an event by ID"
         >
-          <ApiDetails
-            title="Request"
-            cors="*"
-            params={getEventParamsSchema} />
+          <ApiDetails title="Request" cors="*" params={getEventParamsSchema} />
           <ApiDetails
             title="Response"
             cors="*"
-            params={eventAttendeeListScheme} />
+            params={eventAttendeeListScheme}
+          />
         </ApiCard>
         <ApiCard
           id="api-message"
@@ -427,12 +420,13 @@ export default function DocsPage() {
             {[
               `curl --request POST \\`,
               `    --header "Content-Type: application/json" \\`,
-              `    --data '${attendState.address &&
-              JSON.stringify({
-                address: attendState.address,
-                message: attendState.message,
-                signature: attendState.signature,
-              })
+              `    --data '${
+                attendState.address &&
+                JSON.stringify({
+                  address: attendState.address,
+                  message: attendState.message,
+                  signature: attendState.signature,
+                })
               }' \\`,
               `    ${process.env.GATSBY_EVENTS_URL}/message`,
               ``,

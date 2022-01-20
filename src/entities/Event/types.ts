@@ -160,7 +160,7 @@ export enum EventListType {
   All = "all",
   Active = "active",
   Live = "live",
-  Upcoming= "upcoming",
+  Upcoming = "upcoming",
 }
 
 export type EventListParams = {

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import EventModel from '../entities/Event/model';
+import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import EventModel from "../entities/Event/model"
 
-export const shorthands: ColumnDefinitions | undefined = undefined;
+export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns(EventModel.tableName, {
@@ -12,9 +12,19 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     },
   })
 
-  pgm.createIndex(EventModel.tableName, ['rejected', 'approved', 'user', 'next_finish_at'] )
+  pgm.createIndex(EventModel.tableName, [
+    "rejected",
+    "approved",
+    "user",
+    "next_finish_at",
+  ])
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropIndex(EventModel.tableName, ['rejected', 'approved', 'user', 'next_finish_at'] )
+  pgm.dropIndex(EventModel.tableName, [
+    "rejected",
+    "approved",
+    "user",
+    "next_finish_at",
+  ])
 }

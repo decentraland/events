@@ -47,7 +47,11 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const x = data.x
   const y = data.y
   if (!isInsideWorldLimits(x, y)) {
-    throw new RequestError(`Event is outside the world limits`, RequestError.BadRequest, { body: data })
+    throw new RequestError(
+      `Event is outside the world limits`,
+      RequestError.BadRequest,
+      { body: data }
+    )
   }
 
   const recurrent = calculateRecurrentProperties(data)

@@ -11,14 +11,15 @@ import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
-
   const query = validate(req.query)
   const options: EventListOptions = {
     user: req.auth,
     offset: query.offset ? Math.max(Number(query.offset), 0) : 0,
-    limit: query.limit ? Math.min(Math.max(Number(req.query["limit"]), 0),  500) : 500,
+    limit: query.limit
+      ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
+      : 500,
     list: query.list || EventListType.Active,
-    order: query.order ?? 'asc'
+    order: query.order ?? "asc",
   }
 
   if (options.limit === 0) {
@@ -26,16 +27,12 @@ export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
   }
 
   if (query.position) {
-    const [x, y] = query.position
-      .split(",")
-      .slice(0, 2)
-      .map(Number) as [number, number]
+    const [x, y] = query.position.split(",").slice(0, 2).map(Number) as [
+      number,
+      number
+    ]
 
-    if (
-      Number.isFinite(x) &&
-      Number.isFinite(y) &&
-      isInsideWorldLimits(x, y)
-    ) {
+    if (Number.isFinite(x) && Number.isFinite(y) && isInsideWorldLimits(x, y)) {
       options.x = x
       options.y = y
     } else {
@@ -65,7 +62,10 @@ export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
 
   if (query.only_attendee) {
     if (!req.auth) {
-      throw new RequestError('only_attendee filter requieres autentication', RequestError.Unauthorized)
+      throw new RequestError(
+        "only_attendee filter requieres autentication",
+        RequestError.Unauthorized
+      )
     }
 
     options.only_attendee = bool(query.only_attendee) ?? true
