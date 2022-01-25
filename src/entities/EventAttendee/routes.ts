@@ -12,8 +12,6 @@ import {
   WithAuthProfile,
 } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import { getProfileSettings } from "../ProfileSettings/routes"
-import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
-import API from "decentraland-gatsby/dist/utils/api/API"
 import EventAttendeeModel from "../EventAttendee/model"
 import { getEvent } from "../Event/routes/getEvent"
 import { Request } from "express"
