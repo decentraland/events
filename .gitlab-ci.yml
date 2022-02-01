@@ -32,9 +32,6 @@ build:code:
     - source dcl-env
 
     # setup project environment
-    # - pulumi plugin install resource aws v4.35.0
-    # - pulumi plugin install resource cloudflare v4.3.0
-    - pulumi plugin install
     - pulumi login -c "s3://$STATE_BUCKET/"
     - >
       if pulumi stack select "$PULUMI_STACK-$ENVIRONMENT"; then
@@ -50,6 +47,9 @@ build:code:
     - echo .env
 
     # push server
+    # - pulumi plugin install resource aws v4.35.0
+    # - pulumi plugin install resource cloudflare v4.3.0
+    - pulumi plugin install
     - dcl-lock-sync
     - dcl-up $PULUMI_STACK
     - dcl-sync-release
