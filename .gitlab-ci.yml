@@ -46,7 +46,7 @@ build:code:
     - source ./node_modules/.bin/setup-environment
 
     - env | grep GATSBY_ > .env
-    - echo .env
+    # - echo .env
 
     # push server
     # - pulumi plugin install resource aws v4.35.0
