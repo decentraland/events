@@ -1,3 +1,5 @@
+import { SQLStatement } from "decentraland-gatsby/dist/entities/Database/utils"
+
 export enum Frequency {
   YEARLY = "YEARLY",
   MONTHLY = "MONTHLY",
@@ -122,6 +124,7 @@ export type EventAttributes = {
   details: string | null
   total_attendees: number
   latest_attendees: string[]
+  textsearch: SQLStatement | string | null | undefined
 }
 
 export type GetEventParams = {
@@ -161,6 +164,7 @@ export enum EventListType {
   Active = "active",
   Live = "live",
   Upcoming = "upcoming",
+  Relevance = "relevance",
 }
 
 export type EventListParams = {
@@ -169,6 +173,7 @@ export type EventListParams = {
   position?: string
   estate_id?: string
   only_attendee?: boolean
+  search?: string
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -182,6 +187,7 @@ export type EventListOptions = {
   y?: number
   estate_id?: string
   only_attendee?: boolean
+  search?: string
   limit?: number
   offset?: number
   order?: "asc" | "desc"

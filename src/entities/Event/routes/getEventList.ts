@@ -19,11 +19,19 @@ export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
       ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
       : 500,
     list: query.list || EventListType.Active,
-    order: query.order ?? "asc",
+    order: query.order,
   }
 
   if (options.limit === 0) {
     return []
+  }
+
+  if (query.search) {
+    if (!/\w{3}/.test(query.search)) {
+      return []
+    }
+
+    options.search = query.search
   }
 
   if (query.position) {

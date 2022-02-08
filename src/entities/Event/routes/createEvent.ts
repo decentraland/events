@@ -94,8 +94,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     total_attendees: 0,
     latest_attendees: [],
     created_at: now,
+    textsearch: null
   }
 
+  event.textsearch = EventModel.textsearch(event)
   await EventModel.create(event)
   await notifyNewEvent(event)
 

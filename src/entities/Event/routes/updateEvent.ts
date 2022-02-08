@@ -99,18 +99,22 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.trending = false
   }
 
+
+  const updatedEvent = {
+    ...event,
+    ...updatedAttributes,
+  }
+
+  updatedAttributes.textsearch = EventModel.textsearch(updatedEvent)
   await EventModel.update(updatedAttributes, { id: event.id })
 
   const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({
     event_id: event.id,
     user,
   })
-  const updatedEvent = {
-    ...event,
-    ...updatedAttributes,
-    attending: !!attendee,
-    notify: !!attendee?.notify,
-  }
+
+  updatedEvent.attending = !!attendee
+  updatedEvent.notify = !!attendee?.notify
 
   if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)

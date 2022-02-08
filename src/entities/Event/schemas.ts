@@ -20,6 +20,7 @@ export const getEventParamsSchema: AjvObjectSchema = {
 
 export const getEventListQuery: AjvObjectSchema = {
   type: "object",
+  description: "Event representation",
   additionalProperties: false,
   properties: {
     limit: {
@@ -46,8 +47,12 @@ export const getEventListQuery: AjvObjectSchema = {
       description: "Filter events created by a user",
     },
     only_attendee: {
-      enum: TruthyEnum,
+      enum: TruthyEnum.filter(value => typeof value === 'string'),
       description: "Filter events that user will go (requires authentication)",
+    },
+    search: {
+      type: "string",
+      description: "Filter events that contains a websearch expression, should have at least 3 characters otherwise the resultant list will be empty",
     },
     list: {
       description: "Filter event using one of the following list",

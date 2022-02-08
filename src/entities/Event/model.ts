@@ -5,6 +5,9 @@ import {
   conditional,
   limit,
   offset,
+  join,
+  createSearchableMatches,
+  tsquery
 } from "decentraland-gatsby/dist/entities/Database/utils"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
@@ -22,6 +25,15 @@ import EventAttendee from "../EventAttendee/model"
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = "events"
+
+  static textsearch(event: DeprecatedEventAttributes) {
+    return SQL`(${join([
+      SQL`setweight(to_tsvector(${event.name}), 'A')`,
+      SQL`setweight(to_tsvector(${event.user_name || ''}), 'B')`,
+      SQL`setweight(to_tsvector(${event.estate_name || ''}), 'B')`,
+      SQL`setweight(to_tsvector(${createSearchableMatches(event.description || '')}), 'C')`,
+    ], SQL` || `)})`
+  }
 
   static selectNextStartAt(
     duration: number,
@@ -72,6 +84,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       next_start_at,
       scene_name: event.estate_name,
       coordinates: [event.x, event.y],
+      textsearch: undefined
     }
   }
 
@@ -129,6 +142,17 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
     // return []
+    let orderBy = 'e.next_finish_at'
+    let orderDirection = 'ASC'
+    if (options.search) {
+      orderBy = '"rank"'
+      orderDirection = 'DESC'
+    }
+
+    if (options.order) {
+      orderDirection = options.order === 'asc' ? 'ASC' : 'DESC'
+    }
+
     const query = SQL`
       SELECT
         e.*
@@ -141,6 +165,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
             EventAttendee
           )} a on e.id = a.event_id AND lower(a.user) = ${options.user}`
         )}
+          ${conditional(!!options.search, SQL`, ts_rank(textsearch, to_tsquery(${tsquery(options.search || '')})) AS "rank"`)}
       WHERE
         e.rejected IS FALSE
         ${conditional(options.list === EventListType.All, SQL``)}
@@ -155,6 +180,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${conditional(
           options.list === EventListType.Upcoming,
           SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
+        )}
+        ${conditional(
+          !!options.search,
+          SQL`AND "rank" > 0`
         )}
         ${conditional(
           !!options.creator,
@@ -173,9 +202,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !!options.estate_id,
           SQL`AND e.estate_id = ${options.estate_id}`
         )}
-      ORDER BY e.next_finish_at ${
-        options.order === "desc" ? SQL`DESC` : SQL`ASC`
-      }
+
+      ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}
       ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
     `
