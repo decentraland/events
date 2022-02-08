@@ -1,21 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react"
-import { Address } from "web3x/address"
-import { Personal } from "web3x/personal"
-
-import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
+import React from "react"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import { Table } from "decentraland-ui/dist/components/Table/Table"
 
 import ApiCard from "decentraland-gatsby/dist/components/Docs/ApiCard"
 import ApiDetails from "decentraland-gatsby/dist/components/Docs/ApiDetails"
-import Code from "decentraland-gatsby/dist/components/Text/Code"
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import Navigation from "../components/Layout/Navigation"
-import { useEventsContext, useEventSorter } from "../context/Event"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import {
   getEventListQuery,
   eventResponseSchema,
@@ -29,20 +17,6 @@ export type IndexPageState = {
   updating: Record<string, boolean>
 }
 
-type AttendState = {
-  processing: boolean
-  event: null | string
-  attend: null | boolean
-  address: null | string
-  message: null | string
-  signature: null | string
-}
-
-const attendOptions = [
-  { key: "yes", value: true, text: "yes" },
-  { key: "no", value: false, text: "no" },
-]
-
 export default function DocsPage() {
   return (
     <>
@@ -55,7 +29,6 @@ export default function DocsPage() {
           description="Returns the list of the upcoming events"
         >
           <ApiDetails title="Request" cors="*" query={getEventListQuery} />
-
           <ApiDetails title="Response" body={eventListResponseSchema} />
         </ApiCard>
 
@@ -66,7 +39,6 @@ export default function DocsPage() {
           description="Returns information about an event by ID"
         >
           <ApiDetails title="Request" cors="*" params={getEventParamsSchema} />
-
           <ApiDetails title="Response" body={eventResponseSchema} />
         </ApiCard>
         <ApiCard
@@ -79,7 +51,7 @@ export default function DocsPage() {
           <ApiDetails
             title="Response"
             cors="*"
-            params={eventAttendeeListScheme}
+            body={eventAttendeeListScheme}
           />
         </ApiCard>
         <ApiCard
@@ -105,7 +77,7 @@ export default function DocsPage() {
           <ApiDetails
             title="Response"
             cors="*"
-            params={eventAttendeeListScheme}
+            body={eventAttendeeListScheme}
           />
         </ApiCard>
       </Container>
