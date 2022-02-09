@@ -26,26 +26,29 @@ import {
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import "./index.css"
+import useListEventsFiltered from "../hooks/useListEventsFiltered"
 
 export default function MyEventsPage() {
   const l = useFormatMessage()
   const location = useLocation()
-  const params = new URLSearchParams(location.search)
+  const params = useMemo(() => new URLSearchParams(location.search), [location.search])
   // const events = useListEvents(siteStore.events.getState().data)
   const [account, accountState] = useAuthContext()
   const [eventList, eventsState] = useEventsContext()
   const events = useEventSorter(eventList)
   const [event] = useEventIdContext(params.get("event"))
+  const filteredEvents = useListEventsFiltered(events, params.get('search'))
   const myEvents = useMemo(
-    () => events.filter((event) => event.owned),
-    [events]
+    () => filteredEvents.filter((event) => event.owned),
+    [filteredEvents]
   )
   const attendingEvents = useMemo(
-    () => events.filter((event) => !!event.attending),
-    [events]
+    () => filteredEvents.filter((event) => !!event.attending),
+    [filteredEvents]
   )
   const [enabledNotification, setEnabledNotification] = useState(false)
   const loading = accountState.loading || eventsState.loading
+  const searching = !!params.get('search')
 
   return (
     <>
@@ -97,7 +100,7 @@ export default function MyEventsPage() {
         event={event}
         onClose={prevent(() => navigate(locations.myEvents()))}
       />
-      <Navigation activeTab={NavigationTab.MyEvents} />
+      <Navigation activeTab={NavigationTab.MyEvents} search />
       <Container>
         {!loading && !account && (
           <div style={{ textAlign: "center" }}>
@@ -124,7 +127,7 @@ export default function MyEventsPage() {
             {!loading && attendingEvents.length === 0 && (
               <div style={{ textAlign: "center" }}>
                 <Divider size="mini" />
-                <Paragraph secondary>
+                {!searching && <Paragraph secondary>
                   You are not attending to any event, find some{" "}
                   <Link
                     href={locations.events()}
@@ -133,7 +136,10 @@ export default function MyEventsPage() {
                     amazing event
                   </Link>
                   .
-                </Paragraph>
+                </Paragraph>}
+                {searching && <Paragraph secondary>
+                  {l('page.events.not_found')}
+                </Paragraph>}
                 <Divider size="mini" />
               </div>
             )}
@@ -165,7 +171,7 @@ export default function MyEventsPage() {
             {!loading && myEvents.length === 0 && (
               <div style={{ textAlign: "center" }}>
                 <Divider size="tiny" />
-                <Paragraph secondary>
+                {!searching && <Paragraph secondary>
                   You are not hosting any events, try to propose a{" "}
                   <Link
                     href={locations.submit()}
@@ -174,7 +180,11 @@ export default function MyEventsPage() {
                     new event
                   </Link>
                   .
-                </Paragraph>
+                </Paragraph>}
+
+                {searching && <Paragraph secondary>
+                  {l('page.events.not_found')}
+                </Paragraph>}
                 <Divider size="tiny" />
               </div>
             )}

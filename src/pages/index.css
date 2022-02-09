@@ -8,11 +8,11 @@
   position: relative;
 }
 
-.dcl.tabs .ui.button {
+/* .dcl.tabs .ui.button {
   position: absolute;
   right: 0;
   bottom: 2px;
-}
+} */
 
 .dcl.tabs .ui.container .ui.button {
   bottom: 11px;

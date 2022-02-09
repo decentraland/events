@@ -9,12 +9,17 @@
     "events": "World Events",
     "my_events": "My Events",
     "pending_events": "Pending Events",
-    "submit_events": "Submit Event"
+    "submit_events": "Submit Event",
+    "search": "Search..."
   },
   "page": {
     "404": {
       "title": "Page not found",
       "description": "You just hit a route that doesn't exist..."
+    },
+    "events": {
+      "no_events": "No events planned yet.",
+      "not_found": "No events found."
     }
   },
   "social": {

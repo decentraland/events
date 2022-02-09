@@ -31,6 +31,9 @@ import {
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { SessionEventAttributes } from "../entities/Event/types"
+import useListEventsFiltered from "../hooks/useListEventsFiltered"
+import useListEventsMain from "../hooks/useListEventsMain"
+import useListEventsTrending from "../hooks/useListEventsTrending"
 import "./index.css"
 
 export type IndexPageState = {
@@ -38,39 +41,20 @@ export type IndexPageState = {
 }
 
 export default function IndexPage() {
-  const now = Date.now()
   const l = useFormatMessage()
   const [, accountState] = useAuthContext()
   const location = useLocation()
-  const params = new URLSearchParams(location.search)
+  const params = useMemo(() => new URLSearchParams(location.search), [location.search])
   const [event] = useEventIdContext(params.get("event"))
   const [settings] = useProfileSettingsContext()
   const [all, state] = useEventsContext()
   const events = useEventSorter(all)
   const loading = accountState.loading || state.loading
-
-  const eventsByMonth = useListEventsByMonth(events)
-  const trendingEvents = useMemo(
-    () => events.filter((event) => !!event.trending),
-    [events]
-  )
-  const mainEvents = useMemo(
-    () =>
-      events
-        .filter(
-          (event) =>
-            event.approved &&
-            event.highlighted &&
-            event.finish_at.getTime() > now
-        )
-        .sort((eventA, eventB) => {
-          return (
-            Math.abs(now - eventA.next_start_at.getTime()) -
-            Math.abs(now - eventB.next_start_at.getTime())
-          )
-        }),
-    [events]
-  )
+  const searching = !!params.get('search')
+  const filteredEvents = useListEventsFiltered(events, params.get('search'))
+  const eventsByMonth = useListEventsByMonth(filteredEvents)
+  const trendingEvents = useListEventsTrending(filteredEvents)
+  const mainEvents = useListEventsMain(events)
 
   const [enabledNotification, setEnabledNotification] = useState(false)
   const handleEventClick = useCallback(
@@ -132,13 +116,23 @@ export default function IndexPage() {
         event={event}
         onClose={prevent(() => navigate(locations.events()))}
       />
-      <Navigation activeTab={NavigationTab.Events} />
+      <Navigation activeTab={NavigationTab.Events} search />
       <Container>
         {!loading && events.length === 0 && (
           <div>
             <Divider />
             <Paragraph secondary style={{ textAlign: "center" }}>
-              No events planned yet.
+              {l('page.events.no_events')}
+            </Paragraph>
+            <Divider />
+          </div>
+        )}
+
+        {!loading && events.length > 0 && filteredEvents.length === 0 && (
+          <div>
+            <Divider />
+            <Paragraph secondary style={{ textAlign: "center" }}>
+              {l('page.events.not_found')}
             </Paragraph>
             <Divider />
           </div>
@@ -152,7 +146,7 @@ export default function IndexPage() {
           </div>
         )}
 
-        {!loading && events.length > 0 && mainEvents.length > 0 && (
+        {!loading && !searching && events.length > 0 && mainEvents.length > 0 && (
           <div>
             <Carousel>
               {mainEvents.map((event) => (

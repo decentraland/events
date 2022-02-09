@@ -16,7 +16,7 @@ function url(path: string, query?: Record<string, string> | URLSearchParams) {
 }
 
 export default {
-  events: () => url("/"),
+  events: (filters: Partial<{ search: string }> | URLSearchParams = {}) => url("/", filters),
   event: (id: string) => url("/event/", { id }),
   myEvents: () => url("/me/"),
   pendingEvents: () => url("/pending/"),

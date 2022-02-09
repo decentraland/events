@@ -12,7 +12,7 @@ export default function SubmitButton(props: ButtonProps) {
   const l = useFormatMessage()
   return (
     <Button
-      basic
+      primary
       size="small"
       {...props}
       className={TokenList.join(["SubmitButton", props.className])}
@@ -24,10 +24,11 @@ export default function SubmitButton(props: ButtonProps) {
           width="16"
           height="16"
           style={{
-            width: "16px",
+            width: "13px",
             height: "auto",
             verticalAlign: "text-bottom",
-            marginRight: "1rem",
+            marginRight: ".5rem",
+            marginBottom: '1px'
           }}
         />
       )}
