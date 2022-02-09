@@ -73,11 +73,6 @@ export default function Navigation(props: NavigationProps) {
             </Tabs.Tab>
           </Link>
         )}
-        <Link href={locations.events()}>
-          <Tabs.Tab>
-           History
-          </Tabs.Tab>
-        </Link>
         <div style={{ flex: 1 }} />
         {props.search && <SearchInput placeholder={l('navigation.search')} onChange={handleSearchChange} defaultValue={params.get('search') || ''} />}
         <SubmitButton as={Link} href={locations.submit()} />
