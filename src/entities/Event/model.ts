@@ -26,13 +26,14 @@ import EventAttendee from "../EventAttendee/model"
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = "events"
 
-  static textsearch(event: DeprecatedEventAttributes) {
-    return SQL`(${join([
-      SQL`setweight(to_tsvector(${event.name}), 'A')`,
-      SQL`setweight(to_tsvector(${event.user_name || ''}), 'B')`,
-      SQL`setweight(to_tsvector(${event.estate_name || ''}), 'B')`,
-      SQL`setweight(to_tsvector(${createSearchableMatches(event.description || '')}), 'C')`,
-    ], SQL` || `)})`
+  static textsearch(_event: DeprecatedEventAttributes) {
+    return null
+    // return SQL`(${join([
+    //   SQL`setweight(to_tsvector(${event.name}), 'A')`,
+    //   SQL`setweight(to_tsvector(${event.user_name || ''}), 'B')`,
+    //   SQL`setweight(to_tsvector(${event.estate_name || ''}), 'B')`,
+    //   SQL`setweight(to_tsvector(${createSearchableMatches(event.description || '')}), 'C')`,
+    // ], SQL` || `)})`
   }
 
   static selectNextStartAt(
@@ -152,6 +153,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     if (options.order) {
       orderDirection = options.order === 'asc' ? 'ASC' : 'DESC'
     }
+
+    // console.log(tsquery(options.search || ''))
 
     const query = SQL`
       SELECT
