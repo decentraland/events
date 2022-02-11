@@ -7,6 +7,8 @@ import {
   offset,
   join,
   createSearchableMatches,
+  columns,
+  objectValues,
   tsquery
 } from "decentraland-gatsby/dist/entities/Database/utils"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
@@ -22,18 +24,53 @@ import {
   EventListType,
 } from "./types"
 import EventAttendee from "../EventAttendee/model"
+import { QueryPart } from "decentraland-server/dist/db/types"
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = "events"
 
-  static textsearch(_event: DeprecatedEventAttributes) {
-    return null
-    // return SQL`(${join([
-    //   SQL`setweight(to_tsvector(${event.name}), 'A')`,
-    //   SQL`setweight(to_tsvector(${event.user_name || ''}), 'B')`,
-    //   SQL`setweight(to_tsvector(${event.estate_name || ''}), 'B')`,
-    //   SQL`setweight(to_tsvector(${createSearchableMatches(event.description || '')}), 'C')`,
-    // ], SQL` || `)})`
+  static textsearch(event: DeprecatedEventAttributes) {
+    // return null
+    return SQL`(${join([
+      SQL`setweight(to_tsvector(${event.name}), 'A')`,
+      SQL`setweight(to_tsvector(${event.user_name || ''}), 'B')`,
+      SQL`setweight(to_tsvector(${event.estate_name || ''}), 'B')`,
+      SQL`setweight(to_tsvector(${createSearchableMatches(event.description || '')}), 'C')`,
+    ], SQL` || `)})`
+  }
+
+  static create<U extends QueryPart = any>(event: U): Promise<U> {
+    const keys = Object.keys(event)
+      .map(key => key.replace(/\W/gi, ''))
+
+    const sql = SQL`
+      INSERT INTO ${table(this)} ${columns(keys)}
+      VALUES ${objectValues(keys, [ event ])}
+    `
+
+    return this.query(sql) as any
+  }
+
+  static update<U extends QueryPart = any, P extends QueryPart = any>(changes: Partial<U>, conditions: Partial<P>): Promise<U> {
+    const changesKeys = Object.keys(changes).map(key => key.replace(/\W/gi, ''))
+    const conditionsKeys = Object.keys(conditions).map(key => key.replace(/\W/gi, ''))
+    if (changesKeys.length === 0) {
+      throw new Error(`Missing update changes`)
+    }
+
+    if (conditionsKeys.length === 0) {
+      throw new Error(`Missing update conditions`)
+    }
+
+    const sql = SQL`
+      UPDATE ${table(this)}
+      SET
+        ${join(changesKeys.map(key => SQL`"${SQL.raw(key)}" = ${changes[key]}`), SQL`,`)}
+      WHERE
+        ${join(conditionsKeys.map(key => SQL`"${SQL.raw(key)}" = ${conditions[key]}`), SQL`,`)}
+    `
+
+    return this.query(sql) as any
   }
 
   static selectNextStartAt(
@@ -154,8 +191,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       orderDirection = options.order === 'asc' ? 'ASC' : 'DESC'
     }
 
-    // console.log(tsquery(options.search || ''))
-
     const query = SQL`
       SELECT
         e.*
@@ -168,7 +203,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
             EventAttendee
           )} a on e.id = a.event_id AND lower(a.user) = ${options.user}`
         )}
-          ${conditional(!!options.search, SQL`, ts_rank(textsearch, to_tsquery(${tsquery(options.search || '')})) AS "rank"`)}
+          ${conditional(!!options.search, SQL`, ts_rank_cd(e.textsearch, to_tsquery(${tsquery(options.search || '')})) AS "rank"`)}
       WHERE
         e.rejected IS FALSE
         ${conditional(options.list === EventListType.All, SQL``)}
