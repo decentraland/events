@@ -40,7 +40,7 @@ function Icon({ src, width, height, center, ...props }: IconProps) {
         props.className,
       ])}
     >
-      <img src={src} width={width ?? 16} height={height ?? 16} />
+      {!!src && <img src={src} width={width ?? 16} height={height ?? 16} />}
     </div>
   )
 }
