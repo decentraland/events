@@ -78,7 +78,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         track((analytics) =>
           analytics.track(SegmentEvent.Share, {
             ethAddress,
-            event: event?.id || null,
+            eventId: event?.id || null,
             medium: "facebook",
           })
         )
@@ -97,7 +97,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         track((analytics) =>
           analytics.track(SegmentEvent.Share, {
             ethAddress,
-            event: event?.id || null,
+            eventId: event?.id || null,
             medium: "twitter",
           })
         )
@@ -118,7 +118,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         track((analytics) =>
           analytics.track(SegmentEvent.ShareFallback, {
             ethAddress,
-            event: event?.id || null,
+            eventId: event?.id || null,
           })
         )
         setFallbackShare(true)
