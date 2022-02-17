@@ -11,7 +11,6 @@ export = async function main() {
     // contentRoutingRules: {
     //   '/en/*': '/$1'
     // },
-    contentImmutableCache: ["/static/*", "/poster/*"],
     serviceSource: ".",
     serviceMemory: 1024,
     serviceEnvironment: [variable("NODE_ENV", "production")],
