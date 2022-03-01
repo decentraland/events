@@ -46,7 +46,7 @@ export async function getProfileSettings(user: string) {
     return settings
   }
 
-  let defaultSettings = {
+  return {
     user,
     email: null,
     email_verified: false,
@@ -56,9 +56,6 @@ export async function getProfileSettings(user: string) {
     notify_by_email: false,
     notify_by_browser: false,
   }
-
-  await ProfileSettingsModel.create(defaultSettings)
-  return defaultSettings
 }
 
 export async function getMyProfileSettings(req: WithAuth) {
