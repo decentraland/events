@@ -79,6 +79,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           analytics.track(SegmentEvent.Share, {
             ethAddress,
             eventId: event?.id || null,
+            trending: event?.trending || false,
+            highlighted: event?.highlighted || false,
             medium: "facebook",
           })
         )
@@ -98,6 +100,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           analytics.track(SegmentEvent.Share, {
             ethAddress,
             eventId: event?.id || null,
+            trending: event?.trending || false,
+            highlighted: event?.highlighted || false,
             medium: "twitter",
           })
         )
@@ -119,6 +123,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           analytics.track(SegmentEvent.ShareFallback, {
             ethAddress,
             eventId: event?.id || null,
+            trending: event?.trending || false,
+            highlighted: event?.highlighted || false,
           })
         )
         setFallbackShare(true)
