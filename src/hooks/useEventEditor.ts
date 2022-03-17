@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react"
-import { isInsideWorldLimits } from "@dcl/schemas"
 import isURL from "validator/lib/isURL"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import {

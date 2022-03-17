@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid"
-import { isInsideWorldLimits } from "@dcl/schemas"
+import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
