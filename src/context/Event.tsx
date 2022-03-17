@@ -133,7 +133,12 @@ export function useEvents() {
 
         add(newEvent)
         track((analytics) =>
-          analytics.track(SegmentEvent.Going, { ethAddress, event: id || null })
+          analytics.track(SegmentEvent.Going, {
+            ethAddress,
+            eventId: event?.id || null,
+            trending: event?.trending || false,
+            highlighted: event?.highlighted || false,
+          })
         )
         return event
       } catch (error) {

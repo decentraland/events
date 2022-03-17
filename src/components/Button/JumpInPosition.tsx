@@ -37,6 +37,8 @@ export default function JumpInPosition({
         analytics.track(SegmentEvent.JumpIn, {
           ethAddress,
           eventId: event?.id || null,
+          trending: event?.trending || false,
+          highlighted: event?.highlighted || false,
         })
       )
     }

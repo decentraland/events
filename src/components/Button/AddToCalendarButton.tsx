@@ -35,7 +35,9 @@ export default function AddToCalendarButton({
     track((analytics) =>
       analytics.track(SegmentEvent.AddToCalendar, {
         ethAddress: address,
-        eventId: event?.id,
+        eventId: event?.id || null,
+        trending: event?.trending || false,
+        highlighted: event?.highlighted || false,
       })
     )
     if (props.onClick) {
