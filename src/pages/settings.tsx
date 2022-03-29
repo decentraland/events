@@ -241,7 +241,7 @@ export default function SettingsPage(props: any) {
                   <Loader size="mini" active={state?.loading} />
                   <Radio
                     toggle
-                    checked={!!settings?.use_local_time}
+                    checked={!settings?.use_local_time}
                     disabled={state?.loading}
                     onClick={prevent(() =>
                       state.update({
