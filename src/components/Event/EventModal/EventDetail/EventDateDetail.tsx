@@ -45,6 +45,17 @@ export default React.memo(function EventDateDetail({
   )
   const isLive = now.isBetween(start_at, finish_at)
 
+  /**
+   * Return a formatted label like (UTC) of with different timezone than UTC like (UTC -3)
+   * @param timeParam 
+   * @returns 
+   */
+  const showTimezoneLabel = (timeParam: Time.Dayjs) => {
+    // In case of +/- timezone erase the extra 0 // -0300 => -3
+    const timeZone = !settings?.use_local_time ? '' : timeParam.format("ZZ").replace(/0/g, '')
+    return `(UTC${timeZone})`
+  }
+
   return (
     <EventSection {...props}>
       <EventSection.Icon
@@ -74,7 +85,7 @@ export default React.memo(function EventDateDetail({
                 {" to "}
                 <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
                 <Bold>
-                  {!settings?.use_local_time ? "UTC" : finish_at.format("Z")}
+                  {showTimezoneLabel(finish_at)}
                 </Bold>
               </>
             )}
@@ -87,7 +98,7 @@ export default React.memo(function EventDateDetail({
             {" to "}
             <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>{" "}
             <Bold>
-              {!settings?.use_local_time ? "UTC" : finish_at.format("Z")}
+              {showTimezoneLabel(finish_at)}
             </Bold>
           </Paragraph>
         )}
@@ -101,7 +112,7 @@ export default React.memo(function EventDateDetail({
               {" at "}
               <Bold>{start_at.format("hh:mma")}</Bold>{" "}
               <Bold>
-                {!settings?.use_local_time ? "UTC" : start_at.format("Z")}
+                {showTimezoneLabel(start_at)}
               </Bold>
             </Paragraph>
             <Paragraph secondary={secondary}>
@@ -112,7 +123,7 @@ export default React.memo(function EventDateDetail({
               {" at "}
               <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
               <Bold>
-                {!settings?.use_local_time ? "UTC" : finish_at.format("Z")}
+                {showTimezoneLabel(finish_at)}
               </Bold>
             </Paragraph>
           </>
