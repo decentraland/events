@@ -9,6 +9,7 @@ import Live from "../../../Badge/Live"
 import EventSection from "../../EventSection"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import clockIcon from "../../../../images/secondary-clock.svg"
+import { showTimezoneLabel } from "../../../../modules/date"
 
 export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {
   event: SessionEventAttributes
@@ -74,7 +75,7 @@ export default React.memo(function EventDateDetail({
                 {" to "}
                 <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
                 <Bold>
-                  {!settings?.use_local_time ? "UTC" : finish_at.format("Z")}
+                  {showTimezoneLabel(finish_at, settings?.use_local_time)}
                 </Bold>
               </>
             )}
@@ -87,7 +88,7 @@ export default React.memo(function EventDateDetail({
             {" to "}
             <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>{" "}
             <Bold>
-              {!settings?.use_local_time ? "UTC" : finish_at.format("Z")}
+              {showTimezoneLabel(finish_at, settings?.use_local_time)}
             </Bold>
           </Paragraph>
         )}
@@ -101,7 +102,7 @@ export default React.memo(function EventDateDetail({
               {" at "}
               <Bold>{start_at.format("hh:mma")}</Bold>{" "}
               <Bold>
-                {!settings?.use_local_time ? "UTC" : start_at.format("Z")}
+                {showTimezoneLabel(start_at, settings?.use_local_time)}
               </Bold>
             </Paragraph>
             <Paragraph secondary={secondary}>
@@ -112,7 +113,7 @@ export default React.memo(function EventDateDetail({
               {" at "}
               <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
               <Bold>
-                {!settings?.use_local_time ? "UTC" : finish_at.format("Z")}
+                {showTimezoneLabel(finish_at, settings?.use_local_time)}
               </Bold>
             </Paragraph>
           </>
