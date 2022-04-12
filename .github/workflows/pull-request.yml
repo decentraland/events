@@ -1,0 +1,45 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+
+jobs:
+
+  release:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Reconfigure git to use HTTP authentication
+        run: >
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+
+      - name: node.js 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+          cache: 'npm'
+
+      - name: installing
+        run: npm ci
+
+      # - name: linters
+      #   uses: wearerequired/lint-action@v1
+      #   with:
+      #     prettier: true
+      #     prettier_extensions: ts,tsx,js,jsx,json,md,mdx,css
+      #     continue_on_error: false
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: testing
+        run: npm test -- --coverage
+
+      - name: building
+        run: npm run build
