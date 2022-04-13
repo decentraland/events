@@ -1,6 +1,13 @@
 .SubmitButton img {
-  width: 16px;
+  width: 13px;
   height: auto;
   vertical-align: text-bottom;
-  margin-right: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 1px;
+}
+
+@media only screen and (max-width: 415px) {
+  .SubmitButton img {
+    display: none;
+  }
 }

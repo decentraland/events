@@ -20,6 +20,12 @@
   min-width: 300px;
 }
 
+@media only screen and (max-width: 415px) {
+  .LayoutMainContainer>.dcl.tabs .dcl.tab {
+    margin-right: 0;
+  }
+}
+
 @media only screen and (max-width: 991px) {
   .LayoutMainContainer > .dcl.tabs {
     height: auto;
@@ -43,7 +49,7 @@
   } 
   
   .LayoutMainContainer > .dcl.tabs .SearchInput {
-    min-width: 210px;
+    min-width: 140px;
     flex: 1;
   }
   

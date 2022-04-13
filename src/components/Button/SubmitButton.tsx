@@ -23,13 +23,6 @@ export default function SubmitButton(props: ButtonProps) {
           src={invertedAddIcon}
           width="16"
           height="16"
-          style={{
-            width: "13px",
-            height: "auto",
-            verticalAlign: "text-bottom",
-            marginRight: ".5rem",
-            marginBottom: '1px'
-          }}
         />
       )}
       {!props.children && l("navigation.submit_events")}
