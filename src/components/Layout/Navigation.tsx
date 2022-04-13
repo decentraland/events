@@ -54,28 +54,32 @@ export default function Navigation(props: NavigationProps) {
   return (
     <>
       <Tabs>
-        <Link href={locations.events()}>
-          <Tabs.Tab active={props.activeTab === NavigationTab.Events}>
-            {l("navigation.events")}
-          </Tabs.Tab>
-        </Link>
-        {account && (
-          <Link href={locations.myEvents()}>
-            <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
-              {l("navigation.my_events")}
+        <div className={"tabs__wrapper"}>
+          <Link href={locations.events()}>
+            <Tabs.Tab active={props.activeTab === NavigationTab.Events}>
+              {l("navigation.events")}
             </Tabs.Tab>
           </Link>
-        )}
-        {hasPendingEvents && (
-          <Link href={locations.pendingEvents()}>
-            <Tabs.Tab active={props.activeTab === NavigationTab.PendingEvents}>
-              {l("navigation.pending_events")}
-            </Tabs.Tab>
-          </Link>
-        )}
+          {account && (
+            <Link href={locations.myEvents()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
+                {l("navigation.my_events")}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {hasPendingEvents && (
+            <Link href={locations.pendingEvents()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.PendingEvents}>
+                {l("navigation.pending_events")}
+              </Tabs.Tab>
+            </Link>
+          )}
+        </div>
         <div style={{ flex: 1 }} />
-        {props.search && <SearchInput placeholder={l('navigation.search')} onChange={handleSearchChange} defaultValue={params.get('search') || ''} />}
-        <SubmitButton as={Link} href={locations.submit()} />
+        <div className={"tabs__wrapper"}>
+          {props.search && <SearchInput placeholder={l('navigation.search')} onChange={handleSearchChange} defaultValue={params.get('search') || ''} />}
+          <SubmitButton as={Link} href={locations.submit()} />
+          </div>
       </Tabs>
     </>
   )

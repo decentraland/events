@@ -16,7 +16,44 @@
   margin-left: 1rem;
 }
 
-
 .LayoutMainContainer > .dcl.tabs .SearchInput {
   min-width: 300px;
+}
+
+@media only screen and (max-width: 415px) {
+  .LayoutMainContainer>.dcl.tabs .dcl.tab {
+    margin-right: 0;
+  }
+}
+
+@media only screen and (max-width: 991px) {
+  .LayoutMainContainer > .dcl.tabs {
+    height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .LayoutMainContainer > .dcl.tabs .ui.container {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .LayoutMainContainer > .dcl.tabs .tabs__wrapper {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .LayoutMainContainer > .dcl.tabs .tabs__wrapper:last-child {
+    margin-bottom: 8px;
+    width: 100%;
+  } 
+  
+  .LayoutMainContainer > .dcl.tabs .SearchInput {
+    min-width: 140px;
+    flex: 1;
+  }
+  
+  .LayoutMainContainer > .dcl.tabs .SubmitButton {
+    margin-right: 1rem;
+  }
 }
