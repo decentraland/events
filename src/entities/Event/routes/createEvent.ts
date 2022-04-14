@@ -13,6 +13,8 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { newEventSchema } from "../schemas"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 
+const MAX_EVENT_DURATION = 1000 * 60 * 60 * 24
+
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
 )
@@ -55,6 +57,18 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   const recurrent = calculateRecurrentProperties(data)
+
+  /**
+   * Verify that the duration event is not longer than the max allowed, like 24Hrs
+   */
+  if (recurrent.duration > MAX_EVENT_DURATION) {
+    throw new RequestError(
+      `Maximum allowed duration ${(MAX_EVENT_DURATION / 3600000)}Hrs`,
+      RequestError.BadRequest,
+      { body: data }
+    )
+  }
+
   const now = new Date()
   const event_id = uuid()
   const tiles = await API.catch(Land.get().getTiles([x, y], [x, y]))

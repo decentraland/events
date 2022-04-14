@@ -481,7 +481,7 @@ export default function SubmitPage() {
                   <Divider size="tiny" />
                 </Grid.Column>
               </Grid.Row>
-              {/* TODO: since max duration is 24hrs, this needs to be rebuild or erased
+              {/* DEPRECATED // TODO: since max duration is 24hrs, this needs to be rebuild or erased
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Label style={{ cursor: "pointer" }}>
