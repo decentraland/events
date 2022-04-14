@@ -7,13 +7,12 @@ import {
   MonthMask,
   Position,
   MAX_EVENT_RECURRENT,
+  DEFAULT_EVENT_DURATION, 
+  MAX_EVENT_DURATION
 } from "../entities/Event/types"
 import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
 import { EditEvent } from "../api/Events"
 import { newEventSchema } from "../entities/Event/schemas"
-
-const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
-const MAX_EVENT_DURATION = 1000 * 60 * 60 * 24
 
 type EventEditorState = EditEvent & {
   errors: Record<string, string>
@@ -114,7 +113,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
    * @returns 
    */
   function getMaxHoursAllowedLabel() : string {
-    return MAX_EVENT_DURATION / 3600000 + "Hrs"
+    return MAX_EVENT_DURATION / Time.Hour + "Hrs"
   }
 
   function setError(key: string, description: string) {
@@ -189,7 +188,6 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
       setValues({
         start_at,
-        duration: MAX_EVENT_DURATION, // When change start date, set max duration
         recurrent_until,
         recurrent_monthday: null,
         recurrent_setpos: null,
@@ -227,8 +225,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       0,
       finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
     )
-    // Change duration only if it's a different value and if it's less or equals to the max duration allowed
-    if (duration !== event.duration && duration <= MAX_EVENT_DURATION) {
+    // Change duration only if it's a different value and if it's less or equals to the max or previous duration or previous allowed
+    if (duration !== event.duration && duration <= Math.max(event.duration, MAX_EVENT_DURATION)) {
       setValues({ duration })
     }
   }
@@ -244,8 +242,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       0,
       finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
     )
-    // Change duration only if it's a different value and if it's less or equals to the max duration allowed
-    if (duration !== event.duration && duration <= MAX_EVENT_DURATION) {
+    // Change duration only if it's a different value and if it's less or equals to the max or previous duration allowed
+    if (duration !== event.duration && duration <= Math.max(event.duration, MAX_EVENT_DURATION)) {
       setValues({ duration })
     }
   }

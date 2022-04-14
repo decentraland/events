@@ -1,4 +1,5 @@
 import { SQLStatement } from "decentraland-gatsby/dist/entities/Database/utils"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 export enum Frequency {
   YEARLY = "YEARLY",
@@ -222,3 +223,6 @@ export const adminPatchAttributes: (keyof EventAttributes)[] =
   editableAttributes.concat(["approved", "highlighted", "trending", "url"])
 
 export const SITEMAP_ITEMS_PER_PAGE = 100
+
+export const DEFAULT_EVENT_DURATION = Time.Hour
+export const MAX_EVENT_DURATION = Time.Day

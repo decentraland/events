@@ -5,15 +5,14 @@ import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { EventAttributes, DeprecatedEventAttributes } from "../types"
+import { EventAttributes, DeprecatedEventAttributes, MAX_EVENT_DURATION } from "../types"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import { notifyNewEvent } from "../../Slack/utils"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { newEventSchema } from "../schemas"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
-
-const MAX_EVENT_DURATION = 1000 * 60 * 60 * 24
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -63,7 +62,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
    */
   if (recurrent.duration > MAX_EVENT_DURATION) {
     throw new RequestError(
-      `Maximum allowed duration ${(MAX_EVENT_DURATION / 3600000)}Hrs`,
+      `Maximum allowed duration ${(MAX_EVENT_DURATION / Time.Hour)}Hrs`,
       RequestError.BadRequest,
       { body: data }
     )

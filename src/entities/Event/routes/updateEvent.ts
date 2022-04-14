@@ -9,6 +9,7 @@ import {
   patchAttributes,
   DeprecatedEventAttributes,
   EventAttributes,
+  MAX_EVENT_DURATION
 } from "../types"
 import { WithEvent } from "../middleware"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
@@ -25,8 +26,6 @@ import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { getEvent } from "./getEvent"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-
-const MAX_EVENT_DURATION = 1000 * 60 * 60 * 24
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -54,13 +53,11 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   })
 
   /**
-   * Verify that the duration event is not longer than the max allowed, like 24Hrs
-   * In case the maximum is exceeded, verify that the previous duration is not greater than the maximum allowed.
-   * This is done in order not to break the exemptions already created for more than 24hrs.
+   * Verify that the duration event is not longer than the max allowed or the previous duration
    */
-  if (updatedAttributes.duration > MAX_EVENT_DURATION && event.duration <= MAX_EVENT_DURATION) {
+  if (updatedAttributes.duration > Math.max(event.duration, MAX_EVENT_DURATION)) {
     throw new RequestError(
-      `Maximum allowed duration ${(MAX_EVENT_DURATION / 3600000)}Hrs`,
+      `Maximum allowed duration ${(MAX_EVENT_DURATION / Time.Hour)}Hrs`,
       RequestError.BadRequest,
       { body: updatedAttributes }
     )
