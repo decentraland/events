@@ -13,6 +13,7 @@ import { EditEvent } from "../api/Events"
 import { newEventSchema } from "../entities/Event/schemas"
 
 const DEFAULT_EVENT_DURATION = 1000 * 60 * 60
+const MAX_EVENT_DURATION = 1000 * 60 * 60 * 24
 
 type EventEditorState = EditEvent & {
   errors: Record<string, string>
@@ -108,6 +109,14 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     // return finish_at.toInputTime()
   }
 
+  /**
+   * Return the max duration event in hours like 24Hrs
+   * @returns 
+   */
+  function getMaxHoursAllowedLabel() : string {
+    return MAX_EVENT_DURATION / 3600000 + "Hrs"
+  }
+
   function setError(key: string, description: string) {
     setEvent((current) => {
       return {
@@ -180,6 +189,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
       setValues({
         start_at,
+        duration: MAX_EVENT_DURATION, // When change start date, set max duration
         recurrent_until,
         recurrent_monthday: null,
         recurrent_setpos: null,
@@ -217,7 +227,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       0,
       finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
     )
-    if (duration !== event.duration) {
+    // Change duration only if it's a different value and if it's less or equals to the max duration allowed
+    if (duration !== event.duration && duration <= MAX_EVENT_DURATION) {
       setValues({ duration })
     }
   }
@@ -233,7 +244,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       0,
       finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
     )
-    if (duration !== event.duration) {
+    // Change duration only if it's a different value and if it's less or equals to the max duration allowed
+    if (duration !== event.duration && duration <= MAX_EVENT_DURATION) {
       setValues({ duration })
     }
   }
@@ -617,6 +629,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     getStartTime,
     getFinishDate,
     getFinishTime,
+    getMaxHoursAllowedLabel,
     setValue,
     setValues,
     setError,
