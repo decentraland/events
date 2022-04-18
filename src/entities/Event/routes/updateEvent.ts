@@ -9,6 +9,7 @@ import {
   patchAttributes,
   DeprecatedEventAttributes,
   EventAttributes,
+  MAX_EVENT_DURATION
 } from "../types"
 import { WithEvent } from "../middleware"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
@@ -50,6 +51,17 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
+
+  /**
+   * Verify that the duration event is not longer than the max allowed or the previous duration
+   */
+  if (updatedAttributes.duration > Math.max(event.duration, MAX_EVENT_DURATION)) {
+    throw new RequestError(
+      `Maximum allowed duration ${(MAX_EVENT_DURATION / Time.Hour)}Hrs`,
+      RequestError.BadRequest,
+      { body: updatedAttributes }
+    )
+  }
 
   const userProfiles = await Catalyst.get().getProfiles([event.user])
   if (
