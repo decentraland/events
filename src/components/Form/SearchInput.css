@@ -3,7 +3,7 @@
   border: 0;
   border-radius: 5px;
   background: #f2f3f5 no-repeat 8px center;
-  background-image: url('../../images/magnify.svg');
+  background-image: url("../../images/magnify.svg");
 }
 
 .SearchInput:focus {

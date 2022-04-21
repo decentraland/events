@@ -26,7 +26,10 @@ export type NavigationProps = {
 export default function Navigation(props: NavigationProps) {
   const l = useFormatMessage()
   const location = useLocation()
-  const params = useMemo(() => new URLSearchParams(location.search), [ location.search ])
+  const params = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  )
   const [events] = useEventsContext()
   const [account] = useAuthContext()
   const hasPendingEvents = useMemo(
@@ -34,22 +37,25 @@ export default function Navigation(props: NavigationProps) {
     [events]
   )
 
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newParams = new URLSearchParams(params)
-    if (e.target.value) {
-      newParams.set('search', e.target.value)
-    } else {
-      newParams.delete('search')
-    }
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newParams = new URLSearchParams(params)
+      if (e.target.value) {
+        newParams.set("search", e.target.value)
+      } else {
+        newParams.delete("search")
+      }
 
-    let target = location.pathname
-    const search = newParams.toString()
-    if (search) {
-      target += '?' + search
-    }
+      let target = location.pathname
+      const search = newParams.toString()
+      if (search) {
+        target += "?" + search
+      }
 
-    navigate(target)
-  }, [ location.pathname, params ])
+      navigate(target)
+    },
+    [location.pathname, params]
+  )
 
   return (
     <>
@@ -69,7 +75,9 @@ export default function Navigation(props: NavigationProps) {
           )}
           {hasPendingEvents && (
             <Link href={locations.pendingEvents()}>
-              <Tabs.Tab active={props.activeTab === NavigationTab.PendingEvents}>
+              <Tabs.Tab
+                active={props.activeTab === NavigationTab.PendingEvents}
+              >
                 {l("navigation.pending_events")}
               </Tabs.Tab>
             </Link>
@@ -77,9 +85,15 @@ export default function Navigation(props: NavigationProps) {
         </div>
         <div style={{ flex: 1 }} />
         <div className={"tabs__wrapper"}>
-          {props.search && <SearchInput placeholder={l('navigation.search')} onChange={handleSearchChange} defaultValue={params.get('search') || ''} />}
+          {props.search && (
+            <SearchInput
+              placeholder={l("navigation.search")}
+              onChange={handleSearchChange}
+              defaultValue={params.get("search") || ""}
+            />
+          )}
           <SubmitButton as={Link} href={locations.submit()} />
-          </div>
+        </div>
       </Tabs>
     </>
   )

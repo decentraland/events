@@ -7,8 +7,8 @@ import {
   MonthMask,
   Position,
   MAX_EVENT_RECURRENT,
-  DEFAULT_EVENT_DURATION, 
-  MAX_EVENT_DURATION
+  DEFAULT_EVENT_DURATION,
+  MAX_EVENT_DURATION,
 } from "../entities/Event/types"
 import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
 import { EditEvent } from "../api/Events"
@@ -110,9 +110,9 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
   /**
    * Return the max duration event in hours like 24Hrs
-   * @returns 
+   * @returns
    */
-  function getMaxHoursAllowedLabel() : string {
+  function getMaxHoursAllowedLabel(): string {
     return MAX_EVENT_DURATION / Time.Hour + "Hrs"
   }
 
@@ -226,7 +226,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
     )
     // Change duration only if it's a different value and if it's less or equals to the max or previous duration or previous allowed
-    if (duration !== event.duration && duration <= Math.max(event.duration, MAX_EVENT_DURATION)) {
+    if (
+      duration !== event.duration &&
+      duration <= Math.max(event.duration, MAX_EVENT_DURATION)
+    ) {
       setValues({ duration })
     }
   }
@@ -243,7 +246,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       finish_date.getTime() + finish_time.getTime() - event.start_at.getTime()
     )
     // Change duration only if it's a different value and if it's less or equals to the max or previous duration allowed
-    if (duration !== event.duration && duration <= Math.max(event.duration, MAX_EVENT_DURATION)) {
+    if (
+      duration !== event.duration &&
+      duration <= Math.max(event.duration, MAX_EVENT_DURATION)
+    ) {
       setValues({ duration })
     }
   }

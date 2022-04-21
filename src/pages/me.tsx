@@ -31,13 +31,16 @@ import useListEventsFiltered from "../hooks/useListEventsFiltered"
 export default function MyEventsPage() {
   const l = useFormatMessage()
   const location = useLocation()
-  const params = useMemo(() => new URLSearchParams(location.search), [location.search])
+  const params = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  )
   // const events = useListEvents(siteStore.events.getState().data)
   const [account, accountState] = useAuthContext()
   const [eventList, eventsState] = useEventsContext()
   const events = useEventSorter(eventList)
   const [event] = useEventIdContext(params.get("event"))
-  const filteredEvents = useListEventsFiltered(events, params.get('search'))
+  const filteredEvents = useListEventsFiltered(events, params.get("search"))
   const myEvents = useMemo(
     () => filteredEvents.filter((event) => event.owned),
     [filteredEvents]
@@ -48,7 +51,7 @@ export default function MyEventsPage() {
   )
   const [enabledNotification, setEnabledNotification] = useState(false)
   const loading = accountState.loading || eventsState.loading
-  const searching = !!params.get('search')
+  const searching = !!params.get("search")
 
   return (
     <>
@@ -127,19 +130,21 @@ export default function MyEventsPage() {
             {!loading && attendingEvents.length === 0 && (
               <div style={{ textAlign: "center" }}>
                 <Divider size="mini" />
-                {!searching && <Paragraph secondary>
-                  You are not attending to any event, find some{" "}
-                  <Link
-                    href={locations.events()}
-                    onClick={prevent(() => navigate(locations.events()))}
-                  >
-                    amazing event
-                  </Link>
-                  .
-                </Paragraph>}
-                {searching && <Paragraph secondary>
-                  {l('page.events.not_found')}
-                </Paragraph>}
+                {!searching && (
+                  <Paragraph secondary>
+                    You are not attending to any event, find some{" "}
+                    <Link
+                      href={locations.events()}
+                      onClick={prevent(() => navigate(locations.events()))}
+                    >
+                      amazing event
+                    </Link>
+                    .
+                  </Paragraph>
+                )}
+                {searching && (
+                  <Paragraph secondary>{l("page.events.not_found")}</Paragraph>
+                )}
                 <Divider size="mini" />
               </div>
             )}
@@ -171,20 +176,22 @@ export default function MyEventsPage() {
             {!loading && myEvents.length === 0 && (
               <div style={{ textAlign: "center" }}>
                 <Divider size="tiny" />
-                {!searching && <Paragraph secondary>
-                  You are not hosting any events, try to propose a{" "}
-                  <Link
-                    href={locations.submit()}
-                    onClick={prevent(() => navigate(locations.submit()))}
-                  >
-                    new event
-                  </Link>
-                  .
-                </Paragraph>}
+                {!searching && (
+                  <Paragraph secondary>
+                    You are not hosting any events, try to propose a{" "}
+                    <Link
+                      href={locations.submit()}
+                      onClick={prevent(() => navigate(locations.submit()))}
+                    >
+                      new event
+                    </Link>
+                    .
+                  </Paragraph>
+                )}
 
-                {searching && <Paragraph secondary>
-                  {l('page.events.not_found')}
-                </Paragraph>}
+                {searching && (
+                  <Paragraph secondary>{l("page.events.not_found")}</Paragraph>
+                )}
                 <Divider size="tiny" />
               </div>
             )}

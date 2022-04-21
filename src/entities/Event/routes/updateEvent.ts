@@ -9,7 +9,7 @@ import {
   patchAttributes,
   DeprecatedEventAttributes,
   EventAttributes,
-  MAX_EVENT_DURATION
+  MAX_EVENT_DURATION,
 } from "../types"
 import { WithEvent } from "../middleware"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
@@ -55,9 +55,11 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   /**
    * Verify that the duration event is not longer than the max allowed or the previous duration
    */
-  if (updatedAttributes.duration > Math.max(event.duration, MAX_EVENT_DURATION)) {
+  if (
+    updatedAttributes.duration > Math.max(event.duration, MAX_EVENT_DURATION)
+  ) {
     throw new RequestError(
-      `Maximum allowed duration ${(MAX_EVENT_DURATION / Time.Hour)}Hrs`,
+      `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
       RequestError.BadRequest,
       { body: updatedAttributes }
     )
@@ -110,7 +112,6 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.highlighted = false
     updatedAttributes.trending = false
   }
-
 
   const updatedEvent = {
     ...event,

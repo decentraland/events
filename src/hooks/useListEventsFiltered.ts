@@ -14,23 +14,19 @@ export default function useListEventsFiltered(
       return events
     }
 
-    const matches = search
-      .toLowerCase()
-      .split(/\W+/gi)
+    const matches = search.toLowerCase().split(/\W+/gi)
 
-    return events
-      .filter((event) => {
-        const name = event.name.toLowerCase()
-        const description = event.description.toLowerCase()
+    return events.filter((event) => {
+      const name = event.name.toLowerCase()
+      const description = event.description.toLowerCase()
 
-        return matches.every(match => {
-          if (!match) {
-            return true
-          }
+      return matches.every((match) => {
+        if (!match) {
+          return true
+        }
 
-          return name.includes(match) || description.includes(match)
-        })
+        return name.includes(match) || description.includes(match)
       })
-
+    })
   }, [events, search])
 }

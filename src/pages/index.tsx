@@ -5,6 +5,7 @@ import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
+import { ToggleBox } from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
@@ -35,6 +36,8 @@ import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import useListEventsMain from "../hooks/useListEventsMain"
 import useListEventsTrending from "../hooks/useListEventsTrending"
 import "./index.css"
+import { Column } from "../components/Layout/Column/Column"
+import { Row } from "../components/Layout/Row/Row"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -44,14 +47,17 @@ export default function IndexPage() {
   const l = useFormatMessage()
   const [, accountState] = useAuthContext()
   const location = useLocation()
-  const params = useMemo(() => new URLSearchParams(location.search), [location.search])
+  const params = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  )
   const [event] = useEventIdContext(params.get("event"))
   const [settings] = useProfileSettingsContext()
   const [all, state] = useEventsContext()
   const events = useEventSorter(all)
   const loading = accountState.loading || state.loading
-  const searching = !!params.get('search')
-  const filteredEvents = useListEventsFiltered(events, params.get('search'))
+  const searching = !!params.get("search")
+  const filteredEvents = useListEventsFiltered(events, params.get("search"))
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const trendingEvents = useListEventsTrending(filteredEvents)
   const mainEvents = useListEventsMain(events)
@@ -122,7 +128,7 @@ export default function IndexPage() {
           <div>
             <Divider />
             <Paragraph secondary style={{ textAlign: "center" }}>
-              {l('page.events.no_events')}
+              {l("page.events.no_events")}
             </Paragraph>
             <Divider />
           </div>
@@ -132,7 +138,7 @@ export default function IndexPage() {
           <div>
             <Divider />
             <Paragraph secondary style={{ textAlign: "center" }}>
-              {l('page.events.not_found')}
+              {l("page.events.not_found")}
             </Paragraph>
             <Divider />
           </div>
@@ -210,28 +216,57 @@ export default function IndexPage() {
           </>
         )}
 
-        {!loading &&
-          eventsByMonth.length > 0 &&
-          eventsByMonth.map(([date, events]) => (
-            <Fragment key={"month:" + date.toJSON()}>
-              <div className="GroupTitle">
-                <SubTitle>
-                  {Time.from(date, { utc: !settings?.use_local_time }).format(
-                    "MMMM"
-                  )}
-                </SubTitle>
-              </div>
-              <Card.Group>
-                {events.map((event) => (
-                  <EventCard
-                    key={"event:" + event.id}
-                    event={event}
-                    onClick={handleEventClick}
-                  />
+        {!loading && (
+          <Row>
+            {true && (
+              <Column align="left" className="sidebar">
+                <ToggleBox
+                  header="Type"
+                  items={[
+                    {
+                      title: "All events",
+                      description: "Every event in Decentraland",
+                      active: true,
+                    },
+                    {
+                      title: "One time event",
+                      description: "Events which happen once",
+                      active: false,
+                    },
+                    {
+                      title: "Recurring event",
+                      description: "Events which happen on more than one day",
+                      active: false,
+                    },
+                  ]}
+                />
+              </Column>
+            )}
+            <Column align="right" grow={true}>
+              {eventsByMonth.length > 0 &&
+                eventsByMonth.map(([date, events]) => (
+                  <Fragment key={"month:" + date.toJSON()}>
+                    <div className="GroupTitle">
+                      <SubTitle>
+                        {Time.from(date, {
+                          utc: !settings?.use_local_time,
+                        }).format("MMMM")}
+                      </SubTitle>
+                    </div>
+                    <Card.Group>
+                      {events.map((event) => (
+                        <EventCard
+                          key={"event:" + event.id}
+                          event={event}
+                          onClick={handleEventClick}
+                        />
+                      ))}
+                    </Card.Group>
+                  </Fragment>
                 ))}
-              </Card.Group>
-            </Fragment>
-          ))}
+            </Column>
+          </Row>
+        )}
       </Container>
     </>
   )

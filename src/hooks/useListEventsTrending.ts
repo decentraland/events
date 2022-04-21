@@ -5,7 +5,7 @@ export default function useListEventsTrending(
   events?: SessionEventAttributes[] | null
 ) {
   return useMemo(
-    () => events ? events.filter((event) => !!event.trending) : [],
+    () => (events ? events.filter((event) => !!event.trending) : []),
     [events]
   )
 }
