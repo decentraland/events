@@ -40,7 +40,9 @@ export default function MyEventsPage() {
   const [eventList, eventsState] = useEventsContext()
   const events = useEventSorter(eventList)
   const [event] = useEventIdContext(params.get("event"))
-  const filteredEvents = useListEventsFiltered(events, params.get("search"))
+  const filteredEvents = useListEventsFiltered(events, {
+    search: params.get("search"),
+  })
   const myEvents = useMemo(
     () => filteredEvents.filter((event) => event.owned),
     [filteredEvents]

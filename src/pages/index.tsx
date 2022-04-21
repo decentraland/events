@@ -5,7 +5,10 @@ import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
-import { ToggleBox } from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
+import {
+  ToggleBox,
+  ToggleBoxItem,
+} from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
@@ -31,7 +34,10 @@ import {
 } from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import { SessionEventAttributes } from "../entities/Event/types"
+import {
+  SessionEventAttributes,
+  toggleItemsValue,
+} from "../entities/Event/types"
 import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import useListEventsMain from "../hooks/useListEventsMain"
 import useListEventsTrending from "../hooks/useListEventsTrending"
@@ -57,10 +63,66 @@ export default function IndexPage() {
   const events = useEventSorter(all)
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
-  const filteredEvents = useListEventsFiltered(events, params.get("search"))
+
+  // Get type from url params or use all as default
+  const typeParam = params.get("type")
+    ? Object.values(toggleItemsValue).find((t) => t === params.get("type"))
+    : toggleItemsValue.all
+
+  const filteredEvents = useListEventsFiltered(events, {
+    search: params.get("search"),
+    type: typeParam,
+  })
+
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const trendingEvents = useListEventsTrending(filteredEvents)
   const mainEvents = useListEventsMain(events)
+
+  const [typeFilter, setTypeFilter] = useState<toggleItemsValue>(
+    typeParam || toggleItemsValue.all
+  )
+
+  // Items to be used in the toggle
+  const toggleItems = [
+    {
+      title: "All events",
+      description: "Every event in Decentraland",
+      active: !typeFilter || typeFilter === toggleItemsValue.all,
+      value: toggleItemsValue.all,
+    },
+    {
+      title: "One time event",
+      description: "Events which happen once",
+      active: typeFilter === toggleItemsValue.one,
+      value: toggleItemsValue.one,
+    },
+    {
+      title: "Recurring event",
+      description: "Events which happen on more than one day",
+      active: typeFilter === toggleItemsValue.recurrent,
+      value: toggleItemsValue.recurrent,
+    },
+  ]
+
+  const handleTypeChange = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
+      const newParams = new URLSearchParams(params)
+
+      // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
+      newParams.set("type", (item as any).value)
+      setTypeFilter((item as any).value)
+
+      let target = location.pathname
+      const searchParams = newParams.toString()
+
+      if (searchParams) {
+        target += "?" + searchParams
+      }
+
+      navigate(target)
+    },
+    [location.pathname, params, setTypeFilter]
+  )
 
   const [enabledNotification, setEnabledNotification] = useState(false)
   const handleEventClick = useCallback(
@@ -222,23 +284,8 @@ export default function IndexPage() {
               <Column align="left" className="sidebar">
                 <ToggleBox
                   header="Type"
-                  items={[
-                    {
-                      title: "All events",
-                      description: "Every event in Decentraland",
-                      active: true,
-                    },
-                    {
-                      title: "One time event",
-                      description: "Events which happen once",
-                      active: false,
-                    },
-                    {
-                      title: "Recurring event",
-                      description: "Events which happen on more than one day",
-                      active: false,
-                    },
-                  ]}
+                  onClick={handleTypeChange}
+                  items={toggleItems}
                 />
               </Column>
             )}
