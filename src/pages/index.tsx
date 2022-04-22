@@ -1,4 +1,10 @@
-import React, { useMemo, useState, Fragment, useCallback } from "react"
+import React, {
+  useMemo,
+  useState,
+  Fragment,
+  useCallback,
+  useEffect,
+} from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -15,6 +21,7 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
@@ -36,7 +43,7 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
   SessionEventAttributes,
-  toggleItemsValue,
+  ToggleItemsValue,
 } from "../entities/Event/types"
 import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import useListEventsMain from "../hooks/useListEventsMain"
@@ -44,6 +51,10 @@ import useListEventsTrending from "../hooks/useListEventsTrending"
 import "./index.css"
 import { Column } from "../components/Layout/Column/Column"
 import { Row } from "../components/Layout/Row/Row"
+import { FeatureFlags } from "../modules/features"
+import { getEventType } from "../entities/Event/utils"
+import track from "decentraland-gatsby/dist/utils/development/segment"
+import { SegmentEvent } from "../modules/segment"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -61,48 +72,45 @@ export default function IndexPage() {
   const [settings] = useProfileSettingsContext()
   const [all, state] = useEventsContext()
   const events = useEventSorter(all)
+  const [ff] = useFeatureFlagContext()
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
-
-  // Get type from url params or use all as default
-  const typeParam = params.get("type")
-    ? Object.values(toggleItemsValue).find((t) => t === params.get("type"))
-    : toggleItemsValue.all
+  const typeFilter = getEventType(params.get("type"))
+  const [address, actions] = useAuthContext()
 
   const filteredEvents = useListEventsFiltered(events, {
     search: params.get("search"),
-    type: typeParam,
+    type: typeFilter,
   })
 
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const trendingEvents = useListEventsTrending(filteredEvents)
   const mainEvents = useListEventsMain(events)
 
-  const [typeFilter, setTypeFilter] = useState<toggleItemsValue>(
-    typeParam || toggleItemsValue.all
-  )
-
   // Items to be used in the toggle
-  const toggleItems = [
-    {
-      title: "All events",
-      description: "Every event in Decentraland",
-      active: !typeFilter || typeFilter === toggleItemsValue.all,
-      value: toggleItemsValue.all,
-    },
-    {
-      title: "One time event",
-      description: "Events which happen once",
-      active: typeFilter === toggleItemsValue.one,
-      value: toggleItemsValue.one,
-    },
-    {
-      title: "Recurring event",
-      description: "Events which happen on more than one day",
-      active: typeFilter === toggleItemsValue.recurrent,
-      value: toggleItemsValue.recurrent,
-    },
-  ]
+  const toggleItems = useMemo(
+    () => [
+      {
+        title: "All events",
+        description: "Every event in Decentraland",
+        active: typeFilter === ToggleItemsValue.All,
+        value: ToggleItemsValue.All,
+      },
+      {
+        title: "One time event",
+        description: "Events which happen once",
+        active: typeFilter === ToggleItemsValue.One,
+        value: ToggleItemsValue.One,
+      },
+      {
+        title: "Recurring event",
+        description: "Events which happen on more than one day",
+        active: typeFilter === ToggleItemsValue.Recurrent,
+        value: ToggleItemsValue.Recurrent,
+      },
+    ],
+    [typeFilter]
+  )
 
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
@@ -110,7 +118,14 @@ export default function IndexPage() {
 
       // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
       newParams.set("type", (item as any).value)
-      setTypeFilter((item as any).value)
+
+      track((analytics) =>
+        analytics.track(SegmentEvent.Filter, {
+          ethAddress: address,
+          featureFlag: ff.flags,
+          type: (item as any).value,
+        })
+      )
 
       let target = location.pathname
       const searchParams = newParams.toString()
@@ -121,7 +136,7 @@ export default function IndexPage() {
 
       navigate(target)
     },
-    [location.pathname, params, setTypeFilter]
+    [location.pathname, params]
   )
 
   const [enabledNotification, setEnabledNotification] = useState(false)
@@ -280,7 +295,7 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {true && (
+            {ff.flags && ff.flags[FeatureFlags.FilterType] && (
               <Column align="left" className="sidebar">
                 <ToggleBox
                   header="Type"

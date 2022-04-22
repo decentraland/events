@@ -1,6 +1,6 @@
 import {
   SessionEventAttributes,
-  toggleItemsValue,
+  ToggleItemsValue,
 } from "../entities/Event/types"
 import { useMemo } from "react"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -9,7 +9,7 @@ export default function useListEventsFiltered(
   events?: SessionEventAttributes[] | null,
   filter?: {
     search?: string | null
-    type?: toggleItemsValue | null
+    type?: ToggleItemsValue | null
   }
 ) {
   return useMemo(() => {
@@ -38,11 +38,11 @@ export default function useListEventsFiltered(
       })
     }
 
-    if (filter.type && filter.type !== toggleItemsValue.all) {
+    if (filter.type && filter.type !== ToggleItemsValue.All) {
       const type = filter.type
 
       events = events.filter((event) => {
-        if (type === toggleItemsValue.one) {
+        if (type === ToggleItemsValue.One) {
           return event.duration <= Time.Day
         } else {
           return event.duration > Time.Day || event.recurrent

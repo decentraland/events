@@ -11,6 +11,10 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import SearchInput from "../Form/SearchInput"
 import { useLocation } from "@gatsbyjs/reach-router"
 import "./Navigation.css"
+import track from "decentraland-gatsby/dist/utils/development/segment"
+import { SegmentEvent } from "../../modules/segment"
+import debounce from "decentraland-gatsby/dist/utils/function/debounce"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export enum NavigationTab {
   Events = "events",
@@ -36,12 +40,27 @@ export default function Navigation(props: NavigationProps) {
     () => events.some((event) => !event.approved && !event.rejected),
     [events]
   )
+  const [ff] = useFeatureFlagContext()
+
+  const trackFunction = useCallback(
+    debounce((search: string) => {
+      track((analytics) =>
+        analytics.track(SegmentEvent.Filter, {
+          ethAddress: account,
+          featureFlag: ff.flags,
+          search: search,
+        })
+      )
+    }, 500),
+    [account, ff.flags]
+  )
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newParams = new URLSearchParams(params)
       if (e.target.value) {
         newParams.set("search", e.target.value)
+        trackFunction(e.target.value)
       } else {
         newParams.delete("search")
       }
@@ -54,7 +73,7 @@ export default function Navigation(props: NavigationProps) {
 
       navigate(target)
     },
-    [location.pathname, params]
+    [location.pathname, params, trackFunction]
   )
 
   return (
