@@ -17,7 +17,7 @@ import "./src/theme.css"
 // import { RawIntlProvider, createIntl } from 'react-intl'
 import { navigate, IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
-// import FeatureFlagProvider from 'decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider'
+import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
 import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
 import UserMenu from "decentraland-gatsby/dist/components/User/UserMenu"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
@@ -34,9 +34,9 @@ export const wrapRootElement = ({ element }) => (
     <AuthProvider>
       <ProfileSettings>
         <Events>
-          {/* <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json"> */}
-          {element}
-          {/* </FeatureFlagProvider> */}
+          <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
+            {element}
+          </FeatureFlagProvider>
         </Events>
       </ProfileSettings>
     </AuthProvider>

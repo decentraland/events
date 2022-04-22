@@ -60,7 +60,12 @@ export default function DocsPage() {
           path="/api/events/{event_id}/attendees"
           description="Create an intention to attend ot a event"
         >
-          <ApiDetails title="Request" cors="*" authorization params={getEventParamsSchema} />
+          <ApiDetails
+            title="Request"
+            cors="*"
+            authorization
+            params={getEventParamsSchema}
+          />
           <ApiDetails
             title="Response"
             cors="*"
@@ -73,7 +78,12 @@ export default function DocsPage() {
           path="/api/events/{event_id}/attendees"
           description="Remove your intention to attend ot a event"
         >
-          <ApiDetails title="Request" cors="*" authorization params={getEventParamsSchema} />
+          <ApiDetails
+            title="Request"
+            cors="*"
+            authorization
+            params={getEventParamsSchema}
+          />
           <ApiDetails
             title="Response"
             cors="*"

@@ -540,7 +540,12 @@ export default function SubmitPage() {
                     name="finish_date"
                     type="date"
                     error={!!errors["finish_at"] || !!errors["finish_date"]}
-                    message={errors["finish_at"] || errors["finish_date"] || "Maximum allowed duration " + editActions.getMaxHoursAllowedLabel() }
+                    message={
+                      errors["finish_at"] ||
+                      errors["finish_date"] ||
+                      "Maximum allowed duration " +
+                        editActions.getMaxHoursAllowedLabel()
+                    }
                     value={editActions.getFinishDate()}
                     min={editActions.getStartDate()}
                     onChange={editActions.handleChange}

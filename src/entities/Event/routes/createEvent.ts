@@ -5,7 +5,11 @@ import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { EventAttributes, DeprecatedEventAttributes, MAX_EVENT_DURATION } from "../types"
+import {
+  EventAttributes,
+  DeprecatedEventAttributes,
+  MAX_EVENT_DURATION,
+} from "../types"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import { notifyNewEvent } from "../../Slack/utils"
 import API from "decentraland-gatsby/dist/utils/api/API"
@@ -62,7 +66,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
    */
   if (recurrent.duration > MAX_EVENT_DURATION) {
     throw new RequestError(
-      `Maximum allowed duration ${(MAX_EVENT_DURATION / Time.Hour)}Hrs`,
+      `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
       RequestError.BadRequest,
       { body: data }
     )
@@ -107,7 +111,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     total_attendees: 0,
     latest_attendees: [],
     created_at: now,
-    textsearch: null
+    textsearch: null,
   }
 
   event.textsearch = EventModel.textsearch(event)
