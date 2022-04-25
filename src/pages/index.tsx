@@ -150,7 +150,7 @@ export default function IndexPage() {
   )
 
   const cardItemsPerRow = useMemo(
-    () => ff.flags && Object.values(ff.flags).find(Boolean) ? 2 : 3,
+    () => (ff.flags && Object.values(ff.flags).find(Boolean) ? 2 : 3),
     [ff.flags]
   )
 
@@ -300,17 +300,17 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {ff.flags && ff.flags[FeatureFlags.FilterType] && 
+            {ff.flags && ff.flags[FeatureFlags.FilterType] && (
               <Column align="left" className="sidebar">
-                {ff.flags[FeatureFlags.FilterType] && 
+                {ff.flags[FeatureFlags.FilterType] && (
                   <ToggleBox
                     header="Type"
                     onClick={handleTypeChange}
                     items={toggleItems}
                   />
-                }
+                )}
               </Column>
-            }
+            )}
             <Column align="right" grow={true}>
               {eventsByMonth.length > 0 &&
                 eventsByMonth.map(([date, events]) => (
