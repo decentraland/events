@@ -58,27 +58,6 @@
   width: calc(100% - 256px);
 }
 
-@media only screen and (max-width: 991px) {
-  .LayoutMainContainer .ui.cards > .ui.card {
-    width: 100%;
-    margin-right: 0px;
-  }
-}
-
-@media only screen and (min-width: 992px) {
-  .LayoutMainContainer .ui.cards > .ui.card {
-    width: calc(50% - 32px);
-  }
-  .ui.cards > .ui.card:nth-child(2n) {
-    margin-right: 0px;
-  }
-  .ui.cards > .ui.card:nth-child(3n) {
-    margin-right: 25px;
-    margin-bottom: 24px;
-    margin-top: 0px;
-  }
-}
-
 @media only screen and (max-width: 768px) {
   .ui.container .Row .left.Column.sidebar {
     display: none;
@@ -86,5 +65,9 @@
 
   .ui.container .Row .right.Column {
     width: 100%;
+  }
+  .ui.container .Row .right.Column .ui.cards>.ui.card {
+    width: 100%;
+    margin-right: 15px;
   }
 }

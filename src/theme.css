@@ -20,3 +20,25 @@ body {
     background-position-x: -200%;
   }
 }
+
+.ui.one.cards>.ui.card {
+  width: 100%;
+  margin-right: 0px;
+}
+
+.ui.two.cards>.ui.card {
+  margin-left: 1em;
+  margin-right: 1em;
+  width: calc(50% - 2em);
+}
+
+.ui.three.cards>.ui.card {
+  margin-left: 1em;
+  margin-right: 1em;
+  width: calc(33.33333% - 2em);
+}
+
+.ui.two.cards>.ui.card:nth-child(2n), 
+.LayoutMainContainer .ui.cards>.ui.card:nth-child(3n) {
+  margin-right: 1em;
+}
