@@ -15,9 +15,10 @@
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
     "aws-sdk": "^2.1002.0",
+    "babel-jest": "^27.5.1",
     "core-js": "^3.19.1",
     "cssnano": "^5.0.10",
-    "decentraland-gatsby": "^5.2.2",
+    "decentraland-gatsby": "^5.7.0",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.1.2",
@@ -43,6 +44,7 @@
     "react-helmet": "^5.2.1",
     "rrule": "^2.6.8",
     "sharp": "^0.29.3",
+    "ts-jest": "^27.1.4",
     "uuid": "^7.0.3",
     "web-push": "^3.4.5",
     "xml": "^1.0.1"
@@ -53,6 +55,7 @@
     "@types/express-fileupload": "^1.1.7",
     "@types/html-escaper": "^3.0.0",
     "@types/isomorphic-fetch": "0.0.35",
+    "@types/jest": "^27.4.1",
     "@types/node": "^13.9.1",
     "@types/react": "^17.0.34",
     "@types/react-helmet": "^5.0.15",
@@ -63,10 +66,11 @@
     "decentraland-gatsby-deploy": "^1.12.1",
     "devcert": "^1.1.2",
     "dotenv": "^8.6.0",
+    "jest": "^27.5.1",
     "nodemon": "^2.0.15",
     "prettier": "^2.4.1",
     "ts-node": "^10.4.0",
-    "typescript": "^4.4.4",
+    "typescript": "^4.6.3",
     "workbox-cli": "^6.5.2"
   },
   "keywords": [
@@ -74,7 +78,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:server && build:sw && npm run build:front",
+    "build": "npm run build:server && npm run build:sw && npm run build:front",
     "build:server": "tsc -p .",
     "build:front": "gatsby build",
     "build:sw": "workbox generateSW workbox-config.js",
@@ -85,7 +89,7 @@
     "clean": "gatsby clean",
     "migrate": "./node_modules/.bin/node-pg-migrate --envPath ./.env.development --tsconfig ./tsconfig.json -j ts -m ./src/migrations -d CONNECTION_STRING",
     "production": "./node_modules/.bin/node-pg-migrate -m lib/migrations -d CONNECTION_STRING up && NODE_ENV=production node lib/server.js",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

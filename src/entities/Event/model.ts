@@ -9,7 +9,7 @@ import {
   createSearchableMatches,
   columns,
   objectValues,
-  tsquery
+  tsquery,
 } from "decentraland-gatsby/dist/entities/Database/utils"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
@@ -31,29 +31,40 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
   static textsearch(event: DeprecatedEventAttributes) {
     // return null
-    return SQL`(${join([
-      SQL`setweight(to_tsvector(${event.name}), 'A')`,
-      SQL`setweight(to_tsvector(${event.user_name || ''}), 'B')`,
-      SQL`setweight(to_tsvector(${event.estate_name || ''}), 'B')`,
-      SQL`setweight(to_tsvector(${createSearchableMatches(event.description || '')}), 'C')`,
-    ], SQL` || `)})`
+    return SQL`(${join(
+      [
+        SQL`setweight(to_tsvector(${event.name}), 'A')`,
+        SQL`setweight(to_tsvector(${event.user_name || ""}), 'B')`,
+        SQL`setweight(to_tsvector(${event.estate_name || ""}), 'B')`,
+        SQL`setweight(to_tsvector(${createSearchableMatches(
+          event.description || ""
+        )}), 'C')`,
+      ],
+      SQL` || `
+    )})`
   }
 
   static create<U extends QueryPart = any>(event: U): Promise<U> {
-    const keys = Object.keys(event)
-      .map(key => key.replace(/\W/gi, ''))
+    const keys = Object.keys(event).map((key) => key.replace(/\W/gi, ""))
 
     const sql = SQL`
       INSERT INTO ${table(this)} ${columns(keys)}
-      VALUES ${objectValues(keys, [ event ])}
+      VALUES ${objectValues(keys, [event])}
     `
 
     return this.query(sql) as any
   }
 
-  static update<U extends QueryPart = any, P extends QueryPart = any>(changes: Partial<U>, conditions: Partial<P>): Promise<U> {
-    const changesKeys = Object.keys(changes).map(key => key.replace(/\W/gi, ''))
-    const conditionsKeys = Object.keys(conditions).map(key => key.replace(/\W/gi, ''))
+  static update<U extends QueryPart = any, P extends QueryPart = any>(
+    changes: Partial<U>,
+    conditions: Partial<P>
+  ): Promise<U> {
+    const changesKeys = Object.keys(changes).map((key) =>
+      key.replace(/\W/gi, "")
+    )
+    const conditionsKeys = Object.keys(conditions).map((key) =>
+      key.replace(/\W/gi, "")
+    )
     if (changesKeys.length === 0) {
       throw new Error(`Missing update changes`)
     }
@@ -65,9 +76,17 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     const sql = SQL`
       UPDATE ${table(this)}
       SET
-        ${join(changesKeys.map(key => SQL`"${SQL.raw(key)}" = ${changes[key]}`), SQL`,`)}
+        ${join(
+          changesKeys.map((key) => SQL`"${SQL.raw(key)}" = ${changes[key]}`),
+          SQL`,`
+        )}
       WHERE
-        ${join(conditionsKeys.map(key => SQL`"${SQL.raw(key)}" = ${conditions[key]}`), SQL`,`)}
+        ${join(
+          conditionsKeys.map(
+            (key) => SQL`"${SQL.raw(key)}" = ${conditions[key]}`
+          ),
+          SQL`,`
+        )}
     `
 
     return this.query(sql) as any
@@ -122,7 +141,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       next_start_at,
       scene_name: event.estate_name,
       coordinates: [event.x, event.y],
-      textsearch: undefined
+      textsearch: undefined,
     }
   }
 
@@ -180,15 +199,15 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
     // return []
-    let orderBy = 'e.next_finish_at'
-    let orderDirection = 'ASC'
+    let orderBy = "e.next_finish_at"
+    let orderDirection = "ASC"
     if (options.search) {
       orderBy = '"rank"'
-      orderDirection = 'DESC'
+      orderDirection = "DESC"
     }
 
     if (options.order) {
-      orderDirection = options.order === 'asc' ? 'ASC' : 'DESC'
+      orderDirection = options.order === "asc" ? "ASC" : "DESC"
     }
 
     const query = SQL`
@@ -203,7 +222,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
             EventAttendee
           )} a on e.id = a.event_id AND lower(a.user) = ${options.user}`
         )}
-          ${conditional(!!options.search, SQL`, ts_rank_cd(e.textsearch, to_tsquery(${tsquery(options.search || '')})) AS "rank"`)}
+          ${conditional(
+            !!options.search,
+            SQL`, ts_rank_cd(e.textsearch, to_tsquery(${tsquery(
+              options.search || ""
+            )})) AS "rank"`
+          )}
       WHERE
         e.rejected IS FALSE
         ${conditional(options.list === EventListType.All, SQL``)}
@@ -219,10 +243,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           options.list === EventListType.Upcoming,
           SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
         )}
-        ${conditional(
-          !!options.search,
-          SQL`AND "rank" > 0`
-        )}
+        ${conditional(!!options.search, SQL`AND "rank" > 0`)}
         ${conditional(
           !!options.creator,
           SQL`AND lower(e.user) = ${options.creator}`

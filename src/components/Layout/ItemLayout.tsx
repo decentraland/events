@@ -9,7 +9,9 @@ type ItemLayoutState = {
   children?: React.ReactNode
 }
 
-function handleBack() { back() }
+function handleBack() {
+  back()
+}
 
 export default function ItemLayout(props: ItemLayoutState) {
   return (

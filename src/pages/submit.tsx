@@ -481,6 +481,7 @@ export default function SubmitPage() {
                   <Divider size="tiny" />
                 </Grid.Column>
               </Grid.Row>
+              {/* DEPRECATED // TODO: since max duration is 24hrs, this needs to be rebuild or erased
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Label style={{ cursor: "pointer" }}>
@@ -499,7 +500,7 @@ export default function SubmitPage() {
                     />
                   </Label>
                 </Grid.Column>
-              </Grid.Row>
+                    </Grid.Row>*/}
               <Grid.Row>
                 <Grid.Column mobile="8">
                   <Field
@@ -539,7 +540,12 @@ export default function SubmitPage() {
                     name="finish_date"
                     type="date"
                     error={!!errors["finish_at"] || !!errors["finish_date"]}
-                    message={errors["finish_at"] || errors["finish_date"]}
+                    message={
+                      errors["finish_at"] ||
+                      errors["finish_date"] ||
+                      "Maximum allowed duration " +
+                        editActions.getMaxHoursAllowedLabel()
+                    }
                     value={editActions.getFinishDate()}
                     min={editActions.getStartDate()}
                     onChange={editActions.handleChange}
@@ -563,6 +569,9 @@ export default function SubmitPage() {
                     <Paragraph className="FieldNote">UTC</Paragraph>
                   </Grid.Column>
                 )}
+                <Grid.Column mobile="16">
+                  <Divider size="mini" />
+                </Grid.Column>
                 <Grid.Column mobile="8">
                   <SelectField
                     label="Repeat"

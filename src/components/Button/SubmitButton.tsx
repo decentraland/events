@@ -18,20 +18,7 @@ export default function SubmitButton(props: ButtonProps) {
       className={TokenList.join(["SubmitButton", props.className])}
     >
       {props.children}
-      {!props.children && (
-        <img
-          src={invertedAddIcon}
-          width="16"
-          height="16"
-          style={{
-            width: "13px",
-            height: "auto",
-            verticalAlign: "text-bottom",
-            marginRight: ".5rem",
-            marginBottom: '1px'
-          }}
-        />
-      )}
+      {!props.children && <img src={invertedAddIcon} width="16" height="16" />}
       {!props.children && l("navigation.submit_events")}
     </Button>
   )

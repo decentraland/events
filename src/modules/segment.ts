@@ -17,4 +17,5 @@ export enum SegmentEvent {
   AddToCalendar = "Add To Calendar",
   JumpIn = "Jump In",
   Error = "Error",
+  Filter = "Filter",
 }

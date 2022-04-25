@@ -8,6 +8,7 @@ import {
   Position,
   RecurrentEventAttributes,
   MAX_EVENT_RECURRENT,
+  ToggleItemsValue,
 } from "./types"
 import { RRule, Weekday } from "rrule"
 
@@ -276,4 +277,17 @@ export function calculateRecurrentProperties(
   }
 
   return recurrent
+}
+
+export function getEventType(type: string | null) {
+  switch (type) {
+    case ToggleItemsValue.One:
+      return ToggleItemsValue.One
+
+    case ToggleItemsValue.Recurrent:
+      return ToggleItemsValue.Recurrent
+
+    default:
+      return ToggleItemsValue.All
+  }
 }
