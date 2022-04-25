@@ -150,7 +150,7 @@ export default function IndexPage() {
   )
 
   const cardItemsPerRow = useMemo(
-    () => ff.flags && Object.values(ff.flags).find((flag) => flag) ? 2 : 3,
+    () => ff.flags && Object.values(ff.flags).find(Boolean) ? 2 : 3,
     [ff.flags]
   )
 
@@ -300,7 +300,7 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {ff.flags && Object.values(ff.flags).find((flag) => flag) && 
+            {ff.flags && ff.flags[FeatureFlags.FilterType] && 
               <Column align="left" className="sidebar">
                 {ff.flags[FeatureFlags.FilterType] && 
                   <ToggleBox
