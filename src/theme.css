@@ -20,3 +20,19 @@ body {
     background-position-x: -200%;
   }
 }
+
+.ui.one.cards>.ui.card {
+  width: 100%;
+}
+
+.ui.two.cards>.ui.card {
+  margin-left: 1em;
+  margin-right: 1em;
+  width: calc(50% - 2em);
+}
+
+.ui.three.cards>.ui.card {
+  margin-left: 1em;
+  margin-right: 1em;
+  width: calc(33.33333% - 2em);
+}

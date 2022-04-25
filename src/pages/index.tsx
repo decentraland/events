@@ -149,6 +149,11 @@ export default function IndexPage() {
     []
   )
 
+  const cardItemsPerRow = useMemo(
+    () => ff.flags && Object.values(ff.flags).find((flag) => flag) ? 2 : 3,
+    [ff.flags]
+  )
+
   return (
     <>
       <Helmet>
@@ -295,15 +300,17 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {ff.flags && ff.flags[FeatureFlags.FilterType] && (
+            {ff.flags && Object.values(ff.flags).find((flag) => flag) && 
               <Column align="left" className="sidebar">
-                <ToggleBox
-                  header="Type"
-                  onClick={handleTypeChange}
-                  items={toggleItems}
-                />
+                {ff.flags[FeatureFlags.FilterType] && 
+                  <ToggleBox
+                    header="Type"
+                    onClick={handleTypeChange}
+                    items={toggleItems}
+                  />
+                }
               </Column>
-            )}
+            }
             <Column align="right" grow={true}>
               {eventsByMonth.length > 0 &&
                 eventsByMonth.map(([date, events]) => (
@@ -315,7 +322,7 @@ export default function IndexPage() {
                         }).format("MMMM")}
                       </SubTitle>
                     </div>
-                    <Card.Group>
+                    <Card.Group itemsPerRow={cardItemsPerRow}>
                       {events.map((event) => (
                         <EventCard
                           key={"event:" + event.id}
