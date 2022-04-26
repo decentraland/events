@@ -13,6 +13,7 @@ import { SegmentEvent } from "../../modules/segment"
 
 import { eventTargetUrl } from "../../entities/Event/utils"
 import "./AddToCalendarButton.css"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export type AddToCalendarButtonProps = ButtonProps & {
   event?: EventAttributes
@@ -26,6 +27,7 @@ export default function AddToCalendarButton({
   ...props
 }: AddToCalendarButtonProps) {
   const [address] = useAuth()
+  const [ ff ] = useFeatureFlagContext()
   const to = href || getGoogleCalendar(event, startAt) || "#"
 
   function handleClick(
@@ -38,6 +40,7 @@ export default function AddToCalendarButton({
         eventId: event?.id || null,
         trending: event?.trending || false,
         highlighted: event?.highlighted || false,
+        featureFlag: ff.flags,
       })
     )
     if (props.onClick) {

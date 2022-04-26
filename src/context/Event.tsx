@@ -9,6 +9,7 @@ import { useMemo } from "react"
 import { SegmentEvent } from "../modules/segment"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 import isUUID from "validator/lib/isUUID"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 const defaultProfileSettings = [
   [] as SessionEventAttributes[],
@@ -32,6 +33,7 @@ const defaultProfileSettings = [
 ] as const
 
 export function useEvents() {
+  const [ ff ] = useFeatureFlagContext()
   const [account, accountState] = useAuthContext()
   const [events, eventsState] = useAsyncMemo(
     async () => {
@@ -79,7 +81,7 @@ export function useEvents() {
 
       const newEvent = await Events.get().updateEvent(id as string, changes)
       track((analytics) =>
-        analytics.track(SegmentEvent.EditEvent, { event: newEvent })
+        analytics.track(SegmentEvent.EditEvent, { event: newEvent, featureFlag: ff.flags })
       )
       add(newEvent)
     },
@@ -138,6 +140,7 @@ export function useEvents() {
             eventId: event?.id || null,
             trending: event?.trending || false,
             highlighted: event?.highlighted || false,
+            featureFlag: ff.flags
           })
         )
         return event
@@ -148,6 +151,7 @@ export function useEvents() {
             error: (error as any).message,
             eventId: id,
             ...(error as any),
+            featureFlag: ff.flags
           })
         )
         throw error

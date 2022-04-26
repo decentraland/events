@@ -9,6 +9,7 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import secondaryPinIcon from "../../images/secondary-pin-small.svg"
 import "./JumpInPosition.css"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export type JumpInPositionProps = React.HTMLProps<HTMLAnchorElement> & {
   event?: EventAttributes
@@ -22,6 +23,7 @@ export default function JumpInPosition({
   ...props
 }: JumpInPositionProps) {
   const [address] = useAuthContext()
+  const [ ff ] = useFeatureFlagContext()
   const to = href || (event && eventTargetUrl(event)) || "#"
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"
@@ -39,6 +41,7 @@ export default function JumpInPosition({
           eventId: event?.id || null,
           trending: event?.trending || false,
           highlighted: event?.highlighted || false,
+          featureFlag: ff.flags
         })
       )
     }

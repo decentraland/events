@@ -5,7 +5,6 @@ import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import track from "decentraland-gatsby/dist/utils/development/segment"
 import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import { SessionEventAttributes } from "../../entities/Event/types"
@@ -28,6 +27,7 @@ import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import { useEventsContext } from "../../context/Event"
 import locations from "../../modules/locations"
 import "./AttendingButtons.css"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export type AttendingButtonsProps = {
   event?: SessionEventAttributes
@@ -47,6 +47,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const location = useLocation()
   const isMobile = useMobileDetector()
   const [, state] = useEventsContext()
+  const [ ff ] = useFeatureFlagContext()
   const ethAddress = address
   const approved = useMemo(() => !event || event.approved, [event])
   const loading = useMemo(
@@ -82,6 +83,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             trending: event?.trending || false,
             highlighted: event?.highlighted || false,
             medium: "facebook",
+            featureFlag: ff.flags,
           })
         )
         newPopupWindow(eventFacebookUrl(event))
@@ -103,6 +105,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             trending: event?.trending || false,
             highlighted: event?.highlighted || false,
             medium: "twitter",
+            featureFlag: ff.flags,
           })
         )
         newPopupWindow(eventTwitterUrl(event))
@@ -125,6 +128,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             eventId: event?.id || null,
             trending: event?.trending || false,
             highlighted: event?.highlighted || false,
+            featureFlag: ff.flags,
           })
         )
         setFallbackShare(true)
