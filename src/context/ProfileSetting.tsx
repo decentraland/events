@@ -10,6 +10,7 @@ import usePushSubscription from "../hooks/usePushSubscription"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 const defaultProfileSettings = [
   null as ProfileSettingsAttributes | null,
@@ -34,6 +35,7 @@ const UserSettingsContext = createContext(defaultProfileSettings)
 
 function useProfileSettings() {
   const [account] = useAuthContext()
+  const [ ff ] = useFeatureFlagContext()
   const [pushSubscription, pushSubscriptionState] = usePushSubscription()
   const isNotificationSupported = useFeatureSupported("Notification")
   const isServiceWorkerSupported = useFeatureSupported("ServiceWorker")
@@ -52,7 +54,7 @@ function useProfileSettings() {
   const [updating, update] = useAsyncTask(
     async (settings: Partial<ProfileSettingsAttributes>) => {
       const newSettings = await Events.get().updateProfileSettings(settings)
-      track((analytics) => analytics.track(SegmentEvent.Settings, settings))
+      track((analytics) => analytics.track(SegmentEvent.Settings, { ...settings, featureFlag: ff.flags }))
       state.set(newSettings)
     },
     [state]
