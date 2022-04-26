@@ -57,7 +57,7 @@ function useProfileSettings() {
       track((analytics) => analytics.track(SegmentEvent.Settings, { ...settings, featureFlag: ff.flags }))
       state.set(newSettings)
     },
-    [state]
+    [state, ff]
   )
 
   const [unsubscribing, unsubscribe] = useAsyncTask(async () => {

@@ -1,4 +1,5 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
+import { ToggleItemsValue } from "../entities/Event/types"
 
 const GATSBY_BASE_URL = process.env.GATSBY_BASE_URL || "/"
 
@@ -16,7 +17,7 @@ function url(path: string, query?: Record<string, string> | URLSearchParams) {
 }
 
 export default {
-  events: (filters: Partial<{ search: string }> | URLSearchParams = {}) =>
+  events: (filters: Partial<{ search: string, type: ToggleItemsValue }> | URLSearchParams = {}) =>
     url("/", filters),
   event: (id: string) => url("/event/", { id }),
   myEvents: () => url("/me/"),

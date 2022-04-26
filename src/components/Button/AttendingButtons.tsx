@@ -89,7 +89,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         newPopupWindow(eventFacebookUrl(event))
       }
     },
-    [event]
+    [event, ethAddress, ff]
   )
 
   const handleShareTwitter = useCallback(
@@ -111,7 +111,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         newPopupWindow(eventTwitterUrl(event))
       }
     },
-    [event]
+    [event, ethAddress, ff]
   )
 
   const handleShare = useCallback(
@@ -134,7 +134,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         setFallbackShare(true)
       }
     },
-    [setFallbackShare]
+    [setFallbackShare, ethAddress, event, ff]
   )
 
   const handleFallbackShareClose = useCallback(
