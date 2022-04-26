@@ -136,7 +136,7 @@ export default function IndexPage() {
 
       navigate(target)
     },
-    [location.pathname, params]
+    [location.pathname, params, ff]
   )
 
   const [enabledNotification, setEnabledNotification] = useState(false)

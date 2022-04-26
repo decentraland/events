@@ -52,7 +52,7 @@ export default function Navigation(props: NavigationProps) {
         })
       )
     }, 500),
-    [account, ff.flags]
+    [account, ff]
   )
 
   const handleSearchChange = useCallback(

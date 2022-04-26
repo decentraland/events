@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import {
   Button,
   ButtonProps,
@@ -30,7 +30,7 @@ export default function AddToCalendarButton({
   const [ ff ] = useFeatureFlagContext()
   const to = href || getGoogleCalendar(event, startAt) || "#"
 
-  function handleClick(
+  const handleClick = useCallback(function (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     data: ButtonProps
   ) {
@@ -46,7 +46,7 @@ export default function AddToCalendarButton({
     if (props.onClick) {
       props.onClick(e, data)
     }
-  }
+  }, [ address, event, ff ])
 
   return (
     <Button

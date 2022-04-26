@@ -85,7 +85,7 @@ export function useEvents() {
       )
       add(newEvent)
     },
-    [account, accountState, add]
+    [account, accountState, add, ff]
   )
 
   const [approving, approve] = useAsyncTasks(
@@ -157,7 +157,7 @@ export function useEvents() {
         throw error
       }
     },
-    [account, accountState, events, add]
+    [account, accountState, events, add, ff]
   )
 
   const [attending, attend] = useAsyncTasks(

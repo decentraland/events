@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import track from "decentraland-gatsby/dist/utils/development/segment"
 import { EventAttributes } from "../../entities/Event/types"
@@ -29,7 +29,7 @@ export default function JumpInPosition({
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"
   const ethAddress = address
 
-  function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+  const handleClick = useCallback(function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     if (props.onClick) {
       props.onClick(e)
     }
@@ -45,7 +45,7 @@ export default function JumpInPosition({
         })
       )
     }
-  }
+  }, [ event, ethAddress, ff ])
 
   return (
     <a
