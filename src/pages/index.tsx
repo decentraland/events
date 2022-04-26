@@ -117,24 +117,22 @@ export default function IndexPage() {
       const newParams = new URLSearchParams(params)
 
       // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
-      newParams.set("type", (item as any).value)
+      const type = getEventType((item as any).value)
+      if (type === ToggleItemsValue.All) {
+        newParams.delete("type")
+      } else {
+        newParams.set("type", type)
+      }
 
       track((analytics) =>
         analytics.track(SegmentEvent.Filter, {
           ethAddress: address,
           featureFlag: ff.flags,
-          type: (item as any).value,
+          type,
         })
       )
 
-      let target = location.pathname
-      const searchParams = newParams.toString()
-
-      if (searchParams) {
-        target += "?" + searchParams
-      }
-
-      navigate(target)
+      navigate(locations.events(newParams))
     },
     [location.pathname, params, ff]
   )
