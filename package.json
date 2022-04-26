@@ -84,7 +84,7 @@
     "build:sw": "workbox generateSW workbox-config.js",
     "develop": "gatsby develop --https -H 0.0.0.0",
     "format": "prettier --write '**/*.{ts,tsx,js,jsx,json,md,mdx,css}'",
-    "start": "concurrently -c blue,green -n SERVER,FRONT 'npm run serve' 'npm run develop'",
+    "start": "concurrently -c green,blue -n express,gatsby 'npm run serve' 'npm run develop'",
     "serve": "DOTENV_CONFIG_PATH=.env.development nodemon --watch src/entities --watch src/server.ts -e ts,json --exec 'ts-node -r dotenv/config' src/server",
     "clean": "gatsby clean",
     "migrate": "./node_modules/.bin/node-pg-migrate --envPath ./.env.development --tsconfig ./tsconfig.json -j ts -m ./src/migrations -d CONNECTION_STRING",
