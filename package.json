@@ -57,7 +57,7 @@
     "@types/isomorphic-fetch": "0.0.35",
     "@types/jest": "^27.4.1",
     "@types/node": "^13.9.1",
-    "@types/react": "^17.0.34",
+    "@types/react": "^18.0.8",
     "@types/react-helmet": "^5.0.15",
     "@types/validator": "^13.6.3",
     "@types/web-push": "^3.3.2",
