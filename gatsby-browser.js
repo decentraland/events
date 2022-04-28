@@ -33,11 +33,9 @@ export const wrapRootElement = ({ element }) => (
   <>
     <AuthProvider>
       <ProfileSettings>
-        <Events>
-          <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
-            {element}
-          </FeatureFlagProvider>
-        </Events>
+        <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
+          <Events>{element}</Events>
+        </FeatureFlagProvider>
       </ProfileSettings>
     </AuthProvider>
   </>
