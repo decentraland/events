@@ -33,7 +33,7 @@ const defaultProfileSettings = [
 ] as const
 
 export function useEvents() {
-  const [ ff ] = useFeatureFlagContext()
+  const [ff] = useFeatureFlagContext()
   const [account, accountState] = useAuthContext()
   const [events, eventsState] = useAsyncMemo(
     async () => {
@@ -140,6 +140,7 @@ export function useEvents() {
             eventId: event?.id || null,
             trending: event?.trending || false,
             highlighted: event?.highlighted || false,
+            attending: newEvent.attending,
             featureFlag: ff.flags
           })
         )
