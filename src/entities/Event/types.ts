@@ -126,6 +126,7 @@ export type EventAttributes = {
   total_attendees: number
   latest_attendees: string[]
   textsearch: SQLStatement | string | null | undefined
+  categories: string[]
 }
 
 export type GetEventParams = {
@@ -232,3 +233,5 @@ export enum ToggleItemsValue {
   One = "one",
   Recurrent = "recurrent",
 }
+
+export const MAX_TAG_ALLOWED = 2
