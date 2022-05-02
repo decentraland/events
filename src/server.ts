@@ -21,6 +21,7 @@ import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import events from "./entities/Event/routes"
 import attendees from "./entities/EventAttendee/routes"
+import categories from "./entities/EventCategory/routes"
 import social from "./entities/Social/routes"
 import poster from "./entities/Poster/routes"
 import sitemap from "./entities/Sitemap/routes"
@@ -50,6 +51,7 @@ app.use("/api", [
   events,
   poster,
   attendees,
+  categories,
   profileSettings,
   profileSubscription,
   profile,

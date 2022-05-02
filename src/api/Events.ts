@@ -9,6 +9,7 @@ import Options from "decentraland-gatsby/dist/utils/api/Options"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 import { PosterAttributes } from "../entities/Poster/types"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
+import { EventCategoryAttributes } from "../entities/EventCategory/types"
 
 export type EditEvent = Pick<
   EventAttributes,
@@ -37,6 +38,7 @@ export type EditEvent = Pick<
   | "recurrent_until"
   | "contact"
   | "details"
+  | "categories"
 >
 
 export default class Events extends API {
@@ -272,6 +274,12 @@ export default class Events extends API {
     return this.fetch(
       `/poster`,
       this.options({ method: "POST", body }).authorization({ sign: true })
+    )
+  }
+
+  async getCategories(): Promise<(EventCategoryAttributes)[]>  {
+    return this.fetch(
+      `/events_categories`
     )
   }
 }

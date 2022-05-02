@@ -9,6 +9,7 @@ import {
   MAX_EVENT_RECURRENT,
   DEFAULT_EVENT_DURATION,
   MAX_EVENT_DURATION,
+  MAX_TAG_ALLOWED,
 } from "../entities/Event/types"
 import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
 import { EditEvent } from "../api/Events"
@@ -63,6 +64,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     rejected: false,
     highlighted: false,
     trending: false,
+    categories: [],
 
     // recurrent
     recurrent: false,
@@ -434,6 +436,19 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setValue("recurrent_until", recurrent_until)
   }
 
+  function handleChangeCategories(value: string) {
+    let currentCategories = event.categories
+    if(currentCategories.includes(value)) {
+      currentCategories  = currentCategories.filter((e)=> e != value)
+    } else if (currentCategories.length === MAX_TAG_ALLOWED) {
+      setError('categories', `Maximun tags allowed ${MAX_TAG_ALLOWED}`)
+      return
+    } else {
+      currentCategories = [...currentCategories, value]
+    }
+    setValue("categories", currentCategories)
+  }
+
   function handleChange(
     e: React.ChangeEvent<any>,
     props?:
@@ -569,6 +584,9 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       case "recurrent_until":
         return handleChangeRecurrentUntil(value)
 
+      case "categories":
+        return handleChangeCategories(value)
+
       default:
       // ignore change
     }
@@ -609,6 +627,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       errors["recurrent_end"] = "Missing recurrent end"
     } else if ((event.recurrent_count as any) === "") {
       errors["recurrent_count"] = "Invalid count"
+    }
+
+    if (event.categories.length > MAX_TAG_ALLOWED) {
+      errors["categories"] = `Maximun tags allowed ${MAX_TAG_ALLOWED}`
     }
 
     if (Object.values(errors).filter(Boolean).length) {
