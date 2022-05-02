@@ -13,7 +13,7 @@
     "@mediacurrent/gatsby-plugin-silence-css-order-warning": "^1.0.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
-    "autoprefixer": "^10.4.0",
+    "autoprefixer": "^10.4.6",
     "aws-sdk": "^2.1002.0",
     "babel-jest": "^27.5.1",
     "core-js": "^3.22.2",
