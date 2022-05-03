@@ -62,9 +62,6 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   const recurrent = calculateRecurrentProperties(data)
 
-  /**
-   * Verify that the duration event is not longer than the max allowed, like 24Hrs
-   */
   if (recurrent.duration > MAX_EVENT_DURATION) {
     throw new RequestError(
       `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
@@ -73,9 +70,6 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
-  /**
-   * Verify categories actually exist 
-   */
   if (data.categories.length) {
     const validation = await validateCategories(data.categories)
     if (!validation) {

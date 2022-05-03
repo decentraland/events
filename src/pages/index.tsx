@@ -3,7 +3,6 @@ import React, {
   useState,
   Fragment,
   useCallback,
-  useEffect,
 } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
@@ -55,6 +54,9 @@ import { FeatureFlags } from "../modules/features"
 import { getEventType } from "../entities/Event/utils"
 import track from "decentraland-gatsby/dist/utils/development/segment"
 import { SegmentEvent } from "../modules/segment"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import { getCategoriesFetch } from "../modules/events"
+import useListEventsCategories from "../hooks/useListEventsCategories"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -77,15 +79,18 @@ export default function IndexPage() {
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))
   const [address, actions] = useAuthContext()
+  const [categories] = useAsyncMemo(getCategoriesFetch)
 
   const filteredEvents = useListEventsFiltered(events, {
     search: params.get("search"),
+    tag: params.get("tag"),
     type: typeFilter,
   })
 
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const trendingEvents = useListEventsTrending(filteredEvents)
-  const mainEvents = useListEventsMain(events)
+  const mainEvents = useListEventsMain(filteredEvents)
+  const categoriesUsed = useListEventsCategories(events, categories)
 
   // Items to be used in the toggle
   const toggleItems = useMemo(
@@ -112,6 +117,33 @@ export default function IndexPage() {
     [typeFilter]
   )
 
+  const categoryItems = useMemo(
+    () => {
+      let categoriesToReturn = [{
+        title: 'All',
+        description: '',
+        active: !params.get("tag") || params.get("tag") == 'all',
+        value: 'all',
+      }]
+
+      if (categoriesUsed) {
+        const categoriesOptions = categoriesUsed?.map((category) => (
+          {
+            title: l(`page.events.categories.${category.name}`),
+            description: '',
+            active: params.get("tag") === category.name,
+            value: category.name,
+          }
+        ))
+
+        categoriesToReturn = [...categoriesToReturn, ...categoriesOptions]
+      }
+
+      return categoriesToReturn
+    },
+    [categoriesUsed, params.get("tag")]
+  )
+
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
       const newParams = new URLSearchParams(params)
@@ -129,6 +161,32 @@ export default function IndexPage() {
           ethAddress: address,
           featureFlag: ff.flags,
           type,
+        })
+      )
+
+      navigate(locations.events(newParams))
+    },
+    [location.pathname, params, ff]
+  )
+
+  const handleTagChange = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
+      const newParams = new URLSearchParams(params)
+
+      const tag = (item as any).value
+
+      // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
+      if (tag === 'All') {
+        newParams.delete("tag")
+      } else {
+        newParams.set("tag", tag)
+      }
+
+      track((analytics) =>
+        analytics.track(SegmentEvent.Filter, {
+          ethAddress: address,
+          featureFlag: ff.flags,
+          tag,
         })
       )
 
@@ -214,16 +272,6 @@ export default function IndexPage() {
           </div>
         )}
 
-        {!loading && events.length > 0 && filteredEvents.length === 0 && (
-          <div>
-            <Divider />
-            <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.events.not_found")}
-            </Paragraph>
-            <Divider />
-          </div>
-        )}
-
         {loading && (
           <div>
             <Carousel>
@@ -298,7 +346,13 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {ff.flags && ff.flags[FeatureFlags.FilterType] && (
+            {
+              events.length !== 0 &&
+              ff.flags && 
+              ( 
+                ff.flags[FeatureFlags.FilterType] || 
+                true // TODO change this TRUE for the correct FeatureFlag for Category tags
+              ) && (
               <Column align="left" className="sidebar">
                 {ff.flags[FeatureFlags.FilterType] && (
                   <ToggleBox
@@ -307,9 +361,45 @@ export default function IndexPage() {
                     items={toggleItems}
                   />
                 )}
+
+                { true && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
+                    <div className={'dcl box borderless'}>
+                      <div className={'dcl box-header'}>Tag</div>
+                      <div className={'dcl box-children'}>
+                        {categoryItems.map((item, index) => {
+                          const classesItem = ['dcl', 'togglebox-item']
+                          if (
+                            (params.get("tag") && params.get("tag") === item.value) ||
+                            (!params.get("tag") && item.value == 'all')
+                            ) {
+                            classesItem.push('active')
+                          }
+                          return (
+                            <div
+                              key={index}
+                              className={classesItem.join(' ')}
+                              onClick={(event) => handleTagChange(event, item)}
+                            >
+                              <div className={'dcl togglebox-item-title'}>{item.title}</div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                )}
               </Column>
             )}
             <Column align="right" grow={true}>
+              {!loading && events.length > 0 && filteredEvents.length === 0 && (
+                <div>
+                  <Divider />
+                  <Paragraph secondary style={{ textAlign: "center" }}>
+                    {l("page.events.not_found")}
+                  </Paragraph>
+                  <Divider />
+                </div>
+              )}
+              
               {eventsByMonth.length > 0 &&
                 eventsByMonth.map(([date, events]) => (
                   <Fragment key={"month:" + date.toJSON()}>
