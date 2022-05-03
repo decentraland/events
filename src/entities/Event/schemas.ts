@@ -358,8 +358,8 @@ export const newEventSchema = {
       format: "uri",
     },
     categories: {
-      type: ["array","null"],
-      items: {type: "string"}
-    }
+      type: ["array", "null"],
+      items: { type: "string" },
+    },
   },
 }

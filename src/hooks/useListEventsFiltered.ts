@@ -50,8 +50,8 @@ export default function useListEventsFiltered(
         }
       })
     }
-    
-    if (filter.tag && filter.tag != 'all') {
+
+    if (filter.tag && filter.tag != "all") {
       const matches = filter.tag.toLowerCase()
 
       events = events.filter((event) => {

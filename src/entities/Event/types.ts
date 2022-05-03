@@ -215,7 +215,7 @@ export const editableAttributes: (keyof EventAttributes)[] = [
   "recurrent_interval",
   "recurrent_count",
   "recurrent_until",
-  "categories"
+  "categories",
 ]
 
 export const patchAttributes: (keyof EventAttributes)[] =

@@ -1,9 +1,4 @@
-import React, {
-  useMemo,
-  useState,
-  Fragment,
-  useCallback,
-} from "react"
+import React, { useMemo, useState, Fragment, useCallback } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -117,32 +112,29 @@ export default function IndexPage() {
     [typeFilter]
   )
 
-  const categoryItems = useMemo(
-    () => {
-      let categoriesToReturn = [{
-        title: 'All',
-        description: '',
-        active: !params.get("tag") || params.get("tag") == 'all',
-        value: 'all',
-      }]
+  const categoryItems = useMemo(() => {
+    let categoriesToReturn = [
+      {
+        title: "All",
+        description: "",
+        active: !params.get("tag") || params.get("tag") == "all",
+        value: "all",
+      },
+    ]
 
-      if (categoriesUsed) {
-        const categoriesOptions = categoriesUsed?.map((category) => (
-          {
-            title: l(`page.events.categories.${category.name}`),
-            description: '',
-            active: params.get("tag") === category.name,
-            value: category.name,
-          }
-        ))
+    if (categoriesUsed) {
+      const categoriesOptions = categoriesUsed?.map((category) => ({
+        title: l(`page.events.categories.${category.name}`),
+        description: "",
+        active: params.get("tag") === category.name,
+        value: category.name,
+      }))
 
-        categoriesToReturn = [...categoriesToReturn, ...categoriesOptions]
-      }
+      categoriesToReturn = [...categoriesToReturn, ...categoriesOptions]
+    }
 
-      return categoriesToReturn
-    },
-    [categoriesUsed, params.get("tag")]
-  )
+    return categoriesToReturn
+  }, [categoriesUsed, params.get("tag")])
 
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
@@ -176,7 +168,7 @@ export default function IndexPage() {
       const tag = (item as any).value
 
       // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
-      if (tag === 'All') {
+      if (tag === "All") {
         newParams.delete("tag")
       } else {
         newParams.set("tag", tag)
@@ -346,49 +338,48 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {
-              events.length !== 0 &&
-              ff.flags && 
-              ( 
-                ff.flags[FeatureFlags.FilterType] || 
-                true // TODO change this TRUE for the correct FeatureFlag for Category tags
-              ) && (
-              <Column align="left" className="sidebar">
-                {ff.flags[FeatureFlags.FilterType] && (
-                  <ToggleBox
-                    header="Type"
-                    onClick={handleTypeChange}
-                    items={toggleItems}
-                  />
-                )}
+            {events.length !== 0 &&
+              ff.flags &&
+              (ff.flags[FeatureFlags.FilterType] || true) && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
+                <Column align="left" className="sidebar">
+                  {ff.flags[FeatureFlags.FilterType] && (
+                    <ToggleBox
+                      header="Type"
+                      onClick={handleTypeChange}
+                      items={toggleItems}
+                    />
+                  )}
 
-                { true && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
-                    <div className={'dcl box borderless'}>
-                      <div className={'dcl box-header'}>Tag</div>
-                      <div className={'dcl box-children'}>
+                  {true && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
+                    <div className={"dcl box borderless"}>
+                      <div className={"dcl box-header"}>Tag</div>
+                      <div className={"dcl box-children"}>
                         {categoryItems.map((item, index) => {
-                          const classesItem = ['dcl', 'togglebox-item']
+                          const classesItem = ["dcl", "togglebox-item"]
                           if (
-                            (params.get("tag") && params.get("tag") === item.value) ||
-                            (!params.get("tag") && item.value == 'all')
-                            ) {
-                            classesItem.push('active')
+                            (params.get("tag") &&
+                              params.get("tag") === item.value) ||
+                            (!params.get("tag") && item.value == "all")
+                          ) {
+                            classesItem.push("active")
                           }
                           return (
                             <div
                               key={index}
-                              className={classesItem.join(' ')}
+                              className={classesItem.join(" ")}
                               onClick={(event) => handleTagChange(event, item)}
                             >
-                              <div className={'dcl togglebox-item-title'}>{item.title}</div>
+                              <div className={"dcl togglebox-item-title"}>
+                                {item.title}
+                              </div>
                             </div>
                           )
                         })}
                       </div>
                     </div>
-                )}
-              </Column>
-            )}
+                  )}
+                </Column>
+              )}
             <Column align="right" grow={true}>
               {!loading && events.length > 0 && filteredEvents.length === 0 && (
                 <div>
@@ -399,7 +390,7 @@ export default function IndexPage() {
                   <Divider />
                 </div>
               )}
-              
+
               {eventsByMonth.length > 0 &&
                 eventsByMonth.map(([date, events]) => (
                   <Fragment key={"month:" + date.toJSON()}>

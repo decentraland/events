@@ -1,4 +1,3 @@
-
 export type EventCategoryAttributes = {
   name: string // primary key
   active: boolean

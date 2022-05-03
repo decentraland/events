@@ -5,7 +5,11 @@ import { EventCategoryAttributes } from "./types"
 import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import EventModel from "../Event/model"
 import { EventAttributes } from "../Event/types"
-import { SQL, table, values } from "decentraland-gatsby/dist/entities/Database/utils"
+import {
+  SQL,
+  table,
+  values,
+} from "decentraland-gatsby/dist/entities/Database/utils"
 
 export default routes((router) => {
   const withPublicAccess = withCors({ cors: "*" })
@@ -17,5 +21,8 @@ export default routes((router) => {
 })
 
 export async function getEventCategoryList() {
-  return (await EventCategoryModel.find<EventCategoryAttributes>({ active: true }, {name: 'asc'}))
+  return await EventCategoryModel.find<EventCategoryAttributes>(
+    { active: true },
+    { name: "asc" }
+  )
 }

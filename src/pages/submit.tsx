@@ -52,7 +52,10 @@ import ItemLayout from "../components/Layout/ItemLayout"
 import { getServerOptions, getServers } from "../modules/servers"
 import infoIcon from "../images/info.svg"
 import "./submit.css"
-import { getCategoriesFetch, getCategoriesOptionsActives } from "../modules/events"
+import {
+  getCategoriesFetch,
+  getCategoriesOptionsActives,
+} from "../modules/events"
 
 type SubmitPageState = {
   loading?: boolean
@@ -98,18 +101,18 @@ export default function SubmitPage() {
     () => getServerOptions(servers || []),
     [servers]
   )
-  
-  const categoryOptions = useMemo(
-    () => {
-      const categoriesOptions = getCategoriesOptionsActives(
-        categories,
-        editing.categories
-      )
-      return categoriesOptions.map((categoryOption) => ({ ...categoryOption, text: l(categoryOption.text)}))
-    },
-    [categories, editing.categories]
-  )
-  
+
+  const categoryOptions = useMemo(() => {
+    const categoriesOptions = getCategoriesOptionsActives(
+      categories,
+      editing.categories
+    )
+    return categoriesOptions.map((categoryOption) => ({
+      ...categoryOption,
+      text: l(categoryOption.text),
+    }))
+  }, [categories, editing.categories])
+
   const loading = accountState.loading && eventState.loading
 
   const recurrent_date = useMemo(
@@ -892,7 +895,8 @@ export default function SubmitPage() {
                 <Grid.Column mobile="8">
                   <Label>Tags</Label>
                   <Paragraph tiny secondary>
-                    Want a new tag? Ask for it on the <span className={'submit__tag__dao'}>DAO</span>.
+                    Want a new tag? Ask for it on the{" "}
+                    <span className={"submit__tag__dao"}>DAO</span>.
                   </Paragraph>
                   <SelectField
                     placeholder="Add tag"
@@ -901,21 +905,27 @@ export default function SubmitPage() {
                     message={errors["categories"]}
                     options={categoryOptions}
                     onChange={editActions.handleChange}
-                    value={''}
+                    value={""}
                   />
-                  {
-                    editing.categories.map((category, key) => 
-                      <SelectionLabel key={key} className={'submit__category-select-wrapper'}>
-                        {l(`page.events.categories.${category}`)}
-                        <Icon 
-                          className={'submit__tag-select-label'} 
-                          name='delete' 
-                          circular 
-                          onClick={(event: React.ChangeEvent<any>) => editActions.handleChange(event, { name: 'categories', value: category})} 
-                        />
-                      </SelectionLabel>
-                    )
-                  }
+                  {editing.categories.map((category, key) => (
+                    <SelectionLabel
+                      key={key}
+                      className={"submit__category-select-wrapper"}
+                    >
+                      {l(`page.events.categories.${category}`)}
+                      <Icon
+                        className={"submit__tag-select-label"}
+                        name="delete"
+                        circular
+                        onClick={(event: React.ChangeEvent<any>) =>
+                          editActions.handleChange(event, {
+                            name: "categories",
+                            value: category,
+                          })
+                        }
+                      />
+                    </SelectionLabel>
+                  ))}
                 </Grid.Column>
               </Grid.Row>
 

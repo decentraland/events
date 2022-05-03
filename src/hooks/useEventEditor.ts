@@ -438,10 +438,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
   function handleChangeCategories(value: string) {
     let currentCategories = event.categories
-    if(currentCategories.includes(value)) {
-      currentCategories  = currentCategories.filter((e)=> e != value)
+    if (currentCategories.includes(value)) {
+      currentCategories = currentCategories.filter((e) => e != value)
     } else if (currentCategories.length === MAX_TAG_ALLOWED) {
-      setError('categories', `Maximun tags allowed ${MAX_TAG_ALLOWED}`)
+      setError("categories", `Maximun tags allowed ${MAX_TAG_ALLOWED}`)
       return
     } else {
       currentCategories = [...currentCategories, value]

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
+import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
 import EventModel from "../entities/Event/model"
 import Model from "../entities/EventCategory/model"
 
-export const shorthands: ColumnDefinitions | undefined = undefined;
+export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(Model.tableName, {
@@ -38,31 +38,31 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   })
 
   const tagIds = [
-    'art',
-    'causes',
-    'competition',
-    'education',
-    'gambling',
-    'gaming',
-    'giveaway',
-    'health',
-    'hobbies',
-    'identity',
-    'live',
-    'music',
-    'networking',
-    'nft',
-    'other',
-    'party',
-    'play',
-    'poap',
-    'religion',
-    'shopping',
-    'social',
-    'sports',
-    'talks',
-    'town',
-    'tv',
+    "art",
+    "causes",
+    "competition",
+    "education",
+    "gambling",
+    "gaming",
+    "giveaway",
+    "health",
+    "hobbies",
+    "identity",
+    "live",
+    "music",
+    "networking",
+    "nft",
+    "other",
+    "party",
+    "play",
+    "poap",
+    "religion",
+    "shopping",
+    "social",
+    "sports",
+    "talks",
+    "town",
+    "tv",
   ]
 
   for (const element of tagIds) {
