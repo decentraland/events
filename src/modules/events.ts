@@ -8,9 +8,6 @@ export type Option = { key: string; value: string; text: string }
 
 export const getCategoriesOptionsActives = (categories: (EventCategoryAttributes)[]|null, userCategories: string[]): Option[] => {
   let result: Option[] = []
-  console.log("---getCategoriesOptionsActives")
-  console.log(categories)
-  console.log(userCategories)
   if (categories) {
     result = categories?.filter(
       (category) => !userCategories.includes(category.name)
