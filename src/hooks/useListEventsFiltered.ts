@@ -10,7 +10,7 @@ export default function useListEventsFiltered(
   filter?: {
     search?: string | null
     type?: ToggleItemsValue | null
-    tag?: string | null
+    categories?: string | null
   }
 ) {
   return useMemo(() => {
@@ -51,14 +51,11 @@ export default function useListEventsFiltered(
       })
     }
 
-    if (filter.tag && filter.tag != "all") {
-      const matches = filter.tag.toLowerCase()
+    if (filter.categories && filter.categories != "all") {
+      const matches = filter.categories.toLowerCase()
 
       events = events.filter((event) => {
-        const categoryList = new Set<string>()
-        for (let category of event.categories) {
-          categoryList.add(category)
-        }
+        const categoryList = new Set<string>(event.categories)
         return categoryList.has(matches)
       })
     }

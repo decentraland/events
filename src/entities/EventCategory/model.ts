@@ -9,15 +9,15 @@ import {
 export default class EventCategoryModel extends Model<EventCategoryAttributes> {
   static tableName = "event_categories"
   static primaryKey = "name"
-}
 
-export type countQuery = { count: number }
+  static validateCategories = async (categories: string[]) => {
+    const query = SQL`SELECT count(*) FROM ${table(
+      EventCategoryModel
+    )} WHERE "name" IN ${values(categories)}`
+    const categoriesFound = await EventCategoryModel.query<{ count: number }>(
+      query
+    )
 
-export const validateCategories = async (categories: string[]) => {
-  const query = SQL`SELECT count(*) FROM ${table(
-    EventCategoryModel
-  )} WHERE "name" IN ${values(categories)}`
-  const categoriesFound = await EventCategoryModel.query<countQuery>(query)
-
-  return categoriesFound[0].count == categories.length
+    return categoriesFound[0].count == categories.length
+  }
 }

@@ -8,6 +8,8 @@ export const getCategoriesFetch = once(
 
 export type Option = { key: string; value: string; text: string }
 
+// TODO: replace with `loadash.uniqBy `
+
 export const getCategoriesOptionsActives = (
   categories: EventCategoryAttributes[] | null,
   userCategories: string[]

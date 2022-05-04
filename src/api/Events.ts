@@ -278,6 +278,6 @@ export default class Events extends API {
   }
 
   async getCategories(): Promise<EventCategoryAttributes[]> {
-    return this.fetch(`/events_categories`)
+    return this.fetch(`/events/categories`)
   }
 }

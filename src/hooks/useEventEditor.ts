@@ -9,7 +9,7 @@ import {
   MAX_EVENT_RECURRENT,
   DEFAULT_EVENT_DURATION,
   MAX_EVENT_DURATION,
-  MAX_TAG_ALLOWED,
+  MAX_CATAGORIES_ALLOWED,
 } from "../entities/Event/types"
 import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
 import { EditEvent } from "../api/Events"
@@ -440,9 +440,6 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     let currentCategories = event.categories
     if (currentCategories.includes(value)) {
       currentCategories = currentCategories.filter((e) => e != value)
-    } else if (currentCategories.length === MAX_TAG_ALLOWED) {
-      setError("categories", `Maximun tags allowed ${MAX_TAG_ALLOWED}`)
-      return
     } else {
       currentCategories = [...currentCategories, value]
     }
@@ -629,8 +626,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       errors["recurrent_count"] = "Invalid count"
     }
 
-    if (event.categories.length > MAX_TAG_ALLOWED) {
-      errors["categories"] = `Maximun tags allowed ${MAX_TAG_ALLOWED}`
+    if (event.categories.length > MAX_CATAGORIES_ALLOWED) {
+      errors["categories"] = `Maximun tags allowed ${MAX_CATAGORIES_ALLOWED}`
     }
 
     if (Object.values(errors).filter(Boolean).length) {

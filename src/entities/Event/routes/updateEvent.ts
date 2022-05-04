@@ -24,7 +24,7 @@ import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { getEvent } from "./getEvent"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-import { validateCategories } from "../../EventCategory/model"
+import EventCategoryModel from "../../EventCategory/model"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -88,7 +88,9 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
    * Verify categories actually exist
    */
   if (event.categories.length) {
-    const validation = await validateCategories(event.categories)
+    const validation = await EventCategoryModel.validateCategories(
+      event.categories
+    )
     if (!validation) {
       throw new RequestError(
         `Invalid category tag supplied`,

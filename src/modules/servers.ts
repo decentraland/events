@@ -15,7 +15,7 @@ export const getServers = once(async () => {
 
 export type Option = { key: string; value: string; text: string }
 
-// TODO: replace with lodash
+// TODO: replace with `loadash.uniqBy `
 export function getServerOptions(servers: (CommsStatus | null)[]): Option[] {
   const result: Option[] = [{ key: "default", value: "", text: "any server" }]
 

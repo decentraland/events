@@ -98,10 +98,7 @@ export default function DocsPage() {
           path="/api/events/categories"
           description="Return all the categories of events"
         >
-          <ApiDetails
-            title="Request"
-            cors="*"
-          />
+          <ApiDetails title="Request" cors="*" />
           <ApiDetails
             title="Response"
             cors="*"
@@ -112,8 +109,3 @@ export default function DocsPage() {
     </>
   )
 }
-
-
-
-
-

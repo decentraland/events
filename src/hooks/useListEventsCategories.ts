@@ -13,12 +13,7 @@ export default function useListEventsCategories(
         (item) => (categoriesFound = [...categoriesFound, ...item.categories])
       )
 
-      const categoryList = new Set<string>()
-      for (let category of categoriesFound) {
-        if (!categoryList.has(category)) {
-          categoryList.add(category)
-        }
-      }
+      const categoryList = new Set<string>(categoriesFound)
 
       return categories.filter((category) => categoryList.has(category.name))
     } else {

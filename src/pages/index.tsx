@@ -78,7 +78,7 @@ export default function IndexPage() {
 
   const filteredEvents = useListEventsFiltered(events, {
     search: params.get("search"),
-    tag: params.get("tag"),
+    categories: params.get("category"),
     type: typeFilter,
   })
 
@@ -117,7 +117,7 @@ export default function IndexPage() {
       {
         title: "All",
         description: "",
-        active: !params.get("tag") || params.get("tag") == "all",
+        active: !params.get("category") || params.get("category") == "all",
         value: "all",
       },
     ]
@@ -126,7 +126,7 @@ export default function IndexPage() {
       const categoriesOptions = categoriesUsed?.map((category) => ({
         title: l(`page.events.categories.${category.name}`),
         description: "",
-        active: params.get("tag") === category.name,
+        active: params.get("category") === category.name,
         value: category.name,
       }))
 
@@ -134,7 +134,7 @@ export default function IndexPage() {
     }
 
     return categoriesToReturn
-  }, [categoriesUsed, params.get("tag")])
+  }, [categoriesUsed, params.get("category")])
 
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
@@ -165,20 +165,20 @@ export default function IndexPage() {
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
       const newParams = new URLSearchParams(params)
 
-      const tag = (item as any).value
+      const category = (item as any).value
 
       // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
-      if (tag === "All") {
-        newParams.delete("tag")
+      if (category === "All") {
+        newParams.delete("category")
       } else {
-        newParams.set("tag", tag)
+        newParams.set("category", category)
       }
 
       track((analytics) =>
         analytics.track(SegmentEvent.Filter, {
           ethAddress: address,
           featureFlag: ff.flags,
-          tag,
+          category,
         })
       )
 
@@ -351,15 +351,16 @@ export default function IndexPage() {
                   )}
 
                   {true && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
+                    // TODO: move to `decentraland-ui`
                     <div className={"dcl box borderless"}>
                       <div className={"dcl box-header"}>Tag</div>
                       <div className={"dcl box-children"}>
                         {categoryItems.map((item, index) => {
                           const classesItem = ["dcl", "togglebox-item"]
                           if (
-                            (params.get("tag") &&
-                              params.get("tag") === item.value) ||
-                            (!params.get("tag") && item.value == "all")
+                            (params.get("category") &&
+                              params.get("category") === item.value) ||
+                            (!params.get("category") && item.value == "all")
                           ) {
                             classesItem.push("active")
                           }

@@ -235,4 +235,4 @@ export enum ToggleItemsValue {
   Recurrent = "recurrent",
 }
 
-export const MAX_TAG_ALLOWED = 1
+export const MAX_CATAGORIES_ALLOWED = 1
