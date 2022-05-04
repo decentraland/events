@@ -46,7 +46,7 @@ import useListEventsTrending from "../hooks/useListEventsTrending"
 import "./index.css"
 import { Column } from "../components/Layout/Column/Column"
 import { Row } from "../components/Layout/Row/Row"
-import { FilterTypeVariant, Flags } from "../modules/features"
+import { FilterCategoryVariant, FilterTypeVariant, Flags } from "../modules/features"
 import { getEventType } from "../entities/Event/utils"
 import { SegmentEvent } from "../modules/segment"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
@@ -88,7 +88,7 @@ export default function IndexPage() {
   const [all, state] = useEventsContext()
   const track = useTrackContext()
   const events = useEventSorter(all)
-  const [ff ] = useFeatureFlagContext()
+  const [ff] = useFeatureFlagContext()
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))
@@ -186,14 +186,7 @@ export default function IndexPage() {
         newParams.set("category", category)
       }
 
-      track((analytics) =>
-        analytics.track(SegmentEvent.Filter, {
-          ethAddress: address,
-          featureFlag: ff.flags,
-          category,
-        })
-      )
-
+      track(SegmentEvent.Filter, { category })
       navigate(locations.events(newParams))
     },
     [location.pathname, params, ff]
@@ -210,7 +203,10 @@ export default function IndexPage() {
   )
 
   const cardItemsPerRow = useMemo(
-    () => ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.disabled ? 3 : 2,
+    () => (
+      ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.disabled &&
+      ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) === FilterCategoryVariant.disabled
+    ) ? 3 : 2,
     [ff.flags]
   )
 
@@ -351,47 +347,48 @@ export default function IndexPage() {
         {!loading && (
           <Row>
             {events.length !== 0 &&
-              ff.flags &&
-              (ff.flags[FeatureFlags.FilterType] || true) && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
-                <Column align="left" className="sidebar">
-                  {ff.flags[FeatureFlags.FilterType] && (
-                    <ToggleBox
-                      header="Type"
-                      onClick={handleTypeChange}
-                      items={toggleItems}
-                    />
-                  )}
+              (
+                ff.name<FilterTypeVariant>(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.enabled ||
+                ff.name<FilterCategoryVariant>(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) === FilterCategoryVariant.enabled
+              ) && (<Column align="left" className="sidebar">
+                {ff.name<FilterTypeVariant>(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.enabled && (
+                  <ToggleBox
+                    header="Type"
+                    onClick={handleTypeChange}
+                    items={toggleItems}
+                  />
+                )}
 
-                  {true && ( // TODO change this TRUE for the correct FeatureFlag for Category tags
-                    // TODO: move to `decentraland-ui`
-                    <div className={"dcl box borderless"}>
-                      <div className={"dcl box-header"}>Tag</div>
-                      <div className={"dcl box-children"}>
-                        {categoryItems.map((item, index) => {
-                          const classesItem = ["dcl", "togglebox-item"]
-                          if (
-                            (params.get("category") &&
-                              params.get("category") === item.value) ||
-                            (!params.get("category") && item.value == "all")
-                          ) {
-                            classesItem.push("active")
-                          }
-                          return (
-                            <div
-                              key={index}
-                              className={classesItem.join(" ")}
-                              onClick={(event) => handleTagChange(event, item)}
-                            >
-                              <div className={"dcl togglebox-item-title"}>
-                                {item.title}
-                              </div>
+                {ff.name<FilterCategoryVariant>(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) === FilterCategoryVariant.enabled && (
+                  // TODO: move to `decentraland-ui`
+                  <div className={"dcl box borderless"}>
+                    <div className={"dcl box-header"}>Tag</div>
+                    <div className={"dcl box-children"}>
+                      {categoryItems.map((item, index) => {
+                        const classesItem = ["dcl", "togglebox-item"]
+                        if (
+                          (params.get("category") &&
+                            params.get("category") === item.value) ||
+                          (!params.get("category") && item.value == "all")
+                        ) {
+                          classesItem.push("active")
+                        }
+                        return (
+                          <div
+                            key={index}
+                            className={classesItem.join(" ")}
+                            onClick={(event) => handleTagChange(event, item)}
+                          >
+                            <div className={"dcl togglebox-item-title"}>
+                              {item.title}
                             </div>
-                          )
-                        })}
-                      </div>
+                          </div>
+                        )
+                      })}
                     </div>
-                  )}
-                </Column>
+                  </div>
+                )}
+              </Column>
               )}
             <Column align="right" grow={true}>
               {!loading && events.length > 0 && filteredEvents.length === 0 && (
