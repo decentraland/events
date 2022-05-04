@@ -32,11 +32,11 @@ export const registerServiceWorker = () => true
 export const wrapRootElement = ({ element }) => (
   <>
     <AuthProvider>
-      <ProfileSettings>
-        <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
+      <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
+        <ProfileSettings>
           <Events>{element}</Events>
-        </FeatureFlagProvider>
-      </ProfileSettings>
+        </ProfileSettings>
+      </FeatureFlagProvider>
     </AuthProvider>
   </>
 )

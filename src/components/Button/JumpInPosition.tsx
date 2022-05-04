@@ -1,15 +1,13 @@
 import React, { useCallback } from "react"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import track from "decentraland-gatsby/dist/utils/development/segment"
 import { EventAttributes } from "../../entities/Event/types"
 
 import { eventTargetUrl } from "../../entities/Event/utils"
 import { SegmentEvent } from "../../modules/segment"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import secondaryPinIcon from "../../images/secondary-pin-small.svg"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import "./JumpInPosition.css"
-import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export type JumpInPositionProps = React.HTMLProps<HTMLAnchorElement> & {
   event?: EventAttributes
@@ -22,12 +20,10 @@ export default function JumpInPosition({
   compact,
   ...props
 }: JumpInPositionProps) {
-  const [address] = useAuthContext()
-  const [ ff ] = useFeatureFlagContext()
+  const track = useTrackContext()
   const to = href || (event && eventTargetUrl(event)) || "#"
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"
-  const ethAddress = address
 
   const handleClick = useCallback(function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     if (props.onClick) {
@@ -35,17 +31,13 @@ export default function JumpInPosition({
     }
 
     if (!e.defaultPrevented) {
-      track((analytics) =>
-        analytics.track(SegmentEvent.JumpIn, {
-          ethAddress,
+      track(SegmentEvent.JumpIn, {
           eventId: event?.id || null,
           trending: event?.trending || false,
           highlighted: event?.highlighted || false,
-          featureFlag: ff.flags
-        })
-      )
+      })
     }
-  }, [ event, ethAddress, ff ])
+  }, [ event, track ])
 
   return (
     <a
