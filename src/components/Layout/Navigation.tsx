@@ -42,7 +42,10 @@ export default function Navigation(props: NavigationProps) {
 
   const track = useTrackContext()
   const debounceTrack = useCallback(
-    debounce((search: string) => track(SegmentEvent.Filter, { search: search }), 500),
+    debounce(
+      (search: string) => track(SegmentEvent.Filter, { search: search }),
+      500
+    ),
     [track]
   )
 

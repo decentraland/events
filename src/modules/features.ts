@@ -5,11 +5,11 @@ export enum Flags {
 }
 
 export enum FilterTypeVariant {
-  enabled = 'enabled',
-  disabled = 'disabled',
+  enabled = "enabled",
+  disabled = "disabled",
 }
 
 export enum FilterCategoryVariant {
-  enabled = 'enabled',
-  disabled = 'disabled',
+  enabled = "enabled",
+  disabled = "disabled",
 }

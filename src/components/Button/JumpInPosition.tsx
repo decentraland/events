@@ -25,19 +25,22 @@ export default function JumpInPosition({
   const isPosition = !href && !!event
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"
 
-  const handleClick = useCallback(function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    if (props.onClick) {
-      props.onClick(e)
-    }
+  const handleClick = useCallback(
+    function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+      if (props.onClick) {
+        props.onClick(e)
+      }
 
-    if (!e.defaultPrevented) {
-      track(SegmentEvent.JumpIn, {
+      if (!e.defaultPrevented) {
+        track(SegmentEvent.JumpIn, {
           eventId: event?.id || null,
           trending: event?.trending || false,
           highlighted: event?.highlighted || false,
-      })
-    }
-  }, [ event, track ])
+        })
+      }
+    },
+    [event, track]
+  )
 
   return (
     <a

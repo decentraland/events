@@ -26,23 +26,25 @@ export default function AddToCalendarButton({
   startAt,
   ...props
 }: AddToCalendarButtonProps) {
-
   const track = useTrackContext()
   const to = href || getGoogleCalendar(event, startAt) || "#"
 
-  const handleClick = useCallback(function (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    data: ButtonProps
-  ) {
-    track(SegmentEvent.AddToCalendar, {
-      eventId: event?.id || null,
-      trending: event?.trending || false,
-      highlighted: event?.highlighted || false,
-    })
-    if (props.onClick) {
-      props.onClick(e, data)
-    }
-  }, [ event, track ])
+  const handleClick = useCallback(
+    function (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      data: ButtonProps
+    ) {
+      track(SegmentEvent.AddToCalendar, {
+        eventId: event?.id || null,
+        trending: event?.trending || false,
+        highlighted: event?.highlighted || false,
+      })
+      if (props.onClick) {
+        props.onClick(e, data)
+      }
+    },
+    [event, track]
+  )
 
   return (
     <Button
