@@ -2,14 +2,13 @@ import React, { createContext, useContext, useCallback } from "react"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncTasks from "decentraland-gatsby/dist/hooks/useAsyncTasks"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import track from "decentraland-gatsby/dist/utils/development/segment"
 import Events from "../api/Events"
 import { SessionEventAttributes } from "../entities/Event/types"
 import { useMemo } from "react"
 import { SegmentEvent } from "../modules/segment"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 import isUUID from "validator/lib/isUUID"
-import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 
 const defaultProfileSettings = [
   [] as SessionEventAttributes[],
@@ -33,7 +32,7 @@ const defaultProfileSettings = [
 ] as const
 
 export function useEvents() {
-  const [ff] = useFeatureFlagContext()
+  const track = useTrackContext()
   const [account, accountState] = useAuthContext()
   const [events, eventsState] = useAsyncMemo(
     async () => {
@@ -80,12 +79,10 @@ export function useEvents() {
       }
 
       const newEvent = await Events.get().updateEvent(id as string, changes)
-      track((analytics) =>
-        analytics.track(SegmentEvent.EditEvent, { event: newEvent, featureFlag: ff.flags })
-      )
+      track(SegmentEvent.EditEvent, { data: newEvent })
       add(newEvent)
     },
-    [account, accountState, add, ff]
+    [account, accountState, add, track]
   )
 
   const [approving, approve] = useAsyncTasks(
@@ -117,7 +114,6 @@ export function useEvents() {
       }
 
       try {
-        const ethAddress = account
         const newAttendees = await updateAttendee()
         const newAttendee = newAttendees.find(
           (attendee) => attendee.user === account
@@ -134,31 +130,24 @@ export function useEvents() {
         }
 
         add(newEvent)
-        track((analytics) =>
-          analytics.track(SegmentEvent.Going, {
-            ethAddress,
-            eventId: event?.id || null,
-            trending: event?.trending || false,
-            highlighted: event?.highlighted || false,
-            attending: newEvent.attending,
-            featureFlag: ff.flags
-          })
-        )
+        track(SegmentEvent.Going, {
+          eventId: event?.id || null,
+          trending: event?.trending || false,
+          highlighted: event?.highlighted || false,
+          attending: newEvent.attending,
+        })
         return event
       } catch (error) {
         console.error(error)
-        track((analytics) =>
-          analytics.track(SegmentEvent.Error, {
-            error: (error as any).message,
-            eventId: id,
-            ...(error as any),
-            featureFlag: ff.flags
-          })
-        )
+        track(SegmentEvent.Error, {
+          eventId: id,
+          error: (error as any).message,
+          ...(error as any),
+        })
         throw error
       }
     },
-    [account, accountState, events, add, ff]
+    [account, accountState, events, add, track]
   )
 
   const [attending, attend] = useAsyncTasks(

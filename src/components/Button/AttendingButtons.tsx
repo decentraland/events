@@ -3,7 +3,6 @@ import { Button } from "decentraland-ui/dist/components/Button/Button"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import track from "decentraland-gatsby/dist/utils/development/segment"
 import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
@@ -26,8 +25,8 @@ import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 
 import { useEventsContext } from "../../context/Event"
 import locations from "../../modules/locations"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import "./AttendingButtons.css"
-import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export type AttendingButtonsProps = {
   event?: SessionEventAttributes
@@ -47,8 +46,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const location = useLocation()
   const isMobile = useMobileDetector()
   const [, state] = useEventsContext()
-  const [ ff ] = useFeatureFlagContext()
-  const ethAddress = address
+  const track = useTrackContext()
   const approved = useMemo(() => !event || event.approved, [event])
   const loading = useMemo(
     () => props.loading ?? state.modifying.has(event?.id || ""),
@@ -76,20 +74,16 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       e.stopPropagation()
 
       if (event) {
-        track((analytics) =>
-          analytics.track(SegmentEvent.Share, {
-            ethAddress,
-            eventId: event?.id || null,
-            trending: event?.trending || false,
-            highlighted: event?.highlighted || false,
-            medium: "facebook",
-            featureFlag: ff.flags,
-          })
-        )
+        track(SegmentEvent.Share, {
+          eventId: event?.id || null,
+          trending: event?.trending || false,
+          highlighted: event?.highlighted || false,
+          medium: "facebook",
+        })
         newPopupWindow(eventFacebookUrl(event))
       }
     },
-    [event, ethAddress, ff]
+    [event, track]
   )
 
   const handleShareTwitter = useCallback(
@@ -98,20 +92,16 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       e.stopPropagation()
 
       if (event) {
-        track((analytics) =>
-          analytics.track(SegmentEvent.Share, {
-            ethAddress,
-            eventId: event?.id || null,
-            trending: event?.trending || false,
-            highlighted: event?.highlighted || false,
-            medium: "twitter",
-            featureFlag: ff.flags,
-          })
-        )
+        track(SegmentEvent.Share, {
+          eventId: event?.id || null,
+          trending: event?.trending || false,
+          highlighted: event?.highlighted || false,
+          medium: "twitter",
+        })
         newPopupWindow(eventTwitterUrl(event))
       }
     },
-    [event, ethAddress, ff]
+    [event, track]
   )
 
   const handleShare = useCallback(
@@ -122,19 +112,15 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       if (typeof navigator !== "undefined" && (navigator as any).share) {
         share()
       } else {
-        track((analytics) =>
-          analytics.track(SegmentEvent.ShareFallback, {
-            ethAddress,
-            eventId: event?.id || null,
-            trending: event?.trending || false,
-            highlighted: event?.highlighted || false,
-            featureFlag: ff.flags,
-          })
-        )
+        track(SegmentEvent.ShareFallback, {
+          eventId: event?.id || null,
+          trending: event?.trending || false,
+          highlighted: event?.highlighted || false,
+        })
         setFallbackShare(true)
       }
     },
-    [setFallbackShare, ethAddress, event, ff]
+    [setFallbackShare, track]
   )
 
   const handleFallbackShareClose = useCallback(
