@@ -18,7 +18,7 @@
     "babel-jest": "^27.5.1",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
-    "decentraland-gatsby": "^5.7.0",
+    "decentraland-gatsby": "^5.10.1",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.1.2",
@@ -66,7 +66,9 @@
     "decentraland-gatsby-deploy": "^1.12.1",
     "devcert": "^1.1.2",
     "dotenv": "^8.6.0",
+    "husky": "^7.0.4",
     "jest": "^27.5.1",
+    "lint-staged": "12.3.8",
     "nodemon": "^2.0.15",
     "prettier": "^2.4.1",
     "ts-node": "^10.4.0",
@@ -89,7 +91,9 @@
     "clean": "gatsby clean",
     "migrate": "./node_modules/.bin/node-pg-migrate --envPath ./.env.development --tsconfig ./tsconfig.json -j ts -m ./src/migrations -d CONNECTION_STRING",
     "production": "./node_modules/.bin/node-pg-migrate -m lib/migrations -d CONNECTION_STRING up && NODE_ENV=production node lib/server.js",
-    "test": "jest"
+    "test": "jest",
+    "husky-setup": "husky install",
+    "precommit": "lint-staged --config .husky/pre-commit.js"
   },
   "repository": {
     "type": "git",

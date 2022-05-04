@@ -34,6 +34,7 @@ import {
   useEventSorter,
 } from "../context/Event"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
   SessionEventAttributes,
@@ -45,9 +46,8 @@ import useListEventsTrending from "../hooks/useListEventsTrending"
 import "./index.css"
 import { Column } from "../components/Layout/Column/Column"
 import { Row } from "../components/Layout/Row/Row"
-import { FeatureFlags } from "../modules/features"
+import { FilterTypeVariant, Flags } from "../modules/features"
 import { getEventType } from "../entities/Event/utils"
-import track from "decentraland-gatsby/dist/utils/development/segment"
 import { SegmentEvent } from "../modules/segment"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { getCategoriesFetch } from "../modules/events"
@@ -56,6 +56,24 @@ import useListEventsCategories from "../hooks/useListEventsCategories"
 export type IndexPageState = {
   updating: Record<string, boolean>
 }
+
+const toggleItems = [
+  {
+    title: "All events",
+    description: "Every event in Decentraland",
+    value: ToggleItemsValue.All,
+  },
+  {
+    title: "One time event",
+    description: "Events which happen once",
+    value: ToggleItemsValue.One,
+  },
+  {
+    title: "Recurring event",
+    description: "Events which happen on more than one day",
+    value: ToggleItemsValue.Recurrent,
+  },
+]
 
 export default function IndexPage() {
   const l = useFormatMessage()
@@ -68,8 +86,9 @@ export default function IndexPage() {
   const [event] = useEventIdContext(params.get("event"))
   const [settings] = useProfileSettingsContext()
   const [all, state] = useEventsContext()
+  const track = useTrackContext()
   const events = useEventSorter(all)
-  const [ff] = useFeatureFlagContext()
+  const [ff ] = useFeatureFlagContext()
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))
@@ -148,17 +167,10 @@ export default function IndexPage() {
         newParams.set("type", type)
       }
 
-      track((analytics) =>
-        analytics.track(SegmentEvent.Filter, {
-          ethAddress: address,
-          featureFlag: ff.flags,
-          type,
-        })
-      )
-
+      track(SegmentEvent.Filter, { type })
       navigate(locations.events(newParams))
     },
-    [location.pathname, params, ff]
+    [location.pathname, params]
   )
 
   const handleTagChange = useCallback(
@@ -198,7 +210,7 @@ export default function IndexPage() {
   )
 
   const cardItemsPerRow = useMemo(
-    () => (ff.flags && Object.values(ff.flags).find(Boolean) ? 2 : 3),
+    () => ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.disabled ? 3 : 2,
     [ff.flags]
   )
 
