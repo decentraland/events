@@ -34,7 +34,9 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         text: {
           type: "mrkdwn",
           text: [
-            `*<${eventUrl(event)}|${event.name}>* by ${event.user_name || "Guest"}`,
+            `*<${eventUrl(event)}|${event.name}>* by ${
+              event.user_name || "Guest"
+            }`,
             `_${event.description || "No description"}_`,
             "",
             event.url &&

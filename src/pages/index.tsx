@@ -1,9 +1,4 @@
-import React, {
-  useMemo,
-  useState,
-  Fragment,
-  useCallback,
-} from "react"
+import React, { useMemo, useState, Fragment, useCallback } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -51,9 +46,16 @@ import useListEventsTrending from "../hooks/useListEventsTrending"
 import "./index.css"
 import { Column } from "../components/Layout/Column/Column"
 import { Row } from "../components/Layout/Row/Row"
-import { FilterTypeVariant, Flags } from "../modules/features"
+import {
+  FilterCategoryVariant,
+  FilterTypeVariant,
+  Flags,
+} from "../modules/features"
 import { getEventType } from "../entities/Event/utils"
 import { SegmentEvent } from "../modules/segment"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import { getCategoriesFetch } from "../modules/events"
+import useListEventsCategories from "../hooks/useListEventsCategories"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -90,19 +92,72 @@ export default function IndexPage() {
   const [all, state] = useEventsContext()
   const track = useTrackContext()
   const events = useEventSorter(all)
-  const [ff ] = useFeatureFlagContext()
+  const [ff] = useFeatureFlagContext()
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))
+  const [address, actions] = useAuthContext()
+  const [categories] = useAsyncMemo(getCategoriesFetch)
 
   const filteredEvents = useListEventsFiltered(events, {
     search: params.get("search"),
+    categories: params.get("category"),
     type: typeFilter,
   })
 
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const trendingEvents = useListEventsTrending(filteredEvents)
-  const mainEvents = useListEventsMain(events)
+  const mainEvents = useListEventsMain(filteredEvents)
+  const categoriesUsed = useListEventsCategories(events, categories)
+
+  // Items to be used in the toggle
+  const toggleItems = useMemo(
+    () => [
+      {
+        title: "All events",
+        description: "Every event in Decentraland",
+        active: typeFilter === ToggleItemsValue.All,
+        value: ToggleItemsValue.All,
+      },
+      {
+        title: "One time event",
+        description: "Events which happen once",
+        active: typeFilter === ToggleItemsValue.One,
+        value: ToggleItemsValue.One,
+      },
+      {
+        title: "Recurring event",
+        description: "Events which happen on more than one day",
+        active: typeFilter === ToggleItemsValue.Recurrent,
+        value: ToggleItemsValue.Recurrent,
+      },
+    ],
+    [typeFilter]
+  )
+
+  const categoryItems = useMemo(() => {
+    let categoriesToReturn = [
+      {
+        title: "All",
+        description: "",
+        active: !params.get("category") || params.get("category") == "all",
+        value: "all",
+      },
+    ]
+
+    if (categoriesUsed) {
+      const categoriesOptions = categoriesUsed?.map((category) => ({
+        title: l(`page.events.categories.${category.name}`),
+        description: "",
+        active: params.get("category") === category.name,
+        value: category.name,
+      }))
+
+      categoriesToReturn = [...categoriesToReturn, ...categoriesOptions]
+    }
+
+    return categoriesToReturn
+  }, [categoriesUsed, params.get("category")])
 
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
@@ -122,6 +177,25 @@ export default function IndexPage() {
     [location.pathname, params]
   )
 
+  const handleTagChange = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
+      const newParams = new URLSearchParams(params)
+
+      const category = (item as any).value
+
+      // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
+      if (category === "All") {
+        newParams.delete("category")
+      } else {
+        newParams.set("category", category)
+      }
+
+      track(SegmentEvent.Filter, { category })
+      navigate(locations.events(newParams))
+    },
+    [location.pathname, params, ff]
+  )
+
   const [enabledNotification, setEnabledNotification] = useState(false)
   const handleEventClick = useCallback(
     (e: React.MouseEvent<any>, event: SessionEventAttributes) => {
@@ -133,7 +207,13 @@ export default function IndexPage() {
   )
 
   const cardItemsPerRow = useMemo(
-    () => ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.disabled ? 3 : 2,
+    () =>
+      ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) ===
+        FilterTypeVariant.disabled &&
+      ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) ===
+        FilterCategoryVariant.disabled
+        ? 3
+        : 2,
     [ff.flags]
   )
 
@@ -194,16 +274,6 @@ export default function IndexPage() {
             <Divider />
             <Paragraph secondary style={{ textAlign: "center" }}>
               {l("page.events.no_events")}
-            </Paragraph>
-            <Divider />
-          </div>
-        )}
-
-        {!loading && events.length > 0 && filteredEvents.length === 0 && (
-          <div>
-            <Divider />
-            <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.events.not_found")}
             </Paragraph>
             <Divider />
           </div>
@@ -283,21 +353,72 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {(
-              ff.name<FilterTypeVariant>(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.enabled
-            ) && (
-              <Column align="left" className="sidebar">
-                {ff.name<FilterTypeVariant>(Flags.FilterTypeVariant, FilterTypeVariant.disabled) === FilterTypeVariant.enabled && (
-                  <ToggleBox
-                    header="Type"
-                    onClick={handleTypeChange}
-                    items={toggleItems}
-                    value={typeFilter}
-                  />
-                )}
-              </Column>
-            )}
+            {events.length !== 0 &&
+              (ff.name<FilterTypeVariant>(
+                Flags.FilterTypeVariant,
+                FilterTypeVariant.disabled
+              ) === FilterTypeVariant.enabled ||
+                ff.name<FilterCategoryVariant>(
+                  Flags.FilterCategoryVariant,
+                  FilterCategoryVariant.disabled
+                ) === FilterCategoryVariant.enabled) && (
+                <Column align="left" className="sidebar">
+                  {ff.name<FilterTypeVariant>(
+                    Flags.FilterTypeVariant,
+                    FilterTypeVariant.disabled
+                  ) === FilterTypeVariant.enabled && (
+                    <ToggleBox
+                      header="Type"
+                      onClick={handleTypeChange}
+                      items={toggleItems}
+                    />
+                  )}
+
+                  {ff.name<FilterCategoryVariant>(
+                    Flags.FilterCategoryVariant,
+                    FilterCategoryVariant.disabled
+                  ) === FilterCategoryVariant.enabled && (
+                    // TODO: move to `decentraland-ui`
+                    <div className={"dcl box borderless"}>
+                      <div className={"dcl box-header"}>Tag</div>
+                      <div className={"dcl box-children"}>
+                        {categoryItems.map((item, index) => {
+                          const classesItem = ["dcl", "togglebox-item"]
+                          if (
+                            (params.get("category") &&
+                              params.get("category") === item.value) ||
+                            (!params.get("category") && item.value == "all")
+                          ) {
+                            classesItem.push("active")
+                          }
+                          return (
+                            <div
+                              key={index}
+                              className={classesItem.join(" ")}
+                              onClick={(event) => handleTagChange(event, item)}
+                            >
+                              <div className={"dcl togglebox-item-title"}>
+                                {item.title}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </Column>
+              )}
             <Column align="right" grow={true}>
+              {!loading && events.length > 0 && filteredEvents.length === 0 && (
+                <div>
+                  <Divider />
+                  <Paragraph secondary style={{ textAlign: "center" }}>
+                    {l("page.events.not_found")}
+                  </Paragraph>
+                  <Divider />
+                </div>
+              )}
+
               {eventsByMonth.length > 0 &&
                 eventsByMonth.map(([date, events]) => (
                   <Fragment key={"month:" + date.toJSON()}>

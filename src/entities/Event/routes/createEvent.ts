@@ -17,6 +17,7 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { newEventSchema } from "../schemas"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import EventCategoryModel from "../../EventCategory/model"
 
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -61,15 +62,25 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   const recurrent = calculateRecurrentProperties(data)
 
-  /**
-   * Verify that the duration event is not longer than the max allowed, like 24Hrs
-   */
   if (recurrent.duration > MAX_EVENT_DURATION) {
     throw new RequestError(
       `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
       RequestError.BadRequest,
       { body: data }
     )
+  }
+
+  if (data.categories.length) {
+    const validation = await EventCategoryModel.validateCategories(
+      data.categories
+    )
+    if (!validation) {
+      throw new RequestError(
+        `Invalid category tag supplied`,
+        RequestError.BadRequest,
+        { body: data }
+      )
+    }
   }
 
   const now = new Date()

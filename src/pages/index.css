@@ -71,3 +71,7 @@
     margin-right: 15px;
   }
 }
+
+.dcl.borderless {
+  border-color: transparent;
+}
