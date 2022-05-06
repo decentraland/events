@@ -236,3 +236,8 @@ export enum ToggleItemsValue {
 }
 
 export const MAX_CATAGORIES_ALLOWED = 1
+
+export type EventTimeParams = {
+  start: number
+  end: number
+}

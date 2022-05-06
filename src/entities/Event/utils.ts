@@ -9,6 +9,7 @@ import {
   RecurrentEventAttributes,
   MAX_EVENT_RECURRENT,
   ToggleItemsValue,
+  EventTimeParams,
 } from "./types"
 import { RRule, Weekday } from "rrule"
 
@@ -289,5 +290,43 @@ export function getEventType(type: string | null) {
 
     default:
       return ToggleItemsValue.All
+  }
+}
+
+export function validateTime(time: string, defaultTime: number): number {
+  let newTime = Number(time)
+  if (isNaN(newTime) || newTime < 0 || newTime > 2400) {
+    newTime = defaultTime
+  }
+  return newTime
+}
+
+export function getEventTime(
+  from: string | null,
+  to: string | null
+): EventTimeParams {
+  let fromTime: string | number = from || "0000"
+  let toTime: string | number = to || "2400"
+  const fromTimeDefault = 0
+  const toTimeDefault = 2400
+
+  fromTime = validateTime(fromTime, fromTimeDefault)
+  toTime = validateTime(toTime, toTimeDefault)
+
+  const fromTimeHour = Math.floor(fromTime / 100)
+  const fromTimeMinute = fromTime % 100 === 30 ? 30 : 0
+  const toTimeHour = Math.floor(toTime / 100)
+  const toTimeMinute = toTime % 100 === 30 ? 30 : 0
+
+  const fromInMinutes = fromTimeHour * 60 + fromTimeMinute
+  let toInMinutes = toTimeHour * 60 + toTimeMinute
+
+  if (fromInMinutes > toInMinutes) {
+    toInMinutes = fromInMinutes
+  }
+
+  return {
+    start: fromInMinutes,
+    end: toInMinutes,
   }
 }
