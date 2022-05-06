@@ -377,7 +377,7 @@ export default function IndexPage() {
                   {ff.name<FilterCategoryVariant>(
                     Flags.FilterCategoryVariant,
                     FilterCategoryVariant.disabled
-                  ) === FilterCategoryVariant.enabled && (
+                  ) === FilterCategoryVariant.enabled && categoryItems.length > 1 && (
                       // TODO: move to `decentraland-ui`
                       <div className={"dcl box borderless"}>
                         <div className={"dcl box-header"}>Tag</div>
