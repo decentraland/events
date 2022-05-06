@@ -57,10 +57,12 @@ export default function EventModal({
       )}
       {showEvent && <ImgFixed src={event!.image || ""} dimension="wide" />}
       {showEvent && <EventStatusBanner event={event!} />}
-      {showEvent && <EventDetail
-        event={event!}
-        onClickAttendees={() => setAttendees(true)}
-      />}
+      {showEvent && (
+        <EventDetail
+          event={event!}
+          onClickAttendees={() => setAttendees(true)}
+        />
+      )}
 
       {(showSocialActions || showApproveActions) && <EventSection.Divider />}
 

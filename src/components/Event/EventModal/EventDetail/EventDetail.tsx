@@ -49,190 +49,190 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const dates = completed
     ? event.recurrent_dates
     : event.recurrent_dates.filter(
-      (date) => date.getTime() + event.duration > now
-    )
+        (date) => date.getTime() + event.duration > now
+      )
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
   const advance = event.editable || event.owned
   const [settings] = useProfileSettingsContext()
   const utc = props.utc ?? !settings?.use_local_time
 
-  const handleAttendees = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (props.onClickAttendees) {
-      props.onClickAttendees(e, event)
-    }
-  }, [props.onClickAttendees])
+  const handleAttendees = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (props.onClickAttendees) {
+        props.onClickAttendees(e, event)
+      }
+    },
+    [props.onClickAttendees]
+  )
 
-  return <div className={"EventDetail"}>
-    <div className="EventDetail__Header">
-      <DateBox date={next_start_at} utc={utc} />
-      <div className="EventDetail__Header__Event">
-        <SubTitle>{event.name}</SubTitle>
-        <Paragraph className="EventDetail__Header__Event__By" secondary>
-          Public, Organized by <Link>{event.user_name || "Guest"}</Link>
-        </Paragraph>
+  return (
+    <div className={"EventDetail"}>
+      <div className="EventDetail__Header">
+        <DateBox date={next_start_at} utc={utc} />
+        <div className="EventDetail__Header__Event">
+          <SubTitle>{event.name}</SubTitle>
+          <Paragraph className="EventDetail__Header__Event__By" secondary>
+            Public, Organized by <Link>{event.user_name || "Guest"}</Link>
+          </Paragraph>
+        </div>
+        {props.showEdit !== false && advance && (
+          <div className="EventDetail__Header__Actions">
+            <Button
+              basic
+              as="a"
+              href={locations.edit(event.id)}
+              onClick={prevent(() => navigate(locations.edit(event.id)))}
+            >
+              {" "}
+              EDIT{" "}
+            </Button>
+          </div>
+        )}
       </div>
-      {props.showEdit !== false && advance && (
-        <div className="EventDetail__Header__Actions">
-          <Button
-            basic
-            as="a"
-            href={locations.edit(event.id)}
-            onClick={prevent(() => navigate(locations.edit(event.id)))}
-          >
-            {" "}
-            EDIT{" "}
-          </Button>
+
+      {/* DESCRIPTION */}
+      {props.showDescription !== false && <EventSection.Divider />}
+      {props.showDescription !== false && (
+        <EventSection>
+          <EventSection.Icon src={infoIcon} width="16" height="16" />
+          <EventSection.Detail>
+            {!event.description && (
+              <Paragraph secondary={!event.description}>
+                <Italic>No description</Italic>
+              </Paragraph>
+            )}
+            {event.description && <Markdown children={event.description} />}
+          </EventSection.Detail>
+          <EventSection.Action />
+        </EventSection>
+      )}
+
+      {/* DATE */}
+      {props.showDate !== false && <EventSection.Divider />}
+      {props.showDate !== false && props.showAllDates === false && (
+        <EventDateDetail
+          event={event}
+          startAt={next_start_at}
+          countdown={!!props.showCountdownDate}
+        />
+      )}
+      {props.showDate !== false && props.showAllDates !== false && (
+        <div style={{ overflow: "auto" }}>
+          {dates.map((date, i) => {
+            return (
+              <EventDateDetail
+                key={date.getTime()}
+                style={i > 0 ? { paddingTop: "0" } : {}}
+                secondary={i > 0 || date.getTime() + event.duration < now}
+                completed={date.getTime() + event.duration < now}
+                event={event}
+                startAt={date}
+              />
+            )
+          })}
         </div>
       )}
-    </div>
 
-    {/* DESCRIPTION */}
-    {props.showDescription !== false && <EventSection.Divider />}
-    {props.showDescription !== false && (
-      <EventSection>
-        <EventSection.Icon src={infoIcon} width="16" height="16" />
-        <EventSection.Detail>
-          {!event.description && (
-            <Paragraph secondary={!event.description}>
-              <Italic>No description</Italic>
-            </Paragraph>
-          )}
-          {event.description && <Markdown children={event.description} />}
-        </EventSection.Detail>
-        <EventSection.Action />
-      </EventSection>
-    )}
+      {/* PLACE */}
+      {props.showPlace !== false && <EventSection.Divider />}
+      {props.showPlace !== false && (
+        <EventSection>
+          <EventSection.Icon src={pinIcon} width="16" height="16" />
+          <EventSection.Detail>
+            <Paragraph bold>{event.scene_name || "Decentraland"}</Paragraph>
+          </EventSection.Detail>
+          <EventSection.Action>
+            <JumpInButton event={event} />
+          </EventSection.Action>
+        </EventSection>
+      )}
 
-    {/* DATE */}
-    {props.showDate !== false && <EventSection.Divider />}
-    {props.showDate !== false && props.showAllDates === false && (
-      <EventDateDetail
-        event={event}
-        startAt={next_start_at}
-        countdown={!!props.showCountdownDate}
-      />
-    )}
-    {props.showDate !== false && props.showAllDates !== false && (
-      <div style={{ overflow: "auto" }}>
-        {dates.map((date, i) => {
-          return (
-            <EventDateDetail
-              key={date.getTime()}
-              style={i > 0 ? { paddingTop: "0" } : {}}
-              secondary={i > 0 || date.getTime() + event.duration < now}
-              completed={date.getTime() + event.duration < now}
-              event={event}
-              startAt={date}
-            />
-          )
-        })}
-      </div>
-    )}
-
-    {/* PLACE */}
-    {props.showPlace !== false && <EventSection.Divider />}
-    {props.showPlace !== false && (
-      <EventSection>
-        <EventSection.Icon src={pinIcon} width="16" height="16" />
-        <EventSection.Detail>
-          <Paragraph bold>{event.scene_name || "Decentraland"}</Paragraph>
-        </EventSection.Detail>
-        <EventSection.Action>
-          <JumpInButton event={event} />
-        </EventSection.Action>
-      </EventSection>
-    )}
-
-    {/* ATTENDEES */}
-    {props.showAttendees !== false && <EventSection.Divider />}
-    {props.showAttendees !== false && (
-      <EventSection>
-        <EventSection.Icon
-          src={friendsIcon}
-          width="16x"
-          height="16"
-          center
-        />
-        <EventSection.Detail
-          style={{
-            display: "flex",
-            justifyContent: attendeesDiff > 0 ? "space-around" : "",
-          }}
-        >
-          {(event.latest_attendees || [])
-            .slice(0, ATTENDEES_PREVIEW_LIMIT)
-            .map((address) => (
+      {/* ATTENDEES */}
+      {props.showAttendees !== false && <EventSection.Divider />}
+      {props.showAttendees !== false && (
+        <EventSection>
+          <EventSection.Icon src={friendsIcon} width="16x" height="16" center />
+          <EventSection.Detail
+            style={{
+              display: "flex",
+              justifyContent: attendeesDiff > 0 ? "space-around" : "",
+            }}
+          >
+            {(event.latest_attendees || [])
+              .slice(0, ATTENDEES_PREVIEW_LIMIT)
+              .map((address) => (
+                <div
+                  key={address}
+                  style={attendeesDiff <= 0 ? { margin: "0 .4rem" } : {}}
+                >
+                  <Avatar key={address} size="small" address={address} />
+                </div>
+              ))}
+            {event.total_attendees === 0 && (
+              <Paragraph secondary>
+                <Italic>Nobody confirmed yet</Italic>
+              </Paragraph>
+            )}
+          </EventSection.Detail>
+          <EventSection.Action>
+            {attendeesDiff > 0 && (
               <div
-                key={address}
-                style={attendeesDiff <= 0 ? { margin: "0 .4rem" } : {}}
+                className="EventDetail__Detail__ShowAttendees"
+                onClick={handleAttendees}
               >
-                <Avatar key={address} size="small" address={address} />
+                {`+${attendeesDiff}`}
               </div>
-            ))}
-          {event.total_attendees === 0 && (
-            <Paragraph secondary>
-              <Italic>Nobody confirmed yet</Italic>
-            </Paragraph>
-          )}
-        </EventSection.Detail>
-        <EventSection.Action>
-          {attendeesDiff > 0 && (
-            <div
-              className="EventDetail__Detail__ShowAttendees"
-              onClick={handleAttendees}
-            >
-              {`+${attendeesDiff}`}
-            </div>
-          )}
-        </EventSection.Action>
-      </EventSection>
-    )}
+            )}
+          </EventSection.Action>
+        </EventSection>
+      )}
 
-    {/* CONTACT */}
-    {props.showContact !== false && !event.approved && advance && (
-      <EventSection.Divider />
-    )}
-    {props.showContact !== false && !event.approved && advance && (
-      <EventSection highlight>
-        <EventSection.Icon src={extraIcon} width="16" height="16" />
-        <EventSection.Detail>
-          {event.contact && !isEmail(event.contact) && (
-            <Paragraph>{event.contact}</Paragraph>
-          )}
-          {event.contact && isEmail(event.contact) && (
-            <Paragraph>
-              <Link href={"mailto:" + event.contact} target="_blank">
-                {event.contact}
-              </Link>
-            </Paragraph>
-          )}
-          {!event.contact && (
-            <Paragraph secondary={!event.contact}>
-              <Italic>No contact</Italic>
-            </Paragraph>
-          )}
-        </EventSection.Detail>
-        <EventSection.Action />
-      </EventSection>
-    )}
+      {/* CONTACT */}
+      {props.showContact !== false && !event.approved && advance && (
+        <EventSection.Divider />
+      )}
+      {props.showContact !== false && !event.approved && advance && (
+        <EventSection highlight>
+          <EventSection.Icon src={extraIcon} width="16" height="16" />
+          <EventSection.Detail>
+            {event.contact && !isEmail(event.contact) && (
+              <Paragraph>{event.contact}</Paragraph>
+            )}
+            {event.contact && isEmail(event.contact) && (
+              <Paragraph>
+                <Link href={"mailto:" + event.contact} target="_blank">
+                  {event.contact}
+                </Link>
+              </Paragraph>
+            )}
+            {!event.contact && (
+              <Paragraph secondary={!event.contact}>
+                <Italic>No contact</Italic>
+              </Paragraph>
+            )}
+          </EventSection.Detail>
+          <EventSection.Action />
+        </EventSection>
+      )}
 
-    {/* DETAILS */}
-    {props.showContact !== false && !event.approved && advance && (
-      <EventSection.Divider />
-    )}
-    {props.showContact !== false && !event.approved && advance && (
-      <EventSection highlight>
-        <EventSection.Icon src={extraIcon} width="16" height="16" />
-        <EventSection.Detail>
-          {event.details && <Paragraph>{event.details}</Paragraph>}
-          {!event.details && (
-            <Paragraph secondary={!event.details}>
-              <Italic>No details</Italic>
-            </Paragraph>
-          )}
-        </EventSection.Detail>
-        <EventSection.Action />
-      </EventSection>
-    )}
-  </div>
+      {/* DETAILS */}
+      {props.showContact !== false && !event.approved && advance && (
+        <EventSection.Divider />
+      )}
+      {props.showContact !== false && !event.approved && advance && (
+        <EventSection highlight>
+          <EventSection.Icon src={extraIcon} width="16" height="16" />
+          <EventSection.Detail>
+            {event.details && <Paragraph>{event.details}</Paragraph>}
+            {!event.details && (
+              <Paragraph secondary={!event.details}>
+                <Italic>No details</Italic>
+              </Paragraph>
+            )}
+          </EventSection.Detail>
+          <EventSection.Action />
+        </EventSection>
+      )}
+    </div>
+  )
 }

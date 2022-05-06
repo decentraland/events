@@ -33,7 +33,10 @@ export default React.memo(function EventCard(props: EventCardProps) {
       new Date(event ? Date.parse(event.next_start_at.toString()) : Date.now()),
     [event?.next_start_at]
   )
-  const handleJumpIn = useCallback((e: React.MouseEvent<any>) => e.preventDefault(), [])
+  const handleJumpIn = useCallback(
+    (e: React.MouseEvent<any>) => e.preventDefault(),
+    []
+  )
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (event) {
@@ -77,12 +80,14 @@ export default React.memo(function EventCard(props: EventCardProps) {
         <ImgFixed src={event?.image || ""} dimension="wide" />
       </div>
       <Card.Content>
-        {event && <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <EventDate event={event} />
-          <div>
-            <JumpInPosition event={event} onClick={handleJumpIn} />
+        {event && (
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <EventDate event={event} />
+            <div>
+              <JumpInPosition event={event} onClick={handleJumpIn} />
+            </div>
           </div>
-        </div>}
+        )}
 
         <Card.Header>{event?.name || " "}</Card.Header>
         <Card.Description>

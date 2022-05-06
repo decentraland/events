@@ -209,7 +209,7 @@ export default function IndexPage() {
     () =>
       ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) ===
         FilterTypeVariant.disabled &&
-        ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) ===
+      ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) ===
         FilterCategoryVariant.disabled
         ? 3
         : 2,
@@ -366,18 +366,19 @@ export default function IndexPage() {
                     Flags.FilterTypeVariant,
                     FilterTypeVariant.disabled
                   ) === FilterTypeVariant.enabled && (
-                      <ToggleBox
-                        header="Type"
-                        onClick={handleTypeChange}
-                        items={toggleItems}
-                        value={typeFilter}
-                      />
-                    )}
+                    <ToggleBox
+                      header="Type"
+                      onClick={handleTypeChange}
+                      items={toggleItems}
+                      value={typeFilter}
+                    />
+                  )}
 
                   {ff.name<FilterCategoryVariant>(
                     Flags.FilterCategoryVariant,
                     FilterCategoryVariant.disabled
-                  ) === FilterCategoryVariant.enabled && categoryItems.length > 1 && (
+                  ) === FilterCategoryVariant.enabled &&
+                    categoryItems.length > 1 && (
                       // TODO: move to `decentraland-ui`
                       <div className={"dcl box borderless"}>
                         <div className={"dcl box-header"}>Tag</div>
@@ -395,7 +396,9 @@ export default function IndexPage() {
                               <div
                                 key={index}
                                 className={classesItem.join(" ")}
-                                onClick={(event) => handleTagChange(event, item)}
+                                onClick={(event) =>
+                                  handleTagChange(event, item)
+                                }
                               >
                                 <div className={"dcl togglebox-item-title"}>
                                   {item.title}

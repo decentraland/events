@@ -156,30 +156,36 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
 
   return (
     <div className="AttendingButtons">
-      {fallbackShare && <Button
-        inverted
-        size="small"
-        className="share fluid"
-        onClick={handleShareFacebook}
-      >
-        <img src={facebookIcon} width="10" height="16" />
-      </Button>}
-      {fallbackShare && <Button
-        inverted
-        size="small"
-        className="share fluid"
-        onClick={handleShareTwitter}
-      >
-        <img src={twitterIcon} width="18" height="15" />
-      </Button>}
-      {fallbackShare && <Button
-        inverted
-        size="small"
-        className="share"
-        onClick={handleFallbackShareClose}
-      >
-        <img src={closeIcon} width="14" height="14" />
-      </Button>}
+      {fallbackShare && (
+        <Button
+          inverted
+          size="small"
+          className="share fluid"
+          onClick={handleShareFacebook}
+        >
+          <img src={facebookIcon} width="10" height="16" />
+        </Button>
+      )}
+      {fallbackShare && (
+        <Button
+          inverted
+          size="small"
+          className="share fluid"
+          onClick={handleShareTwitter}
+        >
+          <img src={twitterIcon} width="18" height="15" />
+        </Button>
+      )}
+      {fallbackShare && (
+        <Button
+          inverted
+          size="small"
+          className="share"
+          onClick={handleFallbackShareClose}
+        >
+          <img src={closeIcon} width="14" height="14" />
+        </Button>
+      )}
 
       {!fallbackShare && isLive && (actions.provider || !isMobile) && (
         <Button
@@ -225,25 +231,28 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare && !isLive && event?.attending && (actions.provider || !isMobile) && (
-        <Button
-          inverted
-          primary
-          size="small"
-          className="share"
-          disabled={loading || sharing || !approved}
-          onClick={handleNotify}
-        >
-          <img
-            src={
-              (event?.notify && notificationEnabledIcon) ||
-              notificationDisabledIcon
-            }
-            width="22"
-            height="22"
-          />
-        </Button>
-      )}
+      {!fallbackShare &&
+        !isLive &&
+        event?.attending &&
+        (actions.provider || !isMobile) && (
+          <Button
+            inverted
+            primary
+            size="small"
+            className="share"
+            disabled={loading || sharing || !approved}
+            onClick={handleNotify}
+          >
+            <img
+              src={
+                (event?.notify && notificationEnabledIcon) ||
+                notificationDisabledIcon
+              }
+              width="22"
+              height="22"
+            />
+          </Button>
+        )}
 
       {!fallbackShare && (actions.provider || !isMobile) && (
         <Button
