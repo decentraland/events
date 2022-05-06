@@ -64,35 +64,39 @@ export default function useListEventsFiltered(
       })
     }
 
-    const fromHour = Time.duration(filter.time.start, "minutes").format("HH")
-    const fromMinute = Time.duration(filter.time.start, "minutes").format("mm")
-    const toHour = Time.duration(filter.time.end, "minutes").format("HH")
-    const toMinute = Time.duration(filter.time.end, "minutes").format("mm")
+    if (filter.time) {
+      const fromHour = Time.duration(filter.time.start, "minutes").format("HH")
+      const fromMinute = Time.duration(filter.time.start, "minutes").format(
+        "mm"
+      )
+      const toHour = Time.duration(filter.time.end, "minutes").format("HH")
+      const toMinute = Time.duration(filter.time.end, "minutes").format("mm")
 
-    events = events.filter((event) => {
-      const eventDate = Time.from(event.start_at, {
-        utc: !settings?.use_local_time,
-      })
+      events = events.filter((event) => {
+        const eventDate = Time.from(event.start_at, {
+          utc: !settings?.use_local_time,
+        })
 
-      let eventTimeFrom = Time.from(event.start_at, {
-        utc: !settings?.use_local_time,
-      })
-        .set("hour", Number(fromHour))
-        .set("minute", Number(fromMinute))
-      let eventTimeTo = Time.from(event.start_at, {
-        utc: !settings?.use_local_time,
-      })
-        .set("hour", Number(toHour))
-        .set("minute", Number(toMinute))
-      if (filter.time.start === 1440) {
-        eventTimeFrom = eventTimeFrom.add(1, "day")
-      }
-      if (filter.time.end === 1440) {
-        eventTimeTo = eventTimeTo.add(1, "day")
-      }
+        let eventTimeFrom = Time.from(event.start_at, {
+          utc: !settings?.use_local_time,
+        })
+          .set("hour", Number(fromHour))
+          .set("minute", Number(fromMinute))
+        let eventTimeTo = Time.from(event.start_at, {
+          utc: !settings?.use_local_time,
+        })
+          .set("hour", Number(toHour))
+          .set("minute", Number(toMinute))
+        if (filter?.time?.start === 1440) {
+          eventTimeFrom = eventTimeFrom.add(1, "day")
+        }
+        if (filter?.time?.end === 1440) {
+          eventTimeTo = eventTimeTo.add(1, "day")
+        }
 
-      return eventDate.isBetween(eventTimeFrom, eventTimeTo, null, "[]")
-    })
+        return eventDate.isBetween(eventTimeFrom, eventTimeTo, null, "[]")
+      })
+    }
 
     return events
   }, [events, filter])
