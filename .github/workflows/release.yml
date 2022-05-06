@@ -43,6 +43,12 @@ jobs:
       #   with:
       #     github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: setup environment
+        run: source ./node_modules/.bin/setup-environment $PWD website-events-prd
+
+      - name: export public env
+        run: env | grep GATSBY_ > .env
+
       - name: build image
         id: build-image
         uses: redhat-actions/buildah-build@v2
