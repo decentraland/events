@@ -7,11 +7,11 @@ export type RangeProps = {
   className?: string
   min?: number
   max?: number
-  defaultValue?: number[]
-  value?: number[]
+  defaultValue?: readonly [number, number]
+  value?: readonly [number, number]
   label?: string | React.PureComponent<{ value: [number, number] }>
-  onChange?: (props: number | number[]) => void
-  onMouseUp?: (props: number | number[]) => void
+  onChange?: (props: [number, number]) => void
+  onMouseUp?: (props: [number, number]) => void
 }
 
 export default function Range(props: RangeProps) {
@@ -35,7 +35,7 @@ export default function Range(props: RangeProps) {
   const handleChange = useCallback(
     (value: number | number[]) => {
       if (onChange) {
-        onChange(value)
+        onChange(value as [number, number])
       }
     },
     [onChange]
@@ -44,7 +44,7 @@ export default function Range(props: RangeProps) {
   const handleAfterChange = useCallback(
     (value: number | number[]) => {
       if (onMouseUp) {
-        onMouseUp(value)
+        onMouseUp(value as [number, number])
       }
     },
     [onChange]
@@ -60,8 +60,8 @@ export default function Range(props: RangeProps) {
           min={min || 0}
           max={max || 100}
           allowCross={false}
-          defaultValue={defaultValue}
-          value={value}
+          defaultValue={defaultValue as [number, number]}
+          value={value as [number, number]}
           onChange={handleChange}
           onAfterChange={handleAfterChange}
         />

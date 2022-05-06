@@ -167,7 +167,7 @@ export default function IndexPage() {
   }, [eventTime])
 
   const timeRangeValue = useMemo(() => {
-    return [timeFilter.start / 30, timeFilter.end / 30]
+    return [timeFilter.start / 30, timeFilter.end / 30] as const
   }, [timeFilter])
 
   const cardItemsPerRow = useMemo(
@@ -218,9 +218,7 @@ export default function IndexPage() {
     [location.pathname, params, ff]
   )
 
-  const handleRangeChange = useCallback((value: number | number[]) => {
-    const valueArray: number[] = Array.isArray(value) ? value : [0, value]
-
+  const handleRangeChange = useCallback((valueArray: [number, number]) => {
     const from = Time.from((Time.Hour / 2) * valueArray[0], {
       utc: true,
     }).format("HHmm")
@@ -235,8 +233,7 @@ export default function IndexPage() {
     setEventTime(eventTimeData)
   }, [])
 
-  const handleRangeAfterChange = useCallback((value: number | number[]) => {
-    const valueArray: number[] = Array.isArray(value) ? value : [0, value]
+  const handleRangeAfterChange = useCallback((valueArray: [number, number]) => {
     const from = Time.from((Time.Hour / 2) * valueArray[0], {
       utc: true,
     }).format("HHmm")
