@@ -33,6 +33,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
       new Date(event ? Date.parse(event.next_start_at.toString()) : Date.now()),
     [event?.next_start_at]
   )
+  const handleJumpIn = useCallback((e: React.MouseEvent<any>) => e.preventDefault(), [])
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (event) {
@@ -59,8 +60,8 @@ export default React.memo(function EventCard(props: EventCardProps) {
       href={href}
       onClick={handleClick}
     >
+      {event && <StartIn date={nextStartAt} />}
       <div className="EventCard__Cover">
-        {event && <StartIn date={nextStartAt} />}
         {event && event.total_attendees > 0 && (
           <div className="EventCard__Attendees">
             {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => (
@@ -76,15 +77,12 @@ export default React.memo(function EventCard(props: EventCardProps) {
         <ImgFixed src={event?.image || ""} dimension="wide" />
       </div>
       <Card.Content>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {event && <EventDate event={event} />}
+        {event && <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <EventDate event={event} />
           <div>
-            <JumpInPosition
-              event={event}
-              onClick={(e) => e.stopPropagation()}
-            />
+            <JumpInPosition event={event} onClick={handleJumpIn} />
           </div>
-        </div>
+        </div>}
 
         <Card.Header>{event?.name || " "}</Card.Header>
         <Card.Description>
