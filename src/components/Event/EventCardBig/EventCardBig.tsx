@@ -55,18 +55,16 @@ export default React.memo(function EventCardBig(props: EventCardBigProps) {
           <ImgFixed src={event?.image || ""} dimension="wide" />
         </div>
         <Card.Content>
-          {event && (
-            <EventDetail
-              event={event}
-              showEdit={false}
-              showDescription={false}
-              showAttendees={false}
-              showContact={false}
-              showDetails={false}
-              showAllDates={false}
-              showCountdownDate={true}
-            />
-          )}
+          {event && <EventDetail
+            event={event}
+            showEdit={false}
+            showDescription={false}
+            showAttendees={false}
+            showContact={false}
+            showDetails={false}
+            showAllDates={false}
+            showCountdownDate={true}
+          />}
           <EventSection>
             {event && <AttendingButtons event={event} />}
           </EventSection>

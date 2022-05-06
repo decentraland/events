@@ -1,31 +1,3 @@
-.EventNote {
-  background: #eee;
-  border: 1px solid #736e7d;
-  color: #736e7d;
-}
-
-.EventNote {
-  padding: 1em 2em;
-  text-align: center;
-  border-left: 0;
-  border-right: 0;
-}
-
-.EventDetail__Detail__Item code,
-.EventNote code {
-  font-size: 14px;
-  margin: 0;
-  white-space: pre;
-  font-family: sf mono, Menlo, Monaco, Consolas, Lucida Console, Liberation Mono,
-    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
-}
-
-.EventNote.EventNote--error {
-  background: #feced7;
-  border: 1px solid #ff3d61;
-  color: #ff3d61;
-}
-
 .EventDetail input,
 .EventDetail textarea {
   border: 1px solid #ddd;
@@ -113,6 +85,14 @@
   margin-right: 8px;
   width: 32px;
   height: 32px;
+}
+
+.EventDetail .EventDetail__Detail .EventDetail__Detail__Item code {
+  font-size: 14px;
+  margin: 0;
+  white-space: pre;
+  font-family: sf mono, Menlo, Monaco, Consolas, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
 }
 
 .EventDetail .EventDetail__Detail__ShowAttendees {

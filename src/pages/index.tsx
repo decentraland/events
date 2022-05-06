@@ -1,4 +1,4 @@
-import React, { useMemo, useState, Fragment, useCallback } from "react"
+import React, { useMemo, useState, useCallback } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -306,9 +306,9 @@ export default function IndexPage() {
               <SubTitle>TRENDING</SubTitle>
             </div>
             <Card.Group>
-              <EventCardMini loading={true} />
-              <EventCardMini loading={true} />
-              <EventCardMini loading={true} />
+              <EventCardMini loading />
+              <EventCardMini loading />
+              <EventCardMini loading />
             </Card.Group>
           </div>
         )}
@@ -340,12 +340,12 @@ export default function IndexPage() {
               </SubTitle>
             </div>
             <Card.Group>
-              <EventCard loading={true} />
-              <EventCard loading={true} />
-              <EventCard loading={true} />
-              <EventCard loading={true} />
-              <EventCard loading={true} />
-              <EventCard loading={true} />
+              <EventCard loading />
+              <EventCard loading />
+              <EventCard loading />
+              <EventCard loading />
+              <EventCard loading />
+              <EventCard loading />
             </Card.Group>
           </div>
         )}
@@ -421,7 +421,7 @@ export default function IndexPage() {
 
               {eventsByMonth.length > 0 &&
                 eventsByMonth.map(([date, events]) => (
-                  <Fragment key={"month:" + date.toJSON()}>
+                  <div key={"month:" + date.toJSON()}>
                     <div className="GroupTitle">
                       <SubTitle>
                         {Time.from(date, {
@@ -438,7 +438,7 @@ export default function IndexPage() {
                         />
                       ))}
                     </Card.Group>
-                  </Fragment>
+                  </div>
                 ))}
             </Column>
           </Row>

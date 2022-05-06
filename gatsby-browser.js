@@ -30,15 +30,13 @@ import locations from "./src/modules/locations"
 export const registerServiceWorker = () => true
 
 export const wrapRootElement = ({ element }) => (
-  <>
-    <AuthProvider>
-      <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
-        <ProfileSettings>
-          <Events>{element}</Events>
-        </ProfileSettings>
-      </FeatureFlagProvider>
-    </AuthProvider>
-  </>
+  <AuthProvider>
+    <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
+      <ProfileSettings>
+        <Events>{element}</Events>
+      </ProfileSettings>
+    </FeatureFlagProvider>
+  </AuthProvider>
 )
 
 export const wrapPageElement = ({ element, props }) => {
