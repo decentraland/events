@@ -13,7 +13,7 @@ export default function useListEventsFiltered(
     search?: string | null
     type?: ToggleItemsValue | null
     categories?: string | null
-    time: EventTimeParams
+    time?: EventTimeParams
   },
   settings?: ProfileSettingsAttributes | null
 ) {

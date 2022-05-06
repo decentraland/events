@@ -218,36 +218,34 @@ export default function IndexPage() {
     [location.pathname, params, ff]
   )
 
-  const handleRangeChange = useCallback((value: number[]) => {
-    const from = Time.from((Time.Hour / 2) * value[0], { utc: true }).format(
-      "HHmm"
-    )
-    const to = Time.from((Time.Hour / 2) * value[1], { utc: true }).format(
+  const handleRangeChange = useCallback((value: number | number[]) => {
+    const valueArray: number[] = Array.isArray(value) ? value : [0, value]
+
+    const from = Time.from((Time.Hour / 2) * valueArray[0], {
+      utc: true,
+    }).format("HHmm")
+    const to = Time.from((Time.Hour / 2) * valueArray[1], { utc: true }).format(
       "HHmm"
     )
 
     const eventTimeData = getEventTime(
-      value[0] === 48 ? "2400" : from,
-      value[1] === 48 ? "2400" : to
+      valueArray[0] === 48 ? "2400" : from,
+      valueArray[1] === 48 ? "2400" : to
     )
-
     setEventTime(eventTimeData)
-    /* const newParams = new URLSearchParams(params)
-    newParams.set("time-from", value[0] === 48 ? "2400" : from)
-    newParams.set("time-to", value[1] === 48 ? "2400" : to)
-    navigate(locations.events(newParams)) */
   }, [])
 
-  const handleRangeAfterChange = useCallback((value: number[]) => {
-    const from = Time.from((Time.Hour / 2) * value[0], { utc: true }).format(
-      "HHmm"
-    )
-    const to = Time.from((Time.Hour / 2) * value[1], { utc: true }).format(
+  const handleRangeAfterChange = useCallback((value: number | number[]) => {
+    const valueArray: number[] = Array.isArray(value) ? value : [0, value]
+    const from = Time.from((Time.Hour / 2) * valueArray[0], {
+      utc: true,
+    }).format("HHmm")
+    const to = Time.from((Time.Hour / 2) * valueArray[1], { utc: true }).format(
       "HHmm"
     )
     const newParams = new URLSearchParams(params)
-    newParams.set("time-from", value[0] === 48 ? "2400" : from)
-    newParams.set("time-to", value[1] === 48 ? "2400" : to)
+    newParams.set("time-from", valueArray[0] === 48 ? "2400" : from)
+    newParams.set("time-to", valueArray[1] === 48 ? "2400" : to)
     navigate(locations.events(newParams))
   }, [])
 
@@ -469,7 +467,7 @@ export default function IndexPage() {
                       max={48}
                       defaultValue={timeRangeValue}
                       onChange={handleRangeChange}
-                      onAfterChange={handleRangeAfterChange}
+                      onMouseUp={handleRangeAfterChange}
                       label={timeRangeLabel}
                     />
                   )}

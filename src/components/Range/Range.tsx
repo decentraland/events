@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import Slider from "rc-slider"
 import "./Range.css"
 
@@ -7,11 +7,11 @@ export type RangeProps = {
   className?: string
   min?: number
   max?: number
-  label?: string
   defaultValue?: number[]
-  onChange?: Function
-  onAfterChange?: Function
   value?: number[]
+  label?: string | React.PureComponent<{ value: [number, number] }>
+  onChange?: (props: number | number[]) => void
+  onMouseUp?: (props: number | number[]) => void
 }
 
 export default function Range(props: RangeProps) {
@@ -22,7 +22,7 @@ export default function Range(props: RangeProps) {
     min,
     max,
     onChange,
-    onAfterChange,
+    onMouseUp,
     defaultValue,
     value,
   } = props
@@ -32,21 +32,23 @@ export default function Range(props: RangeProps) {
     classes.push(className)
   }
 
-  let extraProps = {}
+  const handleChange = useCallback(
+    (value: number | number[]) => {
+      if (onChange) {
+        onChange(value)
+      }
+    },
+    [onChange]
+  )
 
-  if (onChange) {
-    extraProps = {
-      ...extraProps,
-      onChange: (value: number | number[]) => onChange(value),
-    }
-  }
-
-  if (onAfterChange) {
-    extraProps = {
-      ...extraProps,
-      onAfterChange: (value: number | number[]) => onAfterChange(value),
-    }
-  }
+  const handleAfterChange = useCallback(
+    (value: number | number[]) => {
+      if (onMouseUp) {
+        onMouseUp(value)
+      }
+    },
+    [onChange]
+  )
 
   return (
     <div>
@@ -60,7 +62,8 @@ export default function Range(props: RangeProps) {
           allowCross={false}
           defaultValue={defaultValue}
           value={value}
-          {...extraProps}
+          onChange={handleChange}
+          onAfterChange={handleAfterChange}
         />
       </div>
     </div>
