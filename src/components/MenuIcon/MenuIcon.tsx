@@ -3,33 +3,52 @@ import "./MenuIcon.css"
 import Menu from "semantic-ui-react/dist/commonjs/collections/Menu"
 import Dropdown from "semantic-ui-react/dist/commonjs/modules/Dropdown"
 
-export enum MenuIconItemType {
-  HEADER = "Header",
-  ITEM = "Item",
-  DEVIDER = "Devider",
+export type MenuIconChildreHeaderProps = {
+  children?: string | React.ReactNode
 }
 
-export type MenuIconItemProps = {
+export type MenuIconChildreItemProps = {
   children?: string | React.ReactNode
-  type: MenuIconItemType
+  onClick?: (
+    event: React.MouseEvent<HTMLDivElement>,
+    data: MenuIconChildreItemProps
+  ) => void
 }
 
 export type MenuIconProps = {
   icon?: string
-  onClick?: (
-    event: React.MouseEvent<HTMLDivElement>,
-    data: MenuIconItemProps
-  ) => void
-  items: MenuIconItemProps[]
+  children?: string | React.ReactNode
 }
 
 export default function MenuIcon(props: MenuIconProps) {
-  const { icon, items, onClick } = props
+  const { icon, children } = props
 
   const dropDownIcon = icon || "ellipsis vertical"
 
+  return (
+    <Menu className={"dcl menu-icon"} borderless>
+      <Dropdown item icon={dropDownIcon} simple direction="left">
+        <Dropdown.Menu>{children}</Dropdown.Menu>
+      </Dropdown>
+    </Menu>
+  )
+}
+
+export function MenuIconHeader(props: MenuIconChildreHeaderProps) {
+  const { children } = props
+
+  return <Dropdown.Header>{children}</Dropdown.Header>
+}
+
+export function MenuIconDivider() {
+  return <Dropdown.Divider />
+}
+
+export function MenuIconItem(props: MenuIconChildreItemProps) {
+  const { children, onClick } = props
+
   const handleClick = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>, data: MenuIconItemProps) => {
+    (e: React.MouseEvent<HTMLDivElement>, data: MenuIconChildreItemProps) => {
       if (onClick) {
         onClick(e, data)
       }
@@ -38,26 +57,8 @@ export default function MenuIcon(props: MenuIconProps) {
   )
 
   return (
-    <Menu className={"dcl menu-icon"} borderless>
-      <Dropdown item icon={dropDownIcon} simple direction="left">
-        <Dropdown.Menu>
-          {items.map((item, key) => {
-            if (item.type === MenuIconItemType.HEADER) {
-              return (
-                <Dropdown.Header key={key}>{item.children}</Dropdown.Header>
-              )
-            } else if (item.type === MenuIconItemType.DEVIDER) {
-              return <Dropdown.Divider key={key} />
-            } else if (item.type === MenuIconItemType.ITEM) {
-              return (
-                <Dropdown.Item key={key} onClick={(e) => handleClick(e, item)}>
-                  {item.children}
-                </Dropdown.Item>
-              )
-            }
-          })}
-        </Dropdown.Menu>
-      </Dropdown>
-    </Menu>
+    <Dropdown.Item onClick={(e) => handleClick(e, props)}>
+      {children}
+    </Dropdown.Item>
   )
 }

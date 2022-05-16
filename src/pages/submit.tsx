@@ -35,6 +35,7 @@ import {
   WeekdayMask,
   Position,
   MAX_EVENT_RECURRENT,
+  MAX_EVENT_DURATION,
 } from "../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
@@ -213,7 +214,7 @@ export default function SubmitPage() {
   )
 
   const [submitting, submit] = useAsyncTask(async () => {
-    if (!editActions.validate()) {
+    if (!editActions.validate({ new: isNewEvent })) {
       return null
     }
 
@@ -224,7 +225,7 @@ export default function SubmitPage() {
         : Events.get().createEvent(data as EditEvent))
 
       eventsState.add(submitted)
-      navigate(locations.event(submitted.id))
+      navigate(locations.event(submitted.id), { replace: true })
     } catch (err) {
       patchState({
         loading: false,
