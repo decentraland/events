@@ -1,0 +1,17 @@
+.ui.dcl.menu-icon {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.ui.dcl.menu-icon .ui.dropdown:hover {
+  background-color: transparent;
+}
+
+.ui.dcl.menu-icon .ui.dropdown::before {
+  background-color: transparent;
+}
+
+.ui.dcl.menu-icon .ui.dropdown .menu {
+  box-shadow: var(--shadow-2);
+}

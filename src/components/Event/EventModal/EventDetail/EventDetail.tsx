@@ -21,6 +21,9 @@ import friendsIcon from "../../../../images/secondary-friends.svg"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import locations from "../../../../modules/locations"
 import "./EventDetail.css"
+import MenuIcon, { MenuIconItemType } from "../../../MenuIcon/MenuIcon"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
+import Label from "semantic-ui-react/dist/commonjs/elements/Label"
 
 const ATTENDEES_PREVIEW_LIMIT = 12
 
@@ -77,15 +80,42 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         </div>
         {props.showEdit !== false && advance && (
           <div className="EventDetail__Header__Actions">
-            <Button
-              basic
-              as="a"
-              href={locations.edit(event.id)}
-              onClick={prevent(() => navigate(locations.edit(event.id)))}
-            >
-              {" "}
-              EDIT{" "}
-            </Button>
+            <MenuIcon
+              items={[
+                {
+                  type: MenuIconItemType.ITEM,
+                  children: (
+                    <Button
+                      basic
+                      className="edit-detail__menu-icon__button"
+                      as="a"
+                      href={locations.edit(event.id)}
+                      onClick={prevent(() =>
+                        navigate(locations.edit(event.id))
+                      )}
+                    >
+                      <Icon name="edit" /> Edit
+                    </Button>
+                  ),
+                },
+                {
+                  type: MenuIconItemType.ITEM,
+                  children: (
+                    <Button
+                      basic
+                      className="edit-detail__menu-icon__button"
+                      as="a"
+                      href={locations.clone(event.id)}
+                      onClick={prevent(() =>
+                        navigate(locations.clone(event.id))
+                      )}
+                    >
+                      <Icon name="clone" /> Clone
+                    </Button>
+                  ),
+                },
+              ]}
+            />
           </div>
         )}
       </div>
