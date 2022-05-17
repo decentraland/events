@@ -13,7 +13,11 @@ import {
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
-import { notifyApprovedEvent, notifyEditedEvent } from "../../Slack/utils"
+import {
+  notifyApprovedEvent,
+  notifyEditedEvent,
+  notifyRejectedEvent,
+} from "../../Slack/utils"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import API from "decentraland-gatsby/dist/utils/api/API"
@@ -146,6 +150,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
 
   if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)
+  } else if (!event.rejected && updatedEvent.rejected) {
+    notifyRejectedEvent(updatedEvent)
   } else if (!isAdmin(user)) {
     notifyEditedEvent(updatedEvent)
   }
