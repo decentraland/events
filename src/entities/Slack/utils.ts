@@ -85,9 +85,7 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:white_check_mark: new event rejected: *<${eventUrl(event)}|${
-            event.name
-          }>*`,
+          text: `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*`,
         },
       },
     ],
