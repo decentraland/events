@@ -77,6 +77,21 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
   })
 }
 
+export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
+  logger.log(`sending rejected event "${event.id}" to slack`)
+  await sendToSlack({
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*`,
+        },
+      },
+    ],
+  })
+}
+
 const latestEditNotification = new Map<string, number>()
 export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
   const now = Date.now()
