@@ -37,6 +37,7 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
+  EventTimeParams,
   SessionEventAttributes,
   ToggleItemsValue,
 } from "../entities/Event/types"
@@ -48,20 +49,23 @@ import { Column } from "../components/Layout/Column/Column"
 import { Row } from "../components/Layout/Row/Row"
 import {
   FilterCategoryVariant,
+  FilterTimeVariant,
   FilterTypeVariant,
   Flags,
 } from "../modules/features"
-import { getEventType } from "../entities/Event/utils"
+import { getEventTime, getEventType } from "../entities/Event/utils"
 import { SegmentEvent } from "../modules/segment"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { getCategoriesFetch } from "../modules/events"
 import useListEventsCategories from "../hooks/useListEventsCategories"
+import Range from "../components/Range/Range"
+import { showTimezoneLabel } from "../modules/date"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
 }
 
-const toggleItems = [
+const typeItems = [
   {
     title: "All events",
     description: "Every event in Decentraland",
@@ -96,43 +100,31 @@ export default function IndexPage() {
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))
+  const timeFilter = getEventTime(
+    params.get("time-from"),
+    params.get("time-to")
+  )
+
   const [categories] = useAsyncMemo(getCategoriesFetch)
 
-  const filteredEvents = useListEventsFiltered(events, {
-    search: params.get("search"),
-    categories: params.get("category"),
-    type: typeFilter,
-  })
+  const filteredEvents = useListEventsFiltered(
+    events,
+    {
+      search: params.get("search"),
+      categories: params.get("category"),
+      type: typeFilter,
+      time: timeFilter,
+    },
+    settings
+  )
 
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const trendingEvents = useListEventsTrending(filteredEvents)
   const mainEvents = useListEventsMain(filteredEvents)
   const categoriesUsed = useListEventsCategories(events, categories)
 
-  // Items to be used in the toggle
-  const toggleItems = useMemo(
-    () => [
-      {
-        title: "All events",
-        description: "Every event in Decentraland",
-        active: typeFilter === ToggleItemsValue.All,
-        value: ToggleItemsValue.All,
-      },
-      {
-        title: "One time event",
-        description: "Events which happen once",
-        active: typeFilter === ToggleItemsValue.One,
-        value: ToggleItemsValue.One,
-      },
-      {
-        title: "Recurring event",
-        description: "Events which happen on more than one day",
-        active: typeFilter === ToggleItemsValue.Recurrent,
-        value: ToggleItemsValue.Recurrent,
-      },
-    ],
-    [typeFilter]
-  )
+  const [enabledNotification, setEnabledNotification] = useState(false)
+  const [eventTime, setEventTime] = useState<EventTimeParams>(timeFilter)
 
   const categoryItems = useMemo(() => {
     let categoriesToReturn = [
@@ -158,11 +150,43 @@ export default function IndexPage() {
     return categoriesToReturn
   }, [categoriesUsed, params.get("category")])
 
+  const timeRangeLabel = useMemo(() => {
+    const from =
+      eventTime.start == 1440
+        ? "24:00"
+        : Time.duration(eventTime.start, "minutes").format("HH:mm")
+    const to =
+      eventTime.end == 1440
+        ? "24:00"
+        : Time.duration(eventTime.end, "minutes").format("HH:mm")
+    const timezone = showTimezoneLabel(
+      Time.from(event?.start_at),
+      settings?.use_local_time
+    )
+    return `${from} - ${to} ${timezone}`
+  }, [eventTime])
+
+  const timeRangeValue = useMemo(() => {
+    return [timeFilter.start / 30, timeFilter.end / 30] as const
+  }, [timeFilter])
+
+  const cardItemsPerRow = useMemo(
+    () =>
+      ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) ===
+        FilterTypeVariant.disabled &&
+      ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) ===
+        FilterCategoryVariant.disabled &&
+      ff.name(Flags.FilterTimeVariant, FilterTimeVariant.disabled) ===
+        FilterTimeVariant.disabled
+        ? 3
+        : 2,
+    [ff.flags]
+  )
+
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
       const newParams = new URLSearchParams(params)
 
-      // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
       const type = getEventType((item as any).value)
       if (type === ToggleItemsValue.All) {
         newParams.delete("type")
@@ -176,13 +200,12 @@ export default function IndexPage() {
     [location.pathname, params]
   )
 
-  const handleTagChange = useCallback(
+  const handleCategoryChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
       const newParams = new URLSearchParams(params)
 
       const category = (item as any).value
 
-      // TODO: add value into ToggleBoxItem type in ToggleBox component (decentraland-ui)
       if (category === "All") {
         newParams.delete("category")
       } else {
@@ -195,7 +218,34 @@ export default function IndexPage() {
     [location.pathname, params, ff]
   )
 
-  const [enabledNotification, setEnabledNotification] = useState(false)
+  const handleRangeChange = useCallback((valueArray: [number, number]) => {
+    const from = Time.from((Time.Hour / 2) * valueArray[0], {
+      utc: true,
+    }).format("HHmm")
+    const to = Time.from((Time.Hour / 2) * valueArray[1], { utc: true }).format(
+      "HHmm"
+    )
+
+    const eventTimeData = getEventTime(
+      valueArray[0] === 48 ? "2400" : from,
+      valueArray[1] === 48 ? "2400" : to
+    )
+    setEventTime(eventTimeData)
+  }, [])
+
+  const handleRangeAfterChange = useCallback((valueArray: [number, number]) => {
+    const from = Time.from((Time.Hour / 2) * valueArray[0], {
+      utc: true,
+    }).format("HHmm")
+    const to = Time.from((Time.Hour / 2) * valueArray[1], { utc: true }).format(
+      "HHmm"
+    )
+    const newParams = new URLSearchParams(params)
+    newParams.set("time-from", valueArray[0] === 48 ? "2400" : from)
+    newParams.set("time-to", valueArray[1] === 48 ? "2400" : to)
+    navigate(locations.events(newParams))
+  }, [])
+
   const handleEventClick = useCallback(
     (e: React.MouseEvent<any>, event: SessionEventAttributes) => {
       e.stopPropagation()
@@ -203,17 +253,6 @@ export default function IndexPage() {
       navigate(locations.event(event.id))
     },
     []
-  )
-
-  const cardItemsPerRow = useMemo(
-    () =>
-      ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) ===
-        FilterTypeVariant.disabled &&
-      ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) ===
-        FilterCategoryVariant.disabled
-        ? 3
-        : 2,
-    [ff.flags]
   )
 
   return (
@@ -360,16 +399,20 @@ export default function IndexPage() {
                 ff.name<FilterCategoryVariant>(
                   Flags.FilterCategoryVariant,
                   FilterCategoryVariant.disabled
-                ) === FilterCategoryVariant.enabled) && (
+                ) === FilterCategoryVariant.enabled ||
+                ff.name<FilterTimeVariant>(
+                  Flags.FilterTimeVariant,
+                  FilterTimeVariant.disabled
+                ) === FilterTimeVariant.enabled) && (
                 <Column align="left" className="sidebar">
                   {ff.name<FilterTypeVariant>(
                     Flags.FilterTypeVariant,
                     FilterTypeVariant.disabled
-                  ) === FilterTypeVariant.enabled && (
+                  ) !== FilterTypeVariant.enabled && (
                     <ToggleBox
                       header="Type"
                       onClick={handleTypeChange}
-                      items={toggleItems}
+                      items={typeItems}
                       value={typeFilter}
                     />
                   )}
@@ -397,7 +440,7 @@ export default function IndexPage() {
                                 key={index}
                                 className={classesItem.join(" ")}
                                 onClick={(event) =>
-                                  handleTagChange(event, item)
+                                  handleCategoryChange(event, item)
                                 }
                               >
                                 <div className={"dcl togglebox-item-title"}>
@@ -409,6 +452,22 @@ export default function IndexPage() {
                         </div>
                       </div>
                     )}
+
+                  {ff.name<FilterTimeVariant>(
+                    Flags.FilterTimeVariant,
+                    FilterTimeVariant.disabled
+                  ) === FilterTimeVariant.enabled && (
+                    // TODO: move to `decentraland-ui`
+                    <Range
+                      header="Event Time"
+                      min={0}
+                      max={48}
+                      defaultValue={timeRangeValue}
+                      onChange={handleRangeChange}
+                      onMouseUp={handleRangeAfterChange}
+                      label={timeRangeLabel}
+                    />
+                  )}
                 </Column>
               )}
             <Column align="right" grow={true}>
