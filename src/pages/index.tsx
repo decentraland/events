@@ -170,17 +170,51 @@ export default function IndexPage() {
     return [timeFilter.start / 30, timeFilter.end / 30] as const
   }, [timeFilter])
 
-  const cardItemsPerRow = useMemo(
+  const showFilterByType = useMemo(
     () =>
-      ff.name(Flags.FilterTypeVariant, FilterTypeVariant.disabled) ===
-        FilterTypeVariant.disabled &&
-      ff.name(Flags.FilterCategoryVariant, FilterCategoryVariant.disabled) ===
-        FilterCategoryVariant.disabled &&
-      ff.name(Flags.FilterTimeVariant, FilterTimeVariant.disabled) ===
+      ff.name<FilterTypeVariant>(
+        Flags.FilterTypeVariant,
+        FilterTypeVariant.disabled
+      ) === FilterTypeVariant.enabled,
+    [ff]
+  )
+
+  const showFilterByCategory = useMemo(
+    () =>
+      ff.name<FilterCategoryVariant>(
+        Flags.FilterCategoryVariant,
+        FilterCategoryVariant.disabled
+      ) === FilterCategoryVariant.enabled && categoriesUsed.length > 0,
+    [ff]
+  )
+
+  const showFilterByTime = useMemo(
+    () =>
+      ff.name<FilterTimeVariant>(
+        Flags.FilterTimeVariant,
         FilterTimeVariant.disabled
-        ? 3
-        : 2,
-    [ff.flags]
+      ) === FilterTimeVariant.enabled,
+    [ff]
+  )
+
+  const showFilters =
+    events.length > 0 &&
+    (showFilterByType || showFilterByTime || showFilterByCategory)
+  const cardItemsPerRow = showFilters ? 2 : 3
+
+  console.log(
+    ff.name<FilterTypeVariant>(
+      Flags.FilterTypeVariant,
+      FilterTypeVariant.disabled
+    ),
+    ff.name<FilterCategoryVariant>(
+      Flags.FilterCategoryVariant,
+      FilterCategoryVariant.disabled
+    ),
+    ff.name<FilterTimeVariant>(
+      Flags.FilterTimeVariant,
+      FilterTimeVariant.disabled
+    )
   )
 
   const handleTypeChange = useCallback(
@@ -391,85 +425,63 @@ export default function IndexPage() {
 
         {!loading && (
           <Row>
-            {events.length !== 0 &&
-              (ff.name<FilterTypeVariant>(
-                Flags.FilterTypeVariant,
-                FilterTypeVariant.disabled
-              ) === FilterTypeVariant.enabled ||
-                ff.name<FilterCategoryVariant>(
-                  Flags.FilterCategoryVariant,
-                  FilterCategoryVariant.disabled
-                ) === FilterCategoryVariant.enabled ||
-                ff.name<FilterTimeVariant>(
-                  Flags.FilterTimeVariant,
-                  FilterTimeVariant.disabled
-                ) === FilterTimeVariant.enabled) && (
-                <Column align="left" className="sidebar">
-                  {ff.name<FilterTypeVariant>(
-                    Flags.FilterTypeVariant,
-                    FilterTypeVariant.disabled
-                  ) !== FilterTypeVariant.enabled && (
-                    <ToggleBox
-                      header="Type"
-                      onClick={handleTypeChange}
-                      items={typeItems}
-                      value={typeFilter}
-                    />
-                  )}
+            {showFilters && (
+              <Column align="left" className="sidebar">
+                {showFilterByType && (
+                  <ToggleBox
+                    header="Type"
+                    onClick={handleTypeChange}
+                    items={typeItems}
+                    value={typeFilter}
+                  />
+                )}
 
-                  {ff.name<FilterCategoryVariant>(
-                    Flags.FilterCategoryVariant,
-                    FilterCategoryVariant.disabled
-                  ) === FilterCategoryVariant.enabled &&
-                    categoryItems.length > 1 && (
-                      // TODO: move to `decentraland-ui`
-                      <div className={"dcl box borderless"}>
-                        <div className={"dcl box-header"}>Tag</div>
-                        <div className={"dcl box-children"}>
-                          {categoryItems.map((item, index) => {
-                            const classesItem = ["dcl", "togglebox-item"]
-                            if (
-                              (params.get("category") &&
-                                params.get("category") === item.value) ||
-                              (!params.get("category") && item.value == "all")
-                            ) {
-                              classesItem.push("active")
+                {showFilterByCategory && (
+                  // TODO: move to `decentraland-ui`
+                  <div className={"dcl box borderless"}>
+                    <div className={"dcl box-header"}>Tag</div>
+                    <div className={"dcl box-children"}>
+                      {categoryItems.map((item, index) => {
+                        const classesItem = ["dcl", "togglebox-item"]
+                        if (
+                          (params.get("category") &&
+                            params.get("category") === item.value) ||
+                          (!params.get("category") && item.value == "all")
+                        ) {
+                          classesItem.push("active")
+                        }
+                        return (
+                          <div
+                            key={index}
+                            className={classesItem.join(" ")}
+                            onClick={(event) =>
+                              handleCategoryChange(event, item)
                             }
-                            return (
-                              <div
-                                key={index}
-                                className={classesItem.join(" ")}
-                                onClick={(event) =>
-                                  handleCategoryChange(event, item)
-                                }
-                              >
-                                <div className={"dcl togglebox-item-title"}>
-                                  {item.title}
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )}
+                          >
+                            <div className={"dcl togglebox-item-title"}>
+                              {item.title}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
 
-                  {ff.name<FilterTimeVariant>(
-                    Flags.FilterTimeVariant,
-                    FilterTimeVariant.disabled
-                  ) === FilterTimeVariant.enabled && (
-                    // TODO: move to `decentraland-ui`
-                    <Range
-                      header="Event Time"
-                      min={0}
-                      max={48}
-                      defaultValue={timeRangeValue}
-                      onChange={handleRangeChange}
-                      onMouseUp={handleRangeAfterChange}
-                      label={timeRangeLabel}
-                    />
-                  )}
-                </Column>
-              )}
+                {showFilterByTime && (
+                  // TODO: move to `decentraland-ui`
+                  <Range
+                    header="Event Time"
+                    min={0}
+                    max={48}
+                    defaultValue={timeRangeValue}
+                    onChange={handleRangeChange}
+                    onMouseUp={handleRangeAfterChange}
+                    label={timeRangeLabel}
+                  />
+                )}
+              </Column>
+            )}
             <Column align="right" grow={true}>
               {!loading && events.length > 0 && filteredEvents.length === 0 && (
                 <div>
