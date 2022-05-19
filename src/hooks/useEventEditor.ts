@@ -316,6 +316,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         recurrent_monthday: null,
         recurrent_until: start_at.startOf("day").toDate(),
         recurrent_count: null,
+        duration: event.duration > Time.Day ? Time.Day : event.duration,
       })
     } else {
       setValues({
