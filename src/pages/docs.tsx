@@ -11,6 +11,7 @@ import {
   getEventParamsSchema,
 } from "../entities/Event/schemas"
 import { eventAttendeeListScheme } from "../entities/EventAttendee/schemas"
+import { eventCategoryListScheme } from "../entities/EventCategory/schema"
 import "./index.css"
 
 export type IndexPageState = {
@@ -88,6 +89,20 @@ export default function DocsPage() {
             title="Response"
             cors="*"
             body={eventAttendeeListScheme}
+          />
+        </ApiCard>
+
+        <ApiCard
+          id="get-categories"
+          method="GET"
+          path="/api/events/categories"
+          description="Return all the categories of events"
+        >
+          <ApiDetails title="Request" cors="*" />
+          <ApiDetails
+            title="Response"
+            cors="*"
+            body={eventCategoryListScheme}
           />
         </ApiCard>
       </Container>

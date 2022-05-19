@@ -4,6 +4,7 @@ import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import EventAttendeeList from "./EventAttendeeList/EventAttendeeList"
+import EventStatusBanner from "./EventStatusBanner/EventStatusBanner"
 import EventDetail from "./EventDetail/EventDetail"
 import AttendingButtons from "../../Button/AttendingButtons"
 import EditButtons from "../../Button/EditButtons"
@@ -55,6 +56,7 @@ export default function EventModal({
         </div>
       )}
       {showEvent && <ImgFixed src={event!.image || ""} dimension="wide" />}
+      {showEvent && <EventStatusBanner event={event!} />}
       {showEvent && (
         <EventDetail
           event={event!}

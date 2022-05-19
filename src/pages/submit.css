@@ -44,3 +44,16 @@ p.FieldNote {
   .ImageInput__Description__Primary {
   color: var(--primary);
 }
+
+.submit__tag-select-label {
+  background-color: #cfcdd4;
+  color: #000;
+}
+
+.submit__tag__dao {
+  color: var(--primary);
+}
+
+.ui .submit__category-select-wrapper {
+  margin-bottom: 10px;
+}

@@ -12,8 +12,8 @@ import { EventAttributes } from "../../entities/Event/types"
 import { SegmentEvent } from "../../modules/segment"
 
 import { eventTargetUrl } from "../../entities/Event/utils"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import "./AddToCalendarButton.css"
-import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
 export type AddToCalendarButtonProps = ButtonProps & {
   event?: EventAttributes
@@ -26,27 +26,25 @@ export default function AddToCalendarButton({
   startAt,
   ...props
 }: AddToCalendarButtonProps) {
-  const [address] = useAuth()
-  const [ ff ] = useFeatureFlagContext()
+  const track = useTrackContext()
   const to = href || getGoogleCalendar(event, startAt) || "#"
 
-  const handleClick = useCallback(function (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    data: ButtonProps
-  ) {
-    track((analytics) =>
-      analytics.track(SegmentEvent.AddToCalendar, {
-        ethAddress: address,
+  const handleClick = useCallback(
+    function (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      data: ButtonProps
+    ) {
+      track(SegmentEvent.AddToCalendar, {
         eventId: event?.id || null,
         trending: event?.trending || false,
         highlighted: event?.highlighted || false,
-        featureFlag: ff.flags,
       })
-    )
-    if (props.onClick) {
-      props.onClick(e, data)
-    }
-  }, [ address, event, ff ])
+      if (props.onClick) {
+        props.onClick(e, data)
+      }
+    },
+    [event, track]
+  )
 
   return (
     <Button

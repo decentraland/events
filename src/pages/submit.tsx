@@ -6,6 +6,8 @@ import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
+import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import { Field } from "decentraland-ui/dist/components/Field/Field"
 import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
@@ -50,6 +52,10 @@ import ItemLayout from "../components/Layout/ItemLayout"
 import { getServerOptions, getServers } from "../modules/servers"
 import infoIcon from "../images/info.svg"
 import "./submit.css"
+import {
+  getCategoriesFetch,
+  getCategoriesOptionsActives,
+} from "../modules/events"
 
 type SubmitPageState = {
   loading?: boolean
@@ -86,6 +92,7 @@ export default function SubmitPage() {
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
+  const [categories] = useAsyncMemo(getCategoriesFetch)
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
@@ -94,6 +101,18 @@ export default function SubmitPage() {
     () => getServerOptions(servers || []),
     [servers]
   )
+
+  const categoryOptions = useMemo(() => {
+    const categoriesOptions = getCategoriesOptionsActives(
+      categories,
+      editing.categories
+    )
+    return categoriesOptions.map((categoryOption) => ({
+      ...categoryOption,
+      text: l(categoryOption.text),
+    }))
+  }, [categories, editing.categories])
+
   const loading = accountState.loading && eventState.loading
 
   const recurrent_date = useMemo(
@@ -142,6 +161,7 @@ export default function SubmitPage() {
         recurrent_weekday_mask: original.recurrent_weekday_mask,
         recurrent_setpos: original.recurrent_setpos,
         recurrent_monthday: original.recurrent_monthday,
+        categories: original.categories,
       })
     }
   }, [original])
@@ -869,6 +889,44 @@ export default function SubmitPage() {
                       </Grid.Column>
                     )
                   })}
+              </Grid.Row>
+
+              <Grid.Row>
+                <Grid.Column mobile="8">
+                  <Label>Tags</Label>
+                  <Paragraph tiny secondary>
+                    Want a new tag? Ask for it on the{" "}
+                    <span className={"submit__tag__dao"}>DAO</span>.
+                  </Paragraph>
+                  <SelectField
+                    placeholder="Add tag"
+                    name="categories"
+                    error={!!errors["categories"]}
+                    message={errors["categories"]}
+                    options={categoryOptions}
+                    onChange={editActions.handleChange}
+                    value={""}
+                  />
+                  {editing.categories.map((category, key) => (
+                    <SelectionLabel
+                      key={key}
+                      className={"submit__category-select-wrapper"}
+                    >
+                      {l(`page.events.categories.${category}`)}
+                      <Icon
+                        className={"submit__tag-select-label"}
+                        name="delete"
+                        circular
+                        onClick={(event: React.ChangeEvent<any>) =>
+                          editActions.handleChange(event, {
+                            name: "categories",
+                            value: category,
+                          })
+                        }
+                      />
+                    </SelectionLabel>
+                  ))}
+                </Grid.Column>
               </Grid.Row>
 
               <Grid.Row>

@@ -1,11 +1,10 @@
-import React, { useMemo, useState, Fragment } from "react"
+import React, { useState } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { useEventIdContext } from "../context/Event"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import ItemLayout from "../components/Layout/ItemLayout"
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
@@ -13,6 +12,7 @@ import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
 import EventSection from "../components/Event/EventSection"
 import AttendingButtons from "../components/Button/AttendingButtons"
 import EditButtons from "../components/Button/EditButtons"
+import EventStatusBanner from "../components/Event/EventModal/EventStatusBanner/EventStatusBanner"
 import "./index.css"
 
 export type EventPageState = {
@@ -82,10 +82,10 @@ export default function EventPage(props: any) {
           {event && (
             <>
               <ImgFixed src={event.image || ""} dimension="wide" />
+              <EventStatusBanner event={event!} />
               <EventDetail event={event} />
 
               {(event.approved || event.editable) && <EventSection.Divider />}
-
               {event.approved && (
                 <EventSection>
                   <AttendingButtons event={event} />

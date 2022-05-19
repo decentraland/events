@@ -6,9 +6,9 @@ import { Avatar } from "decentraland-gatsby/dist/utils/api/Catalyst"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { DeprecatedEventAttributes } from "../Event/types"
 import logger from "decentraland-gatsby/dist/entities/Development/logger"
+import { eventUrl } from "../Event/utils"
 
 const SLACK_WEBHOOK = env("SLACK_WEBHOOK", "")
-const EVENTS_URL = env("EVENTS_URL", "https://events.centraland.org/api")
 const DECENTRALAND_URL = env(
   "DECENTRALAND_URL",
   "https://play.decentraland.org"
@@ -34,7 +34,9 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         text: {
           type: "mrkdwn",
           text: [
-            `*<${url(event)}|${event.name}>* by ${event.user_name || "Guest"}`,
+            `*<${eventUrl(event)}|${event.name}>* by ${
+              event.user_name || "Guest"
+            }`,
             `_${event.description || "No description"}_`,
             "",
             event.url &&
@@ -66,9 +68,24 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:white_check_mark: new event approved: *<${url(event)}|${
+          text: `:white_check_mark: new event approved: *<${eventUrl(event)}|${
             event.name
           }>*`,
+        },
+      },
+    ],
+  })
+}
+
+export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
+  logger.log(`sending rejected event "${event.id}" to slack`)
+  await sendToSlack({
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*`,
         },
       },
     ],
@@ -93,7 +110,7 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
           type: "mrkdwn",
           text: `:pencil2: user ${
             event.user_name || "Guest"
-          } just edited his event: *<${url(event)}|${event.name}>*`,
+          } just edited his event: *<${eventUrl(event)}|${event.name}>*`,
         },
       },
     ],
@@ -112,7 +129,7 @@ export async function notifyUpcomingEvent(
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:runner: *<${url(event)}|${
+          text: `:runner: *<${eventUrl(event)}|${
             event.name
           }>* is about to start (sent: ${emailNotifications} :email:, ${pushNotifications} :bell:)`,
         },
@@ -156,10 +173,6 @@ export async function notifyEventError(user: Avatar, error: RequestError) {
       ],
     })
   }
-}
-
-function url(event: DeprecatedEventAttributes) {
-  return new URL(`/?event=${event.id}`, EVENTS_URL).toString()
 }
 
 async function sendToSlack(body: object) {

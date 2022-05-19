@@ -126,6 +126,7 @@ export type EventAttributes = {
   total_attendees: number
   latest_attendees: string[]
   textsearch: SQLStatement | string | null | undefined
+  categories: string[]
 }
 
 export type GetEventParams = {
@@ -214,6 +215,7 @@ export const editableAttributes: (keyof EventAttributes)[] = [
   "recurrent_interval",
   "recurrent_count",
   "recurrent_until",
+  "categories",
 ]
 
 export const patchAttributes: (keyof EventAttributes)[] =
@@ -231,4 +233,11 @@ export enum ToggleItemsValue {
   All = "all",
   One = "one",
   Recurrent = "recurrent",
+}
+
+export const MAX_CATAGORIES_ALLOWED = 1
+
+export type EventTimeParams = {
+  start: number
+  end: number
 }

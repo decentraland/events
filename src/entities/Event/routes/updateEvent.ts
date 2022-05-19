@@ -8,14 +8,16 @@ import {
   adminPatchAttributes,
   patchAttributes,
   DeprecatedEventAttributes,
-  EventAttributes,
   MAX_EVENT_DURATION,
 } from "../types"
-import { WithEvent } from "../middleware"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
-import { notifyApprovedEvent, notifyEditedEvent } from "../../Slack/utils"
+import {
+  notifyApprovedEvent,
+  notifyEditedEvent,
+  notifyRejectedEvent,
+} from "../../Slack/utils"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import API from "decentraland-gatsby/dist/utils/api/API"
@@ -26,6 +28,7 @@ import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { getEvent } from "./getEvent"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import EventCategoryModel from "../../EventCategory/model"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -85,6 +88,22 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
+  /**
+   * Verify categories actually exist
+   */
+  if (event.categories.length) {
+    const validation = await EventCategoryModel.validateCategories(
+      event.categories
+    )
+    if (!validation) {
+      throw new RequestError(
+        `Invalid category tag supplied`,
+        RequestError.BadRequest,
+        { body: event }
+      )
+    }
+  }
+
   const tile = await API.catch(Land.get().getTile([x, y]))
   updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
   updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
@@ -131,6 +150,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
 
   if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)
+  } else if (!event.rejected && updatedEvent.rejected) {
+    notifyRejectedEvent(updatedEvent)
   } else if (!isAdmin(user)) {
     notifyEditedEvent(updatedEvent)
   }

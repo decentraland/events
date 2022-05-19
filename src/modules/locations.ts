@@ -17,8 +17,11 @@ function url(path: string, query?: Record<string, string> | URLSearchParams) {
 }
 
 export default {
-  events: (filters: Partial<{ search: string, type: ToggleItemsValue }> | URLSearchParams = {}) =>
-    url("/", filters),
+  events: (
+    filters:
+      | Partial<{ search: string; type: ToggleItemsValue }>
+      | URLSearchParams = {}
+  ) => url("/", filters),
   event: (id: string) => url("/event/", { id }),
   myEvents: () => url("/me/"),
   pendingEvents: () => url("/pending/"),

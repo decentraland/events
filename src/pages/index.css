@@ -43,7 +43,8 @@
   text-transform: uppercase;
 }
 
-.ui.container .Row .left.Column.sidebar .dcl.box {
+.ui.container .Row .left.Column.sidebar .dcl.box,
+.ui.container .Row .left.Column.sidebar .dcl.range {
   margin-left: -16px;
   margin-top: 24px;
 }
@@ -70,4 +71,8 @@
     width: 100%;
     margin-right: 15px;
   }
+}
+
+.dcl.borderless {
+  border-color: transparent;
 }
