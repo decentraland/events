@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Reconfigure git to use HTTP authentication
+      - name: reconfigure git to use HTTP authentication
         run: >
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
@@ -68,5 +68,5 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Print image url
+      - name: print image url
         run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
