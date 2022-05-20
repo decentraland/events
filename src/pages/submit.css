@@ -45,12 +45,12 @@ p.FieldNote {
   color: var(--primary);
 }
 
-.submit__tag-select-label {
+.submit__category-select-label {
   background-color: #cfcdd4;
   color: #000;
 }
 
-.submit__tag__dao {
+.submit__category__dao {
   color: var(--primary);
 }
 

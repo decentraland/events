@@ -893,13 +893,13 @@ export default function SubmitPage() {
 
               <Grid.Row>
                 <Grid.Column mobile="8">
-                  <Label>Tags</Label>
+                  <Label>Categories</Label>
                   <Paragraph tiny secondary>
-                    Want a new tag? Ask for it on the{" "}
-                    <span className={"submit__tag__dao"}>DAO</span>.
+                    Want a new category? Ask for it on the{" "}
+                    <span className={"submit__category__dao"}>DAO</span>.
                   </Paragraph>
                   <SelectField
-                    placeholder="Add tag"
+                    placeholder="Add category"
                     name="categories"
                     error={!!errors["categories"]}
                     message={errors["categories"]}
@@ -914,7 +914,7 @@ export default function SubmitPage() {
                     >
                       {l(`page.events.categories.${category}`)}
                       <Icon
-                        className={"submit__tag-select-label"}
+                        className={"submit__category-select-label"}
                         name="delete"
                         circular
                         onClick={(event: React.ChangeEvent<any>) =>
