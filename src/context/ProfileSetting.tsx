@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useMemo } from "react"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import track from "decentraland-gatsby/dist/utils/development/segment"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 import Events from "../api/Events"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
@@ -12,8 +11,23 @@ import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 
+const DEFAULT_PROFILE_SETTINGS = {
+  user: null,
+  email: null,
+  email_verified: false,
+  email_verified_at: null,
+  email_updated_at: null,
+  use_local_time: true,
+  notify_by_email: false,
+  notify_by_browser: false,
+}
+
+export type HookProfileSettingsAttributes =
+  | ProfileSettingsAttributes
+  | typeof DEFAULT_PROFILE_SETTINGS
+
 const defaultProfileSettings = [
-  null as ProfileSettingsAttributes | null,
+  DEFAULT_PROFILE_SETTINGS as HookProfileSettingsAttributes,
   {
     error: null as Error | null,
     loading: false as boolean,
@@ -43,13 +57,20 @@ function useProfileSettings() {
   const isPushNotificationSupported =
     isNotificationSupported && isServiceWorkerSupported && isPushSupported
 
-  const [settings, state] = useAsyncMemo(async () => {
-    if (!account) {
-      return null
-    }
+  const [settings, state] = useAsyncMemo(
+    async () => {
+      if (!account) {
+        return DEFAULT_PROFILE_SETTINGS
+      }
 
-    return Events.get().getMyProfileSettings()
-  }, [account])
+      return Events.get().getMyProfileSettings()
+    },
+    [account],
+    {
+      initialValue: DEFAULT_PROFILE_SETTINGS,
+      callWithTruthyDeps: true,
+    }
+  )
 
   const [updating, update] = useAsyncTask(
     async (settings: Partial<ProfileSettingsAttributes>) => {
