@@ -111,8 +111,11 @@ export default function MyEventsPage() {
           <div style={{ textAlign: "center" }}>
             <Divider />
             <Paragraph secondary>
-              You need to <Link onClick={() => null}>sign in</Link> before to
-              submit an event
+              {l("sign_in.message", {
+                action: (
+                  <Link onClick={() => null}>{l("general.sign_in")}</Link>
+                ),
+              })}
             </Paragraph>
             <Divider />
           </div>
@@ -120,7 +123,7 @@ export default function MyEventsPage() {
         {account && (
           <div>
             <div className="GroupTitle">
-              <SubTitle>GOING</SubTitle>
+              <SubTitle>{l("page.me.going")}</SubTitle>
             </div>
             {loading && (
               <Card.Group>
@@ -134,12 +137,12 @@ export default function MyEventsPage() {
                 <Divider size="mini" />
                 {!searching && (
                   <Paragraph secondary>
-                    You are not attending to any event, find some{" "}
+                    {l("page.me.you_are_not_attending")}{" "}
                     <Link
                       href={locations.events()}
                       onClick={prevent(() => navigate(locations.events()))}
                     >
-                      amazing event
+                      {l("page.me.amazing_event")}
                     </Link>
                     .
                   </Paragraph>
@@ -166,7 +169,7 @@ export default function MyEventsPage() {
         {account && (
           <div>
             <div className="GroupTitle">
-              <SubTitle>HOSTED BY ME</SubTitle>
+              <SubTitle>{l("page.me.hosted_by_me")}</SubTitle>
             </div>
             {loading && (
               <Card.Group>
@@ -180,12 +183,12 @@ export default function MyEventsPage() {
                 <Divider size="tiny" />
                 {!searching && (
                   <Paragraph secondary>
-                    You are not hosting any events, try to propose a{" "}
+                    {l("page.me.you_are_not_hosting")}{" "}
                     <Link
                       href={locations.submit()}
                       onClick={prevent(() => navigate(locations.submit()))}
                     >
-                      new event
+                      {l("page.me.new_event")}
                     </Link>
                     .
                   </Paragraph>

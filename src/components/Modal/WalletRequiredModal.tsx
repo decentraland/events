@@ -1,8 +1,9 @@
 import React from "react"
 import { Modal } from "decentraland-ui/dist/components/Modal/Modal"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import metamaskIcon from "../../images/metamask-logo.svg"
 import imtokenIcon from "../../images/imtoken-logo.svg"
@@ -20,13 +21,15 @@ export default function WalletRequiredModal({
   onClose,
 }: WalletRequiredModalProps) {
   const isMobile = useMobileDetector()
+  const l = useFormatMessage()
 
   return (
     <Modal open={open} className="WalletRequiredModal" onClose={onClose}>
-      <SubTitle>Get a wallet to continue</SubTitle>
+      <SubTitle>
+        {l("components.modal.wallet_required_modal.sub_title")}
+      </SubTitle>
       <Paragraph>
-        A crypto wallet helps you manage your transactions: earn rewards,
-        purchase items, claim your name, and more!
+        {l("components.modal.wallet_required_modal.paragraph")}
       </Paragraph>
       <div className="WalletRequiredModal__Wallets">
         <Button inverted primary href="https://metamask.io/" target="_blank">
@@ -59,8 +62,7 @@ export default function WalletRequiredModal({
         )}
       </div>
       <Paragraph secondary small>
-        Once you've installed your wallet, you will need to refresh this page to
-        continue
+        {l("components.modal.wallet_required_modal.paragraph_secondary")}
       </Paragraph>
     </Modal>
   )

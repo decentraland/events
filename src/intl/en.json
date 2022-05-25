@@ -1,6 +1,8 @@
 {
   "general": {
-    "sign_in": "sign in"
+    "sign_in": "sign in",
+    "utc": "UTC",
+    "dao": "DAO"
   },
   "sign_in": {
     "message": "You need to {action} before to submit an event"
@@ -16,6 +18,12 @@
     "404": {
       "title": "Page not found",
       "description": "You just hit a route that doesn't exist..."
+    },
+    "confirm": {
+      "email_verified": "Your email was verified",
+      "subscription_canceled": "Your subscription was canceled",
+      "invalid_token": "Invalid token",
+      "link_expired": "This link expired"
     },
     "events": {
       "no_events": "No events planned yet.",
@@ -47,6 +55,80 @@
         "town": "Town Hall",
         "tv": "TV & Movies"
       }
+    },
+    "me": {
+      "going": "GOING",
+      "you_are_not_attending": "You are not attending to any event, find some",
+      "amazing_event": "amazing event",
+      "hosted_by_me": "HOSTED BY ME",
+      "you_are_not_hosting": "You are not hosting any events, try to propose a",
+      "new_event": "new event"
+    },
+    "pending": {
+      "pending_events": "PENDING EVENTS",
+      "you_dont_have_any_pending": "You don't have any pending events, try to propose a",
+      "new_event": "new event"
+    },
+    "submit": {
+      "submit_event": "Submit event",
+      "be_sure_to_fill": "Be sure to fill in as many details as possible to generate interest in your event.",
+      "error_image_size": "This image is too heavy (more than 500Kb), try with",
+      "optimizilla": "optimizilla",
+      "error_image_format": "This file format is not supported, try with",
+      "image_recommended_size": "(recommended size: 1340 x 670)",
+      "browse": "Browse",
+      "browse_line1_label": "your computer or",
+      "browse_line2_label": "drag a picture to add a cover",
+      "advance_label": "Advance",
+      "highlight_label": "HIGHLIGHT",
+      "trending_label": "TRENDING",
+      "event_name_label": "Event Name",
+      "event_name_placeholder": "Be as descriptive as you can",
+      "preview_label": "PREVIEW",
+      "description_label": "Description",
+      "description_placeholder": "Keep it short but keep it interesting!",
+      "start_date_label": "Start date",
+      "start_time_label": "Start time",
+      "end_date_label": "End date",
+      "end_time_label": "End time",
+      "maximum_allowed_duration": "Maximum allowed duration",
+      "recurrent_label": "Repeat",
+      "recurrent_placeholder": "Does not repeat",
+      "day_sun_label": "SUN",
+      "day_mon_label": "MON",
+      "day_tue_label": "TUE",
+      "day_wed_label": "WED",
+      "day_thu_label": "THU",
+      "day_fri_label": "FRI",
+      "day_sat_label": "SAT",
+      "repeat_on_label": "Repeat on",
+      "recurrent_monthday_label": "Monthly on day {date}",
+      "recurrent_setpos_current_label": "Monthly on day {name} {day}",
+      "recurrent_setpos_last_label": "Monthly on the last {day}",
+      "ends_label": "Ends",
+      "occurrences": "Occurrences",
+      "dates": "Dates",
+      "categories_label": "Categories",
+      "want_new_category_label": "Want a new category? Ask for it on the",
+      "add_category_placeholder": "Add category",
+      "latitude_label": "Latitude (X)",
+      "longitude_label": "Longitude (Y)",
+      "server_label": "Server",
+      "server_placeholder": "any server",
+      "contact_label": "Email or Discord username",
+      "contact_placeholder": "hello@decentraland.org",
+      "details_label": "Additional info",
+      "details_placeholder": "Add any other useful details for our reviewers",
+      "save": "save",
+      "submit": "submit",
+      "delete": "delete",
+      "notify_me": "notify me",
+      "event_submission_will_be_reviewed": "The event submission will be reviewed by our team, you’ll be notified by email",
+      "confirm_modal": {
+        "title": "Are you absolutely sure?",
+        "paragraph": "This action **cannot** be undone. This will permanently delete the **{name}** event",
+        "submit": "yes, delete this event"
+      }
     }
   },
   "social": {
@@ -58,7 +140,8 @@
       "og:type": "website",
       "twitter:card": "summary",
       "twitter:creator": "@decentraland",
-      "twitter:site": "@decentraland"
+      "twitter:site": "@decentraland",
+      "trending": "TRENDING"
     },
     "submit": {
       "title": "Submit an Event",
@@ -81,7 +164,9 @@
       "email_verifying": "Pending",
       "email_reverifying": "Send again",
       "email_verifying_message": "we sent you a verification email. try again in {seconds} {seconds, plural, one {second} other {seconds}}",
-      "email_reverifying_message": "didn't receive our email? try it again"
+      "email_reverifying_message": "didn't receive our email? try it again",
+      "email_address_label": "Email address",
+      "email_address_placeholder": "example@domain.com"
     },
     "event_section": {
       "label": "Event settings",
@@ -93,6 +178,76 @@
       "notification_by_email_message": "10 Minutes before",
       "notification_by_browser_description": "Receive Alerts via Browser",
       "notification_by_browser_message": " "
+    }
+  },
+  "components": {
+    "badge": {
+      "live": "LIVE",
+      "start_in": {
+        "day": "day",
+        "days": "days",
+        "hour": "hour",
+        "hours": "hours",
+        "minute": "minute",
+        "minutes": "minutes",
+        "in_less_than_a_minute": "in less than a minute"
+      }
+    },
+    "button": {
+      "add_to_calendar": "add to calendar",
+      "get_google_calendar": {
+        "jump_in": "jump in"
+      },
+      "attending_buttons": {
+        "jump_in": "jump in",
+        "going": "going",
+        "want_to_go": "want to go",
+        "share": "share"
+      },
+      "edit_buttons": {
+        "reject": "reject",
+        "restore": "restore",
+        "approve": "approve"
+      },
+      "jump_in_button": "jump in"
+    },
+    "event": {
+      "event_date": {
+        "now": "now",
+        "today": "today",
+        "tomorrow": "tomorrow"
+      },
+      "event_modal": {
+        "event_attendee_list": {
+          "people_going": "People going",
+          "guest": "Guest"
+        },
+        "event_detail": {
+          "event_date_detail": {
+            "started": "Started",
+            "starts_in": "Starts in",
+            "from": "from",
+            "to": "to",
+            "at": "at"
+          }
+        },
+        "event_status_banner": {
+          "this_event_was_rejected": "This event was rejected",
+          "this_event_is_pending_approval": "This event is pending approval"
+        }
+      }
+    },
+    "modal": {
+      "enabled_notification_modal": {
+        "notifications": "Notifications",
+        "go_to_settings_paragraph": "Go to settings and setup your notifications preferences!",
+        "go_to_settings": "GO TO SETTINGS"
+      },
+      "wallet_required_modal": {
+        "sub_title": "Get a wallet to continue",
+        "paragraph": "A crypto wallet helps you manage your transactions: earn rewards, purchase items, claim your name, and more!",
+        "paragraph_secondary": "Once you've installed your wallet, you will need to refresh this page to continue"
+      }
     }
   }
 }

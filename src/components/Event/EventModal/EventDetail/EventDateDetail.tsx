@@ -1,8 +1,9 @@
 import React, { useMemo } from "react"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import useInterval from "decentraland-gatsby/dist/hooks/useInterval"
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import useInterval from "decentraland-gatsby/dist/hooks/useInterval"
 import { SessionEventAttributes } from "../../../../entities/Event/types"
 import AddToCalendarButton from "../../../Button/AddToCalendarButton"
 import Live from "../../../Badge/Live"
@@ -10,6 +11,7 @@ import EventSection from "../../EventSection"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import clockIcon from "../../../../images/secondary-clock.svg"
 import { showTimezoneLabel } from "../../../../modules/date"
+import "./EventDateDetail.css"
 
 export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {
   event: SessionEventAttributes
@@ -29,6 +31,7 @@ export default React.memo(function EventDateDetail({
 }: EventDateDetailProps) {
   const duration = event.duration
   const [settings] = useProfileSettingsContext()
+  const l = useFormatMessage()
   const now = useInterval(() => Time.from(Date.now()), Time.Second, [
     !settings?.use_local_time,
   ])
@@ -56,12 +59,18 @@ export default React.memo(function EventDateDetail({
       <EventSection.Detail>
         {isLive && (
           <Paragraph secondary={secondary}>
-            Started: {start_at.fromNow()}
+            {l(
+              "components.event.event_modal.event_detail.event_date_detail.started"
+            )}
+            : {start_at.fromNow()}
           </Paragraph>
         )}
         {!isLive && countdown && (
           <Paragraph secondary={secondary}>
-            Starts in {start_at.fromNow(true)}
+            {l(
+              "components.event.event_modal.event_detail.event_date_detail.starts_in"
+            )}{" "}
+            {start_at.fromNow(true)}
           </Paragraph>
         )}
         {!isLive && !countdown && duration < Time.Day && (
@@ -70,9 +79,14 @@ export default React.memo(function EventDateDetail({
             {duration === 0 && <Bold>{start_at.format(" hh:mma")}</Bold>}
             {duration > 0 && (
               <>
-                {" from "}
-                <Bold>{start_at.format("hh:mma")}</Bold>
-                {" to "}
+                {" "}
+                {l(
+                  "components.event.event_modal.event_detail.event_date_detail.from"
+                )}{" "}
+                <Bold>{start_at.format("hh:mma")}</Bold>{" "}
+                {l(
+                  "components.event.event_modal.event_detail.event_date_detail.to"
+                )}{" "}
                 <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
                 <Bold>
                   {showTimezoneLabel(finish_at, settings?.use_local_time)}
@@ -82,10 +96,17 @@ export default React.memo(function EventDateDetail({
           </Paragraph>
         )}
         {!isLive && !countdown && duration >= Time.Day && event.all_day && (
-          <Paragraph secondary={secondary}>
-            {"From "}
-            <Bold>{start_at.format(`dddd, DD MMM`)}</Bold>
-            {" to "}
+          <Paragraph
+            secondary={secondary}
+            className={"EventDateDetail__Capitalize"}
+          >
+            {l(
+              "components.event.event_modal.event_detail.event_date_detail.from"
+            )}{" "}
+            <Bold>{start_at.format(`dddd, DD MMM`)}</Bold>{" "}
+            {l(
+              "components.event.event_modal.event_detail.event_date_detail.to"
+            )}{" "}
             <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>{" "}
             <Bold>
               {showTimezoneLabel(finish_at, settings?.use_local_time)}
@@ -95,22 +116,36 @@ export default React.memo(function EventDateDetail({
         {!isLive && !countdown && duration >= Time.Day && !event.all_day && (
           <>
             <Paragraph secondary={secondary}>
-              <span style={{ width: "3.5em", display: "inline-block" }}>
-                {"From: "}
+              <span
+                className={"EventDateDetail__Capitalize EventDateDetail__Span"}
+              >
+                {l(
+                  "components.event.event_modal.event_detail.event_date_detail.from"
+                )}
+                {": "}
               </span>
-              <Bold>{start_at.format(`dddd, DD MMM`)}</Bold>
-              {" at "}
+              <Bold>{start_at.format(`dddd, DD MMM`)}</Bold>{" "}
+              {l(
+                "components.event.event_modal.event_detail.event_date_detail.at"
+              )}{" "}
               <Bold>{start_at.format("hh:mma")}</Bold>{" "}
               <Bold>
                 {showTimezoneLabel(start_at, settings?.use_local_time)}
               </Bold>
             </Paragraph>
             <Paragraph secondary={secondary}>
-              <span style={{ width: "3.5em", display: "inline-block" }}>
-                {"To: "}
+              <span
+                className={"EventDateDetail__Capitalize EventDateDetail__Span"}
+              >
+                {l(
+                  "components.event.event_modal.event_detail.event_date_detail.to"
+                )}
+                {": "}
               </span>
-              <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>
-              {" at "}
+              <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>{" "}
+              {l(
+                "components.event.event_modal.event_detail.event_date_detail.at"
+              )}{" "}
               <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
               <Bold>
                 {showTimezoneLabel(finish_at, settings?.use_local_time)}

@@ -21,7 +21,6 @@ export type EventPageState = {
 
 export default function EventPage(props: any) {
   const l = useFormatMessage()
-  // const [, accountState] = useAuthContext()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const [event] = useEventIdContext(params.get("id"))

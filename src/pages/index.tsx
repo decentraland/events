@@ -376,7 +376,7 @@ export default function IndexPage() {
         {loading && (
           <div>
             <div className="GroupTitle">
-              <SubTitle>TRENDING</SubTitle>
+              <SubTitle>{l("social.home.trending")}</SubTitle>
             </div>
             <Card.Group>
               <EventCardMini loading />
@@ -389,7 +389,7 @@ export default function IndexPage() {
         {!loading && events.length > 0 && trendingEvents.length > 0 && (
           <div>
             <div className="GroupTitle">
-              <SubTitle>TRENDING</SubTitle>
+              <SubTitle>{l("social.home.trending")}</SubTitle>
             </div>
             <Card.Group>
               {trendingEvents.map((event) => (

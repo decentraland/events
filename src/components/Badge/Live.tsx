@@ -1,5 +1,6 @@
 import React from "react"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import "./Live.css"
 
 export type LiveProps = {
@@ -8,6 +9,7 @@ export type LiveProps = {
 }
 
 export default function Live(props: LiveProps) {
+  const l = useFormatMessage()
   return (
     <div
       className={TokenList.join([
@@ -16,7 +18,7 @@ export default function Live(props: LiveProps) {
         props.inverted && "inverted",
       ])}
     >
-      LIVE
+      {l("components.badge.live")}
     </div>
   )
 }

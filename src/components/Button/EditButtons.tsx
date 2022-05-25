@@ -1,10 +1,11 @@
 import React from "react"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { SessionEventAttributes } from "../../entities/Event/types"
+import { useEventsContext } from "../../context/Event"
 
 import "./EditButtons.css"
-import { useEventsContext } from "../../context/Event"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 
 export type EditButtonsProps = {
   event: SessionEventAttributes
@@ -13,6 +14,7 @@ export type EditButtonsProps = {
 export default function EditButtons(props: EditButtonsProps) {
   const event = props.event
   const [, state] = useEventsContext()
+  const l = useFormatMessage()
   if (event.approved) {
     return null
   }
@@ -29,7 +31,7 @@ export default function EditButtons(props: EditButtonsProps) {
           loading={loading}
           disabled={loading}
         >
-          REJECT
+          {l("components.button.edit_buttons.reject")}
         </Button>
       )}
       {event.rejected && (
@@ -41,7 +43,7 @@ export default function EditButtons(props: EditButtonsProps) {
           loading={loading}
           disabled={loading}
         >
-          RESTORE
+          {l("components.button.edit_buttons.restore")}
         </Button>
       )}
       <Button
@@ -51,7 +53,7 @@ export default function EditButtons(props: EditButtonsProps) {
         loading={loading}
         disabled={loading}
       >
-        APPROVE
+        {l("components.button.edit_buttons.approve")}
       </Button>
     </div>
   )
