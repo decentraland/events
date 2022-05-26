@@ -1,5 +1,6 @@
 encryptionsalt: v1:wMf4U69zWaw=:v1:Qa032rcEd8x73Hl0:m1wVIFvQtnZK42jeptV2BpKOe5IMYA==
 config:
   aws:region: us-east-1
+  events:GATSBY_CHAIN_ID: "1,137"
   events:GATSBY_ROLLBAR_TOKEN: d4ef2affdfbe4816b98a0c7e31c90820
   events:USE_PUBLIC_TLD: "false"
