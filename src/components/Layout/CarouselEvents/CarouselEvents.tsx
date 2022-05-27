@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 
 import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
@@ -7,6 +7,8 @@ import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import EventCardBig from "../../Event/EventCardBig/EventCardBig"
 import "./CarouselEvents.css"
+import locations from "../../../modules/locations"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 export type CarouselEventsProps = {
   className?: string
@@ -14,31 +16,28 @@ export type CarouselEventsProps = {
   loading?: boolean
   hasEvents: boolean
   searching?: boolean
-  onClick: (
-    e: React.MouseEvent<MouseEvent>,
-    data: SessionEventAttributes
-  ) => void
   action?: React.ReactNode
   title?: string
 }
 
 export const CarouselEvents = (props: CarouselEventsProps) => {
-  const {
-    className,
-    hasEvents,
-    events,
-    loading,
-    searching,
-    onClick,
-    action,
-    title,
-  } = props
+  const { className, hasEvents, events, loading, searching, action, title } =
+    props
   const classes = ["carousel-events__wrapper"]
   className && classes.push(className)
 
   if (action && title) {
     classes.push("carousel-events__wrapper__schedule-hightlight")
   }
+
+  const handleEventClick = useCallback(
+    (e: React.MouseEvent<any>, event: SessionEventAttributes) => {
+      e.stopPropagation()
+      e.preventDefault()
+      navigate(locations.event(event.id))
+    },
+    []
+  )
 
   if (loading) {
     return (
@@ -65,7 +64,7 @@ export const CarouselEvents = (props: CarouselEventsProps) => {
                 <EventCardBig
                   key={"live:" + event.id}
                   event={event}
-                  onClick={onClick}
+                  onClick={handleEventClick}
                 />
               ))}
             </Carousel>
