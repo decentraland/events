@@ -16,7 +16,9 @@ export const getServers = once(async () => {
 export type Option = { key: string; value: string; text: string }
 
 // TODO: replace with `loadash.uniqBy `
-export function getServerOptions(servers: (CommsStatus | null)[]): Option[] {
+export function getServerOptions(
+  servers: (CommsStatus | null)[] | null
+): Option[] {
   const result: Option[] = [{ key: "default", value: "", text: "any server" }]
 
   const names = new Set<string>()

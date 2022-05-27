@@ -58,7 +58,7 @@ import {
 import { getEventTime, getEventType } from "../entities/Event/utils"
 import { SegmentEvent } from "../modules/segment"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import { getCategoriesFetch } from "../modules/events"
+import { getCategories } from "../modules/events"
 import useListEventsCategories from "../hooks/useListEventsCategories"
 import { showTimezoneLabel } from "../modules/date"
 
@@ -107,7 +107,7 @@ export default function IndexPage() {
     params.get("time-to")
   )
 
-  const [categories] = useAsyncMemo(getCategoriesFetch)
+  const [categories] = useAsyncMemo(getCategories)
 
   const filteredEvents = useListEventsFiltered(
     events,
