@@ -590,7 +590,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     }
   }
 
-  function validate() {
+  function validate(options: { new?: boolean }) {
     const errors: Record<string, string> = {}
 
     if (!event.name) {
@@ -629,6 +629,15 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
     if (event.categories.length > MAX_CATAGORIES_ALLOWED) {
       errors["categories"] = `Maximun tags allowed ${MAX_CATAGORIES_ALLOWED}`
+    }
+
+    if (options.new && event.duration > MAX_EVENT_DURATION) {
+      errors["finish_date"] =
+        "Maximum allowed duration " + getMaxHoursAllowedLabel()
+    }
+
+    if (event.duration < 0) {
+      errors["finish_date"] = "End date should be after start date"
     }
 
     if (Object.values(errors).filter(Boolean).length) {
