@@ -1,29 +1,64 @@
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 import once from "decentraland-gatsby/dist/utils/function/once"
 import Events from "../api/Events"
 import { EventCategoryAttributes } from "../entities/EventCategory/types"
-
-export const getCategoriesFetch = once(
-  async () => await Events.get().getCategories()
-)
+import { ScheduleAttributes } from "../entities/Schedule/types"
 
 export type Option = { key: string; value: string; text: string }
 
+export const getCategories = once(
+  async () => await Events.get().getCategories()
+)
+
+export const getSchedules = once(async () => await Events.get().getSchedules())
+
 // TODO: replace with `loadash.uniqBy `
+export type GetCategoriesOptions = Partial<{
+  exclude: string[]
+}>
 
 export const getCategoriesOptionsActives = (
   categories: EventCategoryAttributes[] | null,
-  userCategories: string[]
+  options: GetCategoriesOptions = {}
 ): Option[] => {
-  let result: Option[] = []
-  if (categories) {
-    result = categories
-      ?.filter((category) => !userCategories.includes(category.name))
-      .map((category) => ({
-        key: category.name,
-        value: category.name,
-        text: `page.events.categories.${category.name}`,
-      }))
+  if (!categories || categories.length === 0) {
+    return []
   }
 
-  return result
+  const exclude = new Set(options.exclude)
+  return categories
+    .filter((category) => !exclude.has(category.name))
+    .map((category) => ({
+      key: category.name,
+      value: category.name,
+      text: `page.events.categories.${category.name}`,
+    }))
+}
+
+export type GetSchedulesOptions = Partial<{
+  exclude: string[]
+}>
+
+export const getSchedulesOptions = (
+  schedules: ScheduleAttributes[] | null,
+  options: GetSchedulesOptions = {}
+): Option[] => {
+  if (!schedules || schedules.length === 0) {
+    return []
+  }
+
+  const now = Date.now()
+  const exclude = new Set(options.exclude)
+  return schedules
+    .filter((schedule) => {
+      return (
+        Time.from(schedule.active_until).isAfter(now) &&
+        !exclude.has(schedule.id)
+      )
+    })
+    .map((schedule) => ({
+      key: schedule.id,
+      value: schedule.id,
+      text: schedule.name,
+    }))
 }
