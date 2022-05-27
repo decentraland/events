@@ -24,12 +24,12 @@ import {
 } from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
 
 import EventCard from "../components/Event/EventCard/EventCard"
-import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import EventModal from "../components/Event/EventModal/EventModal"
 import { CarouselEvents } from "../components/Layout/CarouselEvents/CarouselEvents"
 import { Column } from "../components/Layout/Column/Column"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import { Row } from "../components/Layout/Row/Row"
+import { TrendingEvents } from "../components/Layout/TrendingEvents/TrendingEvents"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 
 import {
@@ -358,35 +358,12 @@ export default function IndexPage() {
           </div>
         )}
 
-        {loading && (
-          <div>
-            <div className="GroupTitle">
-              <SubTitle>TRENDING</SubTitle>
-            </div>
-            <Card.Group>
-              <EventCardMini loading />
-              <EventCardMini loading />
-              <EventCardMini loading />
-            </Card.Group>
-          </div>
-        )}
-
-        {!loading && events.length > 0 && trendingEvents.length > 0 && (
-          <div>
-            <div className="GroupTitle">
-              <SubTitle>TRENDING</SubTitle>
-            </div>
-            <Card.Group>
-              {trendingEvents.map((event) => (
-                <EventCardMini
-                  key={"trending:" + event.id}
-                  event={event}
-                  onClick={handleEventClick}
-                />
-              ))}
-            </Card.Group>
-          </div>
-        )}
+        <TrendingEvents
+          events={trendingEvents}
+          onClick={handleEventClick}
+          loading={loading}
+          hasEvents={events.length > 0}
+        />
 
         {loading && (
           <div>
