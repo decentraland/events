@@ -42,7 +42,7 @@ import {
   Frequency,
   MAX_EVENT_RECURRENT,
   Position,
-  WeekdayMask,
+  WeekdayMask
 } from "../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
@@ -134,6 +134,21 @@ export default function SubmitPage() {
     ]
   )
 
+  const isNewEvent = useMemo(
+    () => !params.get("view") || params.get("view") === "clone",
+    [params.get("view")]
+  )
+
+  const submitButtonLabel = useMemo(() => {
+    if (original && params.get("view") === "edit") {
+      return "SAVE"
+    } else if (original && params.get("view") === "clone") {
+      return "CLONE"
+    } else {
+      return "SUBMIT"
+    }
+  }, [params.get("view"), original])
+
   // useEffect(() => { GLOBAL_LOADING = false }, [])
 
   useEffect(() => {
@@ -201,18 +216,18 @@ export default function SubmitPage() {
   )
 
   const [submitting, submit] = useAsyncTask(async () => {
-    if (!editActions.validate()) {
+    if (!editActions.validate({ new: isNewEvent })) {
       return null
     }
 
     try {
       const data = editActions.toObject()
-      const submitted = await (original
+      const submitted = await (original && !isNewEvent
         ? Events.get().updateEvent(original.id, data as EditEvent)
         : Events.get().createEvent(data as EditEvent))
 
       eventsState.add(submitted)
-      navigate(locations.event(submitted.id))
+      navigate(locations.event(submitted.id), { replace: true })
     } catch (err) {
       patchState({
         loading: false,
@@ -414,7 +429,7 @@ export default function SubmitPage() {
                   </ImageInput>
                 </Grid.Column>
               </Grid.Row>
-              {!!original?.editable && (
+              {!!original?.editable && !isNewEvent && (
                 <Grid.Row>
                   <Grid.Column mobile="16">
                     <Label style={{ marginBottom: "1em" }}>Advance</Label>
@@ -1029,7 +1044,7 @@ export default function SubmitPage() {
                     style={{ width: "100%" }}
                     onClick={prevent(() => submit())}
                   >
-                    {original ? "SAVE" : "SUBMIT"}
+                    {submitButtonLabel}
                   </Button>
                 </Grid.Column>
                 <Grid.Column mobile="5">

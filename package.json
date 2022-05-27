@@ -65,7 +65,7 @@
     "@types/web-push": "^3.3.2",
     "@types/xml": "^1.0.5",
     "concurrently": "^7.1.0",
-    "decentraland-gatsby-deploy": "^1.12.1",
+    "decentraland-gatsby-deploy": "^1.18.1",
     "devcert": "^1.1.2",
     "dotenv": "^8.6.0",
     "husky": "^7.0.4",
