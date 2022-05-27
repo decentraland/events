@@ -1,15 +1,17 @@
-import { resolve } from "path"
 import { Request, Response } from "express"
 import { escape } from "html-escaper"
+import { resolve } from "path"
 import isUUID from "validator/lib/isUUID"
+
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
-import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import { eventUrl, siteUrl } from "../Event/utils"
-import { EventAttributes } from "../Event/types"
-import EventModel from "../Event/model"
+import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
+
 import copies from "../../intl/en.json"
+import EventModel from "../Event/model"
+import { EventAttributes } from "../Event/types"
+import { eventUrl, siteUrl } from "../Event/utils"
 
 export default routes((router) => {
   router.get("/event/", handleRaw(injectEventMetadata, "html"))

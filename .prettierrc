@@ -3,5 +3,14 @@
   "semi": false,
   "singleQuote": false,
   "tabWidth": 2,
-  "trailingComma": "es5"
+  "trailingComma": "es5",
+  "importOrder": [
+    "^react(.*?)$",
+    "<THIRD_PARTY_MODULES>",
+    "^decentraland(.*?)/(.*)$",
+    "^[../]",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

@@ -1,4 +1,5 @@
 import { useState } from "react"
+
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 
 let service = new Map<string, ServiceWorkerRegistration>()

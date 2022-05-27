@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
 import { SQL, table } from "decentraland-gatsby/dist/entities/Database/utils"
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+
 import EventModel from "../entities/Event/model"
 
 export async function up(pgm: MigrationBuilder): Promise<void> {

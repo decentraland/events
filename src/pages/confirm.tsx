@@ -1,16 +1,17 @@
 import React from "react"
+
 import { useLocation } from "@gatsbyjs/reach-router"
 
-import { Container } from "decentraland-ui/dist/components/Container/Container"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import {
-  ProfileSettingsAttributes,
-  EmailSubscriptionStatus,
-} from "../entities/ProfileSettings/types"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
 
-import "./settings.css"
 import Navigation from "../components/Layout/Navigation"
+import {
+  EmailSubscriptionStatus,
+  ProfileSettingsAttributes,
+} from "../entities/ProfileSettings/types"
+import "./settings.css"
 
 export type SettingsPageState = {
   updating: Partial<{

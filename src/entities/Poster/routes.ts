@@ -1,22 +1,24 @@
 import AWS from "aws-sdk"
-import { promisify } from "util"
 import fileUpload, { UploadedFile } from "express-fileupload"
-import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { promisify } from "util"
+
 import {
-  auth,
   WithAuth,
+  auth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import logger from "decentraland-gatsby/dist/entities/Development/logger"
+import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
+
 import {
   POSTER_FILE_SIZE,
   POSTER_FILE_TYPES,
   PosterAttributes,
   extension,
 } from "./types"
-import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
-import logger from "decentraland-gatsby/dist/entities/Development/logger"
 
 let BUCKET_CHECKED = false
 let BUCKET_CHECKED_JOB: Promise<void> | null = null

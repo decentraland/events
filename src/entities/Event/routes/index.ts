@@ -1,27 +1,28 @@
-import env from "decentraland-gatsby/dist/utils/env"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
-import {
-  auth,
-  WithAuth,
-} from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { EventAttributes } from "../types"
-import { withEvent, WithEvent } from "../middleware"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import {
-  withAuthProfile,
+  WithAuth,
+  auth,
+} from "decentraland-gatsby/dist/entities/Auth/middleware"
+import {
   WithAuthProfile,
+  withAuthProfile,
 } from "decentraland-gatsby/dist/entities/Profile/middleware"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import env from "decentraland-gatsby/dist/utils/env"
+
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import ProfileSettingsModel from "../../ProfileSettings/model"
 import ProfileSubscriptionModel from "../../ProfileSubscription/model"
 import { notify } from "../cron"
-import { getEventList } from "./getEventList"
-import { getEvent } from "./getEvent"
-import { getAttendingEventList } from "./getAttendingEventList"
+import { WithEvent, withEvent } from "../middleware"
+import { EventAttributes } from "../types"
 import { createEvent } from "./createEvent"
+import { getAttendingEventList } from "./getAttendingEventList"
+import { getEvent } from "./getEvent"
+import { getEventList } from "./getEventList"
 import { updateEvent } from "./updateEvent"
 
 export const DECENTRALAND_URL = env("DECENTRALAND_URL", "")

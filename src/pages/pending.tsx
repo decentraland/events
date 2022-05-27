@@ -1,32 +1,32 @@
 import React, { useMemo, useState } from "react"
-import { useLocation } from "@gatsbyjs/reach-router"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import Helmet from "react-helmet"
 
-import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
+import { useLocation } from "@gatsbyjs/reach-router"
+
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-
-import EventModal from "../components/Event/EventModal/EventModal"
-import EventCard from "../components/Event/EventCard/EventCard"
-
-import Link from "decentraland-gatsby/dist/components/Text/Link"
-import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
-import Navigation, { NavigationTab } from "../components/Layout/Navigation"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import locations from "../modules/locations"
+import { Card } from "decentraland-ui/dist/components/Card/Card"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
+
+import EventCard from "../components/Event/EventCard/EventCard"
+import EventModal from "../components/Event/EventModal/EventModal"
+import Navigation, { NavigationTab } from "../components/Layout/Navigation"
+import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import {
   useEventIdContext,
-  useEventsContext,
   useEventSorter,
+  useEventsContext,
 } from "../context/Event"
+import locations from "../modules/locations"
 import "./index.css"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import Helmet from "react-helmet"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 
 export default function MyEventsPage(props: any) {
   const l = useFormatMessage()

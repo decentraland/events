@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react"
+import React, { useEffect, useRef } from "react"
+
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { FieldProps } from "decentraland-ui/dist/components/Field/Field"
 

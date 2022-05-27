@@ -1,40 +1,42 @@
 import express from "express"
+
+import metricsDatabase from "decentraland-gatsby/dist/entities/Database/routes"
+import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
 import Manager from "decentraland-gatsby/dist/entities/Job/manager"
 import { jobInitializer } from "decentraland-gatsby/dist/entities/Job/utils"
-import { initializeServices } from "decentraland-gatsby/dist/entities/Server/handler"
-import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/utils"
-import {
-  status,
-  filesystem,
-} from "decentraland-gatsby/dist/entities/Route/routes"
-import {
-  withDDosProtection,
-  withLogs,
-  withCors,
-  withBody,
-} from "decentraland-gatsby/dist/entities/Route/middleware"
-import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
-import metricsDatabase from "decentraland-gatsby/dist/entities/Database/routes"
 import profile from "decentraland-gatsby/dist/entities/Profile/routes"
 import metrics from "decentraland-gatsby/dist/entities/Prometheus/routes"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import {
+  withBody,
+  withCors,
+  withDDosProtection,
+  withLogs,
+} from "decentraland-gatsby/dist/entities/Route/middleware"
+import {
+  filesystem,
+  status,
+} from "decentraland-gatsby/dist/entities/Route/routes"
+import { initializeServices } from "decentraland-gatsby/dist/entities/Server/handler"
+import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/utils"
+
+import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
 import events from "./entities/Event/routes"
 import attendees from "./entities/EventAttendee/routes"
 import categories from "./entities/EventCategory/routes"
-import social from "./entities/Social/routes"
 import poster from "./entities/Poster/routes"
-import sitemap from "./entities/Sitemap/routes"
 import profileSettings, {
-  verifySubscription,
   removeSubscription,
+  verifySubscription,
 } from "./entities/ProfileSettings/routes"
-import profileSubscription from "./entities/ProfileSubscription/routes"
 import {
   SUBSCRIPTION_PATH,
   UNSUBSCRIBE_PATH,
 } from "./entities/ProfileSettings/types"
-import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
+import profileSubscription from "./entities/ProfileSubscription/routes"
+import sitemap from "./entities/Sitemap/routes"
+import social from "./entities/Social/routes"
 
 const jobs = new Manager({ concurrency: 10 })
 jobs.cron("@eachMinute", notifyUpcomingEvents)

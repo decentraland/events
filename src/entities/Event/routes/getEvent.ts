@@ -1,11 +1,13 @@
-import EventModel from "../model"
+import { Request } from "express"
+import isUUID from "validator/lib/isUUID"
+
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+
 import EventAttendee from "../../EventAttendee/model"
 import { validateGetEventParams } from "../middleware"
-import isUUID from "validator/lib/isUUID"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import EventModel from "../model"
 import { EventAttributes, SessionEventAttributes } from "../types"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
-import { Request } from "express"
 
 type WithEvent = {
   event?: SessionEventAttributes

@@ -1,11 +1,13 @@
+import { useMemo } from "react"
+
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+
+import { HookProfileSettingsAttributes } from "../context/ProfileSetting"
 import {
   EventTimeParams,
   SessionEventAttributes,
   ToggleItemsValue,
 } from "../entities/Event/types"
-import { useMemo } from "react"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { HookProfileSettingsAttributes } from "../context/ProfileSetting"
 
 export default function useListEventsFiltered(
   events?: SessionEventAttributes[] | null,

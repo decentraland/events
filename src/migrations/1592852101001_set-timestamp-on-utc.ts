@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
 import EventModel from "../entities/Event/model"
 import EventAttendeeModel from "../entities/EventAttendee/model"
 

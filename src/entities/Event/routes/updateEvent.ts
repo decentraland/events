@@ -1,34 +1,36 @@
-import { utils } from "decentraland-commons"
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
-import Land from "decentraland-gatsby/dist/utils/api/Land"
-import EventModel from "../model"
-import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
-import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import {
-  adminPatchAttributes,
-  patchAttributes,
-  DeprecatedEventAttributes,
-  MAX_EVENT_DURATION,
-} from "../types"
+import { utils } from "decentraland-commons"
+
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
+import Land from "decentraland-gatsby/dist/utils/api/Land"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+
+import EventAttendeeModel from "../../EventAttendee/model"
+import { EventAttendeeAttributes } from "../../EventAttendee/types"
+import EventCategoryModel from "../../EventCategory/model"
 import {
   notifyApprovedEvent,
   notifyEditedEvent,
   notifyRejectedEvent,
 } from "../../Slack/utils"
-import EventAttendeeModel from "../../EventAttendee/model"
-import { EventAttendeeAttributes } from "../../EventAttendee/types"
-import API from "decentraland-gatsby/dist/utils/api/API"
-import { DECENTRALAND_URL } from "./index"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import EventModel from "../model"
 import { newEventSchema } from "../schemas"
-import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+import {
+  DeprecatedEventAttributes,
+  MAX_EVENT_DURATION,
+  adminPatchAttributes,
+  patchAttributes,
+} from "../types"
+import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
 import { getEvent } from "./getEvent"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-import EventCategoryModel from "../../EventCategory/model"
+import { DECENTRALAND_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema

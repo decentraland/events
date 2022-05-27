@@ -1,16 +1,18 @@
 import { Request } from "express"
 import isUUID from "validator/lib/isUUID"
+
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { middleware } from "decentraland-gatsby/dist/entities/Route/handle"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+
 import EventModel from "./model"
+import { getEventParamsSchema } from "./schemas"
 import {
   DeprecatedEventAttributes,
   EventAttributes,
   GetEventParams,
 } from "./types"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-import { middleware } from "decentraland-gatsby/dist/entities/Route/handle"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import { getEventParamsSchema } from "./schemas"
 
 export type WithEvent<R extends Request = Request> = R & {
   event: DeprecatedEventAttributes

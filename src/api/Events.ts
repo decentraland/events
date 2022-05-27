@@ -1,15 +1,16 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
+import Options from "decentraland-gatsby/dist/utils/api/Options"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
+
 import {
   EventAttributes,
   SessionEventAttributes,
 } from "../entities/Event/types"
-import Options from "decentraland-gatsby/dist/utils/api/Options"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
+import { EventCategoryAttributes } from "../entities/EventCategory/types"
 import { PosterAttributes } from "../entities/Poster/types"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
-import { EventCategoryAttributes } from "../entities/EventCategory/types"
 
 export type EditEvent = Pick<
   EventAttributes,

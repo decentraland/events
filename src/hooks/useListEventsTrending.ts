@@ -1,4 +1,5 @@
 import { useMemo } from "react"
+
 import { SessionEventAttributes } from "../entities/Event/types"
 
 export default function useListEventsTrending(

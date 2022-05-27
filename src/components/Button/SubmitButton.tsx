@@ -1,10 +1,12 @@
 import React from "react"
+
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import {
   Button,
   ButtonProps,
 } from "decentraland-ui/dist/components/Button/Button"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import invertedAddIcon from "../../images/inverted-add.svg"
 import "./SubmitButton.css"
 

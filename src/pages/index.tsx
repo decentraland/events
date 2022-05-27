@@ -1,66 +1,65 @@
-import React, { useMemo, useState, useCallback } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import Helmet from "react-helmet"
-import { useLocation } from "@gatsbyjs/reach-router"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
-import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { useLocation } from "@gatsbyjs/reach-router"
+
+import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
+import Divider from "decentraland-gatsby/dist/components/Text/Divider"
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import { Box } from "decentraland-ui/dist/components/Box/Box"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
 import {
   ToggleBox,
   ToggleBoxItem,
 } from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
-import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
-import { Box } from "decentraland-ui/dist/components/Box/Box"
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
-import EventModal from "../components/Event/EventModal/EventModal"
 import EventCard from "../components/Event/EventCard/EventCard"
-import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
 import EventCardBig from "../components/Event/EventCardBig/EventCardBig"
-import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
+import EventCardMini from "../components/Event/EventCardMini/EventCardMini"
+import EventModal from "../components/Event/EventModal/EventModal"
+import { Column } from "../components/Layout/Column/Column"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
-
-import useListEventsByMonth from "../hooks/useListEventsByMonth"
-
-import locations from "../modules/locations"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
+import { Row } from "../components/Layout/Row/Row"
+import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import {
   useEventIdContext,
-  useEventsContext,
   useEventSorter,
+  useEventsContext,
 } from "../context/Event"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
 import {
   EventTimeParams,
   SessionEventAttributes,
   ToggleItemsValue,
 } from "../entities/Event/types"
+import { getEventTime, getEventType } from "../entities/Event/utils"
+import useListEventsByMonth from "../hooks/useListEventsByMonth"
+import useListEventsCategories from "../hooks/useListEventsCategories"
 import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import useListEventsMain from "../hooks/useListEventsMain"
 import useListEventsTrending from "../hooks/useListEventsTrending"
-import "./index.css"
-import { Column } from "../components/Layout/Column/Column"
-import { Row } from "../components/Layout/Row/Row"
+import { showTimezoneLabel } from "../modules/date"
+import { getCategoriesFetch } from "../modules/events"
 import {
   FilterCategoryVariant,
   FilterTimeVariant,
   FilterTypeVariant,
   Flags,
 } from "../modules/features"
-import { getEventTime, getEventType } from "../entities/Event/utils"
+import locations from "../modules/locations"
 import { SegmentEvent } from "../modules/segment"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import { getCategoriesFetch } from "../modules/events"
-import useListEventsCategories from "../hooks/useListEventsCategories"
-import { showTimezoneLabel } from "../modules/date"
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>

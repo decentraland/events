@@ -1,6 +1,6 @@
 // import { resolve } from "path";
-import { buildGatsby } from "decentraland-gatsby-deploy/dist/recepies/buildGatsby"
 import { variable } from "decentraland-gatsby-deploy/dist/pulumi/env"
+import { buildGatsby } from "decentraland-gatsby-deploy/dist/recepies/buildGatsby"
 
 export = async function main() {
   return buildGatsby({

@@ -1,30 +1,32 @@
 import { utils } from "decentraland-commons"
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import { Request, Response } from "express"
+import isEmail from "validator/lib/isEmail"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
 import {
-  auth,
   WithAuth,
+  auth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
 import { sign, verify } from "decentraland-gatsby/dist/utils/sign"
-import { Response, Request } from "express"
+
+import EventAttendeeModel from "../EventAttendee/model"
+import { sendEmailVerification } from "../Notification/utils"
+import ProfileSubscriptionModel from "../ProfileSubscription/model"
 import ProfileSettingsModel from "./model"
 import {
-  editableAttributes,
-  ProfileSettingsAttributes,
-  EmailSubscriptionStatus,
-  EmailSubscription,
   DATA_PARAM,
+  EmailSubscription,
+  EmailSubscriptionStatus,
+  ProfileSettingsAttributes,
   SUBSCRIPTION_PATH,
+  editableAttributes,
   profileSettingsSchema,
 } from "./types"
-import isEmail from "validator/lib/isEmail"
-import { sendEmailVerification } from "../Notification/utils"
-import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
-import ProfileSubscriptionModel from "../ProfileSubscription/model"
-import EventAttendeeModel from "../EventAttendee/model"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 
 const EVENTS_URL =
   process.env.GATSBY_EVENTS_URL ||

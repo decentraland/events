@@ -1,6 +1,6 @@
 import React from "react"
-import { EventAttributes } from "../../../../entities/Event/types"
 
+import { EventAttributes } from "../../../../entities/Event/types"
 import "./EventStatusBanner.css"
 
 export type EventStatusBannerProp = {

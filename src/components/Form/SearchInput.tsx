@@ -1,6 +1,8 @@
 import React from "react"
+
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import invertedAddIcon from "../../images/inverted-add.svg"
 import "./SearchInput.css"
 

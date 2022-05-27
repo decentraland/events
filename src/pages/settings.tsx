@@ -1,29 +1,28 @@
 import React, { useMemo, useState } from "react"
-
-import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
-import { Field } from "decentraland-ui/dist/components/Field/Field"
-import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
-import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
-
-import Section from "../components/Text/Section"
-
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import isEmail from "validator/lib/isEmail"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-
-import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
-import check from "../images/check.svg"
-import Navigation from "../components/Layout/Navigation"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { useEffect } from "react"
 import Helmet from "react-helmet"
+
+import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
+import isEmail from "validator/lib/isEmail"
+
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { Field } from "decentraland-ui/dist/components/Field/Field"
+import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
+
+import Navigation from "../components/Layout/Navigation"
+import Section from "../components/Text/Section"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
+import check from "../images/check.svg"
 import "./settings.css"
 
 export default function SettingsPage(props: any) {

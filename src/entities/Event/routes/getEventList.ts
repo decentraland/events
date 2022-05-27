@@ -1,13 +1,15 @@
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import Context from "decentraland-gatsby/dist/entities/Route/context"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import { bool } from "decentraland-gatsby/dist/entities/Route/param"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
-import EventModel from "../model"
-import { EventListOptions, EventListParams, EventListType } from "../types"
-import { getEventListQuery } from "../schemas"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { bool } from "decentraland-gatsby/dist/entities/Route/param"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+
+import EventModel from "../model"
+import { getEventListQuery } from "../schemas"
+import { EventListOptions, EventListParams, EventListType } from "../types"
 
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth, res: Response, ctx: Context) {

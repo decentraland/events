@@ -1,9 +1,10 @@
 import {
+  AjvArraySchema,
   AjvObjectSchema,
   TruthyEnum,
   apiResultSchema,
-  AjvArraySchema,
 } from "decentraland-gatsby/dist/entities/Schema/types"
+
 import { Frequencies } from "./types"
 
 export const getEventParamsSchema: AjvObjectSchema = {

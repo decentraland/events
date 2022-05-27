@@ -1,4 +1,5 @@
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+
 import { showTimezoneLabel } from "./date"
 
 describe("Date module", () => {

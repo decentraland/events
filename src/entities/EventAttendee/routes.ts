@@ -1,20 +1,22 @@
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import {
-  auth,
-  WithAuth,
-} from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { requireEvent } from "../Event/middleware"
-import { EventAttendeeAttributes } from "./types"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
-import EventModel from "../Event/model"
-import {
-  withAuthProfile,
-  WithAuthProfile,
-} from "decentraland-gatsby/dist/entities/Profile/middleware"
-import { getProfileSettings } from "../ProfileSettings/routes"
-import EventAttendeeModel from "../EventAttendee/model"
-import { getEvent } from "../Event/routes/getEvent"
 import { Request } from "express"
+
+import {
+  WithAuth,
+  auth,
+} from "decentraland-gatsby/dist/entities/Auth/middleware"
+import {
+  WithAuthProfile,
+  withAuthProfile,
+} from "decentraland-gatsby/dist/entities/Profile/middleware"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+
+import { requireEvent } from "../Event/middleware"
+import EventModel from "../Event/model"
+import { getEvent } from "../Event/routes/getEvent"
+import EventAttendeeModel from "../EventAttendee/model"
+import { getProfileSettings } from "../ProfileSettings/routes"
+import { EventAttendeeAttributes } from "./types"
 
 export default routes((router) => {
   const withAuth = auth({ optional: true })

@@ -1,7 +1,10 @@
 import React from "react"
-import { Back } from "decentraland-ui/dist/components/Back/Back"
-import { back } from "decentraland-gatsby/dist/plugins/intl"
+
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
+
+import { back } from "decentraland-gatsby/dist/plugins/intl"
+import { Back } from "decentraland-ui/dist/components/Back/Back"
+
 // import recordNavigation from "decentraland-gatsby/dist/utils/
 import locations from "../../modules/locations"
 

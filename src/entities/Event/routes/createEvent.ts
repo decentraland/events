@@ -1,23 +1,25 @@
-import { v4 as uuid } from "uuid"
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
-import Land from "decentraland-gatsby/dist/utils/api/Land"
-import EventModel from "../model"
-import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { v4 as uuid } from "uuid"
+
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+import API from "decentraland-gatsby/dist/utils/api/API"
+import Land from "decentraland-gatsby/dist/utils/api/Land"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+
+import EventCategoryModel from "../../EventCategory/model"
+import { notifyNewEvent } from "../../Slack/utils"
+import EventModel from "../model"
+import { newEventSchema } from "../schemas"
 import {
-  EventAttributes,
   DeprecatedEventAttributes,
+  EventAttributes,
   MAX_EVENT_DURATION,
 } from "../types"
-import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
-import { notifyNewEvent } from "../../Slack/utils"
-import API from "decentraland-gatsby/dist/utils/api/API"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import { newEventSchema } from "../schemas"
-import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import EventCategoryModel from "../../EventCategory/model"
+import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
 
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema

@@ -1,17 +1,19 @@
+import { RRule, Weekday } from "rrule"
+
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+
 import {
   EventAttributes,
+  EventTimeParams,
+  MAX_EVENT_RECURRENT,
   MonthMask,
-  WeekdayMask,
-  Weekdays,
   Months,
   Position,
   RecurrentEventAttributes,
-  MAX_EVENT_RECURRENT,
   ToggleItemsValue,
-  EventTimeParams,
+  WeekdayMask,
+  Weekdays,
 } from "./types"
-import { RRule, Weekday } from "rrule"
 
 const DECENTRALAND_URL =
   process.env.GATSBY_DECENTRALAND_URL ||

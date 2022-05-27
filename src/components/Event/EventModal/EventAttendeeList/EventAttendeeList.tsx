@@ -1,16 +1,16 @@
 import React, { useState } from "react"
-import { EventAttendeeAttributes } from "../../../../entities/EventAttendee/types"
-import { SessionEventAttributes } from "../../../../entities/Event/types"
+
+import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
-import Events from "../../../../api/Events"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
+import Events from "../../../../api/Events"
+import { SessionEventAttributes } from "../../../../entities/Event/types"
+import { EventAttendeeAttributes } from "../../../../entities/EventAttendee/types"
 import backIcon from "../../../../images/popup-back.svg"
 import closeIcon from "../../../../images/popup-close.svg"
-
 import "./EventAttendeeList.css"
 
 const attendees = new Map<string, EventAttendeeAttributes[]>()

@@ -1,4 +1,5 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
+
 import { ToggleItemsValue } from "../entities/Event/types"
 
 const GATSBY_BASE_URL = process.env.GATSBY_BASE_URL || "/"

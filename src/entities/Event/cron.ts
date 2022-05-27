@@ -1,17 +1,18 @@
-import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 import logger from "decentraland-gatsby/dist/entities/Development/logger"
-import EventModel from "./model"
+import JobContext from "decentraland-gatsby/dist/entities/Job/context"
+
 import EventAttendeeModel from "../EventAttendee/model"
+import { EventAttendeeAttributes } from "../EventAttendee/types"
+import push from "../Notification/push"
+import { sendEmailUpcomingEvent } from "../Notification/utils"
 import ProfileSettingsModel from "../ProfileSettings/model"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 import ProfileSubscriptionModel from "../ProfileSubscription/model"
 import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types"
-import { sendEmailUpcomingEvent } from "../Notification/utils"
-import { ProfileSettingsAttributes } from "../ProfileSettings/types"
-import push from "../Notification/push"
-import { eventUrl, calculateRecurrentProperties } from "./utils"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
+import EventModel from "./model"
 import { EventAttributes } from "./types"
-import { EventAttendeeAttributes } from "../EventAttendee/types"
+import { calculateRecurrentProperties, eventUrl } from "./utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()

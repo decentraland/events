@@ -1,11 +1,13 @@
-import { ProfileSubscriptionAttributes } from "./types"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
+
+import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import {
   SQL,
   table,
   values,
 } from "decentraland-gatsby/dist/entities/Database/utils"
-import { Model } from "decentraland-gatsby/dist/entities/Database/model"
+
+import { ProfileSubscriptionAttributes } from "./types"
 
 export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionAttributes> {
   static tableName = "profile_subscriptions"

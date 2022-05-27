@@ -1,4 +1,5 @@
 import once from "decentraland-gatsby/dist/utils/function/once"
+
 import Events from "../api/Events"
 import { EventCategoryAttributes } from "../entities/EventCategory/types"
 

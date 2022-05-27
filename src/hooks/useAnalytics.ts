@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+
 import track, {
   Tracker,
 } from "decentraland-gatsby/dist/utils/development/segment"

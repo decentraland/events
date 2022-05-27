@@ -1,15 +1,17 @@
 import React, { createContext, useContext, useMemo } from "react"
+
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
-import Events from "../api/Events"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
-import { SegmentEvent } from "../modules/segment"
-import usePushSubscription from "../hooks/usePushSubscription"
+import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
-import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+
+import Events from "../api/Events"
+import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
+import usePushSubscription from "../hooks/usePushSubscription"
+import { SegmentEvent } from "../modules/segment"
 
 const DEFAULT_PROFILE_SETTINGS = {
   user: null,

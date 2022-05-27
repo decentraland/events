@@ -1,61 +1,64 @@
 import React, { useEffect, useMemo } from "react"
+import Helmet from "react-helmet"
+
 import { useLocation } from "@gatsbyjs/reach-router"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
-import Title from "decentraland-gatsby/dist/components/Text/Title"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
-import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import { Field } from "decentraland-ui/dist/components/Field/Field"
-import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
-import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import useFileDrop from "decentraland-gatsby/dist/hooks/useFileDrop"
-import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
+import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
+
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
+import Link from "decentraland-gatsby/dist/components/Text/Link"
+import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import Title from "decentraland-gatsby/dist/components/Text/Title"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
+import useFileDrop from "decentraland-gatsby/dist/hooks/useFileDrop"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import useEventEditor from "../hooks/useEventEditor"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { Field } from "decentraland-ui/dist/components/Field/Field"
+import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
+import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
+
+import Events, { EditEvent } from "../api/Events"
 import AddCoverButton from "../components/Button/AddCoverButton"
-import ConfirmModal from "../components/Modal/ConfirmModal"
 import ImageInput from "../components/Form/ImageInput"
-import Textarea from "../components/Form/Textarea"
 import Label from "../components/Form/Label"
 import RadioGroup from "../components/Form/RadioGroup"
-import Events, { EditEvent } from "../api/Events"
-import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
+import Textarea from "../components/Form/Textarea"
+import ItemLayout from "../components/Layout/ItemLayout"
+import ConfirmModal from "../components/Modal/ConfirmModal"
+import { useEventIdContext, useEventsContext } from "../context/Event"
 import {
   Frequency,
-  WeekdayMask,
-  Position,
   MAX_EVENT_RECURRENT,
+  Position,
+  WeekdayMask,
 } from "../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
-  toRecurrentSetposName,
   toRRuleDates,
+  toRecurrentSetposName,
 } from "../entities/Event/utils"
-import { useEventIdContext, useEventsContext } from "../context/Event"
-import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
-import locations from "../modules/locations"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import Helmet from "react-helmet"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import ItemLayout from "../components/Layout/ItemLayout"
-import { getServerOptions, getServers } from "../modules/servers"
+import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
+import useEventEditor from "../hooks/useEventEditor"
 import infoIcon from "../images/info.svg"
-import "./submit.css"
 import {
   getCategoriesFetch,
   getCategoriesOptionsActives,
 } from "../modules/events"
+import locations from "../modules/locations"
+import { getServerOptions, getServers } from "../modules/servers"
+import "./submit.css"
 
 type SubmitPageState = {
   loading?: boolean

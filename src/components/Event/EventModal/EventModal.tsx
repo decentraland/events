@@ -1,17 +1,18 @@
 import React, { useState } from "react"
-import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal"
+
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal"
+
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventAttendeeList from "./EventAttendeeList/EventAttendeeList"
-import EventStatusBanner from "./EventStatusBanner/EventStatusBanner"
-import EventDetail from "./EventDetail/EventDetail"
+import closeIcon from "../../../images/remove.svg"
 import AttendingButtons from "../../Button/AttendingButtons"
 import EditButtons from "../../Button/EditButtons"
 import EventSection from "../EventSection"
-import closeIcon from "../../../images/remove.svg"
-
+import EventAttendeeList from "./EventAttendeeList/EventAttendeeList"
+import EventDetail from "./EventDetail/EventDetail"
 import "./EventModal.css"
+import EventStatusBanner from "./EventStatusBanner/EventStatusBanner"
 
 export type EventModalProps = Omit<ModalProps, "open" | "children"> & {
   event?: SessionEventAttributes | null

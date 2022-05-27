@@ -1,9 +1,11 @@
+import { Request } from "express"
+
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
+
 import EventModel from "../Event/model"
 import { SITEMAP_ITEMS_PER_PAGE } from "../Event/types"
 import { eventUrl, siteUrl } from "../Event/utils"
-import { Request } from "express"
 
 export default routes((router) => {
   router.get("/sitemap.xml", handleRaw(getIndexSitemap, "application/xml"))

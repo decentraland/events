@@ -1,19 +1,22 @@
-import { useState, useMemo } from "react"
+import { useMemo, useState } from "react"
+
 import isURL from "validator/lib/isURL"
+
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import {
-  Frequency,
-  WeekdayMask,
-  MonthMask,
-  Position,
-  MAX_EVENT_RECURRENT,
-  DEFAULT_EVENT_DURATION,
-  MAX_EVENT_DURATION,
-  MAX_CATAGORIES_ALLOWED,
-} from "../entities/Event/types"
-import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
+
 import { EditEvent } from "../api/Events"
 import { newEventSchema } from "../entities/Event/schemas"
+import {
+  DEFAULT_EVENT_DURATION,
+  Frequency,
+  MAX_CATAGORIES_ALLOWED,
+  MAX_EVENT_DURATION,
+  MAX_EVENT_RECURRENT,
+  MonthMask,
+  Position,
+  WeekdayMask,
+} from "../entities/Event/types"
+import { toRecurrentSetpos, toWeekdayMask } from "../entities/Event/utils"
 
 type EventEditorState = EditEvent & {
   errors: Record<string, string>

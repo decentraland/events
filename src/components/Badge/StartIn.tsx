@@ -1,9 +1,11 @@
 import React from "react"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import Live from "./Live"
 import "./StartIn.css"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 
 export type StartInProps = {
   date: Date

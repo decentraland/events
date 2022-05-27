@@ -3,11 +3,12 @@
  *
  * See: https://www.gatsbyjs.org/docs/ssr-apis/
  */
-
 // You can delete this file if you're not using it
 import React from "react"
-import Segment from "decentraland-gatsby/dist/components/Development/Segment"
+
 import Rollbar from "decentraland-gatsby/dist/components/Development/Rollbar"
+import Segment from "decentraland-gatsby/dist/components/Development/Segment"
+
 export { wrapPageElement, wrapRootElement } from "./gatsby-browser"
 
 /**

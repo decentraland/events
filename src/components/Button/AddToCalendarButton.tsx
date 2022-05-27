@@ -1,18 +1,18 @@
 import React, { useCallback } from "react"
+
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAuth from "decentraland-gatsby/dist/hooks/useAuth"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import track from "decentraland-gatsby/dist/utils/development/segment"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import {
   Button,
   ButtonProps,
 } from "decentraland-ui/dist/components/Button/Button"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import useAuth from "decentraland-gatsby/dist/hooks/useAuth"
-import track from "decentraland-gatsby/dist/utils/development/segment"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import { EventAttributes } from "../../entities/Event/types"
-import { SegmentEvent } from "../../modules/segment"
-
 import { eventTargetUrl } from "../../entities/Event/utils"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import { SegmentEvent } from "../../modules/segment"
 import "./AddToCalendarButton.css"
 
 export type AddToCalendarButtonProps = ButtonProps & {

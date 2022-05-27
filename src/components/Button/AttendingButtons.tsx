@@ -1,31 +1,32 @@
 import React, { useCallback, useMemo, useState } from "react"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
+
+import { useLocation } from "@gatsbyjs/reach-router"
+
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+
+import { useEventsContext } from "../../context/Event"
 import { SessionEventAttributes } from "../../entities/Event/types"
 import {
-  eventTwitterUrl,
   eventFacebookUrl,
   eventTargetUrl,
+  eventTwitterUrl,
 } from "../../entities/Event/utils"
-import { useLocation } from "@gatsbyjs/reach-router"
-import { SegmentEvent } from "../../modules/segment"
-
-import shareIcon from "../../images/share.svg"
-import closeIcon from "../../images/popup-close.svg"
 import facebookIcon from "../../images/icon-facebook.svg"
 import twitterIcon from "../../images/icon-twitter.svg"
 import notificationDisabledIcon from "../../images/notification-disabled.svg"
 import notificationEnabledIcon from "../../images/notification-enabled.svg"
+import closeIcon from "../../images/popup-close.svg"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
-
-import { useEventsContext } from "../../context/Event"
+import shareIcon from "../../images/share.svg"
 import locations from "../../modules/locations"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import { SegmentEvent } from "../../modules/segment"
 import "./AttendingButtons.css"
 
 export type AttendingButtonsProps = {

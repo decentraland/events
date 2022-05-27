@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
+
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import nextIcon from "../../images/next.svg"
 import "./Accordion.css"
 

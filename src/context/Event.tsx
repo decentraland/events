@@ -1,14 +1,17 @@
-import React, { createContext, useContext, useCallback } from "react"
+import React, { createContext, useCallback, useContext } from "react"
+import { useMemo } from "react"
+
+import isUUID from "validator/lib/isUUID"
+
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import useAsyncTasks from "decentraland-gatsby/dist/hooks/useAsyncTasks"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useAsyncTasks from "decentraland-gatsby/dist/hooks/useAsyncTasks"
+
 import Events from "../api/Events"
 import { SessionEventAttributes } from "../entities/Event/types"
-import { useMemo } from "react"
-import { SegmentEvent } from "../modules/segment"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
-import isUUID from "validator/lib/isUUID"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import { SegmentEvent } from "../modules/segment"
 
 const defaultProfileSettings = [
   [] as SessionEventAttributes[],
