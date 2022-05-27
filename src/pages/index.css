@@ -1,5 +1,6 @@
 .dcl.tabs {
   position: relative;
+  margin-bottom: 0;
 }
 
 .dcl.tabs .ui.container {
