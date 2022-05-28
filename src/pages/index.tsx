@@ -59,8 +59,6 @@ export default function IndexPage() {
     params.get("time-to")
   )
 
-  const [categories] = useCategoriesContext()
-
   const filteredEvents = useListEventsFiltered(
     events,
     {

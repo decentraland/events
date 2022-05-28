@@ -35,7 +35,6 @@ import {
   WeekdayMask,
   Position,
   MAX_EVENT_RECURRENT,
-  MAX_EVENT_DURATION,
 } from "../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
@@ -52,9 +51,14 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import ItemLayout from "../components/Layout/ItemLayout"
 import { getServerOptions, getServers } from "../modules/servers"
 import infoIcon from "../images/info.svg"
-import "./submit.css"
-import { getCategoriesOptionsActives } from "../modules/events"
 import { useCategoriesContext } from "../context/Category"
+import {
+  getCategoriesOptionsActives,
+  getSchedules,
+  getSchedulesOptions,
+} from "../modules/events"
+
+import "./submit.css"
 
 type SubmitPageState = {
   loading?: boolean
@@ -92,21 +96,21 @@ export default function SubmitPage() {
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
   const [categories] = useCategoriesContext()
+  const [schedules] = useAsyncMemo(getSchedules)
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
-  const serverOptions = useMemo(
-    () => getServerOptions(servers || []),
-    [servers]
+  const serverOptions = useMemo(() => getServerOptions(servers), [servers])
+  const scheduleOptions = useMemo(
+    () => getSchedulesOptions(schedules, { exclude: editing.schedules }),
+    [schedules, editing.schedules]
   )
 
   const categoryOptions = useMemo(() => {
-    const categoriesOptions = getCategoriesOptionsActives(
-      categories,
-      editing.categories
-    )
-    return categoriesOptions.map((categoryOption) => ({
+    return getCategoriesOptionsActives(categories, {
+      exclude: editing.categories,
+    }).map((categoryOption) => ({
       ...categoryOption,
       text: l(categoryOption.text),
     }))
@@ -145,8 +149,6 @@ export default function SubmitPage() {
     }
   }, [params.get("view"), original])
 
-  // useEffect(() => { GLOBAL_LOADING = false }, [])
-
   useEffect(() => {
     if (original) {
       editActions.setValues({
@@ -176,6 +178,7 @@ export default function SubmitPage() {
         recurrent_setpos: original.recurrent_setpos,
         recurrent_monthday: original.recurrent_monthday,
         categories: original.categories,
+        schedules: original.schedules,
       })
     }
   }, [original])
@@ -426,35 +429,88 @@ export default function SubmitPage() {
                 </Grid.Column>
               </Grid.Row>
               {!!original?.editable && !isNewEvent && (
-                <Grid.Row>
+                <Grid.Row className="admin-area">
                   <Grid.Column mobile="16">
-                    <Label style={{ marginBottom: "1em" }}>Advance</Label>
-                  </Grid.Column>
-                  <Grid.Column mobile="4">
-                    <Radio
-                      name="highlighted"
-                      label="HIGHLIGHT"
-                      checked={editing.highlighted}
-                      onClick={(e, data) =>
-                        editActions.handleChange(e, {
-                          ...data,
-                          checked: !editing.highlighted,
-                        })
-                      }
-                    />
-                  </Grid.Column>
-                  <Grid.Column mobile="4">
-                    <Radio
-                      name="trending"
-                      label="TRENDING"
-                      checked={editing.trending}
-                      onClick={(e, data) =>
-                        editActions.handleChange(e, {
-                          ...data,
-                          checked: !editing.trending,
-                        })
-                      }
-                    />
+                    <Grid stackable>
+                      <Grid.Row>
+                        <Grid.Column mobile="16">
+                          <Label
+                            style={{
+                              marginBottom: "1rem",
+                              display: "block",
+                              opacity: 0.6,
+                            }}
+                          >
+                            ADMIN AREA
+                          </Label>
+                        </Grid.Column>
+                        <Grid.Column mobile="4">
+                          <Radio
+                            name="highlighted"
+                            label="HIGHLIGHT"
+                            checked={editing.highlighted}
+                            onClick={(e, data) =>
+                              editActions.handleChange(e, {
+                                ...data,
+                                checked: !editing.highlighted,
+                              })
+                            }
+                          />
+                        </Grid.Column>
+                        <Grid.Column mobile="4">
+                          <Radio
+                            name="trending"
+                            label="TRENDING"
+                            checked={editing.trending}
+                            onClick={(e, data) =>
+                              editActions.handleChange(e, {
+                                ...data,
+                                checked: !editing.trending,
+                              })
+                            }
+                          />
+                        </Grid.Column>
+                      </Grid.Row>
+                      <Grid.Row>
+                        <Grid.Column mobile="16">
+                          <Label>Schedules</Label>
+                          <SelectField
+                            placeholder="Add schedules"
+                            name="schedules"
+                            error={!!errors["schedules"]}
+                            message={errors["schedules"]}
+                            options={scheduleOptions}
+                            onChange={editActions.handleChange}
+                            value={""}
+                            disabled={scheduleOptions.length === 0}
+                          />
+                          {editing.schedules.map((schedule) => {
+                            const data = schedules?.find(
+                              (current) => current.id === schedule
+                            )
+                            return (
+                              <SelectionLabel
+                                key={schedule}
+                                className={"submit__category-select-wrapper"}
+                              >
+                                {data?.name || schedule}
+                                <Icon
+                                  className={"submit__category-select-label"}
+                                  name="delete"
+                                  circular
+                                  onClick={(event: React.ChangeEvent<any>) =>
+                                    editActions.handleChange(event, {
+                                      name: "schedules",
+                                      value: schedule,
+                                    })
+                                  }
+                                />
+                              </SelectionLabel>
+                            )
+                          })}
+                        </Grid.Column>
+                      </Grid.Row>
+                    </Grid>
                   </Grid.Column>
                 </Grid.Row>
               )}
@@ -920,6 +976,7 @@ export default function SubmitPage() {
                     options={categoryOptions}
                     onChange={editActions.handleChange}
                     value={""}
+                    disabled={categoryOptions.length === 0}
                   />
                   {editing.categories.map((category, key) => (
                     <SelectionLabel
