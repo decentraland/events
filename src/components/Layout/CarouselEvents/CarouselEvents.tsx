@@ -6,9 +6,8 @@ import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import EventCardBig from "../../Event/EventCardBig/EventCardBig"
+import { navigateEventDetail } from "../../../modules/events"
 import "./CarouselEvents.css"
-import locations from "../../../modules/locations"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 
 export type CarouselEventsProps = {
   className?: string
@@ -29,15 +28,6 @@ export const CarouselEvents = (props: CarouselEventsProps) => {
   if (action && title) {
     classes.push("carousel-events__wrapper__schedule-hightlight")
   }
-
-  const handleEventClick = useCallback(
-    (e: React.MouseEvent<any>, event: SessionEventAttributes) => {
-      e.stopPropagation()
-      e.preventDefault()
-      navigate(locations.event(event.id))
-    },
-    []
-  )
 
   if (loading) {
     return (
@@ -64,7 +54,7 @@ export const CarouselEvents = (props: CarouselEventsProps) => {
                 <EventCardBig
                   key={"live:" + event.id}
                   event={event}
-                  onClick={handleEventClick}
+                  onClick={navigateEventDetail}
                 />
               ))}
             </Carousel>

@@ -7,7 +7,6 @@ import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
@@ -27,13 +26,12 @@ import {
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import { getEventTime, getEventType } from "../entities/Event/utils"
-import useListEventsCategories from "../hooks/useListEventsCategories"
 import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import useListEventsMain from "../hooks/useListEventsMain"
 import useListEventsTrending from "../hooks/useListEventsTrending"
-import { getCategoriesFetch } from "../modules/events"
 import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
 import locations from "../modules/locations"
+import { useCategoriesContext } from "../context/Category"
 import "./index.css"
 
 export type IndexPageState = {
@@ -61,7 +59,7 @@ export default function IndexPage() {
     params.get("time-to")
   )
 
-  const [categories] = useAsyncMemo(getCategoriesFetch)
+  const [categories] = useCategoriesContext()
 
   const filteredEvents = useListEventsFiltered(
     events,
@@ -76,7 +74,6 @@ export default function IndexPage() {
 
   const trendingEvents = useListEventsTrending(filteredEvents)
   const mainEvents = useListEventsMain(filteredEvents)
-  const categoriesUsed = useListEventsCategories(events, categories)
 
   const [enabledNotification, setEnabledNotification] = useState(false)
 
@@ -165,7 +162,6 @@ export default function IndexPage() {
           loading={loading}
           hasEvents={events.length > 0}
           events={filteredEvents}
-          categories={categoriesUsed}
           params={params}
         />
       </Container>

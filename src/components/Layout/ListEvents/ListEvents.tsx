@@ -36,12 +36,14 @@ import locations from "../../../modules/locations"
 import { getEventTime, getEventType } from "../../../entities/Event/utils"
 import { showTimezoneLabel } from "../../../modules/date"
 import { useEventIdContext } from "../../../context/Event"
+import useListEventsCategories from "../../../hooks/useListEventsCategories"
+import { navigateEventDetail } from "../../../modules/events"
 import "./ListEvents.css"
+import { useCategoriesContext } from "../../../context/Category"
 
 export type ListEventsProps = {
   events: SessionEventAttributes[]
   hasEvents: boolean
-  categories: EventCategoryAttributes[]
   params: URLSearchParams
   loading?: boolean
   className?: string
@@ -67,20 +69,14 @@ const typeItems = [
 ]
 
 export const ListEvents = (props: ListEventsProps) => {
-  const {
-    className,
-    hasEvents,
-    events,
-    loading,
-    categories,
-    params,
-    hideFilter,
-  } = props
+  const { className, hasEvents, events, loading, params, hideFilter } = props
   const eventsByMonth = useListEventsByMonth(events)
   const [settings] = useProfileSettingsContext()
   const track = useTrackContext()
   const l = useFormatMessage()
   const [ff] = useFeatureFlagContext()
+  const [categories] = useCategoriesContext()
+  const categoriesFiltered = useListEventsCategories(events, categories)
 
   const [event] = useEventIdContext(params.get("event"))
   const typeFilter = getEventType(params.get("type"))
@@ -101,8 +97,8 @@ export const ListEvents = (props: ListEventsProps) => {
       },
     ]
 
-    if (categories) {
-      const categoriesOptions = categories?.map((category) => ({
+    if (categoriesFiltered) {
+      const categoriesOptions = categoriesFiltered?.map((category) => ({
         title: l(`page.events.categories.${category.name}`),
         description: "",
         value: category.name,
@@ -112,7 +108,7 @@ export const ListEvents = (props: ListEventsProps) => {
     }
 
     return categoriesToReturn
-  }, [categories, params.get("category")])
+  }, [categoriesFiltered, params.get("category")])
 
   const timeRangeLabel = useMemo(() => {
     const from =
@@ -148,7 +144,7 @@ export const ListEvents = (props: ListEventsProps) => {
       ff.name<FilterCategoryVariant>(
         Flags.FilterCategoryVariant,
         FilterCategoryVariant.disabled
-      ) === FilterCategoryVariant.enabled && categories.length > 0,
+      ) === FilterCategoryVariant.enabled && categoriesFiltered.length > 0,
     [ff]
   )
 
@@ -242,15 +238,6 @@ export const ListEvents = (props: ListEventsProps) => {
     []
   )
 
-  const handleEventClick = useCallback(
-    (e: React.MouseEvent<any>, event: SessionEventAttributes) => {
-      e.stopPropagation()
-      e.preventDefault()
-      navigate(locations.event(event.id))
-    },
-    []
-  )
-
   if (loading) {
     return (
       <div className={className}>
@@ -340,7 +327,7 @@ export const ListEvents = (props: ListEventsProps) => {
                       <EventCard
                         key={"event:" + event.id}
                         event={event}
-                        onClick={handleEventClick}
+                        onClick={navigateEventDetail}
                       />
                     ))}
                   </Card.Group>

@@ -53,10 +53,8 @@ import ItemLayout from "../components/Layout/ItemLayout"
 import { getServerOptions, getServers } from "../modules/servers"
 import infoIcon from "../images/info.svg"
 import "./submit.css"
-import {
-  getCategoriesFetch,
-  getCategoriesOptionsActives,
-} from "../modules/events"
+import { getCategoriesOptionsActives } from "../modules/events"
+import { useCategoriesContext } from "../context/Category"
 
 type SubmitPageState = {
   loading?: boolean
@@ -93,7 +91,7 @@ export default function SubmitPage() {
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
-  const [categories] = useAsyncMemo(getCategoriesFetch)
+  const [categories] = useCategoriesContext()
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
