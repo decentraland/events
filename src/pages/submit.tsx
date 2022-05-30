@@ -35,7 +35,6 @@ import {
   WeekdayMask,
   Position,
   MAX_EVENT_RECURRENT,
-  MAX_EVENT_DURATION,
 } from "../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
@@ -52,13 +51,14 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import ItemLayout from "../components/Layout/ItemLayout"
 import { getServerOptions, getServers } from "../modules/servers"
 import infoIcon from "../images/info.svg"
-import "./submit.css"
+import { useCategoriesContext } from "../context/Category"
 import {
-  getCategories,
   getCategoriesOptionsActives,
   getSchedules,
   getSchedulesOptions,
 } from "../modules/events"
+
+import "./submit.css"
 
 type SubmitPageState = {
   loading?: boolean
@@ -95,8 +95,8 @@ export default function SubmitPage() {
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
+  const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
-  const [categories] = useAsyncMemo(getCategories)
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()

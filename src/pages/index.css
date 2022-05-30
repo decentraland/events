@@ -1,5 +1,6 @@
 .dcl.tabs {
   position: relative;
+  margin-bottom: 0;
 }
 
 .dcl.tabs .ui.container {
@@ -60,6 +61,10 @@
 
 .ui.container .Row .right.Column {
   width: calc(100% - 256px);
+}
+
+.ui.container .events__all-events-title {
+  margin-top: 60px;
 }
 
 @media only screen and (max-width: 768px) {
