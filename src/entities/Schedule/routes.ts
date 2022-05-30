@@ -1,7 +1,9 @@
 import { Request } from "express"
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
+
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+
 import ScheduleModel from "./model"
 
 export default routes((router) => {

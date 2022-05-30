@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
 import { Type } from "decentraland-gatsby/dist/entities/Database/types"
+
 import EventModel from "../entities/Event/model"
 
 export const shorthands: ColumnDefinitions | undefined = undefined

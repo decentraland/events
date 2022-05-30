@@ -23,7 +23,6 @@ import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/util
 
 import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
 import events from "./entities/Event/routes"
-import schedules from "./entities/Schedule/routes"
 import attendees from "./entities/EventAttendee/routes"
 import categories from "./entities/EventCategory/routes"
 import poster from "./entities/Poster/routes"
@@ -36,6 +35,7 @@ import {
   UNSUBSCRIBE_PATH,
 } from "./entities/ProfileSettings/types"
 import profileSubscription from "./entities/ProfileSubscription/routes"
+import schedules from "./entities/Schedule/routes"
 import sitemap from "./entities/Sitemap/routes"
 import social from "./entities/Social/routes"
 

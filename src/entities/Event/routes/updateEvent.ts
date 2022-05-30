@@ -15,6 +15,8 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
+import ScheduleModel from "../../Schedule/model"
+import { getMissingSchedules } from "../../Schedule/utils"
 import {
   notifyApprovedEvent,
   notifyEditedEvent,
@@ -31,8 +33,6 @@ import {
 import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
 import { getEvent } from "./getEvent"
 import { DECENTRALAND_URL } from "./index"
-import ScheduleModel from "../../Schedule/model"
-import { getMissingSchedules } from "../../Schedule/utils"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema

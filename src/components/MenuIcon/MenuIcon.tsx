@@ -1,7 +1,9 @@
 import React from "react"
-import "./MenuIcon.css"
+
 import Menu from "semantic-ui-react/dist/commonjs/collections/Menu"
 import Dropdown from "semantic-ui-react/dist/commonjs/modules/Dropdown"
+
+import "./MenuIcon.css"
 
 export type MenuIconChildreHeaderProps = {
   children?: string | React.ReactNode

@@ -1,5 +1,7 @@
 import React, { useCallback } from "react"
 
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
+import Label from "semantic-ui-react/dist/commonjs/elements/Label"
 import isEmail from "validator/lib/isEmail"
 
 import DateBox from "decentraland-gatsby/dist/components/Date/DateBox"
@@ -21,16 +23,14 @@ import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
 import locations from "../../../../modules/locations"
 import JumpInButton from "../../../Button/JumpInPosition"
-import EventSection from "../../EventSection"
-import EventDateDetail from "./EventDateDetail"
-import "./EventDetail.css"
 import MenuIcon, {
   MenuIconDivider,
   MenuIconHeader,
   MenuIconItem,
 } from "../../../MenuIcon/MenuIcon"
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import Label from "semantic-ui-react/dist/commonjs/elements/Label"
+import EventSection from "../../EventSection"
+import EventDateDetail from "./EventDateDetail"
+import "./EventDetail.css"
 
 const ATTENDEES_PREVIEW_LIMIT = 12
 
