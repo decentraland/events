@@ -68,6 +68,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     highlighted: false,
     trending: false,
     categories: [],
+    schedules: [],
 
     // recurrent
     recurrent: false,
@@ -440,14 +441,16 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setValue("recurrent_until", recurrent_until)
   }
 
-  function handleChangeCategories(value: string) {
-    let currentCategories = event.categories
-    if (currentCategories.includes(value)) {
-      currentCategories = currentCategories.filter((e) => e != value)
+  function handleChangeList(name: "categories" | "schedules", value: string) {
+    const list = event[name]
+    if (list.includes(value)) {
+      setValue(
+        name,
+        list.filter((item) => item !== value)
+      )
     } else {
-      currentCategories = [...currentCategories, value]
+      setValue(name, [...list, value])
     }
-    setValue("categories", currentCategories)
   }
 
   function handleChange(
@@ -586,7 +589,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         return handleChangeRecurrentUntil(value)
 
       case "categories":
-        return handleChangeCategories(value)
+      case "schedules":
+        return handleChangeList(name, value)
 
       default:
       // ignore change

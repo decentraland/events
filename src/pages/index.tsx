@@ -15,7 +15,6 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import { Box } from "decentraland-ui/dist/components/Box/Box"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
@@ -50,7 +49,7 @@ import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import useListEventsMain from "../hooks/useListEventsMain"
 import useListEventsTrending from "../hooks/useListEventsTrending"
 import { showTimezoneLabel } from "../modules/date"
-import { getCategoriesFetch } from "../modules/events"
+import { getCategories } from "../modules/events"
 import {
   FilterCategoryVariant,
   FilterTimeVariant,
@@ -106,7 +105,7 @@ export default function IndexPage() {
     params.get("time-to")
   )
 
-  const [categories] = useAsyncMemo(getCategoriesFetch)
+  const [categories] = useAsyncMemo(getCategories)
 
   const filteredEvents = useListEventsFiltered(
     events,

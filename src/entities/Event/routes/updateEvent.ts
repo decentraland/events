@@ -31,6 +31,8 @@ import {
 import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
 import { getEvent } from "./getEvent"
 import { DECENTRALAND_URL } from "./index"
+import ScheduleModel from "../../Schedule/model"
+import { getMissingSchedules } from "../../Schedule/utils"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -56,6 +58,25 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
+
+  // make schedules unique
+  updatedAttributes.schedules = Array.from(new Set(updatedAttributes.schedules))
+  if (updatedAttributes.schedules.length > 0) {
+    const schedules = await ScheduleModel.getScheduleList(
+      updatedAttributes.schedules
+    )
+    const missingSchedules = getMissingSchedules(
+      schedules,
+      updatedAttributes.schedules
+    )
+    if (missingSchedules.length > 0) {
+      throw new RequestError(
+        `Schedule not found: ${missingSchedules.join(", ")}`,
+        RequestError.BadRequest,
+        { body: updatedAttributes }
+      )
+    }
+  }
 
   /**
    * Verify that the duration event is not longer than the max allowed or the previous duration

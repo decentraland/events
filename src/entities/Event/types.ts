@@ -127,6 +127,7 @@ export type EventAttributes = {
   latest_attendees: string[]
   textsearch: SQLStatement | string | null | undefined
   categories: string[]
+  schedules: string[]
 }
 
 export type GetEventParams = {
@@ -222,7 +223,13 @@ export const patchAttributes: (keyof EventAttributes)[] =
   editableAttributes.concat(["contact", "details"])
 
 export const adminPatchAttributes: (keyof EventAttributes)[] =
-  editableAttributes.concat(["approved", "highlighted", "trending", "url"])
+  editableAttributes.concat([
+    "approved",
+    "highlighted",
+    "trending",
+    "schedules",
+    "url",
+  ])
 
 export const SITEMAP_ITEMS_PER_PAGE = 100
 

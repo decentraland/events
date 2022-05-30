@@ -89,6 +89,11 @@ export const getEventListQuery: AjvObjectSchema = {
 export const eventSchema = {
   type: "object",
   properties: {
+    id: {
+      type: "string",
+      format: "uudi",
+      description: "event id",
+    },
     name: {
       type: "string",
       minLength: 0,
@@ -361,6 +366,10 @@ export const newEventSchema = {
     categories: {
       type: ["array", "null"],
       items: { type: "string" },
+    },
+    schedules: {
+      type: ["array", "null"],
+      items: { type: "string", format: "uuid" },
     },
   },
 }

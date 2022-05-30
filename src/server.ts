@@ -23,6 +23,7 @@ import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/util
 
 import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
 import events from "./entities/Event/routes"
+import schedules from "./entities/Schedule/routes"
 import attendees from "./entities/EventAttendee/routes"
 import categories from "./entities/EventCategory/routes"
 import poster from "./entities/Poster/routes"
@@ -53,6 +54,7 @@ app.use("/api", [
   categories,
   events,
   poster,
+  schedules,
   attendees,
   profileSettings,
   profileSubscription,

@@ -11,6 +11,7 @@ import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 import { EventCategoryAttributes } from "../entities/EventCategory/types"
 import { PosterAttributes } from "../entities/Poster/types"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
+import { ScheduleAttributes } from "../entities/Schedule/types"
 
 export type EditEvent = Pick<
   EventAttributes,
@@ -40,6 +41,7 @@ export type EditEvent = Pick<
   | "contact"
   | "details"
   | "categories"
+  | "schedules"
 >
 
 export default class Events extends API {
@@ -280,5 +282,13 @@ export default class Events extends API {
 
   async getCategories(): Promise<EventCategoryAttributes[]> {
     return this.fetch(`/events/categories`)
+  }
+
+  async getSchedules(): Promise<ScheduleAttributes[]> {
+    return this.fetch(`/schedules`)
+  }
+
+  async getSchedule(schedule_id: string): Promise<ScheduleAttributes> {
+    return this.fetch(`/schedules/${schedule_id}`)
   }
 }
