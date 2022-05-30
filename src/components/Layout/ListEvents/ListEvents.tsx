@@ -23,7 +23,6 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import useListEventsByMonth from "../../../hooks/useListEventsByMonth"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
-import { EventCategoryAttributes } from "../../../entities/EventCategory/types"
 import {
   FilterCategoryVariant,
   FilterTimeVariant,
@@ -32,14 +31,15 @@ import {
 } from "../../../modules/features"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import { SegmentEvent } from "../../../modules/segment"
-import locations, { url } from "../../../modules/locations"
+import { url } from "../../../modules/locations"
 import { getEventTime, getEventType } from "../../../entities/Event/utils"
 import { showTimezoneLabel } from "../../../modules/date"
 import { useEventIdContext } from "../../../context/Event"
 import useListEventsCategories from "../../../hooks/useListEventsCategories"
 import { navigateEventDetail } from "../../../modules/events"
-import "./ListEvents.css"
 import { useCategoriesContext } from "../../../context/Category"
+import { useLocation } from "@gatsbyjs/reach-router"
+import "./ListEvents.css"
 
 export type ListEventsProps = {
   events: SessionEventAttributes[]
@@ -72,6 +72,7 @@ export const ListEvents = (props: ListEventsProps) => {
   const { className, hasEvents, events, loading, params, hideFilter } = props
   const eventsByMonth = useListEventsByMonth(events)
   const [settings] = useProfileSettingsContext()
+  const location = useLocation()
   const track = useTrackContext()
   const l = useFormatMessage()
   const [ff] = useFeatureFlagContext()
