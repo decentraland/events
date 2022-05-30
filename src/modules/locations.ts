@@ -13,7 +13,10 @@ export enum SubmitView {
   Clone = "clone",
 }
 
-function url(path: string, query?: Record<string, string> | URLSearchParams) {
+export function url(
+  path: string,
+  query?: Record<string, string> | URLSearchParams
+) {
   return API.url(GATSBY_BASE_URL, path, query)
 }
 
@@ -26,6 +29,7 @@ export default {
   event: (id: string) => url("/event/", { id }),
   myEvents: () => url("/me/"),
   pendingEvents: () => url("/pending/"),
+  schedule: (id: string) => url("/schedule/", { id }),
 
   submit: () => url("/submit/"),
   edit: (event: string) => url("/submit/", { event, view: SubmitView.Edit }),

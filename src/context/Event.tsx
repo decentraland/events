@@ -243,6 +243,25 @@ export function useEventSorter(events: SessionEventAttributes[] = []) {
   }, [events])
 }
 
+export function useEventSchedule(
+  events: SessionEventAttributes[] = [],
+  schedule: string | null
+) {
+  return useMemo(
+    () =>
+      events
+        .filter((event) => {
+          if (!event.schedules || !schedule) {
+            return false
+          }
+          const eventSchedules = new Set(event.schedules)
+          return eventSchedules.has(schedule)
+        })
+        .sort((a, b) => a.next_start_at.getTime() - b.next_start_at.getTime()),
+    [events, schedule]
+  )
+}
+
 export function useEventIdContext(eventId?: string | null) {
   const [events, state] = useContext(EventsContext)
   return useAsyncMemo(async () => {

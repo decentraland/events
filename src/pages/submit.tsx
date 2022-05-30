@@ -37,6 +37,7 @@ import RadioGroup from "../components/Form/RadioGroup"
 import Textarea from "../components/Form/Textarea"
 import ItemLayout from "../components/Layout/ItemLayout"
 import ConfirmModal from "../components/Modal/ConfirmModal"
+import { useCategoriesContext } from "../context/Category"
 import { useEventIdContext, useEventsContext } from "../context/Event"
 import {
   Frequency,
@@ -53,7 +54,6 @@ import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
 import useEventEditor from "../hooks/useEventEditor"
 import infoIcon from "../images/info.svg"
 import {
-  getCategories,
   getCategoriesOptionsActives,
   getSchedules,
   getSchedulesOptions,
@@ -97,8 +97,8 @@ export default function SubmitPage() {
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
+  const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
-  const [categories] = useAsyncMemo(getCategories)
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()

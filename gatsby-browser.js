@@ -23,6 +23,7 @@ import segment from "decentraland-gatsby/dist/utils/development/segment"
 import "decentraland-ui/dist/themes/alternative/light-theme.css"
 import "decentraland-ui/dist/themes/base-theme.css"
 
+import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
 import ProfileSettings from "./src/context/ProfileSetting"
 import locations from "./src/modules/locations"
@@ -34,7 +35,9 @@ export const wrapRootElement = ({ element }) => (
   <AuthProvider>
     <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
       <ProfileSettings>
-        <Events>{element}</Events>
+        <Events>
+          <Categories>{element}</Categories>
+        </Events>
       </ProfileSettings>
     </FeatureFlagProvider>
   </AuthProvider>
