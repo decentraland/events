@@ -6,7 +6,8 @@ const mock: ScheduleAttributes[] = [
     id: "ea869a5a-4201-45d9-beda-7ffb07f8a88a",
     name: "Pride month 2022",
     description: "Pride month description",
-    image: "",
+    image:
+      "https://decentraland.org/blog/images/static/images/pride-4be984a59111e68fb428a3ec060c2f07.jpg",
     active_since: Time.from("2022-06-01 00:00:00").toDate(),
     active_until: Time.from("2022-07-01 00:00:00").toDate(),
   },

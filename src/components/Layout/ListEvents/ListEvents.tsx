@@ -32,7 +32,7 @@ import {
 } from "../../../modules/features"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import { SegmentEvent } from "../../../modules/segment"
-import locations from "../../../modules/locations"
+import locations, { url } from "../../../modules/locations"
 import { getEventTime, getEventType } from "../../../entities/Event/utils"
 import { showTimezoneLabel } from "../../../modules/date"
 import { useEventIdContext } from "../../../context/Event"
@@ -175,7 +175,7 @@ export const ListEvents = (props: ListEventsProps) => {
       }
 
       track(SegmentEvent.Filter, { type })
-      navigate(locations.events(newParams))
+      navigate(url(location.pathname, newParams))
     },
     [location.pathname, params]
   )
@@ -193,7 +193,7 @@ export const ListEvents = (props: ListEventsProps) => {
       }
 
       track(SegmentEvent.Filter, { category })
-      navigate(locations.events(newParams))
+      navigate(url(location.pathname, newParams))
     },
     [location.pathname, params, ff]
   )
@@ -233,7 +233,7 @@ export const ListEvents = (props: ListEventsProps) => {
       const newParams = new URLSearchParams(params)
       newParams.set("time-from", valueArray[0] === 48 ? "2400" : from)
       newParams.set("time-to", valueArray[1] === 48 ? "2400" : to)
-      navigate(locations.events(newParams))
+      navigate(url(location.pathname, newParams))
     },
     []
   )
