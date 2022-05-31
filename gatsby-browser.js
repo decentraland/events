@@ -25,6 +25,7 @@ import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
 import ProfileSettings from "./src/context/ProfileSetting"
 import Events from "./src/context/Event"
+import Categories from "./src/context/Category"
 import locations from "./src/modules/locations"
 
 export const registerServiceWorker = () => true
@@ -33,7 +34,9 @@ export const wrapRootElement = ({ element }) => (
   <AuthProvider>
     <FeatureFlagProvider endpoint="https://feature-flags.decentraland.org/events.json">
       <ProfileSettings>
-        <Events>{element}</Events>
+        <Events>
+          <Categories>{element}</Categories>
+        </Events>
       </ProfileSettings>
     </FeatureFlagProvider>
   </AuthProvider>

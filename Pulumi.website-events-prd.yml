@@ -6,6 +6,7 @@ config:
   events:AWS_BUCKET_URL: https://events.decentraland.org
   events:CONNECTION_STRING:
     secure: v1:+ENLPDJ1vziMEZz3:vHMhEu64mNHnit53Yf3l5kvvYbnBj3EZTWvTBIUcOXrV+X0mtYboiZt0v0GSb0rgQojXFOz8Rvx0fQiX5yRBw5hVpRKgKV2CS+qgLepF8lo1aFxHqe0H0WWOgpLhVlXwk84DJeocVVoRM+6tktUUluhJ+u+QWqR2+vyXKeMi
+  events:GATSBY_CHAIN_ID: "1,137"
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
   events:GATSBY_EVENTS_URL: https://events.decentraland.org/api
   events:GATSBY_LAND_URL: https://api.decentraland.org

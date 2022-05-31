@@ -121,6 +121,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     trending: false,
     total_attendees: 0,
     latest_attendees: [],
+    schedules: [],
     created_at: now,
     textsearch: null,
   }

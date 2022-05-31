@@ -117,6 +117,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
     const start_at = Time.date(event.start_at)
     const finish_at = Time.date(event.finish_at)
+    // TODO: remove
     const duration =
       Number(event.duration) || finish_at.getTime() - start_at.getTime()
     const recurrent_dates =
@@ -199,7 +200,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
     // return []
-    let orderBy = "e.next_finish_at"
+    let orderBy = "e.next_start_at"
     let orderDirection = "ASC"
     if (options.search) {
       orderBy = '"rank"'

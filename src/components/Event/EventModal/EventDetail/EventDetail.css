@@ -125,3 +125,12 @@
     justify-content: flex-end;
   }
 }
+
+.EventDetail
+  .EventDetail__Header
+  .EventDetail__Header__Actions
+  .edit-detail__menu-icon__button {
+  color: black !important;
+  width: 100%;
+  text-align: left;
+}

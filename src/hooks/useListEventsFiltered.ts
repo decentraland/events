@@ -5,7 +5,7 @@ import {
 } from "../entities/Event/types"
 import { useMemo } from "react"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
+import { HookProfileSettingsAttributes } from "../context/ProfileSetting"
 
 export default function useListEventsFiltered(
   events?: SessionEventAttributes[] | null,
@@ -15,7 +15,7 @@ export default function useListEventsFiltered(
     categories?: string | null
     time?: EventTimeParams
   },
-  settings?: ProfileSettingsAttributes | null
+  settings?: HookProfileSettingsAttributes
 ) {
   return useMemo(() => {
     if (!events) {

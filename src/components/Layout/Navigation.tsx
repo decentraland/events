@@ -14,11 +14,15 @@ import { SegmentEvent } from "../../modules/segment"
 import debounce from "decentraland-gatsby/dist/utils/function/debounce"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import "./Navigation.css"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import { getSchedules } from "../../modules/events"
+import { getCurrentSchedules } from "../../entities/Schedule/utils"
 
 export enum NavigationTab {
   Events = "events",
   MyEvents = "my_events",
   PendingEvents = "pending_events",
+  Schedule = "schedule",
 }
 
 export type NavigationProps = {
@@ -35,6 +39,12 @@ export default function Navigation(props: NavigationProps) {
   )
   const [events] = useEventsContext()
   const [account] = useAuthContext()
+  const [schedules] = useAsyncMemo(getSchedules)
+  const scheduleInfo = useMemo(
+    () => getCurrentSchedules(schedules),
+    [schedules]
+  )
+
   const hasPendingEvents = useMemo(
     () => events.some((event) => !event.approved && !event.rejected),
     [events]
@@ -92,6 +102,13 @@ export default function Navigation(props: NavigationProps) {
                 active={props.activeTab === NavigationTab.PendingEvents}
               >
                 {l("navigation.pending_events")}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {scheduleInfo && (
+            <Link href={locations.schedule(scheduleInfo.id)}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.Schedule}>
+                {scheduleInfo.name}
               </Tabs.Tab>
             </Link>
           )}
