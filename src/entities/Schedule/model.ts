@@ -24,6 +24,9 @@ const mock: ScheduleAttributes[] = [
 ]
 
 export default class ScheduleModel {
+  static tableName = "schedule"
+  static primaryKey = "id"
+
   static async getSchedules() {
     const now = Time.from()
     return mock.filter((schedule) => now.isBefore(schedule.active_until))
