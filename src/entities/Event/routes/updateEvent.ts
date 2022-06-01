@@ -5,12 +5,13 @@ import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import {
-  adminPatchAttributes,
-  patchAttributes,
+  editAnyEventAttributes,
+  editOwnEventAttributes,
   DeprecatedEventAttributes,
   MAX_EVENT_DURATION,
+  editEventAttributes,
+  approveEventAttributes,
 } from "../types"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import {
@@ -31,6 +32,12 @@ import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import EventCategoryModel from "../../EventCategory/model"
 import ScheduleModel from "../../Schedule/model"
 import { getMissingSchedules } from "../../Schedule/utils"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import {
+  canApproveAnyEvent,
+  canApproveOwnEvent,
+  canEditAnyEvent,
+} from "../../ProfileSettings/utils"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -38,11 +45,29 @@ const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
-  const attributes = isAdmin(user) ? adminPatchAttributes : patchAttributes
-  let updatedAttributes = {
-    ...utils.pick(event, attributes),
-    ...utils.pick(req.body, attributes),
-  } as DeprecatedEventAttributes
+  const profile = await getMyProfileSettings(req)
+  const updatedAttributes: DeprecatedEventAttributes = utils.pick(
+    event,
+    editEventAttributes
+  )
+  if (event.user === user) {
+    Object.assign(updatedAttributes, utils.pick(event, editOwnEventAttributes))
+
+    if (canApproveOwnEvent(profile)) {
+      Object.assign(
+        updatedAttributes,
+        utils.pick(event, approveEventAttributes)
+      )
+    }
+  }
+
+  if (canEditAnyEvent(profile)) {
+    Object.assign(updatedAttributes, utils.pick(event, editAnyEventAttributes))
+  }
+
+  if (canApproveAnyEvent(profile)) {
+    Object.assign(updatedAttributes, utils.pick(event, approveEventAttributes))
+  }
 
   if (
     !updatedAttributes.url ||
@@ -51,11 +76,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.url = eventTargetUrl(updatedAttributes)
   }
 
-  updatedAttributes = validateUpdateEvent({
-    ...updatedAttributes,
-    start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
-    recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
-  })
+  updatedAttributes.start_at = Time.date(updatedAttributes.start_at)
+  updatedAttributes.recurrent_until = Time.date(
+    updatedAttributes.recurrent_until
+  )
 
   // make schedules unique
   updatedAttributes.schedules = Array.from(new Set(updatedAttributes.schedules))
@@ -173,9 +197,9 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     notifyApprovedEvent(updatedEvent)
   } else if (!event.rejected && updatedEvent.rejected) {
     notifyRejectedEvent(updatedEvent)
-  } else if (!isAdmin(user)) {
+  } else if (updatedEvent.user === user) {
     notifyEditedEvent(updatedEvent)
   }
 
-  return EventModel.toPublic(updatedEvent, user)
+  return EventModel.toPublic(updatedEvent, profile)
 }

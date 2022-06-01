@@ -74,16 +74,16 @@ export default function useListEventsFiltered(
 
       events = events.filter((event) => {
         const eventDate = Time.from(event.start_at, {
-          utc: !settings?.use_local_time,
+          utc: !settings.use_local_time,
         })
 
         let eventTimeFrom = Time.from(event.start_at, {
-          utc: !settings?.use_local_time,
+          utc: !settings.use_local_time,
         })
           .set("hour", Number(fromHour))
           .set("minute", Number(fromMinute))
         let eventTimeTo = Time.from(event.start_at, {
-          utc: !settings?.use_local_time,
+          utc: !settings.use_local_time,
         })
           .set("hour", Number(toHour))
           .set("minute", Number(toMinute))

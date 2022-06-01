@@ -18,9 +18,10 @@ const DECENTRALAND_URL =
   process.env.GATSBY_DECENTRALAND_URL ||
   process.env.DECENTRALAND_URL ||
   "https://play.decentraland.org"
+
 const EVENTS_URL =
-  process.env.GATSBY_EVENTS_URL ||
   process.env.EVENTS_URL ||
+  process.env.GATSBY_EVENTS_URL ||
   "https://events.decentraland.org/api"
 
 export function siteUrl(pathname: string = "") {

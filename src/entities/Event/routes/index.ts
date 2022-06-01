@@ -1,14 +1,10 @@
 import env from "decentraland-gatsby/dist/utils/env"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import {
   auth,
   WithAuth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { EventAttributes } from "../types"
-import { withEvent, WithEvent } from "../middleware"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import {
   withAuthProfile,
@@ -23,6 +19,8 @@ import { getEvent } from "./getEvent"
 import { getAttendingEventList } from "./getAttendingEventList"
 import { createEvent } from "./createEvent"
 import { updateEvent } from "./updateEvent"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { canTestAnyNotification } from "../../ProfileSettings/utils"
 
 export const DECENTRALAND_URL = env("DECENTRALAND_URL", "")
 
@@ -60,16 +58,17 @@ export default routes((router) => {
 
 async function notifyEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
-  const profile = req.authProfile!
+  const userProfile = req.authProfile!
   const event = await getEvent(req)
-  if (!isAdmin(user)) {
+  const profile = await getMyProfileSettings(req)
+  if (!canTestAnyNotification(profile)) {
     return {}
   }
 
   const attendee: EventAttendeeAttributes = {
     event_id: event.id,
-    user: profile.ethAddress,
-    user_name: profile.name || "Guest",
+    user: userProfile.ethAddress,
+    user_name: userProfile.name || "Guest",
     notify: true,
     notified: true,
     created_at: new Date(),

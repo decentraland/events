@@ -28,6 +28,7 @@ import MenuIcon, {
 } from "../../../MenuIcon/MenuIcon"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import Label from "semantic-ui-react/dist/commonjs/elements/Label"
+import { canEditAnyEvent } from "../../../../entities/ProfileSettings/utils"
 
 const ATTENDEES_PREVIEW_LIMIT = 12
 
@@ -59,9 +60,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         (date) => date.getTime() + event.duration > now
       )
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
-  const advance = event.editable || event.owned
   const [settings] = useProfileSettingsContext()
-  const utc = props.utc ?? !settings?.use_local_time
+  const advance = event.user === settings.user || canEditAnyEvent(settings)
+  const utc = props.utc ?? !settings.use_local_time
 
   const handleAttendees = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {

@@ -44,8 +44,8 @@ export default function MyEventsPage() {
     search: params.get("search"),
   })
   const myEvents = useMemo(
-    () => filteredEvents.filter((event) => event.owned),
-    [filteredEvents]
+    () => filteredEvents.filter((event) => event.user === account),
+    [filteredEvents, account]
   )
   const attendingEvents = useMemo(
     () => filteredEvents.filter((event) => !!event.attending),

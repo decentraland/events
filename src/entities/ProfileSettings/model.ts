@@ -11,7 +11,33 @@ import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 export default class ProfileSettingsModel extends Model<ProfileSettingsAttributes> {
   static tableName = "profile_settings"
   static primaryKey = "user"
-  static withTimestamps = false
+
+  static getDefault(user: string): ProfileSettingsAttributes {
+    const now = new Date()
+    return {
+      user: user.toLowerCase(),
+      email: null,
+      email_verified: false,
+      email_verified_at: null,
+      email_updated_at: null,
+      use_local_time: false,
+      notify_by_email: false,
+      notify_by_browser: false,
+      permissions: [],
+      created_at: now,
+      updated_at: now,
+    } as ProfileSettingsAttributes
+  }
+
+  static async findOrGetDefault(user: string) {
+    const settings = await this.findOne<ProfileSettingsAttributes>({ user })
+
+    if (settings) {
+      return settings
+    }
+
+    return this.getDefault(user)
+  }
 
   static async findByUsers(users: string[]) {
     if (users.length === 0) {

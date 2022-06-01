@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
@@ -57,6 +57,9 @@ import {
   getSchedules,
   getSchedulesOptions,
 } from "../modules/events"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
+import { canEditAnyEvent } from "../entities/ProfileSettings/utils"
+import "./submit.css"
 
 import "./submit.css"
 
@@ -100,6 +103,7 @@ export default function SubmitPage() {
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
+  const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
   const serverOptions = useMemo(() => getServerOptions(servers), [servers])
   const scheduleOptions = useMemo(
@@ -252,11 +256,18 @@ export default function SubmitPage() {
     }
   }, [original])
 
-  function handleReject() {
-    if (original && (original.owned || original.editable)) {
-      patchState({ requireConfirmation: true, error: null })
-    }
-  }
+  const handleReject = useCallback(
+    function () {
+      if (
+        original &&
+        settings &&
+        (original.user === settings.user || canEditAnyEvent(settings))
+      ) {
+        patchState({ requireConfirmation: true, error: null })
+      }
+    },
+    [original, patchState, settings]
+  )
 
   useFileDrop((e) => {
     const files = e.dataTransfer?.files
@@ -428,7 +439,7 @@ export default function SubmitPage() {
                   </ImageInput>
                 </Grid.Column>
               </Grid.Row>
-              {!!original?.editable && !isNewEvent && (
+              {canEditAnyEvent(settings) && !isNewEvent && (
                 <Grid.Row className="admin-area">
                   <Grid.Column mobile="16">
                     <Grid stackable>
@@ -1095,7 +1106,7 @@ export default function SubmitPage() {
                       notifying
                     }
                     style={{ width: "100%" }}
-                    onClick={prevent(() => submit())}
+                    onClick={submit}
                   >
                     {submitButtonLabel}
                   </Button>
@@ -1112,6 +1123,7 @@ export default function SubmitPage() {
                       DELETE
                     </Button>
                   )}
+                  )
                 </Grid.Column>
                 <Grid.Column mobile="5">
                   {!!original?.editable && (

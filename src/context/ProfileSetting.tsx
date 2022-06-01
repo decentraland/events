@@ -11,8 +11,8 @@ import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 
-const DEFAULT_PROFILE_SETTINGS = {
-  user: null,
+const DEFAULT_PROFILE_SETTINGS: ProfileSettingsAttributes = {
+  user: "0x0000000000000000000000000000000000000000",
   email: null,
   email_verified: false,
   email_verified_at: null,
@@ -20,6 +20,9 @@ const DEFAULT_PROFILE_SETTINGS = {
   use_local_time: true,
   notify_by_email: false,
   notify_by_browser: false,
+  permissions: [],
+  created_at: new Date(0),
+  updated_at: new Date(0),
 }
 
 export type HookProfileSettingsAttributes =
@@ -74,7 +77,7 @@ function useProfileSettings() {
 
   const [updating, update] = useAsyncTask(
     async (settings: Partial<ProfileSettingsAttributes>) => {
-      const newSettings = await Events.get().updateProfileSettings(settings)
+      const newSettings = await Events.get().updateMyProfileSettings(settings)
       track(SegmentEvent.Settings, newSettings)
       state.set(newSettings)
     },

@@ -11,10 +11,11 @@ import {
   withAuthProfile,
   WithAuthProfile,
 } from "decentraland-gatsby/dist/entities/Profile/middleware"
-import { getProfileSettings } from "../ProfileSettings/routes"
+import { getProfileSettings } from "../ProfileSettings/routes/getProfileSettings"
 import EventAttendeeModel from "../EventAttendee/model"
 import { getEvent } from "../Event/routes/getEvent"
 import { Request } from "express"
+import ProfileSettingsModel from "../ProfileSettings/model"
 
 export default routes((router) => {
   const withAuth = auth({ optional: true })
@@ -69,7 +70,7 @@ export async function createEventAttendee(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const user_name = req.authProfile?.name || null
   const event = await getEvent(req)
-  const settings = await getProfileSettings(user)
+  const settings = await ProfileSettingsModel.findOrGetDefault(user)
   await EventAttendeeModel.create<EventAttendeeAttributes>({
     event_id: event.id,
     user,
