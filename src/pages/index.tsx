@@ -153,11 +153,6 @@ export default function IndexPage() {
             <Divider />
           </div>
         )}
-        {currentSchedule && (
-          <SubTitle className="events__all-events-title">
-            {l("page.events.all_events")}
-          </SubTitle>
-        )}
         <TrendingEvents
           events={trendingEvents}
           loading={loading}
