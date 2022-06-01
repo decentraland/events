@@ -31,11 +31,10 @@ import useListEventsMain from "../hooks/useListEventsMain"
 import useListEventsTrending from "../hooks/useListEventsTrending"
 import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
 import locations from "../modules/locations"
-import { useCategoriesContext } from "../context/Category"
-import "./index.css"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { getSchedules } from "../modules/events"
 import { getCurrentSchedules } from "../entities/Schedule/utils"
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -58,7 +57,7 @@ export default function IndexPage() {
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))
 
-  const scheduleInfo = useMemo(
+  const currentSchedule = useMemo(
     () => getCurrentSchedules(schedules),
     [schedules]
   )
@@ -136,27 +135,13 @@ export default function IndexPage() {
       />
       <Navigation activeTab={NavigationTab.Events} search />
 
-      <CarouselEvents
-        events={mainEvents}
-        loading={loading}
-        searching={searching}
-        hasEvents={events.length > 0}
-        action={
-          scheduleInfo && (
-            <Button
-              primary
-              as="a"
-              href={locations.schedule(scheduleInfo.id)}
-              onClick={prevent(() =>
-                navigate(locations.schedule(scheduleInfo.id))
-              )}
-            >
-              View More
-            </Button>
-          )
-        }
-        title={scheduleInfo ? scheduleInfo.name : undefined}
-      />
+      {!searching && (
+        <CarouselEvents
+          events={mainEvents}
+          schedule={currentSchedule}
+          loading={loading}
+        />
+      )}
 
       <Container>
         {!loading && events.length === 0 && (
@@ -168,7 +153,7 @@ export default function IndexPage() {
             <Divider />
           </div>
         )}
-        {scheduleInfo && (
+        {currentSchedule && (
           <SubTitle className="events__all-events-title">
             {l("page.events.all_events")}
           </SubTitle>

@@ -3,6 +3,7 @@ export type ScheduleAttributes = {
   name: string
   description: string
   image: string
+  background: string[]
   active_since: Date
   active_until: Date
 }
