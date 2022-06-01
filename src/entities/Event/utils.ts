@@ -103,12 +103,10 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
   }
 
   return new RRule({
-    dtstart: new Date(),
+    dtstart: options.start_at,
     freq: RRule[options.recurrent_frequency],
     interval: options.recurrent_interval || 1,
-    until:
-      options.recurrent_until &&
-      new Date(options.recurrent_until.getTime() + 1000 * 60 * 60 * 24),
+    until: options.recurrent_until,
     count: options.recurrent_count,
     byweekday: toRRuleWeekdays(options.recurrent_weekday_mask),
     bymonth: toRRuleMonths(options.recurrent_month_mask),
