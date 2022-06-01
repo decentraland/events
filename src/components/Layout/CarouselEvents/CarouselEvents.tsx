@@ -24,13 +24,30 @@ export type CarouselEventsProps = {
 }
 
 export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
-  const { loading, schedule } = props
+  const schedule = useMemo(() => {
+    if (!props.schedule || !props.events) {
+      return props.schedule
+    }
 
-  const className = TokenList.join([
-    "carousel-events__wrapper",
-    schedule && "carousel-events__wrapper__schedule-hightlight",
-    props.className,
-  ])
+    const scheduleHasEvents = props.events.find((event) =>
+      event.schedules.includes(props.schedule!.id)
+    )
+    if (scheduleHasEvents) {
+      return props.schedule
+    }
+
+    return undefined
+  }, [props.events, props.schedule])
+
+  const className = useMemo(
+    () =>
+      TokenList.join([
+        "carousel-events__wrapper",
+        schedule && "carousel-events__wrapper__schedule-hightlight",
+        props.className,
+      ]),
+    [schedule, props.className]
+  )
 
   const style = useMemo(
     () => (schedule ? { background: getScheduleBackground(schedule) } : {}),
@@ -50,7 +67,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
     [schedule]
   )
 
-  if (loading) {
+  if (props.loading) {
     return (
       <div className={className} style={style}>
         <Container>
