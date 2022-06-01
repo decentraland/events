@@ -25,6 +25,7 @@ import {
 } from "./types"
 import EventAttendee from "../EventAttendee/model"
 import { QueryPart } from "decentraland-server/dist/db/types"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = "events"
@@ -293,13 +294,11 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       attending?: boolean
       notify?: boolean
     },
-    user?: string | null
+    profile: ProfileSettingsAttributes
   ): SessionEventAttributes {
     const now = Date.now()
-    const editable = isAdmin(user)
-    const owned = Boolean(user && event.user && event.user === user)
 
-    if (event.user !== user && !editable) {
+    if (event.user !== profile?.user) {
       event = utils.omit(event, ["contact", "details"])
     }
 
@@ -320,8 +319,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       notify: !!event.notify,
       next_start_at,
       position: [event.x, event.y],
-      editable,
-      owned,
       live,
     }
   }

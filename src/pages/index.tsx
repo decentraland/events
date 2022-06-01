@@ -52,7 +52,7 @@ export default function IndexPage() {
   const [event] = useEventIdContext(params.get("event"))
   const [settings] = useProfileSettingsContext()
   const [all, state] = useEventsContext()
-  const events = useEventSorter(all)
+  const events = useEventSorter(all, settings)
   const loading = accountState.loading || state.loading
   const searching = !!params.get("search")
   const typeFilter = getEventType(params.get("type"))

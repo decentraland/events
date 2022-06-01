@@ -11,24 +11,33 @@ import EditButtons from "../../Button/EditButtons"
 import EventSection from "../EventSection"
 import closeIcon from "../../../images/remove.svg"
 
+import { useProfileSettingsContext } from "../../../context/ProfileSetting"
+import {
+  canApproveAnyEvent,
+  canApproveOwnEvent,
+} from "../../../entities/ProfileSettings/utils"
 import "./EventModal.css"
 
 export type EventModalProps = Omit<ModalProps, "open" | "children"> & {
   event?: SessionEventAttributes | null
 }
 
-export default function EventModal({
+export default React.memo(function EventModal({
   event,
   onClose,
   className,
   ...props
 }: EventModalProps) {
+  const [settings] = useProfileSettingsContext()
   const [attendees, setAttendees] = useState(false)
   const showAttendees = event && attendees
   const showEvent = event && !attendees
   const showSocialActions = event && !attendees && event.approved
   const showApproveActions =
-    event && !attendees && !event.approved && event.editable
+    event &&
+    !attendees &&
+    !event.approved &&
+    (canApproveOwnEvent(settings) || canApproveAnyEvent(settings))
 
   return (
     <Modal
@@ -81,4 +90,4 @@ export default function EventModal({
       )}
     </Modal>
   )
-}
+})

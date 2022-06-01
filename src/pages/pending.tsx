@@ -27,14 +27,16 @@ import "./index.css"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import Helmet from "react-helmet"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
 
-export default function MyEventsPage(props: any) {
+export default function MyEventsPage() {
   const l = useFormatMessage()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const [account, accountState] = useAuthContext()
   const [eventList, eventsState] = useEventsContext()
-  const events = useEventSorter(eventList)
+  const [settings] = useProfileSettingsContext()
+  const events = useEventSorter(eventList, settings)
   const [event] = useEventIdContext(params.get("event"))
   const pendingEvents = useMemo(
     () => events.filter((event) => !event.approved && !event.rejected),

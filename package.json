@@ -18,7 +18,7 @@
     "babel-jest": "^27.5.1",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
-    "decentraland-gatsby": "^5.13.0",
+    "decentraland-gatsby": "^5.15.0",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.1.2",
@@ -72,8 +72,8 @@
     "lint-staged": "12.3.8",
     "nodemon": "^2.0.15",
     "prettier": "^2.4.1",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.6.3",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2",
     "workbox-cli": "^6.5.2"
   },
   "keywords": [

@@ -142,8 +142,6 @@ export type DeprecatedEventAttributes = EventAttributes & {
 export type SessionEventAttributes = DeprecatedEventAttributes & {
   attending: boolean
   notify: boolean
-  editable: boolean
-  owned: boolean
   live: boolean
   position: [number, number]
 }
@@ -196,7 +194,7 @@ export type EventListOptions = {
   order?: "asc" | "desc"
 }
 
-export const editableAttributes: (keyof EventAttributes)[] = [
+export const editEventAttributes = [
   "image",
   "rejected",
   "name",
@@ -217,19 +215,18 @@ export const editableAttributes: (keyof EventAttributes)[] = [
   "recurrent_count",
   "recurrent_until",
   "categories",
-]
+] as const
 
-export const patchAttributes: (keyof EventAttributes)[] =
-  editableAttributes.concat(["contact", "details"])
+export const editOwnEventAttributes = ["contact", "details"] as const
 
-export const adminPatchAttributes: (keyof EventAttributes)[] =
-  editableAttributes.concat([
-    "approved",
-    "highlighted",
-    "trending",
-    "schedules",
-    "url",
-  ])
+export const editAnyEventAttributes = [
+  "highlighted",
+  "trending",
+  "schedules",
+  "url",
+] as const
+
+export const approveEventAttributes = ["approved"] as const
 
 export const SITEMAP_ITEMS_PER_PAGE = 100
 

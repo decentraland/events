@@ -15,7 +15,7 @@ const DECENTRALAND_URL = env(
 )
 
 if (!isURL(SLACK_WEBHOOK)) {
-  console.log(`missing config SLACK_WEBHOOK`)
+  logger.log(`missing config SLACK_WEBHOOK`)
 }
 
 export async function notifyNewEvent(event: DeprecatedEventAttributes) {
