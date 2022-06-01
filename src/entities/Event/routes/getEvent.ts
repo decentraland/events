@@ -13,6 +13,7 @@ import {
 import { ProfileSettingsAttributes } from "../../ProfileSettings/types"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { getEventParamsSchema } from "../schemas"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 
 export const validateGetEventParams =
   createValidator<GetEventParams>(getEventParamsSchema)
@@ -73,6 +74,7 @@ function canReadEvent(
   profile: ProfileSettingsAttributes
 ) {
   return (
+    isAdmin(profile.user) ||
     event.user === profile.user ||
     canApproveAnyEvent(profile) ||
     canEditAnyEvent(profile)

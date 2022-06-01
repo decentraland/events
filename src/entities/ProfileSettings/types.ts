@@ -14,6 +14,20 @@ export type ProfileSettingsAttributes = {
   updated_at: Date
 }
 
+export const DEFAULT_PROFILE_SETTINGS: ProfileSettingsAttributes = {
+  user: "0x0000000000000000000000000000000000000000",
+  email: null,
+  email_verified: false,
+  email_verified_at: null,
+  email_updated_at: null,
+  use_local_time: true,
+  notify_by_email: false,
+  notify_by_browser: false,
+  permissions: [],
+  created_at: new Date(0),
+  updated_at: new Date(0),
+}
+
 export type ProfileSettingsSessionAttributes = ProfileSettingsAttributes & {
   subscriptions: string[]
 }
@@ -27,7 +41,7 @@ export enum ProfilePermissions {
   ApproveAnyEvent = "approve_any_event",
   EditAnyEvent = "edit_any_event",
   EditAnySchedule = "edit_any_schedule",
-  EditAnyProfile = "edit_any_schedule",
+  EditAnyProfile = "edit_any_profile",
   TestAnyNotification = "test_any_notification",
 }
 

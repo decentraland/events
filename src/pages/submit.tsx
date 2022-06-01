@@ -58,7 +58,11 @@ import {
   getSchedulesOptions,
 } from "../modules/events"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { canEditAnyEvent } from "../entities/ProfileSettings/utils"
+import {
+  canApproveAnyEvent,
+  canEditAnyEvent,
+  canTestAnyNotification,
+} from "../entities/ProfileSettings/utils"
 import "./submit.css"
 
 import "./submit.css"
@@ -260,8 +264,7 @@ export default function SubmitPage() {
     function () {
       if (
         original &&
-        settings &&
-        (original.user === settings.user || canEditAnyEvent(settings))
+        (original.user === settings.user || canApproveAnyEvent(settings))
       ) {
         patchState({ requireConfirmation: true, error: null })
       }
@@ -1067,7 +1070,9 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Field
-                    disabled={!original?.owned}
+                    disabled={
+                      original ? original.user !== settings.user : false
+                    }
                     label="Email or Discord username"
                     placeholder="hello@decentraland.org"
                     name="contact"
@@ -1081,7 +1086,9 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Textarea
-                    disabled={!original?.owned}
+                    disabled={
+                      original ? original.user !== settings.user : false
+                    }
                     minHeight={72}
                     maxHeight={500}
                     label="Additional info"
@@ -1100,7 +1107,11 @@ export default function SubmitPage() {
                     primary
                     loading={submitting || removing || notifying}
                     disabled={
-                      (!!original && !original.owned && !original.editable) ||
+                      Boolean(
+                        original &&
+                          original.user !== settings.user &&
+                          !canEditAnyEvent(settings)
+                      ) ||
                       submitting ||
                       removing ||
                       notifying
@@ -1112,21 +1123,23 @@ export default function SubmitPage() {
                   </Button>
                 </Grid.Column>
                 <Grid.Column mobile="5">
-                  {!!original && (!!original.owned || !!original.editable) && (
-                    <Button
-                      basic
-                      loading={submitting || removing || notifying}
-                      disabled={submitting || removing || notifying}
-                      style={{ width: "100%" }}
-                      onClick={handleReject}
-                    >
-                      DELETE
-                    </Button>
-                  )}
-                  )
+                  {original &&
+                    (original.user === settings.user ||
+                      canApproveAnyEvent(settings)) && (
+                      <Button
+                        basic
+                        loading={submitting || removing || notifying}
+                        disabled={submitting || removing || notifying}
+                        style={{ width: "100%" }}
+                        onClick={handleReject}
+                      >
+                        {(original.user === settings.user && "DELETE") ||
+                          "REJECT"}
+                      </Button>
+                    )}
                 </Grid.Column>
                 <Grid.Column mobile="5">
-                  {!!original?.editable && (
+                  {original && canTestAnyNotification(settings) && (
                     <Button
                       basic
                       loading={submitting || removing || notifying}

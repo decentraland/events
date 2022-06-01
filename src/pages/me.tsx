@@ -27,6 +27,7 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import "./index.css"
 import useListEventsFiltered from "../hooks/useListEventsFiltered"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
 
 export default function MyEventsPage() {
   const l = useFormatMessage()
@@ -35,14 +36,19 @@ export default function MyEventsPage() {
     () => new URLSearchParams(location.search),
     [location.search]
   )
-  // const events = useListEvents(siteStore.events.getState().data)
+
   const [account, accountState] = useAuthContext()
   const [eventList, eventsState] = useEventsContext()
-  const events = useEventSorter(eventList)
+  const [settings] = useProfileSettingsContext()
+  const events = useEventSorter(eventList, settings)
   const [event] = useEventIdContext(params.get("event"))
-  const filteredEvents = useListEventsFiltered(events, {
-    search: params.get("search"),
-  })
+  const filteredEvents = useListEventsFiltered(
+    events,
+    {
+      search: params.get("search"),
+    },
+    settings
+  )
   const myEvents = useMemo(
     () => filteredEvents.filter((event) => event.user === account),
     [filteredEvents, account]

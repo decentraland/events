@@ -5,8 +5,8 @@ import ProfileSubscriptionModel from "../../ProfileSubscription/model"
 
 export const getMyProfileSettings = oncePerRequest(async (req: WithAuth) => {
   const [settings, subscriptions] = await Promise.all([
-    ProfileSettingsModel.findOrGetDefault(req.auth!),
-    ProfileSubscriptionModel.findByUser(req.auth!),
+    ProfileSettingsModel.findOrGetDefault(req.auth || ""),
+    ProfileSubscriptionModel.findByUser(req.auth || ""),
   ] as const)
 
   return {

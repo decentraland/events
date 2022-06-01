@@ -21,6 +21,7 @@ import { createEvent } from "./createEvent"
 import { updateEvent } from "./updateEvent"
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
 import { canTestAnyNotification } from "../../ProfileSettings/utils"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 
 export const DECENTRALAND_URL = env("DECENTRALAND_URL", "")
 
@@ -61,7 +62,7 @@ async function notifyEvent(req: WithAuthProfile<WithAuth>) {
   const userProfile = req.authProfile!
   const event = await getEvent(req)
   const profile = await getMyProfileSettings(req)
-  if (!canTestAnyNotification(profile)) {
+  if (!isAdmin(profile.user) || !canTestAnyNotification(profile)) {
     return {}
   }
 

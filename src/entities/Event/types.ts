@@ -194,7 +194,7 @@ export type EventListOptions = {
   order?: "asc" | "desc"
 }
 
-export const editEventAttributes: (keyof EventAttributes)[] = [
+export const editEventAttributes = [
   "image",
   "rejected",
   "name",
@@ -215,16 +215,18 @@ export const editEventAttributes: (keyof EventAttributes)[] = [
   "recurrent_count",
   "recurrent_until",
   "categories",
-]
+] as const
 
-export const editOwnEventAttributes: (keyof EventAttributes)[] =
-  editEventAttributes.concat(["contact", "details"])
+export const editOwnEventAttributes = ["contact", "details"] as const
 
-export const editAnyEventAttributes: (keyof EventAttributes)[] =
-  editEventAttributes.concat(["highlighted", "trending", "schedules", "url"])
+export const editAnyEventAttributes = [
+  "highlighted",
+  "trending",
+  "schedules",
+  "url",
+] as const
 
-export const approveEventAttributes: (keyof EventAttributes)[] =
-  editEventAttributes.concat(["approved"])
+export const approveEventAttributes = ["approved"] as const
 
 export const SITEMAP_ITEMS_PER_PAGE = 100
 

@@ -1,4 +1,4 @@
-import { ProfileSettingsAttributes } from "./types"
+import { DEFAULT_PROFILE_SETTINGS, ProfileSettingsAttributes } from "./types"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 import isEmail from "validator/lib/isEmail"
 import {
@@ -13,19 +13,9 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
   static primaryKey = "user"
 
   static getDefault(user: string): ProfileSettingsAttributes {
-    const now = new Date()
     return {
+      ...DEFAULT_PROFILE_SETTINGS,
       user: user.toLowerCase(),
-      email: null,
-      email_verified: false,
-      email_verified_at: null,
-      email_updated_at: null,
-      use_local_time: false,
-      notify_by_email: false,
-      notify_by_browser: false,
-      permissions: [],
-      created_at: now,
-      updated_at: now,
     } as ProfileSettingsAttributes
   }
 

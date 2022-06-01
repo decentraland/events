@@ -10,13 +10,14 @@ import { canEditAnyProfile } from "../utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { getMyProfileSettings } from "./getMyProfileSettings"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 
 export const validateProfileSettings =
   createValidator<ProfileSettingsAttributes>(updateProfileSettingsSchema)
 
 export async function updateProfileSettings(req: WithAuth) {
   const currentUserProfile = await getMyProfileSettings(req)
-  if (!canEditAnyProfile(currentUserProfile)) {
+  if (!isAdmin(req.auth) && !canEditAnyProfile(currentUserProfile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 

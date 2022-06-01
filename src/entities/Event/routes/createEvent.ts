@@ -50,7 +50,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     data.url = eventTargetUrl(data)
   }
 
-  data = validateNewEvent(data)
+  validateNewEvent(data)
 
   const x = data.x
   const y = data.y

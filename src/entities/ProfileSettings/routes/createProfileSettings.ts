@@ -4,10 +4,11 @@ import isEthereumAddress from "validator/lib/isEthereumAddress"
 import { canEditAnyProfile } from "../utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { getMyProfileSettings } from "./getMyProfileSettings"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 
 export async function createProfileSettings(req: WithAuth) {
   const currentUserProfile = await getMyProfileSettings(req)
-  if (!canEditAnyProfile(currentUserProfile)) {
+  if (!isAdmin(req.auth) && !canEditAnyProfile(currentUserProfile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 

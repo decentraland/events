@@ -21,13 +21,8 @@ import friendsIcon from "../../../../images/secondary-friends.svg"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import locations from "../../../../modules/locations"
 import "./EventDetail.css"
-import MenuIcon, {
-  MenuIconDivider,
-  MenuIconHeader,
-  MenuIconItem,
-} from "../../../MenuIcon/MenuIcon"
+import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import Label from "semantic-ui-react/dist/commonjs/elements/Label"
 import { canEditAnyEvent } from "../../../../entities/ProfileSettings/utils"
 
 const ATTENDEES_PREVIEW_LIMIT = 12

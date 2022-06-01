@@ -3,7 +3,6 @@ import {
   auth,
   WithAuth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { requireEvent } from "../Event/middleware"
 import { EventAttendeeAttributes } from "./types"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import EventModel from "../Event/model"
@@ -11,10 +10,8 @@ import {
   withAuthProfile,
   WithAuthProfile,
 } from "decentraland-gatsby/dist/entities/Profile/middleware"
-import { getProfileSettings } from "../ProfileSettings/routes/getProfileSettings"
 import EventAttendeeModel from "../EventAttendee/model"
 import { getEvent } from "../Event/routes/getEvent"
-import { Request } from "express"
 import ProfileSettingsModel from "../ProfileSettings/model"
 
 export default routes((router) => {
@@ -44,12 +41,12 @@ export async function getEventAttendeeList(event_id: string) {
   return EventAttendeeModel.listByEventId(event_id)
 }
 
-export async function getEventAttendees(req: Request) {
+export async function getEventAttendees(req: WithAuth) {
   const event = await getEvent(req)
   return getEventAttendeeList(event.id)
 }
 
-export async function updateEventAttendees(req: Request) {
+export async function updateEventAttendees(req: WithAuth) {
   const event = await getEvent(req)
   return updateEventAttendeesById(event.id)
 }

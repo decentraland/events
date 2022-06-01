@@ -1,4 +1,4 @@
-import { utils } from "decentraland-commons"
+import pick from "lodash/pick"
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import EventModel from "../model"
@@ -30,7 +30,6 @@ import { getEvent } from "./getEvent"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import EventCategoryModel from "../../EventCategory/model"
-import ScheduleModel from "../../Schedule/model"
 import { getMissingSchedules } from "../../Schedule/utils"
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
 import {
@@ -38,35 +37,52 @@ import {
   canApproveOwnEvent,
   canEditAnyEvent,
 } from "../../ProfileSettings/utils"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import ScheduleModel from "../../Schedule/model"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
 )
+
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
   const profile = await getMyProfileSettings(req)
-  const updatedAttributes: DeprecatedEventAttributes = utils.pick(
-    event,
-    editEventAttributes
-  )
-  if (event.user === user) {
-    Object.assign(updatedAttributes, utils.pick(event, editOwnEventAttributes))
+  const updatedAttributes = {
+    ...pick(event, editEventAttributes),
+    ...pick(req.body, editEventAttributes),
+  } as DeprecatedEventAttributes
 
-    if (canApproveOwnEvent(profile)) {
+  if (event.user === user) {
+    Object.assign(
+      updatedAttributes,
+      pick(event, editOwnEventAttributes),
+      pick(req.body, editOwnEventAttributes)
+    )
+
+    if (isAdmin(user) || canApproveOwnEvent(profile)) {
       Object.assign(
         updatedAttributes,
-        utils.pick(event, approveEventAttributes)
+        pick(event, approveEventAttributes),
+        pick(req.body, approveEventAttributes)
       )
     }
   }
 
-  if (canEditAnyEvent(profile)) {
-    Object.assign(updatedAttributes, utils.pick(event, editAnyEventAttributes))
+  if (isAdmin(user) || canEditAnyEvent(profile)) {
+    Object.assign(
+      updatedAttributes,
+      pick(event, editAnyEventAttributes),
+      pick(req.body, editAnyEventAttributes)
+    )
   }
 
-  if (canApproveAnyEvent(profile)) {
-    Object.assign(updatedAttributes, utils.pick(event, approveEventAttributes))
+  if (isAdmin(user) || canApproveAnyEvent(profile)) {
+    Object.assign(
+      updatedAttributes,
+      pick(event, approveEventAttributes),
+      pick(req.body, approveEventAttributes)
+    )
   }
 
   if (
@@ -80,6 +96,12 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   updatedAttributes.recurrent_until = Time.date(
     updatedAttributes.recurrent_until
   )
+
+  validateUpdateEvent({
+    ...updatedAttributes,
+    start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
+    recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
+  })
 
   // make schedules unique
   updatedAttributes.schedules = Array.from(new Set(updatedAttributes.schedules))
