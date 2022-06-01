@@ -28,9 +28,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
   const admins = listAdmins()
   const permissions = [
-    ProfilePermissions.ApproveOwnEvents,
-    ProfilePermissions.ApproveAnyEvents,
-    ProfilePermissions.EditAnyEvents,
+    ProfilePermissions.ApproveOwnEvent,
+    ProfilePermissions.ApproveAnyEvent,
+    ProfilePermissions.EditAnyEvent,
     ProfilePermissions.EditAnySchedule,
     ProfilePermissions.EditAnyProfile,
   ]
