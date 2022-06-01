@@ -6,13 +6,15 @@ import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/
 import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import { eventUrl, siteUrl } from "../Event/utils"
+import { eventUrl, scheduleUrl, siteUrl } from "../Event/utils"
 import { EventAttributes } from "../Event/types"
 import EventModel from "../Event/model"
+import ScheduleModel from "../Schedule/model"
 import copies from "../../intl/en.json"
 
 export default routes((router) => {
   router.get("/event/", handleRaw(injectEventMetadata, "html"))
+  router.get("/schedule/", handleRaw(injectScheduleMetadata, "html"))
   router.get("/en/*", handleRaw(redirectToNewUrls, "html"))
 })
 
@@ -43,6 +45,31 @@ export async function injectEventMetadata(req: Request) {
         description: escape((event.description || "").trim()),
         image: event.image || "",
         url: eventUrl(event),
+        "twitter:card": "summary_large_image",
+      })
+    }
+  }
+
+  const url = siteUrl().toString() + req.originalUrl.slice(1)
+  return replaceHelmetMetadata(page.toString(), {
+    ...(copies.social.home as any),
+    url,
+  })
+}
+
+export async function injectScheduleMetadata(req: Request) {
+  const id = String(req.query.id || "")
+  const page = await readFile(req)
+  if (isUUID(id)) {
+    const schedule = await ScheduleModel.findOne({ id })
+
+    if (schedule) {
+      return replaceHelmetMetadata(page.toString(), {
+        ...(copies.social.home as any),
+        title: escape(schedule.name) + " | Decentraland Events",
+        description: escape((schedule.description || "").trim()),
+        image: schedule.image || "",
+        url: scheduleUrl(schedule),
         "twitter:card": "summary_large_image",
       })
     }
