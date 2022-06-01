@@ -5,8 +5,7 @@ const mock: ScheduleAttributes[] = [
   {
     id: "ea869a5a-4201-45d9-beda-7ffb07f8a88a",
     name: "Pride Month",
-    description:
-      "Join us for pride month. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
+    description: "Join us for pride month on Decentraland.",
     background: [
       "rgba(255, 188, 91, .1)",
       "rgba(252, 153, 101, .1)",
