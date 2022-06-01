@@ -12,6 +12,7 @@ import {
   EventTimeParams,
 } from "./types"
 import { RRule, Weekday } from "rrule"
+import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL =
   process.env.GATSBY_DECENTRALAND_URL ||
@@ -31,6 +32,12 @@ export function siteUrl(pathname: string = "") {
 export function eventUrl(event: Pick<EventAttributes, "id">): string {
   const target = siteUrl("/event/")
   target.searchParams.set("id", event.id)
+  return target.toString()
+}
+
+export function scheduleUrl(schedule: Pick<ScheduleAttributes, "id">): string {
+  const target = siteUrl("/schedule/")
+  target.searchParams.set("id", schedule.id)
   return target.toString()
 }
 

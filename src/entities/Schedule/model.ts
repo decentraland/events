@@ -33,6 +33,10 @@ export default class ScheduleModel {
     return mock.find((schedule) => schedule.id === filters.id) || null
   }
 
+  static async find(_filters: {} = {}) {
+    return mock.slice()
+  }
+
   static async getScheduleList(ids: string[]) {
     const list = new Set(ids)
     return mock.filter((schedule) => list.has(schedule.id))
