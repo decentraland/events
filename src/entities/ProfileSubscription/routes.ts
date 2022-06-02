@@ -5,7 +5,6 @@ import {
   WithAuth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import ProfileSubscriptionModel from "./model"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import {
   ProfileSubscriptionAttributes,
   profileSubscriptionSchema,
@@ -16,14 +15,18 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 
 export default routes((router) => {
   const withAuth = auth()
-  router.get("/profile/subscription", withAuth, handle(getProfileSubscription))
+  router.get(
+    "/profiles/subscriptions",
+    withAuth,
+    handle(getProfileSubscription)
+  )
   router.post(
-    "/profile/subscription",
+    "/profiles/subscriptions",
     withAuth,
     handle(createProfileSubscription)
   )
   router.delete(
-    "/profile/subscription",
+    "/profiles/subscriptions",
     withAuth,
     handle(removeProfileSubscription)
   )

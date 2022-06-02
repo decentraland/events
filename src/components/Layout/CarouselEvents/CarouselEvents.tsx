@@ -14,6 +14,7 @@ import locations from "../../../modules/locations"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { getScheduleBackground } from "../../../entities/Schedule/utils"
+import useListEventsMain from "../../../hooks/useListEventsMain"
 import "./CarouselEvents.css"
 
 export type CarouselEventsProps = {
@@ -24,13 +25,31 @@ export type CarouselEventsProps = {
 }
 
 export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
-  const { loading, schedule } = props
+  const schedule = useMemo(() => {
+    if (!props.schedule || !props.events) {
+      return props.schedule
+    }
 
-  const className = TokenList.join([
-    "carousel-events__wrapper",
-    schedule && "carousel-events__wrapper__schedule-hightlight",
-    props.className,
-  ])
+    const scheduleHasEvents = props.events.find(
+      (event) =>
+        event.highlighted && event.schedules.includes(props.schedule!.id)
+    )
+    if (scheduleHasEvents) {
+      return props.schedule
+    }
+
+    return undefined
+  }, [props.events, props.schedule])
+
+  const className = useMemo(
+    () =>
+      TokenList.join([
+        "carousel-events__wrapper",
+        schedule && "carousel-events__wrapper__schedule-hightlight",
+        props.className,
+      ]),
+    [schedule, props.className]
+  )
 
   const style = useMemo(
     () => (schedule ? { background: getScheduleBackground(schedule) } : {}),
@@ -40,9 +59,16 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
   const events = useMemo(
     () =>
       props.events && schedule
-        ? props.events.filter((event) => event.schedules.includes(schedule.id))
-        : props.events,
+        ? props.events.filter(
+            (event) =>
+              event.highlighted && event.schedules.includes(schedule.id)
+          )
+        : props.events || [],
     [props.events, schedule]
+  )
+
+  const mainEvents = useListEventsMain(
+    events.length > 0 ? events : props.events
   )
 
   const handleClickFullSchedule = useCallback(
@@ -50,7 +76,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
     [schedule]
   )
 
-  if (loading) {
+  if (props.loading) {
     return (
       <div className={className} style={style}>
         <Container>
@@ -62,7 +88,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
     )
   }
 
-  if (!events || events.length === 0) {
+  if (!mainEvents || mainEvents.length === 0) {
     return null
   }
 
@@ -75,7 +101,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
           </SubTitle>
         )}
         <Carousel>
-          {events.map((event) => (
+          {mainEvents.map((event) => (
             <EventCardBig
               key={"live:" + event.id}
               event={event}

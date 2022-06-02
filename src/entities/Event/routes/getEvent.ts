@@ -1,64 +1,82 @@
 import EventModel from "../model"
 import EventAttendee from "../../EventAttendee/model"
-import { validateGetEventParams } from "../middleware"
 import isUUID from "validator/lib/isUUID"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-import { EventAttributes, SessionEventAttributes } from "../types"
+import { EventAttributes, GetEventParams } from "../types"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
+import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import {
+  canApproveAnyEvent,
+  canEditAnyEvent,
+} from "../../ProfileSettings/utils"
+import { ProfileSettingsAttributes } from "../../ProfileSettings/types"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { getEventParamsSchema } from "../schemas"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
-import { Request } from "express"
 
-type WithEvent = {
-  event?: SessionEventAttributes
-}
+export const validateGetEventParams =
+  createValidator<GetEventParams>(getEventParamsSchema)
 
-type WithAuth = {
-  auth?: string
-}
-
-export async function getEvent(req: Request & WithAuth & WithEvent) {
-  if (req.event) {
-    return req.event
-  }
-
+export const getEvent = oncePerRequest(async (req: WithAuth) => {
   const user = req.auth
+  const profile = await getMyProfileSettings(req)
   const params = validateGetEventParams(req.params)
   if (!isUUID(params.event_id)) {
-    throw EventNotFoundError(params.event_id)
+    throw new RequestError(
+      `Not found event "${params.event_id}"`,
+      RequestError.NotFound
+    )
   }
 
   const event = EventModel.build(
     await EventModel.findOne<EventAttributes>({ id: params.event_id })
   )
+
   if (!event) {
-    throw EventNotFoundError(params.event_id)
+    throw new RequestError(
+      `Not found event "${params.event_id}"`,
+      RequestError.NotFound
+    )
   }
 
   if (!event.approved) {
     if (!user) {
-      throw EventNotFoundError(params.event_id)
+      throw new RequestError(
+        `Not found event "${params.event_id}"`,
+        RequestError.NotFound
+      )
     }
 
-    if (event.user !== user && !isAdmin(user)) {
-      throw EventNotFoundError(params.event_id)
+    if (!canReadEvent(event, profile)) {
+      throw new RequestError(
+        `Not found event "${params.event_id}"`,
+        RequestError.NotFound
+      )
     }
   }
 
   let attending = false
   if (user) {
-    attending = !!(await EventAttendee.count({
+    const count = await EventAttendee.count({
       user,
       event_id: params.event_id,
-    }))
+    })
+
+    attending = !!count
   }
 
-  const publicEvent = { ...EventModel.toPublic(event, req.auth), attending }
-  req.event = publicEvent
-  return publicEvent
-}
+  return { ...EventModel.toPublic(event, profile), attending }
+})
 
-function EventNotFoundError(event_id: string) {
-  return new RequestError(
-    `Not found event "${event_id}"`,
-    RequestError.NotFound
+function canReadEvent(
+  event: EventAttributes,
+  profile: ProfileSettingsAttributes
+) {
+  return (
+    isAdmin(profile.user) ||
+    event.user === profile.user ||
+    canApproveAnyEvent(profile) ||
+    canEditAnyEvent(profile)
   )
 }

@@ -92,8 +92,6 @@ export default class Events extends API {
       recurrent: Boolean(event.recurrent),
       attending: Boolean(event.attending),
       notify: Boolean(event.notify),
-      editable: Boolean(event.editable),
-      owned: Boolean(event.owned),
       live: Boolean(event.live),
     } as SessionEventAttributes
   }
@@ -143,7 +141,7 @@ export default class Events extends API {
     auth: string
   }) {
     return this.fetch<{}>(
-      "/profile/subscription",
+      "/profiles/subscriptions",
       this.options()
         .authorization({ sign: true })
         .json(subscription)
@@ -153,25 +151,25 @@ export default class Events extends API {
 
   async removeSubscriptions() {
     return this.fetch<{}>(
-      "/profile/subscription",
+      "/profiles/subscriptions",
       this.options().authorization({ sign: true }).method("DELETE")
     )
   }
 
   async getMyProfileSettings() {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profile/settings",
+      "/profiles/settings",
       this.options().authorization({ sign: true })
     )
 
     return Events.parseSettings(data)
   }
 
-  async updateProfileSettings(
+  async updateMyProfileSettings(
     settings: Partial<ProfileSettingsAttributes> = {}
   ) {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profile/settings",
+      "/profiles/settings",
       this.options()
         .method("PATCH")
         .authorization({ sign: true })

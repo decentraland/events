@@ -1,8 +1,14 @@
 import { SessionEventAttributes } from "../entities/Event/types"
 import { useMemo } from "react"
+import {
+  DEFAULT_PROFILE_SETTINGS,
+  ProfileSettingsAttributes,
+} from "../entities/ProfileSettings/types"
+import { canEditAnyEvent } from "../entities/ProfileSettings/utils"
 
 export default function useListEvents(
-  events?: Record<string, SessionEventAttributes>
+  events?: Record<string, SessionEventAttributes>,
+  settings: ProfileSettingsAttributes = DEFAULT_PROFILE_SETTINGS
 ) {
   return useMemo(() => {
     if (!events) {
@@ -16,7 +22,11 @@ export default function useListEvents(
           return false
         }
 
-        if (!event.approved && !event.owned && !event.editable) {
+        if (
+          !event.approved &&
+          event.user !== settings.user &&
+          !canEditAnyEvent(settings)
+        ) {
           return false
         }
 

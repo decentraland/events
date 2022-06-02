@@ -186,7 +186,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         recurrent_until.getTime() < start_at.getTime()
       ) {
         // recurrent_until = Datetime.fromInputTime('00:00', start_at, options).date
-        recurrent_until = Time.from(start_at, { utc }).toDate()
+        recurrent_until = Time.from(start_at, { utc })
+          .endOf("day")
+          .subtract(1, "second")
+          .toDate()
       }
 
       setValues({

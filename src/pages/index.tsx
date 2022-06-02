@@ -5,12 +5,10 @@ import { useLocation } from "@gatsbyjs/reach-router"
 
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import EventModal from "../components/Event/EventModal/EventModal"
@@ -25,12 +23,8 @@ import {
   useEventsContext,
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { getEventTime, getEventType } from "../entities/Event/utils"
-import useListEventsFiltered from "../hooks/useListEventsFiltered"
-import useListEventsMain from "../hooks/useListEventsMain"
-import useListEventsTrending from "../hooks/useListEventsTrending"
 import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
-import locations from "../modules/locations"
+import locations, { toEventFilters } from "../modules/locations"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { getSchedules } from "../modules/events"
 import { getCurrentSchedules } from "../entities/Schedule/utils"
@@ -52,35 +46,15 @@ export default function IndexPage() {
   const [event] = useEventIdContext(params.get("event"))
   const [settings] = useProfileSettingsContext()
   const [all, state] = useEventsContext()
-  const events = useEventSorter(all)
+  const events = useEventSorter(all, settings)
   const loading = accountState.loading || state.loading
-  const searching = !!params.get("search")
-  const typeFilter = getEventType(params.get("type"))
 
   const currentSchedule = useMemo(
     () => getCurrentSchedules(schedules),
     [schedules]
   )
 
-  const timeFilter = getEventTime(
-    params.get("time-from"),
-    params.get("time-to")
-  )
-
-  const filteredEvents = useListEventsFiltered(
-    events,
-    {
-      search: params.get("search"),
-      categories: params.get("category"),
-      type: typeFilter,
-      time: timeFilter,
-    },
-    settings
-  )
-
-  const trendingEvents = useListEventsTrending(filteredEvents)
-  const mainEvents = useListEventsMain(filteredEvents)
-
+  const filters = useMemo(() => toEventFilters(params), [params])
   const [enabledNotification, setEnabledNotification] = useState(false)
 
   return (
@@ -135,9 +109,9 @@ export default function IndexPage() {
       />
       <Navigation activeTab={NavigationTab.Events} search />
 
-      {!searching && (
+      {!filters.search && (
         <CarouselEvents
-          events={mainEvents}
+          events={events}
           schedule={currentSchedule}
           loading={loading}
         />
@@ -153,22 +127,8 @@ export default function IndexPage() {
             <Divider />
           </div>
         )}
-        {currentSchedule && (
-          <SubTitle className="events__all-events-title">
-            {l("page.events.all_events")}
-          </SubTitle>
-        )}
-        <TrendingEvents
-          events={trendingEvents}
-          loading={loading}
-          hasEvents={events.length > 0}
-        />
-        <ListEvents
-          loading={loading}
-          hasEvents={events.length > 0}
-          events={filteredEvents}
-          params={params}
-        />
+        <TrendingEvents events={events} loading={loading} />
+        <ListEvents loading={loading} events={events} filters={filters} />
       </Container>
     </>
   )

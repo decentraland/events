@@ -4,3 +4,5 @@ export type EventCategoryAttributes = {
   created_at: Date
   updated_at: Date
 }
+
+export const ALL_EVENT_CATEGORY = "all"

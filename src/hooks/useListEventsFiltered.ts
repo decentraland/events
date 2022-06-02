@@ -1,21 +1,16 @@
-import {
-  EventTimeParams,
-  SessionEventAttributes,
-  ToggleItemsValue,
-} from "../entities/Event/types"
+import { SessionEventAttributes, EventType } from "../entities/Event/types"
 import { useMemo } from "react"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { HookProfileSettingsAttributes } from "../context/ProfileSetting"
+import {
+  DEFAULT_PROFILE_SETTINGS,
+  ProfileSettingsAttributes,
+} from "../entities/ProfileSettings/types"
+import { EventFilters } from "../modules/locations"
 
 export default function useListEventsFiltered(
   events?: SessionEventAttributes[] | null,
-  filter?: {
-    search?: string | null
-    type?: ToggleItemsValue | null
-    categories?: string | null
-    time?: EventTimeParams
-  },
-  settings?: HookProfileSettingsAttributes
+  filter?: EventFilters,
+  settings: ProfileSettingsAttributes = DEFAULT_PROFILE_SETTINGS
 ) {
   return useMemo(() => {
     if (!events) {
@@ -43,11 +38,11 @@ export default function useListEventsFiltered(
       })
     }
 
-    if (filter.type && filter.type !== ToggleItemsValue.All) {
+    if (filter.type && filter.type !== EventType.All) {
       const type = filter.type
 
       events = events.filter((event) => {
-        if (type === ToggleItemsValue.One) {
+        if (type === EventType.One) {
           return event.duration <= Time.Day
         } else {
           return event.duration > Time.Day || event.recurrent
@@ -55,8 +50,8 @@ export default function useListEventsFiltered(
       })
     }
 
-    if (filter.categories && filter.categories != "all") {
-      const matches = filter.categories.toLowerCase()
+    if (filter.category && filter.category != "all") {
+      const matches = filter.category.toLowerCase()
 
       events = events.filter((event) => {
         const categoryList = new Set<string>(event.categories)
@@ -64,33 +59,33 @@ export default function useListEventsFiltered(
       })
     }
 
-    if (filter.time) {
-      const fromHour = Time.duration(filter.time.start, "minutes").format("HH")
-      const fromMinute = Time.duration(filter.time.start, "minutes").format(
-        "mm"
-      )
-      const toHour = Time.duration(filter.time.end, "minutes").format("HH")
-      const toMinute = Time.duration(filter.time.end, "minutes").format("mm")
+    if (filter.timeFrom && filter.timeTo) {
+      const fromHour = Time.duration(filter.timeFrom, "minutes").format("HH")
+      const fromMinute = Time.duration(filter.timeFrom, "minutes").format("mm")
+      const toHour = Time.duration(filter.timeTo, "minutes").format("HH")
+      const toMinute = Time.duration(filter.timeTo, "minutes").format("mm")
 
       events = events.filter((event) => {
         const eventDate = Time.from(event.start_at, {
-          utc: !settings?.use_local_time,
+          utc: !settings.use_local_time,
         })
 
         let eventTimeFrom = Time.from(event.start_at, {
-          utc: !settings?.use_local_time,
+          utc: !settings.use_local_time,
         })
           .set("hour", Number(fromHour))
           .set("minute", Number(fromMinute))
         let eventTimeTo = Time.from(event.start_at, {
-          utc: !settings?.use_local_time,
+          utc: !settings.use_local_time,
         })
           .set("hour", Number(toHour))
           .set("minute", Number(toMinute))
-        if (filter?.time?.start === 1440) {
+
+        if (filter.timeFrom === 1440) {
           eventTimeFrom = eventTimeFrom.add(1, "day")
         }
-        if (filter?.time?.end === 1440) {
+
+        if (filter.timeTo === 1440) {
           eventTimeTo = eventTimeTo.add(1, "day")
         }
 

@@ -1,16 +1,17 @@
-import { utils } from "decentraland-commons"
+import pick from "lodash/pick"
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import EventModel from "../model"
 import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import {
-  adminPatchAttributes,
-  patchAttributes,
+  editAnyEventAttributes,
+  editOwnEventAttributes,
   DeprecatedEventAttributes,
   MAX_EVENT_DURATION,
+  editEventAttributes,
+  approveEventAttributes,
 } from "../types"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import {
@@ -29,20 +30,60 @@ import { getEvent } from "./getEvent"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import EventCategoryModel from "../../EventCategory/model"
-import ScheduleModel from "../../Schedule/model"
 import { getMissingSchedules } from "../../Schedule/utils"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import {
+  canApproveAnyEvent,
+  canApproveOwnEvent,
+  canEditAnyEvent,
+} from "../../ProfileSettings/utils"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import ScheduleModel from "../../Schedule/model"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
 )
+
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
-  const attributes = isAdmin(user) ? adminPatchAttributes : patchAttributes
-  let updatedAttributes = {
-    ...utils.pick(event, attributes),
-    ...utils.pick(req.body, attributes),
+  const profile = await getMyProfileSettings(req)
+  const updatedAttributes = {
+    ...pick(event, editEventAttributes),
+    ...pick(req.body, editEventAttributes),
   } as DeprecatedEventAttributes
+
+  if (event.user === user) {
+    Object.assign(
+      updatedAttributes,
+      pick(event, editOwnEventAttributes),
+      pick(req.body, editOwnEventAttributes)
+    )
+
+    if (isAdmin(user) || canApproveOwnEvent(profile)) {
+      Object.assign(
+        updatedAttributes,
+        pick(event, approveEventAttributes),
+        pick(req.body, approveEventAttributes)
+      )
+    }
+  }
+
+  if (isAdmin(user) || canEditAnyEvent(profile)) {
+    Object.assign(
+      updatedAttributes,
+      pick(event, editAnyEventAttributes),
+      pick(req.body, editAnyEventAttributes)
+    )
+  }
+
+  if (isAdmin(user) || canApproveAnyEvent(profile)) {
+    Object.assign(
+      updatedAttributes,
+      pick(event, approveEventAttributes),
+      pick(req.body, approveEventAttributes)
+    )
+  }
 
   if (
     !updatedAttributes.url ||
@@ -51,7 +92,12 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.url = eventTargetUrl(updatedAttributes)
   }
 
-  updatedAttributes = validateUpdateEvent({
+  updatedAttributes.start_at = Time.date(updatedAttributes.start_at)
+  updatedAttributes.recurrent_until = Time.date(
+    updatedAttributes.recurrent_until
+  )
+
+  validateUpdateEvent({
     ...updatedAttributes,
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
@@ -173,9 +219,9 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     notifyApprovedEvent(updatedEvent)
   } else if (!event.rejected && updatedEvent.rejected) {
     notifyRejectedEvent(updatedEvent)
-  } else if (!isAdmin(user)) {
+  } else if (updatedEvent.user === user) {
     notifyEditedEvent(updatedEvent)
   }
 
-  return EventModel.toPublic(updatedEvent, user)
+  return EventModel.toPublic(updatedEvent, profile)
 }

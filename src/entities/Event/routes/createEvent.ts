@@ -18,6 +18,7 @@ import { newEventSchema } from "../schemas"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import EventCategoryModel from "../../EventCategory/model"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
 
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -25,6 +26,7 @@ const validateNewEvent = createValidator<EventAttributes>(
 export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
+  const profile = await getMyProfileSettings(req)
   let data = req.body as EventAttributes
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
@@ -48,7 +50,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     data.url = eventTargetUrl(data)
   }
 
-  data = validateNewEvent(data)
+  validateNewEvent(data)
 
   const x = data.x
   const y = data.y
@@ -130,5 +132,5 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   await EventModel.create(event)
   await notifyNewEvent(event)
 
-  return EventModel.toPublic(event, user)
+  return EventModel.toPublic(event, profile)
 }

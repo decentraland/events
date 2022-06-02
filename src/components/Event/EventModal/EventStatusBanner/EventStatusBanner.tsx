@@ -15,15 +15,19 @@ export default React.memo(function EventStatusBanner({
   }
 
   if (event.rejected) {
-    ;<div className="EventStatusBanner EventStatusBanner--error">
-      <code>This event was rejected</code>
-    </div>
+    return (
+      <div className="EventStatusBanner EventStatusBanner--error">
+        <code>This event was rejected</code>
+      </div>
+    )
   }
 
   if (!event.approved) {
-    ;<div className="EventStatusBanner">
-      <code>This event is pending approval</code>
-    </div>
+    return (
+      <div className="EventStatusBanner">
+        <code>This event is pending approval</code>
+      </div>
+    )
   }
 
   return null

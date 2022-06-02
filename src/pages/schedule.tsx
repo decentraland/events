@@ -17,12 +17,13 @@ import EnabledNotificationModal from "../components/Modal/EnabledNotificationMod
 
 import { useEventsContext, useEventSchedule } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { getEventTime, getEventType } from "../entities/Event/utils"
+import { fromEventTime, getEventType } from "../entities/Event/utils"
 import useListEventsFiltered from "../hooks/useListEventsFiltered"
 import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { getSchedules } from "../modules/events"
 import "./index.css"
+import { toEventFilters } from "../modules/locations"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -38,36 +39,15 @@ export default function IndexPage() {
   )
 
   const [schedules] = useAsyncMemo(getSchedules)
-
   const schedule = useMemo(
     () => schedules?.find((schedule) => schedule.id === params.get("id")),
     [schedules, params.get("id")]
   )
 
-  const [settings] = useProfileSettingsContext()
-
   const [all, state] = useEventsContext()
   const events = useEventSchedule(all, params.get("id"))
-
+  const filters = useMemo(() => toEventFilters(params), [params])
   const loading = accountState.loading || state.loading
-  const typeFilter = getEventType(params.get("type"))
-
-  const timeFilter = getEventTime(
-    params.get("time-from"),
-    params.get("time-to")
-  )
-
-  const filteredEvents = useListEventsFiltered(
-    events,
-    {
-      search: params.get("search"),
-      categories: params.get("category"),
-      type: typeFilter,
-      time: timeFilter,
-    },
-    settings
-  )
-
   const [enabledNotification, setEnabledNotification] = useState(false)
 
   return (
@@ -133,11 +113,10 @@ export default function IndexPage() {
         )}
 
         <ListEvents
-          hideFilter={true}
+          disabledFilters={true}
           loading={loading}
-          hasEvents={events.length > 0}
-          events={filteredEvents}
-          params={params}
+          events={events}
+          filters={filters}
         />
       </Container>
     </>
