@@ -13,6 +13,11 @@ import {
 import { eventAttendeeListScheme } from "../entities/EventAttendee/schemas"
 import { eventCategoryListScheme } from "../entities/EventCategory/schema"
 import "./index.css"
+import {
+  getScheduleParamsSchema,
+  scheduleListScheme,
+  scheduleScheme,
+} from "../entities/Schedule/schema"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -104,6 +109,71 @@ export default function DocsPage() {
             cors="*"
             body={eventCategoryListScheme}
           />
+        </ApiCard>
+
+        <ApiCard
+          id="get-schedules"
+          method="GET"
+          path="/api/schedules"
+          description="Return all the schedules"
+        >
+          <ApiDetails title="Request" cors="*" />
+          <ApiDetails title="Response" cors="*" body={scheduleListScheme} />
+        </ApiCard>
+
+        <ApiCard
+          id="get-schedule"
+          method="GET"
+          path="/api/schedules/{schedule_id}"
+          description="Return information of a schedule by ID"
+        >
+          <ApiDetails title="Request" cors="*" />
+          <ApiDetails title="Response" cors="*" body={scheduleScheme} />
+        </ApiCard>
+
+        <ApiCard
+          id="post-schedule"
+          method="POST"
+          path="/api/schedules"
+          description="Create a schedule"
+        >
+          <ApiDetails
+            title="Request"
+            cors="*"
+            authorization
+            params={getScheduleParamsSchema}
+          />
+          <ApiDetails title="Response" cors="*" params={scheduleScheme} />
+        </ApiCard>
+
+        <ApiCard
+          id="patch-schedule"
+          method="PATCH"
+          path="/api/schedules"
+          description="Edit a schedule"
+        >
+          <ApiDetails
+            title="Request"
+            cors="*"
+            authorization
+            params={getScheduleParamsSchema}
+          />
+          <ApiDetails title="Response" cors="*" params={scheduleScheme} />
+        </ApiCard>
+
+        <ApiCard
+          id="delete-schedule"
+          method="DELETE"
+          path="/api/schedules/{schedule_id}"
+          description="Deactivate a schedule"
+        >
+          <ApiDetails
+            title="Request"
+            cors="*"
+            authorization
+            params={getScheduleParamsSchema}
+          />
+          <ApiDetails title="Response" cors="*" params={scheduleScheme} />
         </ApiCard>
       </Container>
     </>
