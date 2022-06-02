@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React from "react"
 
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
@@ -6,21 +6,21 @@ import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import EventCardMini from "../../Event/EventCardMini/EventCardMini"
 import { navigateEventDetail } from "../../../modules/events"
+import useListEventsTrending from "../../../hooks/useListEventsTrending"
 import "./TrendingEvents.css"
 
 export type TrendingEventsProps = {
   className?: string
   events: SessionEventAttributes[]
   loading?: boolean
-  hasEvents: boolean
 }
 
-export const TrendingEvents = (props: TrendingEventsProps) => {
-  const { className, hasEvents, events, loading } = props
+export const TrendingEvents = React.memo(function (props: TrendingEventsProps) {
+  const trendingEvents = useListEventsTrending(props.events)
 
-  if (loading) {
+  if (props.loading) {
     return (
-      <div className={className}>
+      <div className={props.className}>
         <div className="trending-events__group-title">
           <SubTitle>TRENDING</SubTitle>
         </div>
@@ -33,24 +33,24 @@ export const TrendingEvents = (props: TrendingEventsProps) => {
     )
   }
 
+  if (trendingEvents.length === 0) {
+    return null
+  }
+
   return (
-    <>
-      {!loading && hasEvents && events.length > 0 && (
-        <div className={className}>
-          <div className="trending-events__group-title">
-            <SubTitle>TRENDING</SubTitle>
-          </div>
-          <Card.Group>
-            {events.map((event) => (
-              <EventCardMini
-                key={"trending:" + event.id}
-                event={event}
-                onClick={navigateEventDetail}
-              />
-            ))}
-          </Card.Group>
-        </div>
-      )}
-    </>
+    <div className={props.className}>
+      <div className="trending-events__group-title">
+        <SubTitle>TRENDING</SubTitle>
+      </div>
+      <Card.Group>
+        {trendingEvents.map((event) => (
+          <EventCardMini
+            key={"trending:" + event.id}
+            event={event}
+            onClick={navigateEventDetail}
+          />
+        ))}
+      </Card.Group>
+    </div>
   )
-}
+})

@@ -9,6 +9,23 @@ export type ProfileSettingsAttributes = {
   use_local_time: boolean
   notify_by_email: boolean
   notify_by_browser: boolean
+  permissions: ProfilePermissions[]
+  created_at: Date
+  updated_at: Date
+}
+
+export const DEFAULT_PROFILE_SETTINGS: ProfileSettingsAttributes = {
+  user: "0x0000000000000000000000000000000000000000",
+  email: null,
+  email_verified: false,
+  email_verified_at: null,
+  email_updated_at: null,
+  use_local_time: true,
+  notify_by_email: false,
+  notify_by_browser: false,
+  permissions: [],
+  created_at: new Date(0),
+  updated_at: new Date(0),
 }
 
 export type ProfileSettingsSessionAttributes = ProfileSettingsAttributes & {
@@ -19,13 +36,14 @@ export const DATA_PARAM = "data"
 export const SUBSCRIPTION_PATH = "/verify"
 export const UNSUBSCRIBE_PATH = "/unsubscribe"
 
-export const editableAttributes = [
-  "email",
-  "email_verified",
-  "use_local_time",
-  "notify_by_email",
-  "notify_by_browser",
-]
+export enum ProfilePermissions {
+  ApproveOwnEvent = "approve_own_event",
+  ApproveAnyEvent = "approve_any_event",
+  EditAnyEvent = "edit_any_event",
+  EditAnySchedule = "edit_any_schedule",
+  EditAnyProfile = "edit_any_profile",
+  TestAnyNotification = "test_any_notification",
+}
 
 export enum EmailSubscriptionStatus {
   OK,
@@ -40,7 +58,27 @@ export type EmailSubscription = {
   exp: number
 }
 
-export const profileSettingsSchema: AjvObjectSchema = {
+export const updateProfileSettingsSchema: AjvObjectSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: [],
+  properties: {
+    permissions: {
+      type: "array",
+      items: {
+        enum: [
+          ProfilePermissions.ApproveAnyEvent,
+          ProfilePermissions.ApproveOwnEvent,
+          ProfilePermissions.EditAnyEvent,
+          ProfilePermissions.EditAnySchedule,
+          ProfilePermissions.EditAnyProfile,
+        ],
+      },
+    },
+  },
+}
+
+export const updateMyProfileSettingsSchema: AjvObjectSchema = {
   type: "object",
   additionalProperties: false,
   required: [],

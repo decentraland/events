@@ -9,6 +9,11 @@ import { SegmentEvent } from "../modules/segment"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 import isUUID from "validator/lib/isUUID"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import {
+  DEFAULT_PROFILE_SETTINGS,
+  ProfileSettingsAttributes,
+} from "../entities/ProfileSettings/types"
+import { canEditAnyEvent } from "../entities/ProfileSettings/utils"
 
 const defaultProfileSettings = [
   [] as SessionEventAttributes[],
@@ -217,7 +222,10 @@ export function useEventsContext() {
   return useContext(EventsContext)
 }
 
-export function useEventSorter(events: SessionEventAttributes[] = []) {
+export function useEventSorter(
+  events: SessionEventAttributes[] = [],
+  settings: ProfileSettingsAttributes = DEFAULT_PROFILE_SETTINGS
+) {
   return useMemo(() => {
     const now = Date.now()
     return events
@@ -226,7 +234,11 @@ export function useEventSorter(events: SessionEventAttributes[] = []) {
           return false
         }
 
-        if (!event.approved && !event.owned && !event.editable) {
+        if (
+          !event.approved &&
+          event.user !== settings.user &&
+          !canEditAnyEvent(settings)
+        ) {
           return false
         }
 
@@ -237,7 +249,7 @@ export function useEventSorter(events: SessionEventAttributes[] = []) {
         return true
       })
       .sort((a, b) => a.next_start_at.getTime() - b.next_start_at.getTime())
-  }, [events])
+  }, [events, settings])
 }
 
 export function useEventSchedule(

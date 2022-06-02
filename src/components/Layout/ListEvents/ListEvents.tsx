@@ -4,9 +4,8 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
 import {
-  EventTimeParams,
   SessionEventAttributes,
-  ToggleItemsValue,
+  EventType,
 } from "../../../entities/Event/types"
 import EventCard from "../../Event/EventCard/EventCard"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -31,63 +30,62 @@ import {
 } from "../../../modules/features"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import { SegmentEvent } from "../../../modules/segment"
-import { url } from "../../../modules/locations"
-import { getEventTime, getEventType } from "../../../entities/Event/utils"
+import { EventFilters, fromEventFilters, url } from "../../../modules/locations"
+import { getEventType } from "../../../entities/Event/utils"
 import { showTimezoneLabel } from "../../../modules/date"
-import { useEventIdContext } from "../../../context/Event"
 import useListEventsCategories from "../../../hooks/useListEventsCategories"
 import { navigateEventDetail } from "../../../modules/events"
 import { useCategoriesContext } from "../../../context/Category"
 import { useLocation } from "@gatsbyjs/reach-router"
+import useListEventsFiltered from "../../../hooks/useListEventsFiltered"
 import "./ListEvents.css"
+import { ALL_EVENT_CATEGORY } from "../../../entities/EventCategory/types"
 
 export type ListEventsProps = {
   events: SessionEventAttributes[]
-  hasEvents: boolean
-  params: URLSearchParams
+  filters: EventFilters
   loading?: boolean
   className?: string
-  hideFilter?: boolean
+  disabledFilters?: boolean
 }
 
 const typeItems = [
   {
     title: "All events",
     description: "Every event in Decentraland",
-    value: ToggleItemsValue.All,
+    value: EventType.All,
   },
   {
     title: "One time event",
     description: "Events which happen once",
-    value: ToggleItemsValue.One,
+    value: EventType.One,
   },
   {
     title: "Recurring event",
     description: "Events which happen on more than one day",
-    value: ToggleItemsValue.Recurrent,
+    value: EventType.Recurrent,
   },
 ]
 
 export const ListEvents = (props: ListEventsProps) => {
-  const { className, hasEvents, events, loading, params, hideFilter } = props
-  const eventsByMonth = useListEventsByMonth(events)
+  const { className, loading, disabledFilters } = props
   const [settings] = useProfileSettingsContext()
   const location = useLocation()
   const track = useTrackContext()
   const l = useFormatMessage()
   const [ff] = useFeatureFlagContext()
   const [categories] = useCategoriesContext()
-  const categoriesFiltered = useListEventsCategories(events, categories)
-
-  const [event] = useEventIdContext(params.get("event"))
-  const typeFilter = getEventType(params.get("type"))
-
-  const timeFilter = getEventTime(
-    params.get("time-from"),
-    params.get("time-to")
+  const filteredEvents = useListEventsFiltered(
+    props.events,
+    props.filters,
+    settings
   )
+  const eventsByMonth = useListEventsByMonth(filteredEvents)
+  const categoriesFiltered = useListEventsCategories(props.events, categories)
 
-  const [eventTime, setEventTime] = useState<EventTimeParams>(timeFilter)
+  // const [event] = useEventIdContext(params.get("event"))
+
+  // const [eventTime, setEventTime] = useState<EventTimeParams>(timeFilter)
 
   const categoryItems = useMemo(() => {
     let categoriesToReturn = [
@@ -109,27 +107,30 @@ export const ListEvents = (props: ListEventsProps) => {
     }
 
     return categoriesToReturn
-  }, [categoriesFiltered, params.get("category")])
+  }, [categoriesFiltered, props.filters.category])
 
   const timeRangeLabel = useMemo(() => {
     const from =
-      eventTime.start == 1440
+      props.filters.timeFrom === 24 * 60
         ? "24:00"
-        : Time.duration(eventTime.start, "minutes").format("HH:mm")
+        : Time.duration(props.filters.timeFrom ?? 0, "minutes").format("HH:mm")
     const to =
-      eventTime.end == 1440
+      props.filters.timeTo === 24 * 60 || props.filters.timeTo === undefined
         ? "24:00"
-        : Time.duration(eventTime.end, "minutes").format("HH:mm")
-    const timezone = showTimezoneLabel(
-      Time.from(event?.start_at),
-      settings?.use_local_time
-    )
-    return `${from} - ${to} ${timezone}`
-  }, [eventTime])
+        : Time.duration(props.filters.timeTo, "minutes").format("HH:mm")
 
-  const timeRangeValue = useMemo(() => {
-    return [timeFilter.start / 30, timeFilter.end / 30] as const
-  }, [timeFilter])
+    const timezone = showTimezoneLabel(Time.from(), settings?.use_local_time)
+    return `${from} - ${to} ${timezone}`
+  }, [props.filters])
+
+  const timeRangeValue = useMemo(
+    () =>
+      [
+        (props.filters.timeFrom ?? 0) / 30,
+        (props.filters.timeTo ?? 24 * 60) / 30,
+      ] as const,
+    [props.filters]
+  )
 
   const showFilterByType = useMemo(
     () =>
@@ -146,7 +147,7 @@ export const ListEvents = (props: ListEventsProps) => {
         Flags.FilterCategoryVariant,
         FilterCategoryVariant.disabled
       ) === FilterCategoryVariant.enabled && categoriesFiltered.length > 0,
-    [ff]
+    [ff, categoriesFiltered]
   )
 
   const showFilterByTime = useMemo(
@@ -159,63 +160,55 @@ export const ListEvents = (props: ListEventsProps) => {
   )
 
   const showFilters =
-    hasEvents &&
-    !hideFilter &&
+    !disabledFilters &&
     (showFilterByType || showFilterByTime || showFilterByCategory)
+
   const cardItemsPerRow = showFilters ? 2 : 3
 
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
-      const newParams = new URLSearchParams(params)
-
-      const type = getEventType((item as any).value)
-      if (type === ToggleItemsValue.All) {
-        newParams.delete("type")
-      } else {
-        newParams.set("type", type)
-      }
-
-      track(SegmentEvent.Filter, { type })
+      const type = getEventType(item.value as string)
+      const newFilters = { ...props.filters, type }
+      const newParams = fromEventFilters(
+        newFilters,
+        new URLSearchParams(location.search)
+      )
+      track(SegmentEvent.Filter, newFilters)
       navigate(url(location.pathname, newParams))
     },
-    [location.pathname, params]
+    [location.pathname, location.search, props.filters]
   )
 
   const handleCategoryChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
-      const newParams = new URLSearchParams(params)
-
-      const category = (item as any).value
-
-      if (category === "All") {
-        newParams.delete("category")
-      } else {
-        newParams.set("category", category)
-      }
-
-      track(SegmentEvent.Filter, { category })
+      const category = item.value as string
+      const newFilters = { ...props.filters, category }
+      const newParams = fromEventFilters(
+        newFilters,
+        new URLSearchParams(location.search)
+      )
+      track(SegmentEvent.Filter, newFilters)
       navigate(url(location.pathname, newParams))
     },
-    [location.pathname, params, ff]
+    [location.pathname, location.search, props.filters]
   )
 
   const handleRangeChange = useCallback(
     (
       ev: React.ChangeEvent<HTMLInputElement>,
-      valueArray: readonly [number, number]
+      [from, to]: readonly [number, number]
     ) => {
-      const from = Time.from((Time.Hour / 2) * valueArray[0], {
-        utc: true,
-      }).format("HHmm")
-      const to = Time.from((Time.Hour / 2) * valueArray[1], {
-        utc: true,
-      }).format("HHmm")
-
-      const eventTimeData = getEventTime(
-        valueArray[0] === 48 ? "2400" : from,
-        valueArray[1] === 48 ? "2400" : to
+      const newFilters = {
+        ...props.filters,
+        timeFrom: from * 30,
+        timeTo: to * 30,
+      }
+      const newParams = fromEventFilters(
+        newFilters,
+        new URLSearchParams(location.search)
       )
-      setEventTime(eventTimeData)
+      track(SegmentEvent.Filter, newFilters)
+      navigate(url(location.pathname, newParams))
     },
     []
   )
@@ -223,17 +216,18 @@ export const ListEvents = (props: ListEventsProps) => {
   const handleRangeAfterChange = useCallback(
     (
       ev: React.MouseEvent<HTMLInputElement, MouseEvent>,
-      valueArray: readonly [number, number]
+      [from, to]: readonly [number, number]
     ) => {
-      const from = Time.from((Time.Hour / 2) * valueArray[0], {
-        utc: true,
-      }).format("HHmm")
-      const to = Time.from((Time.Hour / 2) * valueArray[1], {
-        utc: true,
-      }).format("HHmm")
-      const newParams = new URLSearchParams(params)
-      newParams.set("time-from", valueArray[0] === 48 ? "2400" : from)
-      newParams.set("time-to", valueArray[1] === 48 ? "2400" : to)
+      const newFilters = {
+        ...props.filters,
+        timeFrom: from * 30,
+        timeTo: to * 30,
+      }
+      const newParams = fromEventFilters(
+        newFilters,
+        new URLSearchParams(location.search)
+      )
+      track(SegmentEvent.Filter, newFilters)
       navigate(url(location.pathname, newParams))
     },
     []
@@ -274,7 +268,7 @@ export const ListEvents = (props: ListEventsProps) => {
                   header="Type"
                   onClick={handleTypeChange}
                   items={typeItems}
-                  value={typeFilter}
+                  value={props.filters.type}
                 />
               )}
 
@@ -283,7 +277,7 @@ export const ListEvents = (props: ListEventsProps) => {
                   header="Category"
                   onClick={handleCategoryChange}
                   items={categoryItems}
-                  value={params.get("category") || "all"}
+                  value={props.filters.category || ALL_EVENT_CATEGORY}
                   borderless
                 />
               )}
@@ -303,7 +297,7 @@ export const ListEvents = (props: ListEventsProps) => {
             </Column>
           )}
           <Column align="right" grow={true}>
-            {!loading && hasEvents && events.length === 0 && (
+            {!loading && filteredEvents.length === 0 && (
               <div>
                 <Divider />
                 <Paragraph secondary style={{ textAlign: "center" }}>

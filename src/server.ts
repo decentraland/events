@@ -26,10 +26,11 @@ import categories from "./entities/EventCategory/routes"
 import social from "./entities/Social/routes"
 import poster from "./entities/Poster/routes"
 import sitemap from "./entities/Sitemap/routes"
-import profileSettings, {
+import profileSettings from "./entities/ProfileSettings/routes"
+import {
   verifySubscription,
   removeSubscription,
-} from "./entities/ProfileSettings/routes"
+} from "./entities/ProfileSettings/routes/subscriptions"
 import profileSubscription from "./entities/ProfileSubscription/routes"
 import {
   SUBSCRIPTION_PATH,
