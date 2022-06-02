@@ -233,15 +233,10 @@ export const SITEMAP_ITEMS_PER_PAGE = 100
 export const DEFAULT_EVENT_DURATION = Time.Hour
 export const MAX_EVENT_DURATION = Time.Day
 
-export enum ToggleItemsValue {
+export enum EventType {
   All = "all",
   One = "one",
   Recurrent = "recurrent",
 }
 
 export const MAX_CATAGORIES_ALLOWED = 1
-
-export type EventTimeParams = {
-  start: number
-  end: number
-}

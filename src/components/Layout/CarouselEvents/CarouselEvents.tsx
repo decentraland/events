@@ -14,6 +14,7 @@ import locations from "../../../modules/locations"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { getScheduleBackground } from "../../../entities/Schedule/utils"
+import useListEventsMain from "../../../hooks/useListEventsMain"
 import "./CarouselEvents.css"
 
 export type CarouselEventsProps = {
@@ -29,8 +30,9 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
       return props.schedule
     }
 
-    const scheduleHasEvents = props.events.find((event) =>
-      event.schedules.includes(props.schedule!.id)
+    const scheduleHasEvents = props.events.find(
+      (event) =>
+        event.highlighted && event.schedules.includes(props.schedule!.id)
     )
     if (scheduleHasEvents) {
       return props.schedule
@@ -57,9 +59,16 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
   const events = useMemo(
     () =>
       props.events && schedule
-        ? props.events.filter((event) => event.schedules.includes(schedule.id))
-        : props.events,
+        ? props.events.filter(
+            (event) =>
+              event.highlighted && event.schedules.includes(schedule.id)
+          )
+        : props.events || [],
     [props.events, schedule]
+  )
+
+  const mainEvents = useListEventsMain(
+    events.length > 0 ? events : props.events
   )
 
   const handleClickFullSchedule = useCallback(
@@ -79,7 +88,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
     )
   }
 
-  if (!events || events.length === 0) {
+  if (!mainEvents || mainEvents.length === 0) {
     return null
   }
 
@@ -92,7 +101,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
           </SubTitle>
         )}
         <Carousel>
-          {events.map((event) => (
+          {mainEvents.map((event) => (
             <EventCardBig
               key={"live:" + event.id}
               event={event}
