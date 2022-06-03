@@ -149,11 +149,11 @@ export default function SubmitPage() {
 
   const submitButtonLabel = useMemo(() => {
     if (original && params.get("view") === "edit") {
-      return "SAVE"
+      return l("page.submit.save")
     } else if (original && params.get("view") === "clone") {
-      return "CLONE"
+      return l("page.submit.clone")
     } else {
-      return "SUBMIT"
+      return l("page.submit.submit")
     }
   }, [params.get("view"), original])
 
@@ -457,7 +457,7 @@ export default function SubmitPage() {
                               opacity: 0.6,
                             }}
                           >
-                            ADMIN AREA
+                            {l("page.submit.advance_label")}
                           </Label>
                         </Grid.Column>
                         <Grid.Column mobile="4">
@@ -489,9 +489,9 @@ export default function SubmitPage() {
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column mobile="16">
-                          <Label>Schedules</Label>
+                          <Label>{l("page.submit.schedule_label")}</Label>
                           <SelectField
-                            placeholder="Add schedules"
+                            placeholder={l("page.submit.schedule_placeholder")}
                             name="schedules"
                             error={!!errors["schedules"]}
                             message={errors["schedules"]}
@@ -1163,7 +1163,7 @@ export default function SubmitPage() {
                       >
                         {(original.user === settings.user &&
                           l("page.submit.delete")) ||
-                          "REJECT"}
+                          l("page.submit.reject")}
                       </Button>
                     )}
                 </Grid.Column>
