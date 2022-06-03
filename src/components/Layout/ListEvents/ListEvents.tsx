@@ -83,10 +83,6 @@ export const ListEvents = (props: ListEventsProps) => {
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const categoriesFiltered = useListEventsCategories(props.events, categories)
 
-  // const [event] = useEventIdContext(params.get("event"))
-
-  // const [eventTime, setEventTime] = useState<EventTimeParams>(timeFilter)
-
   const categoryItems = useMemo(() => {
     let categoriesToReturn = [
       {
