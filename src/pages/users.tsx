@@ -99,7 +99,7 @@ export default function SettingsPage() {
                     key={permission}
                     disabled={!currentUserPermissions.has(permission)}
                   >
-                    {permission}
+                    {l("page.users.permissions." + permission)}
                   </Table.HeaderCell>
                 )
               })}
