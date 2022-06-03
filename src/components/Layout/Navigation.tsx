@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { navigate } from "gatsby"
 import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import SubmitButton from "../Button/SubmitButton"
