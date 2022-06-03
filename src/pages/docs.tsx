@@ -165,7 +165,7 @@ export default function DocsPage() {
           id="delete-schedule"
           method="DELETE"
           path="/api/schedules/{schedule_id}"
-          description="Deactivate a schedule"
+          description="Delete a schedule"
         >
           <ApiDetails
             title="Request"
