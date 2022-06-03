@@ -16,11 +16,11 @@ export default class ScheduleModel extends Model<ScheduleAttributes> {
     const query = SQL`SELECT * FROM ${table(
       this
     )} WHERE "active_until" > ${now}`
-    return await this.query<ScheduleAttributes[]>(query)
+    return this.query<ScheduleAttributes[]>(query)
   }
 
   static async getScheduleList(ids: string[]) {
     const query = SQL`SELECT * FROM ${table(this)} WHERE "id" in ${values(ids)}`
-    return await this.query<ScheduleAttributes>(query)
+    return this.query<ScheduleAttributes>(query)
   }
 }
