@@ -135,6 +135,16 @@
         "submit": "yes, delete this event"
       }
     },
+    "users": {
+      "permissions": {
+        "approve_own_event": "Approve events",
+        "approve_any_event": "Approve own events",
+        "edit_any_event": "Edit events",
+        "edit_any_schedule": "Edit schedules",
+        "edit_any_profile": "Edit Users",
+        "test_any_notification": "Test notifications"
+      }
+    },
     "schedule_edit": {
       "title": "Submit schedule",
       "name_label": "Name",
