@@ -74,3 +74,11 @@ export const onClientEntry = () => {
 export const onRouteUpdate = () => {
   segment((analytics) => analytics.page())
 }
+
+export const shouldUpdateScroll = ({ prevRouterProps, routerProps }) => {
+  if (prevRouterProps.location.pathname === routerProps.location.pathname) {
+    return false
+  }
+
+  return true
+}
