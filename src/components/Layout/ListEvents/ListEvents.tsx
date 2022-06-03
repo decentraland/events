@@ -233,8 +233,6 @@ export const ListEvents = (props: ListEventsProps) => {
     []
   )
 
-  console.log(eventsByMonth)
-
   if (loading) {
     return (
       <div className={className}>
