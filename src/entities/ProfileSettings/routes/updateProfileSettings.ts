@@ -1,8 +1,8 @@
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import intersection from "lodash/intersection"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
 import ProfileSettingsModel from "../model"
@@ -14,7 +14,9 @@ import { canEditAnyProfile } from "../utils"
 import { getMyProfileSettings } from "./getMyProfileSettings"
 
 export const validateProfileSettings =
-  createValidator<ProfileSettingsAttributes>(updateProfileSettingsSchema)
+  createValidator<ProfileSettingsAttributes>(
+    updateProfileSettingsSchema as AjvObjectSchema
+  )
 
 export async function updateProfileSettings(req: WithAuth) {
   const currentUserProfile = await getMyProfileSettings(req)
@@ -38,11 +40,6 @@ export async function updateProfileSettings(req: WithAuth) {
     ...updateAttributes,
   }
 
-  // grant only permissions that the current user have
-  newProfile.permissions = intersection(
-    currentUserProfile.permissions,
-    newProfile.permissions
-  )
   await ProfileSettingsModel.update(newProfile, { user })
   return newProfile
 }

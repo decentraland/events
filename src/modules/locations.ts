@@ -109,6 +109,7 @@ export default {
   // editSchedule: (schedule: string) => url("/submit/", { schedule, view: SubmitView.Edit }),
   // cloneSchedule: (shcedule: string) => url("/submit/", { shcedule, view: SubmitView.Clone }),
 
+  users: () => url("/users/"),
   settings: () => url("/settings/"),
 
   docs: () => url("/docs/"),

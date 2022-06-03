@@ -21,19 +21,15 @@ import "./src/theme.css"
 
 // import Helmet from 'react-helmet'
 // import { RawIntlProvider, createIntl } from 'react-intl'
-import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
-import UserMenu from "decentraland-gatsby/dist/components/User/UserMenu"
+import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
-import { IntlProvider, navigate } from "decentraland-gatsby/dist/plugins/intl"
+import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
-import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
-
-import Categories from "./src/context/Category"
-import Events from "./src/context/Event"
+import UserMenu from "./src/components/Layout/UserMenu"
 import ProfileSettings from "./src/context/ProfileSetting"
-import locations from "./src/modules/locations"
+import Events from "./src/context/Event"
+import Categories from "./src/context/Category"
 
 export const registerServiceWorker = () => true
 
@@ -52,26 +48,7 @@ export const wrapRootElement = ({ element }) => (
 export const wrapPageElement = ({ element, props }) => {
   return (
     <IntlProvider {...props.pageContext.intl}>
-      <Layout
-        {...props}
-        rightMenu={
-          <UserMenu
-            onClickSettings={() => navigate(locations.settings())}
-            menuItems={
-              <>
-                <MenuItem onClick={() => navigate(locations.docs())}>
-                  <Icon name="code" />
-                  &nbsp;API
-                </MenuItem>
-                <MenuItem onClick={() => navigate(locations.submitSchedule())}>
-                  <Icon name="calendar alternate" />
-                  &nbsp;Schedule
-                </MenuItem>
-              </>
-            }
-          />
-        }
-      >
+      <Layout {...props} rightMenu={<UserMenu />}>
         {element}
       </Layout>
     </IntlProvider>
