@@ -1,4 +1,4 @@
-import { ProfileSettingsAttributes } from "./types"
+import { DEFAULT_PROFILE_SETTINGS, ProfileSettingsAttributes } from "./types"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 import isEmail from "validator/lib/isEmail"
 import {
@@ -11,7 +11,23 @@ import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 export default class ProfileSettingsModel extends Model<ProfileSettingsAttributes> {
   static tableName = "profile_settings"
   static primaryKey = "user"
-  static withTimestamps = false
+
+  static getDefault(user: string): ProfileSettingsAttributes {
+    return {
+      ...DEFAULT_PROFILE_SETTINGS,
+      user: user.toLowerCase(),
+    } as ProfileSettingsAttributes
+  }
+
+  static async findOrGetDefault(user: string) {
+    const settings = await this.findOne<ProfileSettingsAttributes>({ user })
+
+    if (settings) {
+      return settings
+    }
+
+    return this.getDefault(user)
+  }
 
   static async findByUsers(users: string[]) {
     if (users.length === 0) {

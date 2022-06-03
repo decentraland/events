@@ -33,19 +33,19 @@ export default React.memo(function EventDateDetail({
   const [settings] = useProfileSettingsContext()
   const l = useFormatMessage()
   const now = useInterval(() => Time.from(Date.now()), Time.Second, [
-    !settings?.use_local_time,
+    !settings.use_local_time,
   ])
   const start_at = useMemo(
     () =>
-      Time.from(startAt || event.start_at, { utc: !settings?.use_local_time }),
-    [startAt || event.start_at, !settings?.use_local_time]
+      Time.from(startAt || event.start_at, { utc: !settings.use_local_time }),
+    [startAt || event.start_at, !settings.use_local_time]
   )
   const finish_at = useMemo(
     () =>
       Time.from(start_at.getTime() + duration, {
-        utc: !settings?.use_local_time,
+        utc: !settings.use_local_time,
       }),
-    [start_at, !settings?.use_local_time]
+    [start_at, !settings.use_local_time]
   )
   const isLive = now.isBetween(start_at, finish_at)
 
@@ -89,7 +89,7 @@ export default React.memo(function EventDateDetail({
                 )}{" "}
                 <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
                 <Bold>
-                  {showTimezoneLabel(finish_at, settings?.use_local_time)}
+                  {showTimezoneLabel(finish_at, settings.use_local_time)}
                 </Bold>
               </>
             )}
@@ -108,9 +108,7 @@ export default React.memo(function EventDateDetail({
               "components.event.event_modal.event_detail.event_date_detail.to"
             )}{" "}
             <Bold>{finish_at.format(`dddd, DD MMM`)}</Bold>{" "}
-            <Bold>
-              {showTimezoneLabel(finish_at, settings?.use_local_time)}
-            </Bold>
+            <Bold>{showTimezoneLabel(finish_at, settings.use_local_time)}</Bold>
           </Paragraph>
         )}
         {!isLive && !countdown && duration >= Time.Day && !event.all_day && (
@@ -130,7 +128,7 @@ export default React.memo(function EventDateDetail({
               )}{" "}
               <Bold>{start_at.format("hh:mma")}</Bold>{" "}
               <Bold>
-                {showTimezoneLabel(start_at, settings?.use_local_time)}
+                {showTimezoneLabel(start_at, settings.use_local_time)}
               </Bold>
             </Paragraph>
             <Paragraph secondary={secondary}>
@@ -148,7 +146,7 @@ export default React.memo(function EventDateDetail({
               )}{" "}
               <Bold>{finish_at.format("hh:mma")}</Bold>{" "}
               <Bold>
-                {showTimezoneLabel(finish_at, settings?.use_local_time)}
+                {showTimezoneLabel(finish_at, settings.use_local_time)}
               </Bold>
             </Paragraph>
           </>

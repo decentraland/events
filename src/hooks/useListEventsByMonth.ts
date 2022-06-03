@@ -10,7 +10,7 @@ export default function useListEventsByMonth(
   const [settings] = useProfileSettingsContext()
   return useMemo<EventGroup[]>(() => {
     const now = Date.now()
-    const utc = !settings?.use_local_time
+    const utc = !settings.use_local_time
     const group = new Map<string, SessionEventAttributes[]>()
 
     if (events && events.length) {

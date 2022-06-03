@@ -1,3 +1,4 @@
+import padStart from "lodash/padStart"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import {
   EventAttributes,
@@ -8,18 +9,19 @@ import {
   Position,
   RecurrentEventAttributes,
   MAX_EVENT_RECURRENT,
-  ToggleItemsValue,
-  EventTimeParams,
+  EventType,
 } from "./types"
 import { RRule, Weekday } from "rrule"
+import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL =
   process.env.GATSBY_DECENTRALAND_URL ||
   process.env.DECENTRALAND_URL ||
   "https://play.decentraland.org"
+
 const EVENTS_URL =
-  process.env.GATSBY_EVENTS_URL ||
   process.env.EVENTS_URL ||
+  process.env.GATSBY_EVENTS_URL ||
   "https://events.decentraland.org/api"
 
 export function siteUrl(pathname: string = "") {
@@ -31,6 +33,12 @@ export function siteUrl(pathname: string = "") {
 export function eventUrl(event: Pick<EventAttributes, "id">): string {
   const target = siteUrl("/event/")
   target.searchParams.set("id", event.id)
+  return target.toString()
+}
+
+export function scheduleUrl(schedule: Pick<ScheduleAttributes, "id">): string {
+  const target = siteUrl("/schedule/")
+  target.searchParams.set("id", schedule.id)
   return target.toString()
 }
 
@@ -96,12 +104,10 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
   }
 
   return new RRule({
-    dtstart: new Date(),
+    dtstart: options.start_at,
     freq: RRule[options.recurrent_frequency],
     interval: options.recurrent_interval || 1,
-    until:
-      options.recurrent_until &&
-      new Date(options.recurrent_until.getTime() + 1000 * 60 * 60 * 24),
+    until: options.recurrent_until,
     count: options.recurrent_count,
     byweekday: toRRuleWeekdays(options.recurrent_weekday_mask),
     bymonth: toRRuleMonths(options.recurrent_month_mask),
@@ -282,14 +288,14 @@ export function calculateRecurrentProperties(
 
 export function getEventType(type: string | null) {
   switch (type) {
-    case ToggleItemsValue.One:
-      return ToggleItemsValue.One
+    case EventType.One:
+      return EventType.One
 
-    case ToggleItemsValue.Recurrent:
-      return ToggleItemsValue.Recurrent
+    case EventType.Recurrent:
+      return EventType.Recurrent
 
     default:
-      return ToggleItemsValue.All
+      return EventType.All
   }
 }
 
@@ -301,17 +307,19 @@ export function validateTime(time: string, defaultTime: number): number {
   return newTime
 }
 
-export function getEventTime(
-  from: string | null,
-  to: string | null
-): EventTimeParams {
-  let fromTime: string | number = from || "0000"
-  let toTime: string | number = to || "2400"
+/**
+ * Takes a range of the day represented as two times formatted as `HHmm`
+ * and return the same range represented as two times of the day in minutes
+ * @param from - initial time of the day formatted as `HHmm`
+ * @param to - end time of the day formatted as `HHmm`
+ * @returns
+ */
+export function fromEventTime(from?: string | null, to?: string | null) {
   const fromTimeDefault = 0
   const toTimeDefault = 2400
 
-  fromTime = validateTime(fromTime, fromTimeDefault)
-  toTime = validateTime(toTime, toTimeDefault)
+  const fromTime = validateTime(from || "0000", fromTimeDefault)
+  const toTime = validateTime(to || "2400", toTimeDefault)
 
   const fromTimeHour = Math.floor(fromTime / 100)
   const fromTimeMinute = fromTime % 100 === 30 ? 30 : 0
@@ -325,8 +333,36 @@ export function getEventTime(
     toInMinutes = fromInMinutes
   }
 
-  return {
-    start: fromInMinutes,
-    end: toInMinutes,
+  return [fromInMinutes, toInMinutes] as const
+}
+
+/**
+ * Takes a range of the day represented as two times of the day in minutes
+ * and return the same range represented as two times formatted as `HHmm`
+ * @param fromInMinutes - initial time of the day in minutes
+ * @param toInMinutes - end time of the day in minutes
+ * @returns
+ */
+export function toEventTime(fromInMinutes?: number, toInMinutes?: number) {
+  fromInMinutes = Math.min(Math.max(0, fromInMinutes ?? 0), 60 * 24)
+  toInMinutes = Math.min(Math.max(0, toInMinutes ?? 60 * 24), 60 * 24)
+
+  if (fromInMinutes > toInMinutes) {
+    toInMinutes = fromInMinutes
   }
+
+  return [
+    formatMinutesDuration(fromInMinutes),
+    formatMinutesDuration(toInMinutes),
+  ] as const
+}
+
+export function formatMinutesDuration(minutes: number) {
+  const duration = Time.duration(minutes, "minutes")
+  return duration.days() === 0
+    ? [
+        padStart(duration.hours().toString(), 2, "0"),
+        padStart(duration.minutes().toString(), 2, "0"),
+      ].join("")
+    : "2400"
 }

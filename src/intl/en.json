@@ -28,6 +28,7 @@
     "events": {
       "no_events": "No events planned yet.",
       "not_found": "No events found.",
+      "all_events": "All Events",
       "categories": {
         "art": "Art & Culture",
         "causes": "Causes",

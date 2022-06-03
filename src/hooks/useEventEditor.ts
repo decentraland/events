@@ -65,6 +65,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     highlighted: false,
     trending: false,
     categories: [],
+    schedules: [],
 
     // recurrent
     recurrent: false,
@@ -185,7 +186,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         recurrent_until.getTime() < start_at.getTime()
       ) {
         // recurrent_until = Datetime.fromInputTime('00:00', start_at, options).date
-        recurrent_until = Time.from(start_at, { utc }).toDate()
+        recurrent_until = Time.from(start_at, { utc })
+          .endOf("day")
+          .subtract(1, "second")
+          .toDate()
       }
 
       setValues({
@@ -437,14 +441,16 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setValue("recurrent_until", recurrent_until)
   }
 
-  function handleChangeCategories(value: string) {
-    let currentCategories = event.categories
-    if (currentCategories.includes(value)) {
-      currentCategories = currentCategories.filter((e) => e != value)
+  function handleChangeList(name: "categories" | "schedules", value: string) {
+    const list = event[name]
+    if (list.includes(value)) {
+      setValue(
+        name,
+        list.filter((item) => item !== value)
+      )
     } else {
-      currentCategories = [...currentCategories, value]
+      setValue(name, [...list, value])
     }
-    setValue("categories", currentCategories)
   }
 
   function handleChange(
@@ -583,14 +589,15 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         return handleChangeRecurrentUntil(value)
 
       case "categories":
-        return handleChangeCategories(value)
+      case "schedules":
+        return handleChangeList(name, value)
 
       default:
       // ignore change
     }
   }
 
-  function validate() {
+  function validate(options: { new?: boolean }) {
     const errors: Record<string, string> = {}
 
     if (!event.name) {
@@ -629,6 +636,15 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
     if (event.categories.length > MAX_CATAGORIES_ALLOWED) {
       errors["categories"] = `Maximun tags allowed ${MAX_CATAGORIES_ALLOWED}`
+    }
+
+    if (options.new && event.duration > MAX_EVENT_DURATION) {
+      errors["finish_date"] =
+        "Maximum allowed duration " + getMaxHoursAllowedLabel()
+    }
+
+    if (event.duration < 0) {
+      errors["finish_date"] = "End date should be after start date"
     }
 
     if (Object.values(errors).filter(Boolean).length) {

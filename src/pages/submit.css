@@ -57,3 +57,12 @@ p.FieldNote {
 .ui .submit__category-select-wrapper {
   margin-bottom: 10px;
 }
+
+.admin-area {
+  /* background: var(--secondary); */
+  width: 100%;
+  border: 2px solid var(--secondary);
+  border-radius: 8px;
+  padding-bottom: 2rem;
+  margin: 1rem 0;
+}

@@ -8,9 +8,11 @@ import EventModel from "../model"
 import { EventListOptions, EventListParams, EventListType } from "../types"
 import { getEventListQuery } from "../schemas"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
 
 const validate = createValidator<EventListParams>(getEventListQuery)
-export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
+export async function getEventList(req: WithAuth) {
+  const profile = await getMyProfileSettings(req)
   const query = validate(req.query)
   const options: EventListOptions = {
     user: req.auth,
@@ -80,5 +82,5 @@ export async function getEventList(req: WithAuth, res: Response, ctx: Context) {
   }
 
   const events = await EventModel.getEvents(options)
-  return events.map((event) => EventModel.toPublic(event, req.auth))
+  return events.map((event) => EventModel.toPublic(event, profile))
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
@@ -51,11 +51,21 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import ItemLayout from "../components/Layout/ItemLayout"
 import { getServerOptions, getServers } from "../modules/servers"
 import infoIcon from "../images/info.svg"
-import "./submit.css"
+import { useCategoriesContext } from "../context/Category"
 import {
-  getCategoriesFetch,
   getCategoriesOptionsActives,
+  getSchedules,
+  getSchedulesOptions,
 } from "../modules/events"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
+import {
+  canApproveAnyEvent,
+  canEditAnyEvent,
+  canTestAnyNotification,
+} from "../entities/ProfileSettings/utils"
+import "./submit.css"
+
+import "./submit.css"
 
 type SubmitPageState = {
   loading?: boolean
@@ -92,22 +102,23 @@ export default function SubmitPage() {
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
-  const [categories] = useAsyncMemo(getCategoriesFetch)
+  const [categories] = useCategoriesContext()
+  const [schedules] = useAsyncMemo(getSchedules)
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
+  const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
-  const serverOptions = useMemo(
-    () => getServerOptions(servers || []),
-    [servers]
+  const serverOptions = useMemo(() => getServerOptions(servers), [servers])
+  const scheduleOptions = useMemo(
+    () => getSchedulesOptions(schedules, { exclude: editing.schedules }),
+    [schedules, editing.schedules]
   )
 
   const categoryOptions = useMemo(() => {
-    const categoriesOptions = getCategoriesOptionsActives(
-      categories,
-      editing.categories
-    )
-    return categoriesOptions.map((categoryOption) => ({
+    return getCategoriesOptionsActives(categories, {
+      exclude: editing.categories,
+    }).map((categoryOption) => ({
       ...categoryOption,
       text: l(categoryOption.text),
     }))
@@ -131,7 +142,20 @@ export default function SubmitPage() {
     ]
   )
 
-  // useEffect(() => { GLOBAL_LOADING = false }, [])
+  const isNewEvent = useMemo(
+    () => !params.get("view") || params.get("view") === "clone",
+    [params.get("view")]
+  )
+
+  const submitButtonLabel = useMemo(() => {
+    if (original && params.get("view") === "edit") {
+      return "SAVE"
+    } else if (original && params.get("view") === "clone") {
+      return "CLONE"
+    } else {
+      return "SUBMIT"
+    }
+  }, [params.get("view"), original])
 
   useEffect(() => {
     if (original) {
@@ -162,6 +186,7 @@ export default function SubmitPage() {
         recurrent_setpos: original.recurrent_setpos,
         recurrent_monthday: original.recurrent_monthday,
         categories: original.categories,
+        schedules: original.schedules,
       })
     }
   }, [original])
@@ -198,18 +223,18 @@ export default function SubmitPage() {
   )
 
   const [submitting, submit] = useAsyncTask(async () => {
-    if (!editActions.validate()) {
+    if (!editActions.validate({ new: isNewEvent })) {
       return null
     }
 
     try {
       const data = editActions.toObject()
-      const submitted = await (original
+      const submitted = await (original && !isNewEvent
         ? Events.get().updateEvent(original.id, data as EditEvent)
         : Events.get().createEvent(data as EditEvent))
 
       eventsState.add(submitted)
-      navigate(locations.event(submitted.id))
+      navigate(locations.event(submitted.id), { replace: true })
     } catch (err) {
       patchState({
         loading: false,
@@ -235,11 +260,17 @@ export default function SubmitPage() {
     }
   }, [original])
 
-  function handleReject() {
-    if (original && (original.owned || original.editable)) {
-      patchState({ requireConfirmation: true, error: null })
-    }
-  }
+  const handleReject = useCallback(
+    function () {
+      if (
+        original &&
+        (original.user === settings.user || canApproveAnyEvent(settings))
+      ) {
+        patchState({ requireConfirmation: true, error: null })
+      }
+    },
+    [original, patchState, settings]
+  )
 
   useFileDrop((e) => {
     const files = e.dataTransfer?.files
@@ -413,38 +444,89 @@ export default function SubmitPage() {
                   </ImageInput>
                 </Grid.Column>
               </Grid.Row>
-              {!!original?.editable && (
-                <Grid.Row>
+              {canEditAnyEvent(settings) && !isNewEvent && (
+                <Grid.Row className="admin-area">
                   <Grid.Column mobile="16">
-                    <Label style={{ marginBottom: "1em" }}>
-                      {l("page.submit.advance_label")}
-                    </Label>
-                  </Grid.Column>
-                  <Grid.Column mobile="4">
-                    <Radio
-                      name="highlighted"
-                      label={l("page.submit.highlight_label")}
-                      checked={editing.highlighted}
-                      onClick={(e, data) =>
-                        editActions.handleChange(e, {
-                          ...data,
-                          checked: !editing.highlighted,
-                        })
-                      }
-                    />
-                  </Grid.Column>
-                  <Grid.Column mobile="4">
-                    <Radio
-                      name="trending"
-                      label={l("page.submit.trending_label")}
-                      checked={editing.trending}
-                      onClick={(e, data) =>
-                        editActions.handleChange(e, {
-                          ...data,
-                          checked: !editing.trending,
-                        })
-                      }
-                    />
+                    <Grid stackable>
+                      <Grid.Row>
+                        <Grid.Column mobile="16">
+                          <Label
+                            style={{
+                              marginBottom: "1rem",
+                              display: "block",
+                              opacity: 0.6,
+                            }}
+                          >
+                            ADMIN AREA
+                          </Label>
+                        </Grid.Column>
+                        <Grid.Column mobile="4">
+                          <Radio
+                            name="highlighted"
+                            label={l("page.submit.highlight_label")}
+                            checked={editing.highlighted}
+                            onClick={(e, data) =>
+                              editActions.handleChange(e, {
+                                ...data,
+                                checked: !editing.highlighted,
+                              })
+                            }
+                          />
+                        </Grid.Column>
+                        <Grid.Column mobile="4">
+                          <Radio
+                            name="trending"
+                            label={l("page.submit.trending_label")}
+                            checked={editing.trending}
+                            onClick={(e, data) =>
+                              editActions.handleChange(e, {
+                                ...data,
+                                checked: !editing.trending,
+                              })
+                            }
+                          />
+                        </Grid.Column>
+                      </Grid.Row>
+                      <Grid.Row>
+                        <Grid.Column mobile="16">
+                          <Label>Schedules</Label>
+                          <SelectField
+                            placeholder="Add schedules"
+                            name="schedules"
+                            error={!!errors["schedules"]}
+                            message={errors["schedules"]}
+                            options={scheduleOptions}
+                            onChange={editActions.handleChange}
+                            value={""}
+                            disabled={scheduleOptions.length === 0}
+                          />
+                          {editing.schedules.map((schedule) => {
+                            const data = schedules?.find(
+                              (current) => current.id === schedule
+                            )
+                            return (
+                              <SelectionLabel
+                                key={schedule}
+                                className={"submit__category-select-wrapper"}
+                              >
+                                {data?.name || schedule}
+                                <Icon
+                                  className={"submit__category-select-label"}
+                                  name="delete"
+                                  circular
+                                  onClick={(event: React.ChangeEvent<any>) =>
+                                    editActions.handleChange(event, {
+                                      name: "schedules",
+                                      value: schedule,
+                                    })
+                                  }
+                                />
+                              </SelectionLabel>
+                            )
+                          })}
+                        </Grid.Column>
+                      </Grid.Row>
+                    </Grid>
                   </Grid.Column>
                 </Grid.Row>
               )}
@@ -936,6 +1018,7 @@ export default function SubmitPage() {
                     options={categoryOptions}
                     onChange={editActions.handleChange}
                     value={""}
+                    disabled={categoryOptions.length === 0}
                   />
                   {editing.categories.map((category, key) => (
                     <SelectionLabel
@@ -1015,7 +1098,7 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Field
-                    disabled={!original?.owned}
+                    disabled={original ? original.user !== settings.user : false}
                     label={l("page.submit.contact_label")}
                     placeholder={l("page.submit.contact_placeholder")}
                     name="contact"
@@ -1029,7 +1112,9 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Textarea
-                    disabled={!original?.owned}
+                    disabled={
+                      original ? original.user !== settings.user : false
+                    }
                     minHeight={72}
                     maxHeight={500}
                     label={l("page.submit.details_label")}
@@ -1048,32 +1133,39 @@ export default function SubmitPage() {
                     primary
                     loading={submitting || removing || notifying}
                     disabled={
-                      (!!original && !original.owned && !original.editable) ||
+                      Boolean(
+                        original &&
+                          original.user !== settings.user &&
+                          !canEditAnyEvent(settings)
+                      ) ||
                       submitting ||
                       removing ||
                       notifying
                     }
                     style={{ width: "100%" }}
-                    onClick={prevent(() => submit())}
+                    onClick={submit}
                   >
-                    {original ? l("page.submit.save") : l("page.submit.submit")}
+                    {submitButtonLabel}
                   </Button>
                 </Grid.Column>
                 <Grid.Column mobile="5">
-                  {!!original && (!!original.owned || !!original.editable) && (
-                    <Button
-                      basic
-                      loading={submitting || removing || notifying}
-                      disabled={submitting || removing || notifying}
-                      style={{ width: "100%" }}
-                      onClick={handleReject}
-                    >
-                      {l("page.submit.delete")}
-                    </Button>
-                  )}
+                  {original &&
+                    (original.user === settings.user ||
+                      canApproveAnyEvent(settings)) && (
+                      <Button
+                        basic
+                        loading={submitting || removing || notifying}
+                        disabled={submitting || removing || notifying}
+                        style={{ width: "100%" }}
+                        onClick={handleReject}
+                      >
+                        {(original.user === settings.user && l("page.submit.delete")) ||
+                          "REJECT"}
+                      </Button>
+                    )}
                 </Grid.Column>
                 <Grid.Column mobile="5">
-                  {!!original?.editable && (
+                  {original && canTestAnyNotification(settings) && (
                     <Button
                       basic
                       loading={submitting || removing || notifying}

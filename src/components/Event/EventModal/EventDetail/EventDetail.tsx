@@ -21,6 +21,9 @@ import friendsIcon from "../../../../images/secondary-friends.svg"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import locations from "../../../../modules/locations"
 import "./EventDetail.css"
+import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
+import { canEditAnyEvent } from "../../../../entities/ProfileSettings/utils"
 
 const ATTENDEES_PREVIEW_LIMIT = 12
 
@@ -52,9 +55,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         (date) => date.getTime() + event.duration > now
       )
   const attendeesDiff = event.total_attendees - ATTENDEES_PREVIEW_LIMIT
-  const advance = event.editable || event.owned
   const [settings] = useProfileSettingsContext()
-  const utc = props.utc ?? !settings?.use_local_time
+  const advance = event.user === settings.user || canEditAnyEvent(settings)
+  const utc = props.utc ?? !settings.use_local_time
 
   const handleAttendees = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -77,15 +80,30 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         </div>
         {props.showEdit !== false && advance && (
           <div className="EventDetail__Header__Actions">
-            <Button
-              basic
-              as="a"
-              href={locations.edit(event.id)}
-              onClick={prevent(() => navigate(locations.edit(event.id)))}
-            >
-              {" "}
-              EDIT{" "}
-            </Button>
+            <MenuIcon>
+              <MenuIconItem>
+                <Button
+                  basic
+                  className="edit-detail__menu-icon__button"
+                  as="a"
+                  href={locations.edit(event.id)}
+                  onClick={prevent(() => navigate(locations.edit(event.id)))}
+                >
+                  <Icon name="edit" /> Edit
+                </Button>
+              </MenuIconItem>
+              <MenuIconItem>
+                <Button
+                  basic
+                  className="edit-detail__menu-icon__button"
+                  as="a"
+                  href={locations.clone(event.id)}
+                  onClick={prevent(() => navigate(locations.clone(event.id)))}
+                >
+                  <Icon name="clone" /> Clone
+                </Button>
+              </MenuIconItem>
+            </MenuIcon>
           </div>
         )}
       </div>

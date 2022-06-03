@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import Helmet from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
@@ -13,6 +13,11 @@ import EventSection from "../components/Event/EventSection"
 import AttendingButtons from "../components/Button/AttendingButtons"
 import EditButtons from "../components/Button/EditButtons"
 import EventStatusBanner from "../components/Event/EventModal/EventStatusBanner/EventStatusBanner"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
+import {
+  canApproveAnyEvent,
+  canApproveOwnEvent,
+} from "../entities/ProfileSettings/utils"
 import "./index.css"
 
 export type EventPageState = {
@@ -24,8 +29,15 @@ export default function EventPage(props: any) {
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const [event] = useEventIdContext(params.get("id"))
+  const [settings] = useProfileSettingsContext()
 
   const [enabledNotification, setEnabledNotification] = useState(false)
+  const canApproveThisEvent = useMemo(
+    () =>
+      canApproveAnyEvent(settings) ||
+      (event && event.user === settings.user && canApproveOwnEvent(settings)),
+    [settings, event]
+  )
 
   return (
     <>
@@ -84,14 +96,16 @@ export default function EventPage(props: any) {
               <EventStatusBanner event={event!} />
               <EventDetail event={event} />
 
-              {(event.approved || event.editable) && <EventSection.Divider />}
+              {(event.approved || canApproveThisEvent) && (
+                <EventSection.Divider />
+              )}
               {event.approved && (
                 <EventSection>
                   <AttendingButtons event={event} />
                 </EventSection>
               )}
 
-              {!event.approved && event.editable && (
+              {!event.approved && canApproveThisEvent && (
                 <EventSection>
                   <EditButtons event={event!} />
                 </EventSection>

@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useMemo } from "react"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
+import {
+  DEFAULT_PROFILE_SETTINGS,
+  ProfileSettingsAttributes,
+} from "../entities/ProfileSettings/types"
 import Events from "../api/Events"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import { SegmentEvent } from "../modules/segment"
@@ -11,23 +14,8 @@ import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 
-const DEFAULT_PROFILE_SETTINGS = {
-  user: null,
-  email: null,
-  email_verified: false,
-  email_verified_at: null,
-  email_updated_at: null,
-  use_local_time: true,
-  notify_by_email: false,
-  notify_by_browser: false,
-}
-
-export type HookProfileSettingsAttributes =
-  | ProfileSettingsAttributes
-  | typeof DEFAULT_PROFILE_SETTINGS
-
 const defaultProfileSettings = [
-  DEFAULT_PROFILE_SETTINGS as HookProfileSettingsAttributes,
+  DEFAULT_PROFILE_SETTINGS,
   {
     error: null as Error | null,
     loading: false as boolean,
@@ -74,7 +62,7 @@ function useProfileSettings() {
 
   const [updating, update] = useAsyncTask(
     async (settings: Partial<ProfileSettingsAttributes>) => {
-      const newSettings = await Events.get().updateProfileSettings(settings)
+      const newSettings = await Events.get().updateMyProfileSettings(settings)
       track(SegmentEvent.Settings, newSettings)
       state.set(newSettings)
     },

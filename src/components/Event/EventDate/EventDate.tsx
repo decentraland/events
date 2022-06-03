@@ -19,13 +19,13 @@ export default React.memo(function EventDate({
   const [settings] = useProfileSettingsContext()
   const l = useFormatMessage()
   const now = useMemo(
-    () => Time.from(Date.now(), { utc: utc ?? !settings?.use_local_time }),
-    [utc, settings?.use_local_time]
+    () => Time.from(Date.now(), { utc: utc ?? !settings.use_local_time }),
+    [utc, settings.use_local_time]
   )
   const start_at = useMemo(
     () =>
       Time.from(event.next_start_at || now, {
-        utc: utc ?? !settings?.use_local_time,
+        utc: utc ?? !settings.use_local_time,
       }),
     [event.next_start_at, utc, settings]
   )
@@ -33,7 +33,7 @@ export default React.memo(function EventDate({
   const finish_at = useMemo(
     () =>
       Time.from(start_at.getTime() + event.duration, {
-        utc: utc ?? !settings?.use_local_time,
+        utc: utc ?? !settings.use_local_time,
       }),
     [start_at, event.duration, utc, settings]
   )

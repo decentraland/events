@@ -127,6 +127,7 @@ export type EventAttributes = {
   latest_attendees: string[]
   textsearch: SQLStatement | string | null | undefined
   categories: string[]
+  schedules: string[]
 }
 
 export type GetEventParams = {
@@ -141,8 +142,6 @@ export type DeprecatedEventAttributes = EventAttributes & {
 export type SessionEventAttributes = DeprecatedEventAttributes & {
   attending: boolean
   notify: boolean
-  editable: boolean
-  owned: boolean
   live: boolean
   position: [number, number]
 }
@@ -195,7 +194,7 @@ export type EventListOptions = {
   order?: "asc" | "desc"
 }
 
-export const editableAttributes: (keyof EventAttributes)[] = [
+export const editEventAttributes = [
   "image",
   "rejected",
   "name",
@@ -216,28 +215,28 @@ export const editableAttributes: (keyof EventAttributes)[] = [
   "recurrent_count",
   "recurrent_until",
   "categories",
-]
+] as const
 
-export const patchAttributes: (keyof EventAttributes)[] =
-  editableAttributes.concat(["contact", "details"])
+export const editOwnEventAttributes = ["contact", "details"] as const
 
-export const adminPatchAttributes: (keyof EventAttributes)[] =
-  editableAttributes.concat(["approved", "highlighted", "trending", "url"])
+export const editAnyEventAttributes = [
+  "highlighted",
+  "trending",
+  "schedules",
+  "url",
+] as const
+
+export const approveEventAttributes = ["approved"] as const
 
 export const SITEMAP_ITEMS_PER_PAGE = 100
 
 export const DEFAULT_EVENT_DURATION = Time.Hour
 export const MAX_EVENT_DURATION = Time.Day
 
-export enum ToggleItemsValue {
+export enum EventType {
   All = "all",
   One = "one",
   Recurrent = "recurrent",
 }
 
 export const MAX_CATAGORIES_ALLOWED = 1
-
-export type EventTimeParams = {
-  start: number
-  end: number
-}

@@ -10,6 +10,7 @@ import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 import { PosterAttributes } from "../entities/Poster/types"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 import { EventCategoryAttributes } from "../entities/EventCategory/types"
+import { ScheduleAttributes } from "../entities/Schedule/types"
 
 export type EditEvent = Pick<
   EventAttributes,
@@ -39,6 +40,7 @@ export type EditEvent = Pick<
   | "contact"
   | "details"
   | "categories"
+  | "schedules"
 >
 
 export default class Events extends API {
@@ -90,8 +92,6 @@ export default class Events extends API {
       recurrent: Boolean(event.recurrent),
       attending: Boolean(event.attending),
       notify: Boolean(event.notify),
-      editable: Boolean(event.editable),
-      owned: Boolean(event.owned),
       live: Boolean(event.live),
     } as SessionEventAttributes
   }
@@ -141,7 +141,7 @@ export default class Events extends API {
     auth: string
   }) {
     return this.fetch<{}>(
-      "/profile/subscription",
+      "/profiles/subscriptions",
       this.options()
         .authorization({ sign: true })
         .json(subscription)
@@ -151,25 +151,25 @@ export default class Events extends API {
 
   async removeSubscriptions() {
     return this.fetch<{}>(
-      "/profile/subscription",
+      "/profiles/subscriptions",
       this.options().authorization({ sign: true }).method("DELETE")
     )
   }
 
   async getMyProfileSettings() {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profile/settings",
+      "/profiles/settings",
       this.options().authorization({ sign: true })
     )
 
     return Events.parseSettings(data)
   }
 
-  async updateProfileSettings(
+  async updateMyProfileSettings(
     settings: Partial<ProfileSettingsAttributes> = {}
   ) {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profile/settings",
+      "/profiles/settings",
       this.options()
         .method("PATCH")
         .authorization({ sign: true })
@@ -279,5 +279,13 @@ export default class Events extends API {
 
   async getCategories(): Promise<EventCategoryAttributes[]> {
     return this.fetch(`/events/categories`)
+  }
+
+  async getSchedules(): Promise<ScheduleAttributes[]> {
+    return this.fetch(`/schedules`)
+  }
+
+  async getSchedule(schedule_id: string): Promise<ScheduleAttributes> {
+    return this.fetch(`/schedules/${schedule_id}`)
   }
 }

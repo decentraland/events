@@ -30,16 +30,16 @@ export default function SettingsPage(props: any) {
   const l = useFormatMessage()
   const [account, accountState] = useAuthContext()
   const [settings, state] = useProfileSettingsContext()
-  const [email, setEmail] = useState(settings?.email)
-  const currentEmailChanged = email !== settings?.email
+  const [email, setEmail] = useState(settings.email)
+  const currentEmailChanged = email !== settings.email
   const currentEmailIsValid = useMemo(() => isEmail(email || ""), [email])
-  useEffect(() => setEmail(settings?.email), [settings?.email])
+  useEffect(() => setEmail(settings.email), [settings.email])
 
   const emailNextVerificationDate = useMemo(() => {
-    return settings?.email_updated_at
+    return settings.email_updated_at
       ? new Date(settings.email_updated_at.getTime() + Time.Minute)
       : new Date()
-  }, [settings?.email_updated_at?.getTime()])
+  }, [settings.email_updated_at?.getTime()])
 
   const emailVerificationCountdown = useCountdown(emailNextVerificationDate)
   const emailVerificationAvailable = useMemo(() => {
@@ -53,14 +53,10 @@ export default function SettingsPage(props: any) {
     }
 
     return false
-  }, [
-    settings?.email,
-    settings?.email_verified,
-    emailVerificationCountdown.time,
-  ])
+  }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
 
   const emailMessageField = useMemo(() => {
-    if (!settings?.email || settings?.email_verified) {
+    if (!settings.email || settings.email_verified) {
       return ""
     }
 
@@ -74,11 +70,7 @@ export default function SettingsPage(props: any) {
     return (
       l(`settings.profile_section.email_verifying_message`, { seconds }) || ""
     )
-  }, [
-    settings?.email,
-    settings?.email_verified,
-    emailVerificationCountdown.time,
-  ])
+  }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
 
   function handleSaveEmail() {
     if (!currentEmailIsValid) {
@@ -190,15 +182,15 @@ export default function SettingsPage(props: any) {
                   </Button>
                 )}
                 {!currentEmailChanged &&
-                  settings?.email &&
-                  settings?.email_verified && (
+                  settings.email &&
+                  settings.email_verified && (
                     <Button basic>
                       {l(`settings.profile_section.email_verified`)}{" "}
                       <img src={check} width={18} height={18} />
                     </Button>
                   )}
                 {!currentEmailChanged &&
-                  settings?.email &&
+                  settings.email &&
                   !settings.email_verified &&
                   emailVerificationAvailable && (
                     <Button
@@ -210,8 +202,8 @@ export default function SettingsPage(props: any) {
                     </Button>
                   )}
                 {!currentEmailChanged &&
-                  settings?.email &&
-                  !settings?.email_verified &&
+                  settings.email &&
+                  !settings.email_verified &&
                   !emailVerificationAvailable && (
                     <Button basic disabled>
                       {l(`settings.profile_section.email_verifying`)}
@@ -243,11 +235,11 @@ export default function SettingsPage(props: any) {
                   <Loader size="mini" active={state?.loading} />
                   <Radio
                     toggle
-                    checked={!settings?.use_local_time}
+                    checked={!settings.use_local_time}
                     disabled={state?.loading}
                     onClick={prevent(() =>
                       state.update({
-                        use_local_time: !settings?.use_local_time,
+                        use_local_time: !settings.use_local_time,
                       })
                     )}
                   />
@@ -273,7 +265,7 @@ export default function SettingsPage(props: any) {
                 <div
                   className={TokenList.join([
                     "SettingsDetails",
-                    !settings?.email_verified && "SettingsDetails--disabled",
+                    !settings.email_verified && "SettingsDetails--disabled",
                   ])}
                 >
                   <Paragraph small semiBold>
@@ -289,11 +281,11 @@ export default function SettingsPage(props: any) {
                   <Loader size="mini" active={state.loading} />
                   <Radio
                     toggle
-                    checked={settings?.notify_by_email}
-                    disabled={!settings?.email_verified || state.loading}
+                    checked={settings.notify_by_email}
+                    disabled={!settings.email_verified || state.loading}
                     onClick={prevent(() =>
                       state.update({
-                        notify_by_email: !settings?.notify_by_email,
+                        notify_by_email: !settings.notify_by_email,
                       })
                     )}
                   />

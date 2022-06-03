@@ -2,8 +2,9 @@ import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import EventModel from "../Event/model"
 import { SITEMAP_ITEMS_PER_PAGE } from "../Event/types"
-import { eventUrl, siteUrl } from "../Event/utils"
+import { eventUrl, scheduleUrl, siteUrl } from "../Event/utils"
 import { Request } from "express"
+import ScheduleModel from "../Schedule/model"
 
 export default routes((router) => {
   router.get("/sitemap.xml", handleRaw(getIndexSitemap, "application/xml"))
@@ -14,6 +15,10 @@ export default routes((router) => {
   router.get(
     "/sitemap.events.xml",
     handleRaw(getEventsSitemap, "application/xml")
+  )
+  router.get(
+    "/sitemap.schedules.xml",
+    handleRaw(getSchedulesSitemap, "application/xml")
   )
 })
 
@@ -34,6 +39,7 @@ export async function getIndexSitemap() {
     `<?xml version="1.0" encoding="UTF-8"?>` +
       `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     `<sitemap><loc>${siteUrl("/sitemap.static.xml")}</loc></sitemap>`,
+    `<sitemap><loc>${siteUrl("/sitemap.schedules.xml")}</loc></sitemap>`,
     ...Array.from(
       Array(pages),
       (_, i) =>
@@ -70,6 +76,18 @@ export async function getEventsSitemap(req: Request) {
     `<?xml version="1.0" encoding="UTF-8"?>` +
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ...events.map((event) => `<url><loc>${eventUrl(event)}</loc></url>`),
+    "</urlset>",
+  ].join("")
+}
+
+export async function getSchedulesSitemap(req: Request) {
+  const schedules = await ScheduleModel.find()
+  return [
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...schedules.map(
+      (schedule) => `<url><loc>${scheduleUrl(schedule)}</loc></url>`
+    ),
     "</urlset>",
   ].join("")
 }
