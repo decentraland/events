@@ -162,9 +162,11 @@ export default function SettingsPage(props: any) {
               </Paragraph>
               <div className="AddonField">
                 <Field
-                  label="Email address"
+                  label={l(`settings.profile_section.email_address_label`)}
                   disabled={state.loading}
-                  placeholder="example@domain.com"
+                  placeholder={l(
+                    `settings.profile_section.email_address_placeholder`
+                  )}
                   message={emailMessageField}
                   value={email}
                   onChange={(e, { value }) => setEmail(value || "")}

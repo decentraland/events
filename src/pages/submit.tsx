@@ -149,11 +149,11 @@ export default function SubmitPage() {
 
   const submitButtonLabel = useMemo(() => {
     if (original && params.get("view") === "edit") {
-      return "SAVE"
+      return l("page.submit.save")
     } else if (original && params.get("view") === "clone") {
-      return "CLONE"
+      return l("page.submit.clone")
     } else {
-      return "SUBMIT"
+      return l("page.submit.submit")
     }
   }, [params.get("view"), original])
 
@@ -378,8 +378,11 @@ export default function SubmitPage() {
                 style={{ paddingTop: "30vh", paddingBottom: "30vh" }}
               >
                 <Paragraph secondary>
-                  You need to <Link onClick={() => null}>sign in</Link> before
-                  to submit an event
+                  {l("sign_in.message", {
+                    action: (
+                      <Link onClick={() => null}>{l("general.sign_in")}</Link>
+                    ),
+                  })}
                 </Paragraph>
               </Grid.Column>
             </Grid.Row>
@@ -388,12 +391,9 @@ export default function SubmitPage() {
         {!loading && account && (
           <ItemLayout>
             <Title style={{ fontSize: "34px", lineHeight: "42px" }}>
-              Submit event
+              {l("page.submit.submit_event")}
             </Title>
-            <Paragraph secondary>
-              Be sure to fill in as many details as possible to generate
-              interest in your event.
-            </Paragraph>
+            <Paragraph secondary>{l("page.submit.be_sure_to_fill")}</Paragraph>
             <Grid stackable>
               <Grid.Row>
                 <Grid.Column mobile="16">
@@ -406,36 +406,38 @@ export default function SubmitPage() {
                     message={
                       (state.errorImageSize && (
                         <>
-                          This image is too heavy (more than 500Kb), try with{" "}
+                          {l("page.submit.error_image_size")}{" "}
                           <a
                             href="https://imagecompressor.com/"
                             target="_blank"
                           >
-                            <strong>optimizilla</strong>
+                            <strong>{l("page.submit.optimizilla")}</strong>
                           </a>
                         </>
                       )) ||
                       (state.errorImageFormat && (
                         <>
-                          This file format is not supported, try with{" "}
+                          {l("page.submit.error_image_format")}{" "}
                           <strong>jpg</strong>, <strong>png</strong> or{" "}
                           <strong>gif</strong>
                         </>
                       )) ||
                       state.errorImageServer ||
-                      "(recommended size: 1340 x 670)"
+                      l("page.submit.image_recommended_size")
                     }
                   >
                     <div className="ImageInput__Description">
                       <AddCoverButton />
                       <Paragraph>
                         <span className="ImageInput__Description__Primary">
-                          Browse
+                          {l("page.submit.browse")}
                         </span>{" "}
-                        your computer or <br />
-                        drag a picture to add a cover <br />
+                        {l("page.submit.browse_line1_label")}
+                        <br />
+                        {l("page.submit.browse_line2_label")}
+                        <br />
                         <i style={{ opacity: 0.8 }}>
-                          (recommended size: 1340 x 670)
+                          {l("page.submit.image_recommended_size")}
                         </i>
                       </Paragraph>
                     </div>
@@ -455,13 +457,13 @@ export default function SubmitPage() {
                               opacity: 0.6,
                             }}
                           >
-                            ADMIN AREA
+                            {l("page.submit.advance_label")}
                           </Label>
                         </Grid.Column>
                         <Grid.Column mobile="4">
                           <Radio
                             name="highlighted"
-                            label="HIGHLIGHT"
+                            label={l("page.submit.highlight_label")}
                             checked={editing.highlighted}
                             onClick={(e, data) =>
                               editActions.handleChange(e, {
@@ -474,7 +476,7 @@ export default function SubmitPage() {
                         <Grid.Column mobile="4">
                           <Radio
                             name="trending"
-                            label="TRENDING"
+                            label={l("page.submit.trending_label")}
                             checked={editing.trending}
                             onClick={(e, data) =>
                               editActions.handleChange(e, {
@@ -487,9 +489,9 @@ export default function SubmitPage() {
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column mobile="16">
-                          <Label>Schedules</Label>
+                          <Label>{l("page.submit.schedule_label")}</Label>
                           <SelectField
-                            placeholder="Add schedules"
+                            placeholder={l("page.submit.schedule_placeholder")}
                             name="schedules"
                             error={!!errors["schedules"]}
                             message={errors["schedules"]}
@@ -531,8 +533,8 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Field
-                    label="Event Name"
-                    placeholder="Be as descriptive as you can"
+                    label={l("page.submit.event_name_label")}
+                    placeholder={l("page.submit.event_name_placeholder")}
                     style={{ width: "100%" }}
                     name="name"
                     error={!!errors["name"]}
@@ -546,7 +548,7 @@ export default function SubmitPage() {
                 <Grid.Column mobile="16">
                   <Radio
                     toggle
-                    label="PREVIEW"
+                    label={l("page.submit.preview_label")}
                     checked={state.previewingDescription}
                     onChange={(_, ctx) =>
                       patchState({ previewingDescription: ctx.checked })
@@ -557,8 +559,8 @@ export default function SubmitPage() {
                     <Textarea
                       minHeight={72}
                       maxHeight={500}
-                      label="Description"
-                      placeholder="Keep it short but keep it interesting!"
+                      label={l("page.submit.description_label")}
+                      placeholder={l("page.submit.description_placeholder")}
                       name="description"
                       error={!!errors["description"]}
                       message={errors["description"]}
@@ -566,7 +568,9 @@ export default function SubmitPage() {
                       onChange={editActions.handleChange}
                     />
                   )}
-                  {state.previewingDescription && <Label>Description</Label>}
+                  {state.previewingDescription && (
+                    <Label>{l("page.submit.description_label")}</Label>
+                  )}
                   {state.previewingDescription && (
                     <div
                       style={{
@@ -608,7 +612,7 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="8">
                   <Field
-                    label="Start date"
+                    label={l("page.submit.start_date_label")}
                     name="start_date"
                     type="date"
                     error={!!errors["start_at"] || !!errors["start_date"]}
@@ -623,7 +627,7 @@ export default function SubmitPage() {
                 {!editing.all_day && (
                   <Grid.Column mobile="6">
                     <Field
-                      label="Start time"
+                      label={l("page.submit.start_time_label")}
                       name="start_time"
                       type="time"
                       error={!!errors["start_at"] || !!errors["start_time"]}
@@ -635,19 +639,22 @@ export default function SubmitPage() {
                 )}
                 {!editing.all_day && (
                   <Grid.Column mobile="2">
-                    <Paragraph className="FieldNote">UTC</Paragraph>
+                    <Paragraph className="FieldNote">
+                      {l("general.utc")}
+                    </Paragraph>
                   </Grid.Column>
                 )}
                 <Grid.Column mobile="8">
                   <Field
-                    label="End date"
+                    label={l("page.submit.end_date_label")}
                     name="finish_date"
                     type="date"
                     error={!!errors["finish_at"] || !!errors["finish_date"]}
                     message={
                       errors["finish_at"] ||
                       errors["finish_date"] ||
-                      "Maximum allowed duration " +
+                      l("page.submit.maximum_allowed_duration") +
+                        " " +
                         editActions.getMaxHoursAllowedLabel()
                     }
                     value={editActions.getFinishDate()}
@@ -658,7 +665,7 @@ export default function SubmitPage() {
                 {!editing.all_day && (
                   <Grid.Column mobile="6">
                     <Field
-                      label="End time"
+                      label={l("page.submit.end_time_label")}
                       name="finish_time"
                       type="time"
                       error={!!errors["finish_at"] || !!errors["finish_time"]}
@@ -670,7 +677,9 @@ export default function SubmitPage() {
                 )}
                 {!editing.all_day && (
                   <Grid.Column mobile="2">
-                    <Paragraph className="FieldNote">UTC</Paragraph>
+                    <Paragraph className="FieldNote">
+                      {l("general.utc")}
+                    </Paragraph>
                   </Grid.Column>
                 )}
                 <Grid.Column mobile="16">
@@ -678,9 +687,9 @@ export default function SubmitPage() {
                 </Grid.Column>
                 <Grid.Column mobile="8">
                   <SelectField
-                    label="Repeat"
+                    label={l("page.submit.recurrent_label")}
                     search={false}
-                    placeholder="Does not repeat"
+                    placeholder={l("page.submit.recurrent_placeholder")}
                     name="recurrent"
                     error={!!errors["recurrent"]}
                     message={errors["recurrent"]}
@@ -721,7 +730,7 @@ export default function SubmitPage() {
                     <Grid.Column mobile="16">
                       <RadioGroup label="Repeat on">
                         <Radio
-                          label="SUN"
+                          label={l("page.submit.day_sun_label")}
                           name="recurrent_weekday_mask[SUNDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -738,7 +747,7 @@ export default function SubmitPage() {
                           }
                         />
                         <Radio
-                          label="MON"
+                          label={l("page.submit.day_mon_label")}
                           name="recurrent_weekday_mask[MONDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -755,7 +764,7 @@ export default function SubmitPage() {
                           }
                         />
                         <Radio
-                          label="TUE"
+                          label={l("page.submit.day_tue_label")}
                           name="recurrent_weekday_mask[TUESDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -772,7 +781,7 @@ export default function SubmitPage() {
                           }
                         />
                         <Radio
-                          label="WED"
+                          label={l("page.submit.day_wed_label")}
                           name="recurrent_weekday_mask[WEDNESDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -789,7 +798,7 @@ export default function SubmitPage() {
                           }
                         />
                         <Radio
-                          label="THU"
+                          label={l("page.submit.day_thu_label")}
                           name="recurrent_weekday_mask[THURSDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -806,7 +815,7 @@ export default function SubmitPage() {
                           }
                         />
                         <Radio
-                          label="FRI"
+                          label={l("page.submit.day_fri_label")}
                           name="recurrent_weekday_mask[FRIDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -823,7 +832,7 @@ export default function SubmitPage() {
                           }
                         />
                         <Radio
-                          label="SAT"
+                          label={l("page.submit.day_sat_label")}
                           name="recurrent_weekday_mask[SATURDAY]"
                           checked={Boolean(
                             (editing.recurrent_weekday_mask || 0) &
@@ -845,10 +854,12 @@ export default function SubmitPage() {
                 {editing.recurrent &&
                   editing.recurrent_frequency === Frequency.MONTHLY && (
                     <Grid.Column mobile="16">
-                      <RadioGroup label="Repeat on">
+                      <RadioGroup label={l("page.submit.repeat_on_label")}>
                         <div style={{ flex: "1 1 100%", marginBottom: ".7em" }}>
                           <Radio
-                            label={`Monthly on day ${editing.start_at.getUTCDate()}`}
+                            label={l("page.submit.recurrent_monthday_label", {
+                              date: editing.start_at.getUTCDate(),
+                            })}
                             name="recurrent_monthday[current]"
                             checked={editing.recurrent_monthday !== null}
                             onClick={editActions.handleChange}
@@ -856,11 +867,16 @@ export default function SubmitPage() {
                         </div>
                         <div style={{ flex: "1 1 100%", marginBottom: ".7em" }}>
                           <Radio
-                            label={`Monthly on the ${toRecurrentSetposName(
-                              editing.start_at
-                            )} ${Time.from(editing.start_at, options).format(
-                              "dddd"
-                            )}`}
+                            label={l(
+                              "page.submit.recurrent_setpos_current_label",
+                              {
+                                name: toRecurrentSetposName(editing.start_at),
+                                day: Time.from(
+                                  editing.start_at,
+                                  options
+                                ).format("dddd"),
+                              }
+                            )}
                             name="recurrent_setpos[current]"
                             checked={
                               editing.recurrent_setpos !== null &&
@@ -874,10 +890,15 @@ export default function SubmitPage() {
                             style={{ flex: "1 1 100%", marginBottom: ".7em" }}
                           >
                             <Radio
-                              label={`Monthly on the last ${Time.from(
-                                editing.start_at,
-                                options
-                              ).format("dddd")}`}
+                              label={l(
+                                "page.submit.recurrent_setpos_last_label",
+                                {
+                                  day: Time.from(
+                                    editing.start_at,
+                                    options
+                                  ).format("dddd"),
+                                }
+                              )}
                               name="recurrent_setpos[last]"
                               checked={
                                 editing.recurrent_setpos === Position.LAST
@@ -892,7 +913,7 @@ export default function SubmitPage() {
                 {editing.recurrent && (
                   <Grid.Column mobile="8">
                     <SelectField
-                      label="Ends"
+                      label={l("page.submit.ends_label")}
                       name="recurrent_end"
                       search={false}
                       error={!!errors["recurrent"]}
@@ -922,7 +943,9 @@ export default function SubmitPage() {
                 )}
                 {editing.recurrent && editing.recurrent_count !== null && (
                   <Grid.Column mobile="5">
-                    <Paragraph className="FieldNote">Occurrences</Paragraph>
+                    <Paragraph className="FieldNote">
+                      {l("page.submit.occurrences")}
+                    </Paragraph>
                   </Grid.Column>
                 )}
                 {editing.recurrent && editing.recurrent_until !== null && (
@@ -941,7 +964,9 @@ export default function SubmitPage() {
                 )}
                 {editing.recurrent && recurrent_date.length > 0 && (
                   <Grid.Column mobile="16">
-                    <Label>Dates ({recurrent_date.length}): </Label>
+                    <Label>
+                      {l("page.submit.dates")} ({recurrent_date.length}):{" "}
+                    </Label>
                   </Grid.Column>
                 )}
                 {editing.recurrent &&
@@ -977,13 +1002,16 @@ export default function SubmitPage() {
 
               <Grid.Row>
                 <Grid.Column mobile="8">
-                  <Label>Categories</Label>
+                  <Label>{l("page.submit.categories_label")}</Label>
                   <Paragraph tiny secondary>
-                    Want a new category? Ask for it on the{" "}
-                    <span className={"submit__category__dao"}>DAO</span>.
+                    {l("page.submit.want_new_category_label")}{" "}
+                    <span className={"submit__category__dao"}>
+                      {l("general.dao")}
+                    </span>
+                    .
                   </Paragraph>
                   <SelectField
-                    placeholder="Add category"
+                    placeholder={l("page.submit.add_category_placeholder")}
                     name="categories"
                     error={!!errors["categories"]}
                     message={errors["categories"]}
@@ -1023,7 +1051,7 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="4">
                   <Field
-                    label="Latitude (X)"
+                    label={l("page.submit.latitude_label")}
                     type="number"
                     name="x"
                     min="-170"
@@ -1036,7 +1064,7 @@ export default function SubmitPage() {
                 </Grid.Column>
                 <Grid.Column mobile="4">
                   <Field
-                    label="Longitude (Y)"
+                    label={l("page.submit.longitude_label")}
                     type="number"
                     name="y"
                     min="-170"
@@ -1049,8 +1077,8 @@ export default function SubmitPage() {
                 </Grid.Column>
                 <Grid.Column mobile="8">
                   <SelectField
-                    label="Server"
-                    placeholder="any server"
+                    label={l("page.submit.server_label")}
+                    placeholder={l("page.submit.server_placeholder")}
                     name="server"
                     error={!!errors["server"]}
                     message={errors["server"]}
@@ -1073,8 +1101,8 @@ export default function SubmitPage() {
                     disabled={
                       original ? original.user !== settings.user : false
                     }
-                    label="Email or Discord username"
-                    placeholder="hello@decentraland.org"
+                    label={l("page.submit.contact_label")}
+                    placeholder={l("page.submit.contact_placeholder")}
                     name="contact"
                     error={!!errors["contact"]}
                     message={errors["contact"]}
@@ -1091,8 +1119,8 @@ export default function SubmitPage() {
                     }
                     minHeight={72}
                     maxHeight={500}
-                    label="Additional info"
-                    placeholder="Add any other useful details for our reviewers"
+                    label={l("page.submit.details_label")}
+                    placeholder={l("page.submit.details_placeholder")}
                     name="details"
                     error={!!errors["details"]}
                     message={errors["details"]}
@@ -1133,8 +1161,9 @@ export default function SubmitPage() {
                         style={{ width: "100%" }}
                         onClick={handleReject}
                       >
-                        {(original.user === settings.user && "DELETE") ||
-                          "REJECT"}
+                        {(original.user === settings.user &&
+                          l("page.submit.delete")) ||
+                          l("page.submit.reject")}
                       </Button>
                     )}
                 </Grid.Column>
@@ -1147,7 +1176,7 @@ export default function SubmitPage() {
                       style={{ width: "100%" }}
                       onClick={prevent(() => notify())}
                     >
-                      NOTIFY ME
+                      {l("page.submit.notify_me")}
                     </Button>
                   )}
                 </Grid.Column>
@@ -1170,8 +1199,7 @@ export default function SubmitPage() {
                       height="16"
                       style={{ verticalAlign: "middle", marginRight: ".5rem" }}
                     />
-                    The event submission will be reviewed by our team, you’ll be
-                    notified by email
+                    {l("page.submit.event_submission_will_be_reviewed")}
                   </Paragraph>
                 </Grid.Column>
               </Grid.Row>
@@ -1183,10 +1211,13 @@ export default function SubmitPage() {
         open={state.requireConfirmation}
         onClose={() => patchState({ requireConfirmation: false })}
       >
-        <Title>Are you absolutely sure?</Title>
+        <Title>{l("page.submit.confirm_modal.title")}</Title>
         <Paragraph>
-          This action <Bold>cannot</Bold> be undone. This will permanently
-          delete the <Bold>{original?.name || "this"}</Bold> event
+          <Markdown>
+            {l("page.submit.confirm_modal.paragraph", {
+              name: original?.name || "this",
+            })}
+          </Markdown>
         </Paragraph>
         {state.error && <Paragraph primary>{state.error}</Paragraph>}
         <Button
@@ -1195,7 +1226,7 @@ export default function SubmitPage() {
           loading={submitting || removing}
           style={{ marginTop: "28px" }}
         >
-          YES, DELETE THIS EVENT
+          {l("page.submit.confirm_modal.submit")}
         </Button>
       </ConfirmModal>
     </>

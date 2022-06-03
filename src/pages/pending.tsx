@@ -165,18 +165,18 @@ export default function MyEventsPage() {
         {!eventsState.loading && account && (
           <div>
             <div className="GroupTitle">
-              <SubTitle>PENDING EVENTS</SubTitle>
+              <SubTitle>{l("page.pending.pending_events")}</SubTitle>
             </div>
             {pendingEvents.length === 0 && (
               <div style={{ textAlign: "center" }}>
                 <Divider size="tiny" />
                 <Paragraph secondary>
-                  You don't have any pending events, try to propose a{" "}
+                  {l("page.pending.you_dont_have_any_pending")}{" "}
                   <Link
                     href={locations.submit()}
                     onClick={prevent(() => navigate(locations.submit()))}
                   >
-                    new event
+                    {l("page.pending.new_event")}
                   </Link>
                   .
                 </Paragraph>

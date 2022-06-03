@@ -1,9 +1,9 @@
 import React from "react"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import Live from "./Live"
 import "./StartIn.css"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 
 export type StartInProps = {
   date: Date
@@ -11,6 +11,7 @@ export type StartInProps = {
 
 export default function StartIn(props: StartInProps) {
   const countdown = useCountdown(props.date)
+  const l = useFormatMessage()
 
   if (countdown.time <= 0) {
     return <Live primary />
@@ -22,15 +23,31 @@ export default function StartIn(props: StartInProps) {
 
   return (
     <div className={TokenList.join(["StartIn"])}>
-      {days > 0 && `in ${days} ${days === 1 ? "day" : "days"}`}
+      {days > 0 &&
+        `in ${days} ${
+          days === 1
+            ? l("components.badge.start_in.day")
+            : l("components.badge.start_in.days")
+        }`}
       {days === 0 &&
         hours > 0 &&
-        `in ${hours} ${hours === 1 ? "hour" : "hours"}`}
+        `in ${hours} ${
+          hours === 1
+            ? l("components.badge.start_in.hour")
+            : l("components.badge.start_in.hours")
+        }`}
       {days === 0 &&
         hours === 0 &&
         minutes > 0 &&
-        `in ${minutes + 1} ${minutes + 1 === 1 ? "minute" : "minutes"}`}
-      {days === 0 && hours === 0 && minutes === 0 && `in less than a minute`}
+        `in ${minutes + 1} ${
+          minutes + 1 === 1
+            ? l("components.badge.start_in.minute")
+            : l("components.badge.start_in.minutes")
+        }`}
+      {days === 0 &&
+        hours === 0 &&
+        minutes === 0 &&
+        l("components.badge.start_in.in_less_than_a_minute")}
     </div>
   )
 }
