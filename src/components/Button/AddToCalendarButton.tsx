@@ -3,16 +3,15 @@ import {
   Button,
   ButtonProps,
 } from "decentraland-ui/dist/components/Button/Button"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import useAuth from "decentraland-gatsby/dist/hooks/useAuth"
-import track from "decentraland-gatsby/dist/utils/development/segment"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import { EventAttributes } from "../../entities/Event/types"
+import { eventTargetUrl } from "../../entities/Event/utils"
 import { SegmentEvent } from "../../modules/segment"
 
-import { eventTargetUrl } from "../../entities/Event/utils"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import "./AddToCalendarButton.css"
 
 export type AddToCalendarButtonProps = ButtonProps & {
@@ -27,6 +26,7 @@ export default function AddToCalendarButton({
   ...props
 }: AddToCalendarButtonProps) {
   const track = useTrackContext()
+  const l = useFormatMessage()
   const to = href || getGoogleCalendar(event, startAt) || "#"
 
   const handleClick = useCallback(
@@ -56,7 +56,7 @@ export default function AddToCalendarButton({
       basic
       className={TokenList.join(["AddToCalendarButton", props.className])}
     >
-      {props.children || "ADD TO CALENDAR"}
+      {props.children || l("components.button.add_to_calendar")}
     </Button>
   )
 }
@@ -66,16 +66,19 @@ function getGoogleCalendar(event?: EventAttributes | null, startAt?: Date) {
     return null
   }
 
+  const l = useFormatMessage()
   const url = eventTargetUrl(event)
   const params = new URLSearchParams()
   params.set("text", event.name)
 
+  const jumpInLabel = l("components.button.get_google_calendar.jump_in")
+
   if (event.description && url) {
-    params.set("details", `${event.description}\n\njump in: ${url}`)
+    params.set("details", `${event.description}\n\n${jumpInLabel}: ${url}`)
   } else if (event.description) {
     params.set("details", event.description)
   } else if (url) {
-    params.set("details", `jump in: ${url}`)
+    params.set("details", `${jumpInLabel}: ${url}`)
   }
 
   const start_at = startAt || event.start_at

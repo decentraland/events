@@ -1,19 +1,23 @@
 import React, { useCallback, useMemo, useState } from "react"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
-import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
+import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
+import { useLocation } from "@gatsbyjs/reach-router"
 import { SessionEventAttributes } from "../../entities/Event/types"
 import {
   eventTwitterUrl,
   eventFacebookUrl,
   eventTargetUrl,
 } from "../../entities/Event/utils"
-import { useLocation } from "@gatsbyjs/reach-router"
 import { SegmentEvent } from "../../modules/segment"
+import locations from "../../modules/locations"
+import { useEventsContext } from "../../context/Event"
 
 import shareIcon from "../../images/share.svg"
 import closeIcon from "../../images/popup-close.svg"
@@ -23,9 +27,6 @@ import notificationDisabledIcon from "../../images/notification-disabled.svg"
 import notificationEnabledIcon from "../../images/notification-enabled.svg"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 
-import { useEventsContext } from "../../context/Event"
-import locations from "../../modules/locations"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import "./AttendingButtons.css"
 
 export type AttendingButtonsProps = {
@@ -47,6 +48,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const isMobile = useMobileDetector()
   const [, state] = useEventsContext()
   const track = useTrackContext()
+  const l = useFormatMessage()
   const approved = useMemo(() => !event || event.approved, [event])
   const loading = useMemo(
     () => props.loading ?? state.modifying.has(event?.id || ""),
@@ -202,7 +204,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             alignItems: "center",
           }}
         >
-          <span>JUMP IN</span>
+          <span>{l("components.button.attending_buttons.jump_in")}</span>
           <img
             src={primaryJumpInIcon}
             width={14}
@@ -226,8 +228,12 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           ])}
         >
           {!event && " "}
-          {event && event.attending && "GOING"}
-          {event && !event.attending && "WANT TO GO"}
+          {event &&
+            event.attending &&
+            l("components.button.attending_buttons.going")}
+          {event &&
+            !event.attending &&
+            l("components.button.attending_buttons.want_to_go")}
         </Button>
       )}
 
@@ -276,7 +282,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           disabled={loading || sharing || !approved}
           onClick={handleShare}
         >
-          <img src={shareIcon} width="14" height="14" /> SHARE
+          <img src={shareIcon} width="14" height="14" />{" "}
+          {l("components.button.attending_buttons.share")}
         </Button>
       )}
     </div>

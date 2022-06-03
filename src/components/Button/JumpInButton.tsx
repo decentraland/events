@@ -34,7 +34,7 @@ export default function JumpInButton(props: ButtonProps) {
         alignItems: "center",
       }}
     >
-      <span>JUMP IN</span>
+      <span>{l("components.button.jump_in_button")}</span>
       <img
         src={primaryJumpInIcon}
         width={14}

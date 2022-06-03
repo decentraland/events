@@ -5,8 +5,10 @@ import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import Events from "../../../../api/Events"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
 import backIcon from "../../../../images/popup-back.svg"
 import closeIcon from "../../../../images/popup-close.svg"
@@ -29,6 +31,7 @@ export type EventAttendeeListProps = {
 
 export default function EventAttendeeList(props: EventAttendeeListProps) {
   const [list, setList] = useState(attendees.get(props.event.id))
+  const l = useFormatMessage()
 
   useAsyncEffect(async () => {
     const result = await Events.get().getEventAttending(props.event.id)
@@ -69,7 +72,9 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
             onClick={handleClose}
           />
         )}
-        <SubTitle>People going</SubTitle>
+        <SubTitle>
+          {l("components.event.event_modal.event_attendee_list.people_going")}
+        </SubTitle>
       </div>
       {!list && <Loader size="massive" />}
       {list && list.length === 0 && <div />}
@@ -79,7 +84,10 @@ export default function EventAttendeeList(props: EventAttendeeListProps) {
           return (
             <div key={attendee.user} className="EventAttendeeList__Item">
               <Avatar address={attendee.user} />
-              <Paragraph>{attendee.user_name || "Guest"}</Paragraph>
+              <Paragraph>
+                {attendee.user_name ||
+                  l("components.event.event_modal.event_attendee_list.guest")}
+              </Paragraph>
             </div>
           )
         })}

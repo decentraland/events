@@ -1,9 +1,10 @@
 import React, { useMemo } from "react"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import "./EventDate.css"
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
+import "./EventDate.css"
 
 export type EventDateProps = React.HTMLProps<HTMLDivElement> & {
   event: SessionEventAttributes
@@ -16,6 +17,7 @@ export default React.memo(function EventDate({
   ...props
 }: EventDateProps) {
   const [settings] = useProfileSettingsContext()
+  const l = useFormatMessage()
   const now = useMemo(
     () => Time.from(Date.now(), { utc: utc ?? !settings.use_local_time }),
     [utc, settings.use_local_time]
@@ -38,15 +40,15 @@ export default React.memo(function EventDate({
 
   const description = useMemo(() => {
     if (now.isBetween(start_at, finish_at)) {
-      return "NOW"
+      return l("components.event.event_date.now")
     }
 
     if (start_at.isToday()) {
-      return "TODAY"
+      return l("components.event.event_date.today")
     }
 
     if (start_at.isTomorrow()) {
-      return "TOMORROW"
+      return l("components.event.event_date.tomorrow")
     }
 
     return start_at.format(`MMMM DD`)
