@@ -103,6 +103,7 @@ export default {
   edit: (event: string) => url("/submit/", { event, view: SubmitView.Edit }),
   clone: (event: string) => url("/submit/", { event, view: SubmitView.Clone }),
 
+  users: () => url("/users/"),
   settings: () => url("/settings/"),
 
   docs: () => url("/docs/"),

@@ -16,9 +16,12 @@ import {
   updateMyProfileSettingsSchema,
 } from "../types"
 import { SIGN_SECRET } from "./subscriptions"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 
 export const validateProfileSettings =
-  createValidator<ProfileSettingsAttributes>(updateMyProfileSettingsSchema)
+  createValidator<ProfileSettingsAttributes>(
+    updateMyProfileSettingsSchema as AjvObjectSchema
+  )
 
 export async function updateMyProfileSettings(req: WithAuth) {
   const now = new Date()

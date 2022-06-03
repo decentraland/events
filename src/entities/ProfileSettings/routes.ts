@@ -7,11 +7,17 @@ import { getMyProfileSettings } from "./routes/getMyProfileSettings"
 import { getProfileSettings } from "./routes/getProfileSettings"
 import { updateMyProfileSettings } from "./routes/updateMyProfileSettings"
 import { updateProfileSettings } from "./routes/updateProfileSettings"
+import { listProfileSettings } from "./routes/listProfileSettings"
 
 export default routes((router) => {
   const withAuth = auth()
-  router.get("/profiles/settings", withAuth, handle(getMyProfileSettings))
-  router.patch("/profiles/settings", withAuth, handle(updateMyProfileSettings))
+  router.get("/profiles/settings", withAuth, handle(listProfileSettings))
+  router.get("/profiles/me/settings", withAuth, handle(getMyProfileSettings))
+  router.patch(
+    "/profiles/me/settings",
+    withAuth,
+    handle(updateMyProfileSettings)
+  )
   router.get(
     "/profiles/:profile_id/settings",
     withAuth,
