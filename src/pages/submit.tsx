@@ -1098,7 +1098,9 @@ export default function SubmitPage() {
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Field
-                    disabled={original ? original.user !== settings.user : false}
+                    disabled={
+                      original ? original.user !== settings.user : false
+                    }
                     label={l("page.submit.contact_label")}
                     placeholder={l("page.submit.contact_placeholder")}
                     name="contact"
@@ -1159,7 +1161,8 @@ export default function SubmitPage() {
                         style={{ width: "100%" }}
                         onClick={handleReject}
                       >
-                        {(original.user === settings.user && l("page.submit.delete")) ||
+                        {(original.user === settings.user &&
+                          l("page.submit.delete")) ||
                           "REJECT"}
                       </Button>
                     )}
