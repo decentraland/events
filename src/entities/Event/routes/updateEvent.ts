@@ -104,21 +104,25 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   })
 
   // make schedules unique
-  updatedAttributes.schedules = Array.from(new Set(updatedAttributes.schedules))
-  if (updatedAttributes.schedules.length > 0) {
-    const schedules = await ScheduleModel.getScheduleList(
-      updatedAttributes.schedules
+  if (updatedAttributes.schedules) {
+    updatedAttributes.schedules = Array.from(
+      new Set(updatedAttributes.schedules)
     )
-    const missingSchedules = getMissingSchedules(
-      schedules,
-      updatedAttributes.schedules
-    )
-    if (missingSchedules.length > 0) {
-      throw new RequestError(
-        `Schedule not found: ${missingSchedules.join(", ")}`,
-        RequestError.BadRequest,
-        { body: updatedAttributes }
+    if (updatedAttributes.schedules.length > 0) {
+      const schedules = await ScheduleModel.getScheduleList(
+        updatedAttributes.schedules
       )
+      const missingSchedules = getMissingSchedules(
+        schedules,
+        updatedAttributes.schedules
+      )
+      if (missingSchedules.length > 0) {
+        throw new RequestError(
+          `Schedule not found: ${missingSchedules.join(", ")}`,
+          RequestError.BadRequest,
+          { body: updatedAttributes }
+        )
+      }
     }
   }
 
@@ -126,6 +130,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
    * Verify that the duration event is not longer than the max allowed or the previous duration
    */
   if (
+    updatedAttributes.duration &&
     updatedAttributes.duration > Math.max(event.duration, MAX_EVENT_DURATION)
   ) {
     throw new RequestError(
