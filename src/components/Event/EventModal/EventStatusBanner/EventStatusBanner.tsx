@@ -12,7 +12,6 @@ export default React.memo(function EventStatusBanner({
   event,
 }: EventStatusBannerProp) {
   const l = useFormatMessage()
-  
   if (!event) {
     return null
   }
@@ -20,7 +19,11 @@ export default React.memo(function EventStatusBanner({
   if (event.rejected) {
     return (
       <div className="EventStatusBanner EventStatusBanner--error">
-        <code>This event was rejected</code>
+        <code>
+          {l(
+            "components.event.event_modal.event_status_banner.this_event_was_rejected"
+          )}
+        </code>
       </div>
     )
   }
@@ -28,7 +31,11 @@ export default React.memo(function EventStatusBanner({
   if (!event.approved) {
     return (
       <div className="EventStatusBanner">
-        <code>This event is pending approval</code>
+        <code>
+          {l(
+            "components.event.event_modal.event_status_banner.this_event_is_pending_approval"
+          )}
+        </code>
       </div>
     )
   }
