@@ -11,6 +11,7 @@ import { EventAttributes } from "../Event/types"
 import EventModel from "../Event/model"
 import ScheduleModel from "../Schedule/model"
 import copies from "../../intl/en.json"
+import { ScheduleAttributes } from "../Schedule/types"
 
 export default routes((router) => {
   router.get("/event/", handleRaw(injectEventMetadata, "html"))
@@ -61,7 +62,7 @@ export async function injectScheduleMetadata(req: Request) {
   const id = String(req.query.id || "")
   const page = await readFile(req)
   if (isUUID(id)) {
-    const schedule = await ScheduleModel.findOne({ id })
+    const schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id })
 
     if (schedule) {
       return replaceHelmetMetadata(page.toString(), {

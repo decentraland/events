@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useMemo } from "react"
 
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
@@ -34,12 +34,12 @@ import { EventFilters, fromEventFilters, url } from "../../../modules/locations"
 import { getEventType } from "../../../entities/Event/utils"
 import { showTimezoneLabel } from "../../../modules/date"
 import useListEventsCategories from "../../../hooks/useListEventsCategories"
-import { navigateEventDetail } from "../../../modules/events"
 import { useCategoriesContext } from "../../../context/Category"
 import { useLocation } from "@gatsbyjs/reach-router"
 import useListEventsFiltered from "../../../hooks/useListEventsFiltered"
-import "./ListEvents.css"
 import { ALL_EVENT_CATEGORY } from "../../../entities/EventCategory/types"
+import { ListMonthEvents } from "./ListMonthEvents"
+import "./ListEvents.css"
 
 export type ListEventsProps = {
   events: SessionEventAttributes[]
@@ -82,10 +82,6 @@ export const ListEvents = (props: ListEventsProps) => {
   )
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const categoriesFiltered = useListEventsCategories(props.events, categories)
-
-  // const [event] = useEventIdContext(params.get("event"))
-
-  // const [eventTime, setEventTime] = useState<EventTimeParams>(timeFilter)
 
   const categoryItems = useMemo(() => {
     let categoriesToReturn = [
@@ -163,7 +159,7 @@ export const ListEvents = (props: ListEventsProps) => {
     !disabledFilters &&
     (showFilterByType || showFilterByTime || showFilterByCategory)
 
-  const cardItemsPerRow = showFilters ? 2 : 3
+  const itemsPerRow = showFilters ? 2 : 3
 
   const handleTypeChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
@@ -258,79 +254,65 @@ export const ListEvents = (props: ListEventsProps) => {
   }
 
   return (
-    <>
-      {!loading && (
-        <Row>
-          {showFilters && (
-            <Column align="left" className="sidebar">
-              {showFilterByType && (
-                <ToggleBox
-                  header="Type"
-                  onClick={handleTypeChange}
-                  items={typeItems}
-                  value={props.filters.type}
-                />
-              )}
-
-              {showFilterByCategory && (
-                <ToggleBox
-                  header="Category"
-                  onClick={handleCategoryChange}
-                  items={categoryItems}
-                  value={props.filters.category || ALL_EVENT_CATEGORY}
-                  borderless
-                />
-              )}
-
-              {showFilterByTime && (
-                <SliderField
-                  range={true}
-                  header="Event Time"
-                  min={0}
-                  max={48}
-                  defaultValue={timeRangeValue}
-                  onChange={handleRangeChange}
-                  onMouseUp={handleRangeAfterChange}
-                  label={timeRangeLabel}
-                />
-              )}
-            </Column>
+    <Row>
+      {showFilters && (
+        <Column align="left" className="sidebar">
+          {showFilterByType && (
+            <ToggleBox
+              header="Type"
+              onClick={handleTypeChange}
+              items={typeItems}
+              value={props.filters.type}
+            />
           )}
-          <Column align="right" grow={true}>
-            {!loading && filteredEvents.length === 0 && (
-              <div>
-                <Divider />
-                <Paragraph secondary style={{ textAlign: "center" }}>
-                  {l("page.events.not_found")}
-                </Paragraph>
-                <Divider />
-              </div>
-            )}
 
-            {eventsByMonth.length > 0 &&
-              eventsByMonth.map(([date, events]) => (
-                <div key={"month:" + date.toJSON()}>
-                  <div className="GroupTitle">
-                    <SubTitle>
-                      {Time.from(date, {
-                        utc: !settings?.use_local_time,
-                      }).format("MMMM")}
-                    </SubTitle>
-                  </div>
-                  <Card.Group itemsPerRow={cardItemsPerRow}>
-                    {events.map((event) => (
-                      <EventCard
-                        key={"event:" + event.id}
-                        event={event}
-                        onClick={navigateEventDetail}
-                      />
-                    ))}
-                  </Card.Group>
-                </div>
-              ))}
-          </Column>
-        </Row>
+          {showFilterByCategory && (
+            <ToggleBox
+              header="Category"
+              onClick={handleCategoryChange}
+              items={categoryItems}
+              value={props.filters.category || ALL_EVENT_CATEGORY}
+              borderless
+            />
+          )}
+
+          {showFilterByTime && (
+            <SliderField
+              range={true}
+              header="Event Time"
+              min={0}
+              max={48}
+              defaultValue={timeRangeValue}
+              onChange={handleRangeChange}
+              onMouseUp={handleRangeAfterChange}
+              label={timeRangeLabel}
+            />
+          )}
+        </Column>
       )}
-    </>
+      <Column align="right" grow={true}>
+        {filteredEvents.length === 0 && (
+          <div>
+            <Divider />
+            <Paragraph secondary style={{ textAlign: "center" }}>
+              {l("page.events.not_found")}
+            </Paragraph>
+            <Divider />
+          </div>
+        )}
+
+        {eventsByMonth.length > 0 &&
+          eventsByMonth.map(([date, events]) => {
+            return (
+              <ListMonthEvents
+                key={date.toJSON()}
+                date={date}
+                events={events}
+                itemsPerRow={itemsPerRow}
+              />
+            )
+          })}
+      </Column>
+    </Row>
   )
 }
