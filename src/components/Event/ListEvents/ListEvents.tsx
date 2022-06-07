@@ -8,7 +8,7 @@ import {
   SessionEventAttributes,
   EventType,
 } from "../../../entities/Event/types"
-import EventCard from "../../Event/EventCard/EventCard"
+import EventCard from "../EventCard/EventCard"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -39,6 +39,7 @@ import useListEventsFiltered from "../../../hooks/useListEventsFiltered"
 import { ALL_EVENT_CATEGORY } from "../../../entities/EventCategory/types"
 import { ListMonthEvents } from "./ListMonthEvents"
 import "./ListEvents.css"
+import { NoEvents } from "../NoEvents/NoEvents"
 
 export type ListEventsProps = {
   events: SessionEventAttributes[]
@@ -47,6 +48,8 @@ export type ListEventsProps = {
   className?: string
   disabledFilters?: boolean
 }
+
+const now = new Date()
 
 const typeItems = [
   {
@@ -66,8 +69,8 @@ const typeItems = [
   },
 ]
 
-export const ListEvents = (props: ListEventsProps) => {
-  const { className, loading, disabledFilters } = props
+export const ListEvents = React.memo((props: ListEventsProps) => {
+  const { loading, disabledFilters } = props
   const [settings] = useProfileSettingsContext()
   const location = useLocation()
   const track = useTrackContext()
@@ -155,6 +158,7 @@ export const ListEvents = (props: ListEventsProps) => {
   )
 
   const showFilters =
+    !loading &&
     !disabledFilters &&
     (showFilterByType || showFilterByTime || showFilterByCategory)
 
@@ -228,30 +232,6 @@ export const ListEvents = (props: ListEventsProps) => {
     []
   )
 
-  if (loading) {
-    return (
-      <div className={className}>
-        <div>
-          <div className="GroupTitle">
-            <SubTitle>
-              {Time.from(Date.now(), {
-                utc: !settings?.use_local_time,
-              }).format("MMMM")}
-            </SubTitle>
-          </div>
-          <Card.Group>
-            <EventCard loading />
-            <EventCard loading />
-            <EventCard loading />
-            <EventCard loading />
-            <EventCard loading />
-            <EventCard loading />
-          </Card.Group>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <Grid stackable>
       <Grid.Row>
@@ -288,21 +268,13 @@ export const ListEvents = (props: ListEventsProps) => {
                 label={timeRangeLabel}
               />
             )}
-            {/* <Column align="right" grow={true}> */}
           </Grid.Column>
         )}
         <Grid.Column tablet={showFilters ? 12 : 16}>
-          {filteredEvents.length === 0 && (
-            <div>
-              <Divider />
-              <Paragraph secondary style={{ textAlign: "center" }}>
-                {l("page.events.not_found")}
-              </Paragraph>
-              <Divider />
-            </div>
-          )}
+          {loading && <ListMonthEvents loading itemsPerRow={itemsPerRow} />}
 
-          {eventsByMonth.length > 0 &&
+          {!loading &&
+            eventsByMonth.length > 0 &&
             eventsByMonth.map(([date, events]) => {
               return (
                 <ListMonthEvents
@@ -313,8 +285,12 @@ export const ListEvents = (props: ListEventsProps) => {
                 />
               )
             })}
+
+          {!loading && filteredEvents.length === 0 && (
+            <NoEvents>{l("page.events.not_found")}</NoEvents>
+          )}
         </Grid.Column>
       </Grid.Row>
     </Grid>
   )
-}
+})

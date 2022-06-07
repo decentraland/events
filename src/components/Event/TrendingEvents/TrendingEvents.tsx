@@ -4,7 +4,7 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventCardMini from "../../Event/EventCardMini/EventCardMini"
+import EventCardMini from "../EventCardMini/EventCardMini"
 import { navigateEventDetail } from "../../../modules/events"
 import useListEventsTrending from "../../../hooks/useListEventsTrending"
 import "./TrendingEvents.css"

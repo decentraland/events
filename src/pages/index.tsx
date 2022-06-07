@@ -12,9 +12,9 @@ import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import EventModal from "../components/Event/EventModal/EventModal"
-import { CarouselEvents } from "../components/Layout/CarouselEvents/CarouselEvents"
+import { CarouselEvents } from "../components/Event/CarouselEvents/CarouselEvents"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
-import { TrendingEvents } from "../components/Layout/TrendingEvents/TrendingEvents"
+import { TrendingEvents } from "../components/Event/TrendingEvents/TrendingEvents"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 
 import {
@@ -23,16 +23,20 @@ import {
   useEventsContext,
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
+import { ListEvents } from "../components/Event/ListEvents/ListEvents"
 import locations, { toEventFilters } from "../modules/locations"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { getSchedules } from "../modules/events"
 import { getCurrentSchedules } from "../entities/Schedule/utils"
 import "./index.css"
+import { NoEvents } from "../components/Event/NoEvents/NoEvents"
+import { SessionEventAttributes } from "../entities/Event/types"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
 }
+
+const empty: SessionEventAttributes[] = []
 
 export default function IndexPage() {
   const l = useFormatMessage()
@@ -107,26 +111,18 @@ export default function IndexPage() {
         event={event}
         onClose={prevent(() => navigate(locations.events()))}
       />
+
       <Navigation activeTab={NavigationTab.Events} search />
 
-      {!filters.search && (
-        <CarouselEvents
-          events={events}
-          schedule={currentSchedule}
-          loading={loading}
-        />
-      )}
+      <CarouselEvents
+        events={filters.search ? empty : events}
+        schedule={currentSchedule}
+        loading={loading}
+      />
 
       <Container>
-        {!loading && events.length === 0 && (
-          <div>
-            <Divider />
-            <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.events.no_events")}
-            </Paragraph>
-            <Divider />
-          </div>
-        )}
+        {!loading && events.length === 0 && <NoEvents />}
+
         {!filters.search && (
           <TrendingEvents events={events} loading={loading} />
         )}

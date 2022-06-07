@@ -6,7 +6,7 @@ import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventCardBig from "../../Event/EventCardBig/EventCardBig"
+import EventCardBig from "../EventCardBig/EventCardBig"
 import { navigateEventDetail } from "../../../modules/events"
 import { ScheduleAttributes } from "../../../entities/Schedule/types"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
