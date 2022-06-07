@@ -128,6 +128,8 @@ export type EventAttributes = {
   textsearch: SQLStatement | string | null | undefined
   categories: string[]
   schedules: string[]
+  approved_by: string | null
+  rejected_by: string | null
 }
 
 export type GetEventParams = {

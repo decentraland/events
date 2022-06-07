@@ -76,7 +76,7 @@ export const onRouteUpdate = () => {
 }
 
 export const shouldUpdateScroll = ({ prevRouterProps, routerProps }) => {
-  if (prevRouterProps.location.pathname === routerProps.location.pathname) {
+  if (prevRouterProps?.location?.pathname === routerProps?.location?.pathname) {
     return false
   }
 

@@ -20,9 +20,19 @@ export default React.memo(function EventStatusBanner({
     return (
       <div className="EventStatusBanner EventStatusBanner--error">
         <code>
-          {l(
-            "components.event.event_modal.event_status_banner.this_event_was_rejected"
-          )}
+          {event.rejected_by
+            ? l(
+                "components.event.event_modal.event_status_banner.this_event_was_rejected_by",
+                {
+                  user:
+                    event.rejected_by.slice(0, 6) +
+                    "…" +
+                    event.rejected_by.slice(-4),
+                }
+              )
+            : l(
+                "components.event.event_modal.event_status_banner.this_event_was_rejected"
+              )}
         </code>
       </div>
     )
