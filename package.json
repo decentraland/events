@@ -10,7 +10,6 @@
     "npm": "8.*"
   },
   "dependencies": {
-    "@mediacurrent/gatsby-plugin-silence-css-order-warning": "^1.0.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
