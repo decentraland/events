@@ -3,6 +3,7 @@ import React, { useCallback, useMemo } from "react"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
+import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import {
   SessionEventAttributes,
   EventType,
@@ -10,9 +11,7 @@ import {
 import EventCard from "../../Event/EventCard/EventCard"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
-import { Row } from "../Row/Row"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import { Column } from "../Column/Column"
 import {
   ToggleBox,
   ToggleBoxItem,
@@ -254,65 +253,68 @@ export const ListEvents = (props: ListEventsProps) => {
   }
 
   return (
-    <Row>
-      {showFilters && (
-        <Column align="left" className="sidebar">
-          {showFilterByType && (
-            <ToggleBox
-              header="Type"
-              onClick={handleTypeChange}
-              items={typeItems}
-              value={props.filters.type}
-            />
-          )}
-
-          {showFilterByCategory && (
-            <ToggleBox
-              header="Category"
-              onClick={handleCategoryChange}
-              items={categoryItems}
-              value={props.filters.category || ALL_EVENT_CATEGORY}
-              borderless
-            />
-          )}
-
-          {showFilterByTime && (
-            <SliderField
-              range={true}
-              header="Event Time"
-              min={0}
-              max={48}
-              defaultValue={timeRangeValue}
-              onChange={handleRangeChange}
-              onMouseUp={handleRangeAfterChange}
-              label={timeRangeLabel}
-            />
-          )}
-        </Column>
-      )}
-      <Column align="right" grow={true}>
-        {filteredEvents.length === 0 && (
-          <div>
-            <Divider />
-            <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.events.not_found")}
-            </Paragraph>
-            <Divider />
-          </div>
-        )}
-
-        {eventsByMonth.length > 0 &&
-          eventsByMonth.map(([date, events]) => {
-            return (
-              <ListMonthEvents
-                key={date.toJSON()}
-                date={date}
-                events={events}
-                itemsPerRow={itemsPerRow}
+    <Grid stackable>
+      <Grid.Row>
+        {showFilters && (
+          <Grid.Column tablet={4}>
+            {showFilterByType && (
+              <ToggleBox
+                header="Type"
+                onClick={handleTypeChange}
+                items={typeItems}
+                value={props.filters.type}
               />
-            )
-          })}
-      </Column>
-    </Row>
+            )}
+
+            {showFilterByCategory && (
+              <ToggleBox
+                header="Category"
+                onClick={handleCategoryChange}
+                items={categoryItems}
+                value={props.filters.category || ALL_EVENT_CATEGORY}
+                borderless
+              />
+            )}
+
+            {showFilterByTime && (
+              <SliderField
+                range={true}
+                header="Event Time"
+                min={0}
+                max={48}
+                defaultValue={timeRangeValue}
+                onChange={handleRangeChange}
+                onMouseUp={handleRangeAfterChange}
+                label={timeRangeLabel}
+              />
+            )}
+            {/* <Column align="right" grow={true}> */}
+          </Grid.Column>
+        )}
+        <Grid.Column tablet={showFilters ? 12 : 16}>
+          {filteredEvents.length === 0 && (
+            <div>
+              <Divider />
+              <Paragraph secondary style={{ textAlign: "center" }}>
+                {l("page.events.not_found")}
+              </Paragraph>
+              <Divider />
+            </div>
+          )}
+
+          {eventsByMonth.length > 0 &&
+            eventsByMonth.map(([date, events]) => {
+              return (
+                <ListMonthEvents
+                  key={date.toJSON()}
+                  date={date}
+                  events={events}
+                  itemsPerRow={itemsPerRow}
+                />
+              )
+            })}
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
   )
 }

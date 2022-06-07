@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import Helmet from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
@@ -127,7 +127,9 @@ export default function IndexPage() {
             <Divider />
           </div>
         )}
-        <TrendingEvents events={events} loading={loading} />
+        {!filters.search && (
+          <TrendingEvents events={events} loading={loading} />
+        )}
         <ListEvents loading={loading} events={events} filters={filters} />
       </Container>
     </>
