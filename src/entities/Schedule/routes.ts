@@ -1,16 +1,18 @@
-import { Request } from "express"
-import { v4 as uuid } from "uuid"
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import {
-  auth,
   WithAuth,
+  auth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import ScheduleModel from "./model"
-import { ScheduleAttributes } from "./types"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { Request } from "express"
+import omit from "lodash/omit"
+import { v4 as uuid } from "uuid"
+
 import { getMyProfileSettings } from "../ProfileSettings/routes/getMyProfileSettings"
 import { canEditAnySchedule } from "../ProfileSettings/utils"
+import ScheduleModel from "./model"
+import { ScheduleAttributes } from "./types"
 
 export default routes((router) => {
   const withAuth = auth({ optional: false })
@@ -41,10 +43,9 @@ export async function createSchedule(req: WithAuth) {
   const profile = await getMyProfileSettings(req)
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    const { authorization, ...headers } = req.headers
     throw new RequestError("Empty schedule data", RequestError.BadRequest, {
       body: data,
-      headers,
+      headers: omit(req.headers, ["authorization"]),
       user,
     })
   }
@@ -74,10 +75,9 @@ export async function updateSchedule(req: WithAuth) {
   const profile = await getMyProfileSettings(req)
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    const { authorization, ...headers } = req.headers
     throw new RequestError("Empty schedule data", RequestError.BadRequest, {
       body: data,
-      headers,
+      headers: omit(req.headers, ["authorization"]),
       user,
     })
   }
@@ -86,7 +86,7 @@ export async function updateSchedule(req: WithAuth) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
-  let schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
+  const schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
 
   if (!schedule) {
     throw new RequestError(`Schedule "${id}" not found`, RequestError.NotFound)
@@ -111,7 +111,7 @@ export async function deleteSchedule(req: WithAuth) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
-  let schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
+  const schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
 
   if (!schedule) {
     throw new RequestError(`Schedule "${id}" not found`, RequestError.NotFound)

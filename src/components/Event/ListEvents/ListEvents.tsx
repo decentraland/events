@@ -1,45 +1,42 @@
 import React, { useCallback, useMemo } from "react"
 
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
-import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
-import {
-  SessionEventAttributes,
-  EventType,
-} from "../../../entities/Event/types"
-import EventCard from "../EventCard/EventCard"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { useProfileSettingsContext } from "../../../context/ProfileSetting"
+import { useLocation } from "@gatsbyjs/reach-router"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
 import {
   ToggleBox,
   ToggleBoxItem,
 } from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
+
+import { useCategoriesContext } from "../../../context/Category"
+import { useProfileSettingsContext } from "../../../context/ProfileSetting"
+import {
+  EventType,
+  SessionEventAttributes,
+} from "../../../entities/Event/types"
+import { getEventType } from "../../../entities/Event/utils"
+import { ALL_EVENT_CATEGORY } from "../../../entities/EventCategory/types"
 import useListEventsByMonth from "../../../hooks/useListEventsByMonth"
-import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
+import useListEventsCategories from "../../../hooks/useListEventsCategories"
+import useListEventsFiltered from "../../../hooks/useListEventsFiltered"
+import { showTimezoneLabel } from "../../../modules/date"
 import {
   FilterCategoryVariant,
   FilterTimeVariant,
   FilterTypeVariant,
   Flags,
 } from "../../../modules/features"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
-import { SegmentEvent } from "../../../modules/segment"
 import { EventFilters, fromEventFilters, url } from "../../../modules/locations"
-import { getEventType } from "../../../entities/Event/utils"
-import { showTimezoneLabel } from "../../../modules/date"
-import useListEventsCategories from "../../../hooks/useListEventsCategories"
-import { useCategoriesContext } from "../../../context/Category"
-import { useLocation } from "@gatsbyjs/reach-router"
-import useListEventsFiltered from "../../../hooks/useListEventsFiltered"
-import { ALL_EVENT_CATEGORY } from "../../../entities/EventCategory/types"
-import { ListMonthEvents } from "./ListMonthEvents"
-import "./ListEvents.css"
+import { SegmentEvent } from "../../../modules/segment"
 import { NoEvents } from "../NoEvents/NoEvents"
+import { ListMonthEvents } from "./ListMonthEvents"
+
+import "./ListEvents.css"
 
 export type ListEventsProps = {
   events: SessionEventAttributes[]
@@ -48,8 +45,6 @@ export type ListEventsProps = {
   className?: string
   disabledFilters?: boolean
 }
-
-const now = new Date()
 
 const typeItems = [
   {

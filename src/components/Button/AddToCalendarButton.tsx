@@ -1,12 +1,13 @@
 import React, { useCallback } from "react"
+
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import {
   Button,
   ButtonProps,
 } from "decentraland-ui/dist/components/Button/Button"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import { EventAttributes } from "../../entities/Event/types"
 import { eventTargetUrl } from "../../entities/Event/utils"

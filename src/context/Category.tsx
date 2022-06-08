@@ -1,8 +1,10 @@
 import React, { createContext, useContext } from "react"
+
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+
 import Events from "../api/Events"
 import { EventCategoryAttributes } from "../entities/EventCategory/types"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 
 const defaultProfileSettings = [[] as EventCategoryAttributes[]] as const
 

@@ -1,7 +1,7 @@
 import {
-  registerImmutableFiles,
-  registerGatsbyImmutableFiles,
   registerCatalystImmutableFiles,
+  registerGatsbyImmutableFiles,
+  registerImmutableFiles,
 } from "decentraland-gatsby/dist/utils/webworker/cache"
 import { registerNotification } from "decentraland-gatsby/dist/utils/webworker/notification"
 

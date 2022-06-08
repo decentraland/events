@@ -1,31 +1,32 @@
 import React, { useCallback, useMemo, useState } from "react"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
-import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
+
 import { useLocation } from "@gatsbyjs/reach-router"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
+import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
+import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+
+import { useEventsContext } from "../../context/Event"
 import { SessionEventAttributes } from "../../entities/Event/types"
 import {
-  eventTwitterUrl,
   eventFacebookUrl,
   eventTargetUrl,
+  eventTwitterUrl,
 } from "../../entities/Event/utils"
-import { SegmentEvent } from "../../modules/segment"
-import locations from "../../modules/locations"
-import { useEventsContext } from "../../context/Event"
-
-import shareIcon from "../../images/share.svg"
-import closeIcon from "../../images/popup-close.svg"
 import facebookIcon from "../../images/icon-facebook.svg"
 import twitterIcon from "../../images/icon-twitter.svg"
 import notificationDisabledIcon from "../../images/notification-disabled.svg"
 import notificationEnabledIcon from "../../images/notification-enabled.svg"
+import closeIcon from "../../images/popup-close.svg"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
+import shareIcon from "../../images/share.svg"
+import locations from "../../modules/locations"
+import { SegmentEvent } from "../../modules/segment"
 
 import "./AttendingButtons.css"
 
@@ -43,7 +44,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   )
   const isLive = useTimeout(nextStartAt)
   const [fallbackShare, setFallbackShare] = useState(false)
-  const [address, actions] = useAuthContext()
+  const [, actions] = useAuthContext()
   const location = useLocation()
   const isMobile = useMobileDetector()
   const [, state] = useEventsContext()

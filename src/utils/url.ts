@@ -1,5 +1,5 @@
 export default {
-  toUrl(pathname: string, params: string = "", hash: string = "") {
+  toUrl(pathname: string, params = "", hash = "") {
     if (pathname.slice(-1) !== "/") {
       pathname = pathname + "/"
     }
@@ -15,15 +15,15 @@ export default {
     return pathname + params + hash
   },
 
-  toMyEvents(location: Location) {
+  toMyEvents() {
     return this.toUrl("/me")
   },
 
-  toSubmit(location: Location) {
+  toSubmit() {
     return this.toUrl("/submit")
   },
 
-  toSettings(location: Location) {
+  toSettings() {
     return this.toUrl("/settings")
   },
 
@@ -39,7 +39,7 @@ export default {
     return !targetSearchParams.has("event") && !targetSearchParams.has("view")
   },
 
-  toEvent(location: Location, eventId: string, myEvents: boolean = false) {
+  toEvent(location: Location, eventId: string, myEvents = false) {
     const path = myEvents ? "/me/" : "/"
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set("event", eventId)
@@ -87,11 +87,7 @@ export default {
     )
   },
 
-  toEventAttendees(
-    location: Location,
-    eventId: string,
-    myEvents: boolean = false
-  ) {
+  toEventAttendees(location: Location, eventId: string, myEvents = false) {
     const path = myEvents ? "/me/" : "/"
     const targetSearchParams = new URLSearchParams(location.search)
     targetSearchParams.set("event", eventId)

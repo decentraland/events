@@ -1,34 +1,34 @@
 import React, { useMemo, useState } from "react"
-import Helmet from "react-helmet"
+
+import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
-
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
-import EventModal from "../components/Event/EventModal/EventModal"
 import { CarouselEvents } from "../components/Event/CarouselEvents/CarouselEvents"
-import Navigation, { NavigationTab } from "../components/Layout/Navigation"
+import EventModal from "../components/Event/EventModal/EventModal"
+import { ListEvents } from "../components/Event/ListEvents/ListEvents"
+import { NoEvents } from "../components/Event/NoEvents/NoEvents"
 import { TrendingEvents } from "../components/Event/TrendingEvents/TrendingEvents"
+import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
-
 import {
   useEventIdContext,
   useEventSorter,
   useEventsContext,
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { ListEvents } from "../components/Event/ListEvents/ListEvents"
-import locations, { toEventFilters } from "../modules/locations"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import { getSchedules } from "../modules/events"
-import { getCurrentSchedules } from "../entities/Schedule/utils"
-import "./index.css"
-import { NoEvents } from "../components/Event/NoEvents/NoEvents"
 import { SessionEventAttributes } from "../entities/Event/types"
+import { getCurrentSchedules } from "../entities/Schedule/utils"
+import { getSchedules } from "../modules/events"
+import locations, { toEventFilters } from "../modules/locations"
+
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>

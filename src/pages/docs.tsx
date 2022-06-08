@@ -1,23 +1,25 @@
 import React from "react"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import ApiCard from "decentraland-gatsby/dist/components/Docs/ApiCard"
 import ApiDetails from "decentraland-gatsby/dist/components/Docs/ApiDetails"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+
 import Navigation from "../components/Layout/Navigation"
 import {
-  getEventListQuery,
-  eventResponseSchema,
   eventListResponseSchema,
+  eventResponseSchema,
+  getEventListQuery,
   getEventParamsSchema,
 } from "../entities/Event/schemas"
 import { eventAttendeeListScheme } from "../entities/EventAttendee/schemas"
 import { eventCategoryListScheme } from "../entities/EventCategory/schema"
-import "./index.css"
 import {
   getScheduleParamsSchema,
   scheduleListScheme,
   scheduleScheme,
 } from "../entities/Schedule/schema"
+
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>

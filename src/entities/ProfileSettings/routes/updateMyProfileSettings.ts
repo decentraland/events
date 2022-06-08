@@ -1,19 +1,20 @@
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { sign } from "decentraland-gatsby/dist/utils/sign"
+import isEmail from "validator/lib/isEmail"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
+import { siteUrl } from "../../Event/utils"
+import { sendEmailVerification } from "../../Notification/utils"
 import ProfileSettingsModel from "../model"
 import {
-  ProfileSettingsAttributes,
-  EmailSubscription,
   DATA_PARAM,
+  EmailSubscription,
+  ProfileSettingsAttributes,
   SUBSCRIPTION_PATH,
   updateMyProfileSettingsSchema,
 } from "../types"
-import isEmail from "validator/lib/isEmail"
-import { sendEmailVerification } from "../../Notification/utils"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import { siteUrl } from "../../Event/utils"
 import { SIGN_SECRET } from "./subscriptions"
 
 export const validateProfileSettings =
