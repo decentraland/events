@@ -1,4 +1,4 @@
-FROM node:16-alpine as compiler
+FROM node:16.14-alpine as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -29,6 +29,7 @@ COPY ./package-lock.json    /app/package-lock.json
 COPY ./package.json         /app/package.json
 
 RUN npm install
+RUN npm install --arch=arm64 --platform=linux --libc=musl sharp && exit 1
 
 COPY ./src                  /app/src
 COPY ./static               /app/static
@@ -49,7 +50,7 @@ RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:sw
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front
 RUN npm prune --production
 
-FROM node:16-alpine
+FROM node:16.14-alpine
 WORKDIR /app
 
 COPY --from=compiler /tini /tini
@@ -59,7 +60,6 @@ COPY --from=compiler /app/node_modules         /app/node_modules
 COPY --from=compiler /app/lib                  /app/lib
 COPY --from=compiler /app/public               /app/public
 COPY --from=compiler /app/static               /app/static
-COPY --from=compiler /app/templates            /app/templates
 COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
 
 VOLUME [ "/data" ]
