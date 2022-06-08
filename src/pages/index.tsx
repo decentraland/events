@@ -3,8 +3,6 @@ import Helmet from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -120,12 +118,13 @@ export default function IndexPage() {
         loading={loading}
       />
 
+      <TrendingEvents
+        events={filters.search ? empty : events}
+        loading={loading}
+      />
+
       <Container>
         {!loading && events.length === 0 && <NoEvents />}
-
-        {!filters.search && (
-          <TrendingEvents events={events} loading={loading} />
-        )}
         <ListEvents loading={loading} events={events} filters={filters} />
       </Container>
     </>
