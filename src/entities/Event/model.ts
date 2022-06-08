@@ -12,7 +12,6 @@ import {
   tsquery,
 } from "decentraland-gatsby/dist/entities/Database/utils"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 import {
@@ -250,9 +249,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !!options.creator,
           SQL`AND lower(e.user) = ${options.creator}`
         )}
-        ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
         ${conditional(
-          !!options.user && !isAdmin(options.user),
+          !options.allow_pending && !options.user,
+          SQL`AND e.approved IS TRUE`
+        )}
+        ${conditional(
+          !options.allow_pending && !!options.user,
           SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
         )}
         ${conditional(

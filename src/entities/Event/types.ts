@@ -183,6 +183,7 @@ export type EventListParams = {
 }
 
 export type EventListOptions = {
+  allow_pending?: boolean
   list?: EventListType
   user?: string
   creator?: string
