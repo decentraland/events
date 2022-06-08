@@ -9,13 +9,22 @@ import { EventListOptions, EventListParams, EventListType } from "../types"
 import { getEventListQuery } from "../schemas"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import {
+  canApproveAnyEvent,
+  canEditAnyEvent,
+} from "../../ProfileSettings/utils"
 
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth) {
   const profile = await getMyProfileSettings(req)
   const query = validate(req.query)
   const options: EventListOptions = {
-    user: req.auth,
+    user: profile.user,
+    allow_pending:
+      isAdmin(profile.user) ||
+      canEditAnyEvent(profile) ||
+      canApproveAnyEvent(profile),
     offset: query.offset ? Math.max(Number(query.offset), 0) : 0,
     limit: query.limit
       ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
