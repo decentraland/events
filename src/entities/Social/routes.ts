@@ -1,16 +1,18 @@
 import { resolve } from "path"
+
+import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
+import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
 import { Request, Response } from "express"
 import { escape } from "html-escaper"
 import isUUID from "validator/lib/isUUID"
-import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
-import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
-import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import { eventUrl, scheduleUrl, siteUrl } from "../Event/utils"
-import { EventAttributes } from "../Event/types"
-import EventModel from "../Event/model"
-import ScheduleModel from "../Schedule/model"
+
 import copies from "../../intl/en.json"
+import EventModel from "../Event/model"
+import { EventAttributes } from "../Event/types"
+import { eventUrl, scheduleUrl, siteUrl } from "../Event/utils"
+import ScheduleModel from "../Schedule/model"
 import { ScheduleAttributes } from "../Schedule/types"
 
 export default routes((router) => {

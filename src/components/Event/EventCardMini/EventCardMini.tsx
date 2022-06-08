@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo } from "react"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
+
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { Card } from "decentraland-ui/dist/components/Card/Card"
+
 import { SessionEventAttributes } from "../../../entities/Event/types"
+import locations from "../../../modules/locations"
 import JumpInPosition from "../../Button/JumpInPosition"
 import EventDate from "../EventDate/EventDate"
 
 import "./EventCardMini.css"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import locations from "../../../modules/locations"
 
 export type EventCardMiniProps = {
   event?: SessionEventAttributes

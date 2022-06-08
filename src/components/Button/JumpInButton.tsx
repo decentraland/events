@@ -1,9 +1,11 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
+
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
   Button,
   ButtonProps,
 } from "decentraland-ui/dist/components/Button/Button"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+
 import { SessionEventAttributes } from "../../entities/Event/types"
 import { eventTargetUrl } from "../../entities/Event/utils"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"

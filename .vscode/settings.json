@@ -1,3 +1,9 @@
 {
-  "deno.enable": false
+  "deno.enable": false,
+  "editor.formatOnSave": false,
+  "eslint.validate": ["typescript"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": false
+  }
 }

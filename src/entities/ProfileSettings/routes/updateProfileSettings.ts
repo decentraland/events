@@ -1,16 +1,17 @@
-import intersection from "lodash/intersection"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import intersection from "lodash/intersection"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
 import ProfileSettingsModel from "../model"
 import {
   ProfileSettingsAttributes,
   updateProfileSettingsSchema,
 } from "../types"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
 import { canEditAnyProfile } from "../utils"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { getMyProfileSettings } from "./getMyProfileSettings"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 
 export const validateProfileSettings =
   createValidator<ProfileSettingsAttributes>(updateProfileSettingsSchema)

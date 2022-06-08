@@ -1,6 +1,8 @@
-import { SessionEventAttributes, EventType } from "../entities/Event/types"
 import { useMemo } from "react"
+
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+
+import { EventType, SessionEventAttributes } from "../entities/Event/types"
 import {
   DEFAULT_PROFILE_SETTINGS,
   ProfileSettingsAttributes,

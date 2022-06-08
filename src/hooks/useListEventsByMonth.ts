@@ -1,6 +1,7 @@
-import { SessionEventAttributes } from "../entities/Event/types"
 import { useMemo } from "react"
+
 import { useProfileSettingsContext } from "../context/ProfileSetting"
+import { SessionEventAttributes } from "../entities/Event/types"
 
 export type EventGroup = [Date, SessionEventAttributes[]]
 

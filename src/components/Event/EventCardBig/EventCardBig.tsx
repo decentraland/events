@@ -1,15 +1,17 @@
 import React, { useCallback, useMemo } from "react"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import { SessionEventAttributes } from "../../../entities/Event/types"
 
-import "./EventCardBig.css"
+import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { Card } from "decentraland-ui/dist/components/Card/Card"
+
+import { SessionEventAttributes } from "../../../entities/Event/types"
+import locations from "../../../modules/locations"
+import AttendingButtons from "../../Button/AttendingButtons"
 import EventDetail from "../EventModal/EventDetail/EventDetail"
 import EventSection from "../EventSection"
-import AttendingButtons from "../../Button/AttendingButtons"
-import locations from "../../../modules/locations"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+
+import "./EventCardBig.css"
 
 export type EventCardBigProps = {
   event?: SessionEventAttributes

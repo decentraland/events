@@ -1,4 +1,5 @@
 import React from "react"
+
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 
 export default React.memo(function ContainerWrapper(

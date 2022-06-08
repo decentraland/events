@@ -1,9 +1,12 @@
 import React, { useMemo } from "react"
+
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { SessionEventAttributes } from "../../../entities/Event/types"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
+import { SessionEventAttributes } from "../../../entities/Event/types"
+
 import "./EventDate.css"
 
 export type EventDateProps = React.HTMLProps<HTMLDivElement> & {

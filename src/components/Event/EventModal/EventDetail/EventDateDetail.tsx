@@ -1,16 +1,19 @@
 import React, { useMemo } from "react"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import useInterval from "decentraland-gatsby/dist/hooks/useInterval"
+
 import Bold from "decentraland-gatsby/dist/components/Text/Bold"
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import useInterval from "decentraland-gatsby/dist/hooks/useInterval"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { SessionEventAttributes } from "../../../../entities/Event/types"
-import AddToCalendarButton from "../../../Button/AddToCalendarButton"
-import Live from "../../../Badge/Live"
-import EventSection from "../../EventSection"
+
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
+import { SessionEventAttributes } from "../../../../entities/Event/types"
 import clockIcon from "../../../../images/secondary-clock.svg"
 import { showTimezoneLabel } from "../../../../modules/date"
+import Live from "../../../Badge/Live"
+import AddToCalendarButton from "../../../Button/AddToCalendarButton"
+import EventSection from "../../EventSection"
+
 import "./EventDateDetail.css"
 
 export type EventDateDetailProps = React.HTMLProps<HTMLDivElement> & {

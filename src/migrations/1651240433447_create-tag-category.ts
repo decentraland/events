@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
 import EventModel from "../entities/Event/model"
 import Model from "../entities/EventCategory/model"
 

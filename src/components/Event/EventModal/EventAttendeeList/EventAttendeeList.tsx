@@ -1,15 +1,15 @@
 import React, { useState } from "react"
-import { EventAttendeeAttributes } from "../../../../entities/EventAttendee/types"
-import { SessionEventAttributes } from "../../../../entities/Event/types"
-import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
-import Events from "../../../../api/Events"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
-
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+
+import Events from "../../../../api/Events"
+import { SessionEventAttributes } from "../../../../entities/Event/types"
+import { EventAttendeeAttributes } from "../../../../entities/EventAttendee/types"
 import backIcon from "../../../../images/popup-back.svg"
 import closeIcon from "../../../../images/popup-close.svg"
 

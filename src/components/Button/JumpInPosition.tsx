@@ -1,12 +1,14 @@
 import React, { useCallback } from "react"
+
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import { EventAttributes } from "../../entities/Event/types"
 
+import { EventAttributes } from "../../entities/Event/types"
 import { eventTargetUrl } from "../../entities/Event/utils"
-import { SegmentEvent } from "../../modules/segment"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import secondaryPinIcon from "../../images/secondary-pin-small.svg"
+import { SegmentEvent } from "../../modules/segment"
+
 import "./JumpInPosition.css"
 
 export type JumpInPositionProps = React.HTMLProps<HTMLAnchorElement> & {

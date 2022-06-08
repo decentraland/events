@@ -1,6 +1,7 @@
-import { sendNotification, RequestOptions, PushSubscription } from "web-push"
-import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types"
 import env from "decentraland-gatsby/dist/utils/env"
+import { PushSubscription, RequestOptions, sendNotification } from "web-push"
+
+import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types"
 
 const privateKey = env("WEB_PUSH_SECRET", "")
 const publicKey = env("WEB_PUSH_KEY", "")

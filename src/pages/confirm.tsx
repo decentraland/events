@@ -1,17 +1,18 @@
 import React from "react"
-import { useLocation } from "@gatsbyjs/reach-router"
 
-import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { useLocation } from "@gatsbyjs/reach-router"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+
+import Navigation from "../components/Layout/Navigation"
 import {
-  ProfileSettingsAttributes,
   EmailSubscriptionStatus,
+  ProfileSettingsAttributes,
 } from "../entities/ProfileSettings/types"
 
 import "./settings.css"
-import Navigation from "../components/Layout/Navigation"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 
 export type SettingsPageState = {
   updating: Partial<{
@@ -23,7 +24,7 @@ export type SettingsPageState = {
   settings: Partial<ProfileSettingsAttributes>
 }
 
-export default function SettingsPage(props: any) {
+export default function SettingsPage() {
   const location = useLocation()
   const l = useFormatMessage()
   const params = new URLSearchParams(location.search)

@@ -1,7 +1,8 @@
-import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import ProfileSettingsModel from "../model"
+import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
+
 import ProfileSubscriptionModel from "../../ProfileSubscription/model"
+import ProfileSettingsModel from "../model"
 
 export const getMyProfileSettings = oncePerRequest(async (req: WithAuth) => {
   const [settings, subscriptions] = await Promise.all([
