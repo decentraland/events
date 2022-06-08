@@ -28,8 +28,7 @@ WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
 COPY ./package.json         /app/package.json
 
-RUN npm install
-RUN npm install --arch=arm64 --platform=linux --libc=musl sharp && exit 1
+RUN npm ci
 
 COPY ./src                  /app/src
 COPY ./static               /app/static
@@ -60,6 +59,7 @@ COPY --from=compiler /app/node_modules         /app/node_modules
 COPY --from=compiler /app/lib                  /app/lib
 COPY --from=compiler /app/public               /app/public
 COPY --from=compiler /app/static               /app/static
+COPY --from=compiler /app/templates            /app/templates
 COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
 
 VOLUME [ "/data" ]
