@@ -2,19 +2,20 @@ import React, { useCallback, useMemo } from "react"
 
 import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventCardBig from "../../Event/EventCardBig/EventCardBig"
-import { navigateEventDetail } from "../../../modules/events"
 import { ScheduleAttributes } from "../../../entities/Schedule/types"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import locations from "../../../modules/locations"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { getScheduleBackground } from "../../../entities/Schedule/utils"
 import useListEventsMain from "../../../hooks/useListEventsMain"
+import { navigateEventDetail } from "../../../modules/events"
+import locations from "../../../modules/locations"
+import EventCardBig from "../../Event/EventCardBig/EventCardBig"
+
 import "./CarouselEvents.css"
 
 export type CarouselEventsProps = {

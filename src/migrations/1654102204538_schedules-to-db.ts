@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Type } from "decentraland-gatsby/dist/entities/Database/types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
-import EventModel from "../entities/Event/model"
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
 import Model from "../entities/Schedule/model"
 
 export const shorthands: ColumnDefinitions | undefined = undefined

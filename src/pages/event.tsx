@@ -1,30 +1,34 @@
 import React, { useMemo, useState } from "react"
-import Helmet from "react-helmet"
+
+import { Helmet } from "react-helmet"
+
 import { useLocation } from "@gatsbyjs/reach-router"
+import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
-import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
-import { useEventIdContext } from "../context/Event"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import ItemLayout from "../components/Layout/ItemLayout"
-import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
-import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
-import EventSection from "../components/Event/EventSection"
+
 import AttendingButtons from "../components/Button/AttendingButtons"
 import EditButtons from "../components/Button/EditButtons"
+import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
 import EventStatusBanner from "../components/Event/EventModal/EventStatusBanner/EventStatusBanner"
+import EventSection from "../components/Event/EventSection"
+import ItemLayout from "../components/Layout/ItemLayout"
+import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
+import { useEventIdContext } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import {
   canApproveAnyEvent,
   canApproveOwnEvent,
 } from "../entities/ProfileSettings/utils"
+
 import "./index.css"
 
 export type EventPageState = {
   updating: Record<string, boolean>
 }
 
-export default function EventPage(props: any) {
+export default function EventPage() {
   const l = useFormatMessage()
   const location = useLocation()
   const params = new URLSearchParams(location.search)

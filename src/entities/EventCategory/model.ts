@@ -1,10 +1,11 @@
-import { EventCategoryAttributes } from "./types"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import {
   SQL,
   table,
   values,
 } from "decentraland-gatsby/dist/entities/Database/utils"
+
+import { EventCategoryAttributes } from "./types"
 
 export default class EventCategoryModel extends Model<EventCategoryAttributes> {
   static tableName = "event_categories"

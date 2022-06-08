@@ -1,12 +1,13 @@
 import React from "react"
 
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventCard from "../../Event/EventCard/EventCard"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import { Card } from "decentraland-ui/dist/components/Card/Card"
+
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
+import { SessionEventAttributes } from "../../../entities/Event/types"
 import { navigateEventDetail } from "../../../modules/events"
+import EventCard from "../../Event/EventCard/EventCard"
 
 export type ListMonthEventsProps = {
   events: SessionEventAttributes[]

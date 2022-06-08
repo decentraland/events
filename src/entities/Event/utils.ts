@@ -1,18 +1,19 @@
-import padStart from "lodash/padStart"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import padStart from "lodash/padStart"
+import { RRule, Weekday } from "rrule"
+
+import { ScheduleAttributes } from "../Schedule/types"
 import {
   EventAttributes,
+  EventType,
+  MAX_EVENT_RECURRENT,
   MonthMask,
-  WeekdayMask,
-  Weekdays,
   Months,
   Position,
   RecurrentEventAttributes,
-  MAX_EVENT_RECURRENT,
-  EventType,
+  WeekdayMask,
+  Weekdays,
 } from "./types"
-import { RRule, Weekday } from "rrule"
-import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL =
   process.env.GATSBY_DECENTRALAND_URL ||
@@ -24,7 +25,7 @@ const EVENTS_URL =
   process.env.GATSBY_EVENTS_URL ||
   "https://events.decentraland.org/api"
 
-export function siteUrl(pathname: string = "") {
+export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_URL)
   target.pathname = pathname
   return target

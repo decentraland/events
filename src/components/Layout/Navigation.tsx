@@ -1,22 +1,25 @@
-import React, { useCallback, useEffect, useMemo } from "react"
-import { navigate } from "gatsby"
-import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
-import SubmitButton from "../Button/SubmitButton"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import { Link } from "decentraland-gatsby/dist/plugins/intl"
-import locations from "../../modules/locations"
-import { useEventsContext } from "../../context/Event"
+import React, { useCallback, useMemo } from "react"
 
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import SearchInput from "../Form/SearchInput"
+import { navigate } from "gatsby"
+
 import { useLocation } from "@gatsbyjs/reach-router"
-import { SegmentEvent } from "../../modules/segment"
-import debounce from "decentraland-gatsby/dist/utils/function/debounce"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
-import "./Navigation.css"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import { getSchedules } from "../../modules/events"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { Link } from "decentraland-gatsby/dist/plugins/intl"
+import debounce from "decentraland-gatsby/dist/utils/function/debounce"
+import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
+
+import { useEventsContext } from "../../context/Event"
 import { getCurrentSchedules } from "../../entities/Schedule/utils"
+import { getSchedules } from "../../modules/events"
+import locations from "../../modules/locations"
+import { SegmentEvent } from "../../modules/segment"
+import SubmitButton from "../Button/SubmitButton"
+import SearchInput from "../Form/SearchInput"
+
+import "./Navigation.css"
 
 export enum NavigationTab {
   Events = "events",

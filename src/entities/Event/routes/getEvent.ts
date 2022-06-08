@@ -1,19 +1,20 @@
-import EventModel from "../model"
-import EventAttendee from "../../EventAttendee/model"
-import isUUID from "validator/lib/isUUID"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-import { EventAttributes, GetEventParams } from "../types"
-import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
-import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import isUUID from "validator/lib/isUUID"
+
+import EventAttendee from "../../EventAttendee/model"
+import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { ProfileSettingsAttributes } from "../../ProfileSettings/types"
 import {
   canApproveAnyEvent,
   canEditAnyEvent,
 } from "../../ProfileSettings/utils"
-import { ProfileSettingsAttributes } from "../../ProfileSettings/types"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import EventModel from "../model"
 import { getEventParamsSchema } from "../schemas"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import { EventAttributes, GetEventParams } from "../types"
 
 export const validateGetEventParams =
   createValidator<GetEventParams>(getEventParamsSchema)

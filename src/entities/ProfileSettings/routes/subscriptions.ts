@@ -1,6 +1,7 @@
 import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
 import { verify } from "decentraland-gatsby/dist/utils/sign"
-import { Response, Request } from "express"
+import { Request, Response } from "express"
+
 import { siteUrl } from "../../Event/utils"
 import EventAttendeeModel from "../../EventAttendee/model"
 import ProfileSettingsModel from "../model"

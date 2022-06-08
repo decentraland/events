@@ -1,7 +1,10 @@
 import React from "react"
-import { Link } from "decentraland-gatsby/dist/plugins/intl"
+
 import { GatsbyLinkProps } from "gatsby"
+
+import { Link } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import backIcon from "../../images/back.svg"
 
 import "./BackButton.css"

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
-import { Type } from "decentraland-gatsby/dist/entities/Database/types"
-import ProfileSettings from "../entities/ProfileSettings/model"
 import { listAdmins } from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import { Type } from "decentraland-gatsby/dist/entities/Database/types"
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
+import ProfileSettings from "../entities/ProfileSettings/model"
 import { ProfilePermissions } from "../entities/ProfileSettings/types"
 
 export const shorthands: ColumnDefinitions | undefined = undefined

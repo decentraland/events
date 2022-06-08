@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
+
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"

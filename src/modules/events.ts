@@ -1,11 +1,12 @@
 import { navigate } from "decentraland-gatsby/dist/plugins/intl/utils"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import once from "decentraland-gatsby/dist/utils/function/once"
+
 import Events from "../api/Events"
 import { SessionEventAttributes } from "../entities/Event/types"
 import { EventCategoryAttributes } from "../entities/EventCategory/types"
-import locations from "./locations"
 import { ScheduleAttributes } from "../entities/Schedule/types"
+import locations from "./locations"
 
 export type Option = { key: string; value: string; text: string }
 

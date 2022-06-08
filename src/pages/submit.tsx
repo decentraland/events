@@ -1,69 +1,70 @@
 import React, { useCallback, useEffect, useMemo } from "react"
+
+import Helmet from "react-helmet"
+
 import { useLocation } from "@gatsbyjs/reach-router"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
-import Title from "decentraland-gatsby/dist/components/Text/Title"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import Link from "decentraland-gatsby/dist/components/Text/Link"
-import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
-import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import { Field } from "decentraland-ui/dist/components/Field/Field"
-import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
-import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
-import useFileDrop from "decentraland-gatsby/dist/hooks/useFileDrop"
-import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
-import Bold from "decentraland-gatsby/dist/components/Text/Bold"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
+import Link from "decentraland-gatsby/dist/components/Text/Link"
+import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
+import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import Title from "decentraland-gatsby/dist/components/Text/Title"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
+import useFileDrop from "decentraland-gatsby/dist/hooks/useFileDrop"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import useEventEditor from "../hooks/useEventEditor"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { Field } from "decentraland-ui/dist/components/Field/Field"
+import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
+import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
+import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
+import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
+import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
+
+import Events, { EditEvent } from "../api/Events"
 import AddCoverButton from "../components/Button/AddCoverButton"
-import ConfirmModal from "../components/Modal/ConfirmModal"
 import ImageInput from "../components/Form/ImageInput"
-import Textarea from "../components/Form/Textarea"
 import Label from "../components/Form/Label"
 import RadioGroup from "../components/Form/RadioGroup"
-import Events, { EditEvent } from "../api/Events"
-import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
+import Textarea from "../components/Form/Textarea"
+import ItemLayout from "../components/Layout/ItemLayout"
+import ConfirmModal from "../components/Modal/ConfirmModal"
+import { useCategoriesContext } from "../context/Category"
+import { useEventIdContext, useEventsContext } from "../context/Event"
+import { useProfileSettingsContext } from "../context/ProfileSetting"
 import {
   Frequency,
-  WeekdayMask,
-  Position,
   MAX_EVENT_RECURRENT,
+  Position,
+  WeekdayMask,
 } from "../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
-  toRecurrentSetposName,
   toRRuleDates,
+  toRecurrentSetposName,
 } from "../entities/Event/utils"
-import { useEventIdContext, useEventsContext } from "../context/Event"
-import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
-import locations from "../modules/locations"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import Helmet from "react-helmet"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import ItemLayout from "../components/Layout/ItemLayout"
-import { getServerOptions, getServers } from "../modules/servers"
-import infoIcon from "../images/info.svg"
-import { useCategoriesContext } from "../context/Category"
-import {
-  getCategoriesOptionsActives,
-  getSchedules,
-  getSchedulesOptions,
-} from "../modules/events"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
+import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
 import {
   canApproveAnyEvent,
   canEditAnyEvent,
   canTestAnyNotification,
 } from "../entities/ProfileSettings/utils"
-import "./submit.css"
+import useEventEditor from "../hooks/useEventEditor"
+import infoIcon from "../images/info.svg"
+import {
+  getCategoriesOptionsActives,
+  getSchedules,
+  getSchedulesOptions,
+} from "../modules/events"
+import locations from "../modules/locations"
+import { getServerOptions, getServers } from "../modules/servers"
 
 import "./submit.css"
 
@@ -739,9 +740,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.SUNDAY
+                                WeekdayMask.SUNDAY
                               ),
                             })
                           }
@@ -756,9 +757,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.MONDAY
+                                WeekdayMask.MONDAY
                               ),
                             })
                           }
@@ -773,9 +774,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.TUESDAY
+                                WeekdayMask.TUESDAY
                               ),
                             })
                           }
@@ -790,9 +791,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.WEDNESDAY
+                                WeekdayMask.WEDNESDAY
                               ),
                             })
                           }
@@ -807,9 +808,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.THURSDAY
+                                WeekdayMask.THURSDAY
                               ),
                             })
                           }
@@ -824,9 +825,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.FRIDAY
+                                WeekdayMask.FRIDAY
                               ),
                             })
                           }
@@ -841,9 +842,9 @@ export default function SubmitPage() {
                           onClick={(e, data) =>
                             editActions.handleChange(e, {
                               ...data,
-                              checked: !Boolean(
+                              checked: !(
                                 (editing.recurrent_weekday_mask || 0) &
-                                  WeekdayMask.SATURDAY
+                                WeekdayMask.SATURDAY
                               ),
                             })
                           }

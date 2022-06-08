@@ -1,5 +1,6 @@
-import { SessionEventAttributes } from "../entities/Event/types"
 import { useMemo } from "react"
+
+import { SessionEventAttributes } from "../entities/Event/types"
 import {
   DEFAULT_PROFILE_SETTINGS,
   ProfileSettingsAttributes,

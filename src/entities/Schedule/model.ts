@@ -1,11 +1,12 @@
-import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
-import { ScheduleAttributes } from "./types"
 import {
   SQL,
   table,
   values,
 } from "decentraland-gatsby/dist/entities/Database/utils"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+
+import { ScheduleAttributes } from "./types"
 
 export default class ScheduleModel extends Model<ScheduleAttributes> {
   static tableName = "schedule"

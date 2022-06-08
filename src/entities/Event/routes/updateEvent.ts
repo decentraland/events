@@ -1,44 +1,46 @@
-import pick from "lodash/pick"
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
-import Land from "decentraland-gatsby/dist/utils/api/Land"
-import EventModel from "../model"
-import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import {
-  editAnyEventAttributes,
-  editOwnEventAttributes,
-  DeprecatedEventAttributes,
-  MAX_EVENT_DURATION,
-  editEventAttributes,
-  approveEventAttributes,
-} from "../types"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
-import {
-  notifyApprovedEvent,
-  notifyEditedEvent,
-  notifyRejectedEvent,
-} from "../../Slack/utils"
+import Land from "decentraland-gatsby/dist/utils/api/Land"
+import Time from "decentraland-gatsby/dist/utils/date/Time"
+import pick from "lodash/pick"
+
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
-import API from "decentraland-gatsby/dist/utils/api/API"
-import { DECENTRALAND_URL } from "./index"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import { newEventSchema } from "../schemas"
-import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
-import { getEvent } from "./getEvent"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import EventCategoryModel from "../../EventCategory/model"
-import { getMissingSchedules } from "../../Schedule/utils"
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
 import {
   canApproveAnyEvent,
   canApproveOwnEvent,
   canEditAnyEvent,
 } from "../../ProfileSettings/utils"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import ScheduleModel from "../../Schedule/model"
+import { getMissingSchedules } from "../../Schedule/utils"
+import {
+  notifyApprovedEvent,
+  notifyEditedEvent,
+  notifyRejectedEvent,
+} from "../../Slack/utils"
+import EventModel from "../model"
+import { newEventSchema } from "../schemas"
+import {
+  DeprecatedEventAttributes,
+  MAX_EVENT_DURATION,
+  approveEventAttributes,
+  editAnyEventAttributes,
+  editEventAttributes,
+  editOwnEventAttributes,
+} from "../types"
+import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
+import { getEvent } from "./getEvent"
+
+import { DECENTRALAND_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema

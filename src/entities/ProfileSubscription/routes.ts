@@ -1,17 +1,18 @@
-import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import {
-  auth,
   WithAuth,
+  auth,
 } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import handle from "decentraland-gatsby/dist/entities/Route/handle"
+import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+
+import ProfileSettingsModel from "../ProfileSettings/model"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 import ProfileSubscriptionModel from "./model"
 import {
   ProfileSubscriptionAttributes,
   profileSubscriptionSchema,
 } from "./types"
-import ProfileSettingsModel from "../ProfileSettings/model"
-import { ProfileSettingsAttributes } from "../ProfileSettings/types"
-import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 
 export default routes((router) => {
   const withAuth = auth()

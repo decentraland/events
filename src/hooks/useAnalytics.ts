@@ -1,6 +1,8 @@
 import React, { useEffect } from "react"
-import track, {
+
+import {
   Tracker,
+  default as track,
 } from "decentraland-gatsby/dist/utils/development/segment"
 
 export default function useAnalytics(

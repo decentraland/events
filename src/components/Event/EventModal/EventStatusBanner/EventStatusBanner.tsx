@@ -1,5 +1,7 @@
 import React from "react"
+
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+
 import { EventAttributes } from "../../../../entities/Event/types"
 
 import "./EventStatusBanner.css"

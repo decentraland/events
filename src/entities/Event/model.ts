@@ -1,31 +1,33 @@
-import { utils } from "decentraland-commons"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import {
   SQL,
-  table,
-  conditional,
-  limit,
-  offset,
-  join,
-  createSearchableMatches,
   columns,
+  conditional,
+  createSearchableMatches,
+  join,
+  limit,
   objectValues,
+  offset,
+  table,
   tsquery,
 } from "decentraland-gatsby/dist/entities/Database/utils"
-import { Model } from "decentraland-gatsby/dist/entities/Database/model"
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
-import {
-  EventAttributes,
-  SessionEventAttributes,
-  EventListOptions,
-  DeprecatedEventAttributes,
-  SITEMAP_ITEMS_PER_PAGE,
-  EventListType,
-} from "./types"
-import EventAttendee from "../EventAttendee/model"
 import { QueryPart } from "decentraland-server/dist/db/types"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
+import { utils } from "decentraland-commons"
+
+import EventAttendee from "../EventAttendee/model"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
+import {
+  DeprecatedEventAttributes,
+  EventAttributes,
+  EventListOptions,
+  EventListType,
+  SITEMAP_ITEMS_PER_PAGE,
+  SessionEventAttributes,
+} from "./types"
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = "events"

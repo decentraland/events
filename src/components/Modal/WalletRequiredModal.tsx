@@ -1,14 +1,17 @@
 import React from "react"
-import { Modal } from "decentraland-ui/dist/components/Modal/Modal"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
-import metamaskIcon from "../../images/metamask-logo.svg"
-import imtokenIcon from "../../images/imtoken-logo.svg"
+import { Modal } from "decentraland-ui/dist/components/Modal/Modal"
+
 import coinbaseIcon from "../../images/coinbasewallet-logo.svg"
+import imtokenIcon from "../../images/imtoken-logo.svg"
+import metamaskIcon from "../../images/metamask-logo.svg"
 import trustIcon from "../../images/trustwallet-logo.svg"
+
 import "./WalletRequiredModal.css"
 
 export type WalletRequiredModalProps = {

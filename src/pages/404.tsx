@@ -1,9 +1,11 @@
 import React from "react"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
+
 import Head from "decentraland-gatsby/dist/components/Head/Head"
-import Title from "decentraland-gatsby/dist/components/Text/Title"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+
 import Navigation from "../components/Layout/Navigation"
 
 export default function NotFoundPage() {
