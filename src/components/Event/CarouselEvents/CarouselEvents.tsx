@@ -71,7 +71,10 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
   }
 
   return (
-    <ContainerWrapper style={style}>
+    <ContainerWrapper
+      style={style}
+      className="carousel-events__container-wrapper"
+    >
       <Container>
         {schedule && (
           <SubTitle className="carousel-events__title">

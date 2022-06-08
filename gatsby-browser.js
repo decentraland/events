@@ -8,6 +8,17 @@
 import React from "react"
 import "core-js/features/set-immediate"
 
+// eslint-disable-next-line css-import-order/css-import-order
+import "semantic-ui-css/semantic.min.css"
+// eslint-disable-next-line css-import-order/css-import-order
+import "balloon-css/balloon.min.css"
+// eslint-disable-next-line css-import-order/css-import-order
+import "decentraland-ui/dist/themes/base-theme.css"
+// eslint-disable-next-line css-import-order/css-import-order
+import "decentraland-ui/dist/themes/alternative/light-theme.css"
+// eslint-disable-next-line css-import-order/css-import-order
+import "./src/theme.css"
+
 // import Helmet from 'react-helmet'
 // import { RawIntlProvider, createIntl } from 'react-intl'
 import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
@@ -23,12 +34,6 @@ import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
 import ProfileSettings from "./src/context/ProfileSetting"
 import locations from "./src/modules/locations"
-
-import "semantic-ui-css/semantic.min.css"
-import "balloon-css/balloon.min.css"
-import "decentraland-ui/dist/themes/base-theme.css"
-import "decentraland-ui/dist/themes/alternative/light-theme.css"
-import "./src/theme.css"
 
 export const registerServiceWorker = () => true
 
