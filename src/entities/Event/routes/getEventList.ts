@@ -1,4 +1,5 @@
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { bool } from "decentraland-gatsby/dist/entities/Route/param"
@@ -6,6 +7,10 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import {
+  canApproveAnyEvent,
+  canEditAnyEvent,
+} from "../../ProfileSettings/utils"
 import EventModel from "../model"
 import { getEventListQuery } from "../schemas"
 import { EventListOptions, EventListParams, EventListType } from "../types"
@@ -15,7 +20,11 @@ export async function getEventList(req: WithAuth) {
   const profile = await getMyProfileSettings(req)
   const query = validate(req.query)
   const options: EventListOptions = {
-    user: req.auth,
+    user: profile.user,
+    allow_pending:
+      isAdmin(profile.user) ||
+      canEditAnyEvent(profile) ||
+      canApproveAnyEvent(profile),
     offset: query.offset ? Math.max(Number(query.offset), 0) : 0,
     limit: query.limit
       ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)

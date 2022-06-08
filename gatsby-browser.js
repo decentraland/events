@@ -7,26 +7,28 @@
 // You can delete this file if you're not using it
 import React from "react"
 import "core-js/features/set-immediate"
+
+// import Helmet from 'react-helmet'
+// import { RawIntlProvider, createIntl } from 'react-intl'
+import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
+import UserMenu from "decentraland-gatsby/dist/components/User/UserMenu"
+import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
+import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
+import { IntlProvider, navigate } from "decentraland-gatsby/dist/plugins/intl"
+import segment from "decentraland-gatsby/dist/utils/development/segment"
+import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
+
+import Categories from "./src/context/Category"
+import Events from "./src/context/Event"
+import ProfileSettings from "./src/context/ProfileSetting"
+import locations from "./src/modules/locations"
+
 import "semantic-ui-css/semantic.min.css"
 import "balloon-css/balloon.min.css"
 import "decentraland-ui/dist/themes/base-theme.css"
 import "decentraland-ui/dist/themes/alternative/light-theme.css"
 import "./src/theme.css"
-
-// import Helmet from 'react-helmet'
-// import { RawIntlProvider, createIntl } from 'react-intl'
-import { navigate, IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
-import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
-import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
-import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
-import UserMenu from "decentraland-gatsby/dist/components/User/UserMenu"
-import segment from "decentraland-gatsby/dist/utils/development/segment"
-import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
-import ProfileSettings from "./src/context/ProfileSetting"
-import Events from "./src/context/Event"
-import Categories from "./src/context/Category"
-import locations from "./src/modules/locations"
 
 export const registerServiceWorker = () => true
 
@@ -76,7 +78,7 @@ export const onRouteUpdate = () => {
 }
 
 export const shouldUpdateScroll = ({ prevRouterProps, routerProps }) => {
-  if (prevRouterProps.location.pathname === routerProps.location.pathname) {
+  if (prevRouterProps?.location?.pathname === routerProps?.location?.pathname) {
     return false
   }
 

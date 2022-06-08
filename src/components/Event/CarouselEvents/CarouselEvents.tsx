@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from "react"
 import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
@@ -14,12 +13,12 @@ import { getScheduleBackground } from "../../../entities/Schedule/utils"
 import useListEventsMain from "../../../hooks/useListEventsMain"
 import { navigateEventDetail } from "../../../modules/events"
 import locations from "../../../modules/locations"
-import EventCardBig from "../../Event/EventCardBig/EventCardBig"
+import ContainerWrapper from "../../Layout/ContainerWrapper"
+import EventCardBig from "../EventCardBig/EventCardBig"
 
 import "./CarouselEvents.css"
 
 export type CarouselEventsProps = {
-  className?: string
   loading?: boolean
   events?: SessionEventAttributes[]
   schedule?: ScheduleAttributes
@@ -41,16 +40,6 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
 
     return undefined
   }, [props.events, props.schedule])
-
-  const className = useMemo(
-    () =>
-      TokenList.join([
-        "carousel-events__wrapper",
-        schedule && "carousel-events__wrapper__schedule-hightlight",
-        props.className,
-      ]),
-    [schedule, props.className]
-  )
 
   const style = useMemo(
     () => (schedule ? { background: getScheduleBackground(schedule) } : {}),
@@ -77,39 +66,34 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
     [schedule]
   )
 
-  if (props.loading) {
-    return (
-      <div className={className} style={style}>
-        <Container>
-          <Carousel>
-            <EventCardBig loading />
-          </Carousel>
-        </Container>
-      </div>
-    )
-  }
-
-  if (!mainEvents || mainEvents.length === 0) {
+  if (!props.loading && !mainEvents?.length) {
     return null
   }
 
   return (
-    <div className={className} style={style}>
+    <ContainerWrapper style={style}>
       <Container>
         {schedule && (
           <SubTitle className="carousel-events__title">
             {schedule.name}
           </SubTitle>
         )}
-        <Carousel>
-          {mainEvents.map((event) => (
-            <EventCardBig
-              key={"live:" + event.id}
-              event={event}
-              onClick={navigateEventDetail}
-            />
-          ))}
-        </Carousel>
+        {props.loading && (
+          <Carousel>
+            <EventCardBig loading />
+          </Carousel>
+        )}
+        {!props.loading && (
+          <Carousel>
+            {mainEvents.map((event) => (
+              <EventCardBig
+                key={"live:" + event.id}
+                event={event}
+                onClick={navigateEventDetail}
+              />
+            ))}
+          </Carousel>
+        )}
         {schedule && (
           <div className="carousel-events__action-wrapper">
             <Button
@@ -123,6 +107,6 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
           </div>
         )}
       </Container>
-    </div>
+    </ContainerWrapper>
   )
 })

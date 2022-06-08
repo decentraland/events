@@ -69,9 +69,11 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:white_check_mark: new event approved: *<${eventUrl(event)}|${
-            event.name
-          }>*`,
+          text:
+            `:white_check_mark: new event approved: *<${eventUrl(event)}|${
+              event.name
+            }>*` +
+            (event.approved_by ? `\n_by:_ \`${event.approved_by}\`` : ``),
         },
       },
     ],
@@ -86,7 +88,9 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*`,
+          text:
+            `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*` +
+            (event.rejected_by ? `\n_by:_\`${event.rejected_by}\`` : ``),
         },
       },
     ],

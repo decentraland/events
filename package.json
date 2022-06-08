@@ -10,7 +10,6 @@
     "npm": "8.*"
   },
   "dependencies": {
-    "@mediacurrent/gatsby-plugin-silence-css-order-warning": "^1.0.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
@@ -65,7 +64,7 @@
     "@types/xml": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
-    "concurrently": "^7.1.0",
+    "concurrently": "^7.2.1",
     "decentraland-gatsby-deploy": "^1.18.1",
     "devcert": "^1.1.2",
     "dotenv": "^8.6.0",

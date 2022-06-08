@@ -2,6 +2,11 @@ body {
   background: var(--background);
 }
 
+.LayoutMainContainer > .ui.container,
+.LayoutMainContainer > .ui.container-wrapper {
+  padding-top: 24px;
+}
+
 .dcl.navbar.LayoutNavbarContainer {
   margin-bottom: 0;
   border-bottom: 0;

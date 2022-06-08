@@ -1,4 +1,3 @@
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import {
   SQL,
@@ -252,9 +251,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !!options.creator,
           SQL`AND lower(e.user) = ${options.creator}`
         )}
-        ${conditional(!options.user, SQL`AND e.approved IS TRUE`)}
         ${conditional(
-          !!options.user && !isAdmin(options.user),
+          !options.allow_pending && !options.user,
+          SQL`AND e.approved IS TRUE`
+        )}
+        ${conditional(
+          !options.allow_pending && !!options.user,
           SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
         )}
         ${conditional(

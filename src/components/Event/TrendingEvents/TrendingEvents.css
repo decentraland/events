@@ -1,9 +1,9 @@
-.list-events__group-title {
-  padding: 24px 0;
+.trending-events__group-title {
+  padding-bottom: 24px;
   width: 100%;
 }
 
-.list-events__group-title .dg.SubTitle {
+.trending-events__group-title .dg.SubTitle {
   font-size: 13px;
   font-weight: 600;
   font-stretch: normal;

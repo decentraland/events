@@ -44,7 +44,6 @@ module.exports = {
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,
-    // `@mediacurrent/gatsby-plugin-silence-css-order-warning`,
     {
       resolve: `decentraland-gatsby/dist/plugins/intl`,
       options: {

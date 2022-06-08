@@ -12,7 +12,7 @@ import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
-import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
+import { ListEvents } from "../components/Event/ListEvents/ListEvents"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { useEventSchedule, useEventsContext } from "../context/Event"

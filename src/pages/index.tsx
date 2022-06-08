@@ -3,8 +3,6 @@ import React, { useMemo, useState } from "react"
 import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -12,11 +10,12 @@ import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
+import { CarouselEvents } from "../components/Event/CarouselEvents/CarouselEvents"
 import EventModal from "../components/Event/EventModal/EventModal"
-import { CarouselEvents } from "../components/Layout/CarouselEvents/CarouselEvents"
-import { ListEvents } from "../components/Layout/ListEvents/ListEvents"
+import { ListEvents } from "../components/Event/ListEvents/ListEvents"
+import { NoEvents } from "../components/Event/NoEvents/NoEvents"
+import { TrendingEvents } from "../components/Event/TrendingEvents/TrendingEvents"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
-import { TrendingEvents } from "../components/Layout/TrendingEvents/TrendingEvents"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import {
   useEventIdContext,
@@ -24,6 +23,7 @@ import {
   useEventsContext,
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
+import { SessionEventAttributes } from "../entities/Event/types"
 import { getCurrentSchedules } from "../entities/Schedule/utils"
 import { getSchedules } from "../modules/events"
 import locations, { toEventFilters } from "../modules/locations"
@@ -33,6 +33,8 @@ import "./index.css"
 export type IndexPageState = {
   updating: Record<string, boolean>
 }
+
+const empty: SessionEventAttributes[] = []
 
 export default function IndexPage() {
   const l = useFormatMessage()
@@ -107,27 +109,22 @@ export default function IndexPage() {
         event={event}
         onClose={prevent(() => navigate(locations.events()))}
       />
+
       <Navigation activeTab={NavigationTab.Events} search />
 
-      {!filters.search && (
-        <CarouselEvents
-          events={events}
-          schedule={currentSchedule}
-          loading={loading}
-        />
-      )}
+      <CarouselEvents
+        events={filters.search ? empty : events}
+        schedule={currentSchedule}
+        loading={loading}
+      />
+
+      <TrendingEvents
+        events={filters.search ? empty : events}
+        loading={loading}
+      />
 
       <Container>
-        {!loading && events.length === 0 && (
-          <div>
-            <Divider />
-            <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.events.no_events")}
-            </Paragraph>
-            <Divider />
-          </div>
-        )}
-        <TrendingEvents events={events} loading={loading} />
+        {!loading && events.length === 0 && <NoEvents />}
         <ListEvents loading={loading} events={events} filters={filters} />
       </Container>
     </>

@@ -61,9 +61,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     Model.tableName
   }" (id,name,description,background,image,active_since,active_until,active)
   VALUES (
-    'ea869a5a-4201-45d9-beda-7ffb07f8a88a', 
-    'Pride month 2022', 
-    'Join us for pride month. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.', 
+    'ea869a5a-4201-45d9-beda-7ffb07f8a88a',
+    'Pride month 2022',
+    'Join us for pride month.',
     '{
       "rgba(255, 188, 91, .1)",
       "rgba(252, 153, 101, .1)",

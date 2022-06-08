@@ -128,6 +128,8 @@ export type EventAttributes = {
   textsearch: SQLStatement | string | null | undefined
   categories: string[]
   schedules: string[]
+  approved_by: string | null
+  rejected_by: string | null
 }
 
 export type GetEventParams = {
@@ -181,6 +183,7 @@ export type EventListParams = {
 }
 
 export type EventListOptions = {
+  allow_pending?: boolean
   list?: EventListType
   user?: string
   creator?: string
