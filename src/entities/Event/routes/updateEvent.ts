@@ -210,6 +210,14 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   updatedAttributes.textsearch = EventModel.textsearch(updatedEvent)
+  if (!event.approved && updatedEvent.approved) {
+    updatedEvent.approved_by = user
+    updatedAttributes.approved_by = user
+  } else if (!event.rejected && updatedEvent.rejected) {
+    updatedEvent.rejected_by = user
+    updatedAttributes.rejected_by = user
+  }
+
   await EventModel.update(updatedAttributes, { id: event.id })
 
   const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({

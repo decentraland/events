@@ -1,4 +1,4 @@
-FROM node:16-alpine as compiler
+FROM node:16.14-alpine as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -7,6 +7,7 @@ RUN apk add --no-cache --virtual native-deps \
   g++ gcc libgcc libstdc++ linux-headers make automake autoconf libtool python3 \
   util-linux \
   git \
+  openssh \
   shadow \
   musl-dev \
   nasm \
@@ -14,6 +15,8 @@ RUN apk add --no-cache --virtual native-deps \
   jpeg \
   zlib \
   zlib-dev \
+  vips \
+  vips-dev \
   file \
   pkgconf
 
@@ -46,7 +49,7 @@ RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:sw
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front
 RUN npm prune --production
 
-FROM node:16-alpine
+FROM node:16.14-alpine
 WORKDIR /app
 
 COPY --from=compiler /tini /tini
