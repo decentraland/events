@@ -1,3 +1,4 @@
+import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import {
   WithAuth,
   auth,
@@ -50,7 +51,7 @@ export async function createSchedule(req: WithAuth) {
     })
   }
 
-  if (!canEditAnySchedule(profile)) {
+  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
@@ -82,7 +83,7 @@ export async function updateSchedule(req: WithAuth) {
     })
   }
 
-  if (!canEditAnySchedule(profile)) {
+  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
@@ -105,9 +106,10 @@ export async function updateSchedule(req: WithAuth) {
 
 export async function deleteSchedule(req: WithAuth) {
   const id = req.params.schedule_id
+  const user = req.auth!
   const profile = await getMyProfileSettings(req)
 
-  if (!canEditAnySchedule(profile)) {
+  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
