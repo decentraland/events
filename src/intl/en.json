@@ -17,7 +17,8 @@
   },
   "user_menu": {
     "api": "API",
-    "users": "Users"
+    "users": "Users",
+    "schedules": "Schedule"
   },
   "page": {
     "404": {

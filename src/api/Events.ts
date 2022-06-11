@@ -360,4 +360,11 @@ export default class Events extends API {
         .json(schedule)
     )
   }
+
+  async createSchedule(schedule: EditSchedule) {
+    return this.fetch(
+      "/schedules",
+      this.options().method("POST").authorization({ sign: true }).json(schedule)
+    )
+  }
 }

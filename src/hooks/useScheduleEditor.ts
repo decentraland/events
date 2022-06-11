@@ -9,6 +9,7 @@ import isUUID from "validator/lib/isUUID"
 
 import Events, { EditEvent, EditSchedule } from "../api/Events"
 import { DEFAULT_EVENT_DURATION } from "../entities/Event/types"
+
 import { newScheduleSchema } from "../entities/Schedule/schema"
 import { ScheduleAttributes } from "../entities/Schedule/types"
 
@@ -18,23 +19,29 @@ type ScheduleEditorState = EditSchedule & {
 
 function getName(
   schedule: React.ChangeEvent<any>,
-  props?: { name: string; value: string } | any
+  props?: { name: string; value: string; type: string; checked: boolean } | any
 ): string {
   return (props && props.name) || schedule.target.name
 }
 
 function getValue(
   schedule: React.ChangeEvent<any>,
-  props?: { name: string; value: string } | any
+  props?: { name: string; value: string; type: string; checked: boolean } | any
 ) {
   if (props) {
-    return props.value || ""
+    switch (props.type) {
+      case "radio":
+        return props.checked
+
+      default:
+        return props.value || ""
+    }
   } else {
     return schedule.target.value
   }
 }
 
-export function useScheduleEditor(
+export default function useScheduleEditor(
   defaultSchedule: Partial<ScheduleAttributes> = {}
 ) {
   const l = useFormatMessage()
@@ -240,7 +247,9 @@ export function useScheduleEditor(
 
   function handleChange(
     e: React.ChangeEvent<any>,
-    props?: { name: string; value: string } | any
+    props?:
+      | { name: string; value: string; type: string; checked: boolean }
+      | any
   ) {
     const name = getName(e, props)
     const value = getValue(e, props)
@@ -282,7 +291,7 @@ export function useScheduleEditor(
     }
   }
 
-  function validate() {
+  function validate(options: { new?: boolean }) {
     const errors: Record<string, string> = {}
 
     if (!schedule.name) {

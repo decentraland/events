@@ -1,0 +1,27 @@
+.dcl.field .ui.input.schedule-edit__background-selector {
+  width: 100px;
+}
+
+.dcl.field .ui.input.schedule-edit__background-selector input {
+  border: none;
+  height: 50px;
+  padding: 0;
+}
+
+.schedule-edit__background-selected-wrapper {
+  margin-top: 24px;
+}
+
+.schedule-edit__background-selected-label-wrapper {
+}
+
+.schedule-edit__background-selected-label {
+}
+
+.schedule-edit__background-gradient-wrapper {
+  margin-top: 24px;
+}
+
+.schedule-edit__background-gradient-preview {
+  height: 100px;
+}
