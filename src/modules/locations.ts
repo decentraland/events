@@ -98,6 +98,7 @@ export default {
   myEvents: () => url("/me/"),
   pendingEvents: () => url("/pending/"),
   schedule: (id: string) => url("/schedule/", { id }),
+  scheduleEdit: () => url("/scheduleEdit/"),
 
   submit: () => url("/submit/"),
   edit: (event: string) => url("/submit/", { event, view: SubmitView.Edit }),

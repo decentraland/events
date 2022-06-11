@@ -63,6 +63,10 @@ export const wrapPageElement = ({ element, props }) => {
                   <Icon name="code" />
                   &nbsp;API
                 </MenuItem>
+                <MenuItem onClick={() => navigate(locations.scheduleEdit())}>
+                  <Icon name="calendar alternate" />
+                  &nbsp;Schedule
+                </MenuItem>
               </>
             }
           />

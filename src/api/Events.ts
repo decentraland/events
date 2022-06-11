@@ -44,6 +44,16 @@ export type EditEvent = Pick<
   | "schedules"
 >
 
+export type EditSchedule = Pick<
+  ScheduleAttributes,
+  | "name"
+  | "description"
+  | "image"
+  | "background"
+  | "active_since"
+  | "active_until"
+>
+
 export default class Events extends API {
   static Url =
     process.env.GATSBY_EVENTS_URL || `https://events.decentraland.org/api`
@@ -288,5 +298,12 @@ export default class Events extends API {
 
   async getSchedule(schedule_id: string): Promise<ScheduleAttributes> {
     return this.fetch(`/schedules/${schedule_id}`)
+  }
+
+  async createSchedule(schedule: EditSchedule) {
+    return this.fetch(
+      "/schedules",
+      this.options().method("POST").authorization({ sign: true }).json(schedule)
+    )
   }
 }

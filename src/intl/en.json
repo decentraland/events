@@ -134,6 +134,23 @@
         "paragraph": "This action **cannot** be undone. This will permanently delete the **{name}** event",
         "submit": "yes, delete this event"
       }
+    },
+    "schedule_edit": {
+      "name_label": "Name",
+      "name_placeholder": "Name of Event Schedule",
+      "schedule_cover_label": "Schedule cover",
+      "error_image_size": "This image is too heavy (more than 500Kb), try with",
+      "description_label": "Description",
+      "description_placeholder": "This description is important for SEO",
+      "background_label": "Background color",
+      "active_since_date_label": "Active since date",
+      "active_since_time_label": "Active since time",
+      "active_until_date_label": "Active until date",
+      "active_until_time_label": "Active until time",
+      "background_preview": "Example of background color",
+      "background_select_color_label": "Click to select a color",
+      "background_add_action": "Add",
+      "background_select_color_button": "Select Color"
     }
   },
   "social": {
@@ -255,5 +272,9 @@
         "paragraph_secondary": "Once you've installed your wallet, you will need to refresh this page to continue"
       }
     }
+  },
+  "validation": {
+    "module_field_required": "{module} {field} is required",
+    "module_field_invalid": "{module} {field} is invalid"
   }
 }

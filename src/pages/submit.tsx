@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react"
 
-import Helmet from "react-helmet"
+import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
