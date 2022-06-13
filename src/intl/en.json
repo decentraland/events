@@ -136,6 +136,7 @@
       }
     },
     "schedule_edit": {
+      "title": "Submit schedule",
       "name_label": "Name",
       "name_placeholder": "Name of Event Schedule",
       "schedule_cover_label": "Schedule cover",
@@ -149,8 +150,8 @@
       "active_until_time_label": "Active until time",
       "background_preview": "Example of background color",
       "background_select_color_label": "Click to select a color",
-      "background_add_action": "Add",
-      "background_select_color_button": "Select Color"
+      "background_add_button": "Add",
+      "background_selected_label": "Color: {color}"
     }
   },
   "social": {

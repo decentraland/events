@@ -6,11 +6,7 @@ import omit from "lodash/omit"
 import isURL from "validator/lib/isURL"
 
 import { EditEvent, EditSchedule } from "../api/Events"
-import {
-  DEFAULT_EVENT_DURATION,
-  MAX_CATAGORIES_ALLOWED,
-  MAX_EVENT_DURATION,
-} from "../entities/Event/types"
+import { DEFAULT_EVENT_DURATION } from "../entities/Event/types"
 import { newScheduleSchema } from "../entities/Schedule/schema"
 import { ScheduleAttributes } from "../entities/Schedule/types"
 
@@ -20,23 +16,17 @@ type ScheduleEditorState = EditSchedule & {
 
 function getName(
   schedule: React.ChangeEvent<any>,
-  props?: { name: string; value: string; type: string; checked: boolean } | any
+  props?: { name: string; value: string } | any
 ): string {
   return (props && props.name) || schedule.target.name
 }
 
 function getValue(
   schedule: React.ChangeEvent<any>,
-  props?: { name: string; value: string; type: string; checked: boolean } | any
+  props?: { name: string; value: string } | any
 ) {
   if (props) {
-    switch (props.type) {
-      case "radio":
-        return props.checked
-
-      default:
-        return props.value || ""
-    }
+    return props.value || ""
   } else {
     return schedule.target.value
   }
@@ -54,7 +44,7 @@ export default function useScheduleEditor(
     name: defaultSchedule.name || "",
     description: defaultSchedule.description || "",
     image: defaultSchedule.image || "",
-    background: defaultSchedule.background || [],
+    background: defaultSchedule.background || ["#f3f2f5"],
     active_since: defaultSchedule.active_since || currentDate.toDate(),
     active_until:
       defaultSchedule.active_until ||
@@ -223,26 +213,32 @@ export default function useScheduleEditor(
     }
   }
 
-  function handleChangeBackground(value: string) {
-    if (schedule.background.includes(value)) {
+  function handleAddBackground(props: { color: string; position?: number }) {
+    const { color, position } = props
+    const colors = schedule.background
+    if (typeof position !== "undefined") {
+      colors.splice(position, 1, color)
       setValues({
-        background: schedule.background.filter((item) => item !== value),
+        background: [...colors],
       })
     } else {
       setValues({
-        background: [...schedule.background, value],
+        background: [...colors, color],
       })
     }
-    if (!value) {
-      return
-    }
+  }
+
+  function handleRemoveBackground(value: number) {
+    const colors = schedule.background
+    colors.splice(value, 1)
+    setValues({
+      background: [...colors],
+    })
   }
 
   function handleChange(
     e: React.ChangeEvent<any>,
-    props?:
-      | { name: string; value: string; type: string; checked: boolean }
-      | any
+    props?: { name: string; value: string } | any
   ) {
     const name = getName(e, props)
     const value = getValue(e, props)
@@ -274,14 +270,17 @@ export default function useScheduleEditor(
         return handleChangeActiveUntilTime(value)
 
       case "background":
-        return handleChangeBackground(value)
+        return handleAddBackground(value)
+
+      case "background_remove":
+        return handleRemoveBackground(value)
 
       default:
       // ignore change
     }
   }
 
-  function validate(options: { new?: boolean }) {
+  function validate() {
     const errors: Record<string, string> = {}
 
     if (!schedule.name) {

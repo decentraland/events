@@ -10,12 +10,22 @@
 
 .schedule-edit__background-selected-wrapper {
   margin-top: 24px;
+  margin-right: 20px;
+  display: inline-block;
 }
 
-.schedule-edit__background-selected-label-wrapper {
+.schedule-edit__background-selected-label-wrapper,
+.schedule-edit__background-selected-label-wrapper input {
+  cursor: pointer;
 }
 
-.schedule-edit__background-selected-label {
+.schedule-edit__background-selected-wrapper
+  .schedule-edit__background-selected-label-wrapper,
+.schedule-edit__background-selected-wrapper
+  .ui.primary.button.schedule-edit__background-selected-button {
+  display: inline-block;
+  margin-top: 24px;
+  margin-right: 20px;
 }
 
 .schedule-edit__background-gradient-wrapper {
@@ -24,4 +34,5 @@
 
 .schedule-edit__background-gradient-preview {
   height: 100px;
+  margin-top: 24px;
 }

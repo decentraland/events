@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useMemo, useRef, useState } from "react"
 
 import { Helmet } from "react-helmet"
 
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
+import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -15,8 +16,12 @@ import { Field } from "decentraland-ui/dist/components/Field/Field"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
+import Header from "semantic-ui-react/dist/commonjs/elements/Header"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import { InputOnChangeData } from "semantic-ui-react/dist/commonjs/elements/Input/Input"
+import Input, {
+  InputOnChangeData,
+  InputProps,
+} from "semantic-ui-react/dist/commonjs/elements/Input/Input"
 import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 
 import Events, { EditSchedule } from "../api/Events"
@@ -24,7 +29,9 @@ import AddCoverButton from "../components/Button/AddCoverButton"
 import ImageInput from "../components/Form/ImageInput"
 import Label from "../components/Form/Label"
 import Textarea from "../components/Form/Textarea"
+import ItemLayout from "../components/Layout/ItemLayout"
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
+//import { canEditAnySchedule } from "../entities/ProfileSettings/utils"
 import { getScheduleBackground } from "../entities/Schedule/utils"
 import useScheduleEditor from "../hooks/useScheduleEditor"
 import locations from "../modules/locations"
@@ -48,9 +55,8 @@ export default function ScheduleEditPage() {
   const [state, patchState] = usePatchState<ScheduleEditPageState>({})
   const [account, accountState] = useAuthContext()
   const [editing, editActions] = useScheduleEditor()
-  const [backgroundDataState, setBackgroundDataState] = useState<
-    boolean | InputOnChangeData
-  >(false)
+
+  const backgroundRef = useRef(new Array(0))
 
   const [uploadingPoster, uploadPoster] = useAsyncTask(
     async (file: File) => {
@@ -84,8 +90,8 @@ export default function ScheduleEditPage() {
   )
 
   const styleBackground = useMemo(
-    () => (editing ? { background: getScheduleBackground(editing) } : {}),
-    [editing]
+    () => ({ background: getScheduleBackground(editing) }),
+    [editing.background]
   )
 
   const loading = accountState.loading
@@ -110,20 +116,15 @@ export default function ScheduleEditPage() {
     return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "#000000" : "#FFFFFF"
   }
 
-  const setBackground = useCallback(
-    (e: React.ChangeEvent, data: any) => {
-      setBackgroundDataState(data)
-    },
-    [editActions.handleChange]
-  )
-
   const [submitting, submit] = useAsyncTask(async () => {
     try {
-      const data = editActions.toObject()
-      console.log(data)
-      const submitted = await Events.get().createSchedule(data as EditSchedule)
+      if (!editActions.validate()) {
+        return null
+      }
 
-      console.log(submitted)
+      const data = editActions.toObject()
+
+      await Events.get().createSchedule(data as EditSchedule)
 
       navigate(locations.events(), { replace: true })
     } catch (err) {
@@ -185,140 +186,63 @@ export default function ScheduleEditPage() {
           />
         )}
         {!loading && account && (
-          <Grid stackable>
-            <Grid.Row>
-              <Grid.Column mobile="16">
-                <ImageInput
-                  label={l("page.schedule_edit.schedule_cover_label")}
-                  value={editing.image || ""}
-                  onFileChange={uploadPoster}
-                  loading={uploadingPoster}
-                  error={coverError}
-                  message={
-                    (state.errorImageSize && (
-                      <>
-                        {l("page.schedule_edit.error_image_size")}{" "}
-                        <a href="https://imagecompressor.com/" target="_blank">
-                          <strong>{l("page.submit.optimizilla")}</strong>
-                        </a>
-                      </>
-                    )) ||
-                    (state.errorImageFormat && (
-                      <>
-                        {l("page.submit.error_image_format")}{" "}
-                        <strong>jpg</strong>, <strong>png</strong> or{" "}
-                        <strong>gif</strong>
-                      </>
-                    )) ||
-                    state.errorImageServer ||
-                    l("page.submit.image_recommended_size")
-                  }
-                >
-                  <div className="ImageInput__Description">
-                    <AddCoverButton />
-                    <Paragraph>
-                      <span className="ImageInput__Description__Primary">
-                        {l("page.submit.browse")}
-                      </span>{" "}
-                      {l("page.submit.browse_line1_label")}
-                      <br />
-                      {l("page.submit.browse_line2_label")}
-                      <br />
-                      <i style={{ opacity: 0.8 }}>
-                        {l("page.submit.image_recommended_size")}
-                      </i>
-                    </Paragraph>
-                  </div>
-                </ImageInput>
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column mobile="16">
-                <Field
-                  label={l("page.schedule_edit.name_label")}
-                  placeholder={l("page.schedule_edit.name_placeholder")}
-                  style={{ width: "100%" }}
-                  name="name"
-                  error={!!errors["name"]}
-                  message={errors["name"]}
-                  value={editing.name}
-                  onChange={editActions.handleChange}
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column mobile="16">
-                <Textarea
-                  minHeight={72}
-                  maxHeight={500}
-                  label={l("page.schedule_edit.description_label")}
-                  placeholder={l("page.schedule_edit.description_placeholder")}
-                  name="description"
-                  error={!!errors["description"]}
-                  message={errors["description"]}
-                  value={editing.description}
-                  onChange={editActions.handleChange}
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column mobile="4">
-                <Field
-                  label={l("page.schedule_edit.background_label")}
-                  placeholder={l("page.schedule_edit.background_placeholder")}
-                  className={"schedule-edit__background-selector"}
-                  name="background"
-                  error={!!errors["background"]}
-                  onChange={setBackground}
-                  action={l("page.schedule_edit.background_add_action")}
-                  message={l(
-                    "page.schedule_edit.background_select_color_label"
-                  )}
-                  onAction={(e) => {
-                    editActions.handleChange(e, backgroundDataState)
-                    setBackgroundDataState(false)
-                  }}
-                  value={
-                    typeof backgroundDataState === "object" &&
-                    backgroundDataState !== null
-                      ? backgroundDataState.value
-                      : false
-                  }
-                  type={"color"}
-                />
-              </Grid.Column>
-              <Grid.Column mobile="16">
-                {editing.background.length > 0 && (
-                  <div className="schedule-edit__background-selected-wrapper">
-                    {editing.background.map((color) => {
-                      return (
-                        <SelectionLabel
-                          key={color}
-                          className={
-                            "schedule-edit__background-selected-label-wrapper"
-                          }
-                          style={{
-                            background: color,
-                            color: getAppropriateBlackWhiteFontColor(color),
-                          }}
-                        >
-                          Color: {color}
-                          <Icon
-                            className={
-                              "schedule-edit__background-selected-label"
-                            }
-                            name="delete"
-                            circular
-                            onClick={(event: React.ChangeEvent<any>) =>
-                              editActions.handleChange(event, {
-                                name: "background",
-                                value: color,
-                              })
-                            }
-                          />
-                        </SelectionLabel>
-                      )
-                    })}
+          <ItemLayout>
+            <Title style={{ fontSize: "34px", lineHeight: "42px" }}>
+              {l("page.submit.submit_event")}
+            </Title>
+            <Grid stackable>
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <ImageInput
+                    label={l("page.schedule_edit.schedule_cover_label")}
+                    value={editing.image || ""}
+                    onFileChange={uploadPoster}
+                    loading={uploadingPoster}
+                    error={coverError}
+                    message={
+                      (state.errorImageSize && (
+                        <>
+                          {l("page.schedule_edit.error_image_size")}{" "}
+                          <a
+                            href="https://imagecompressor.com/"
+                            target="_blank"
+                          >
+                            <strong>{l("page.submit.optimizilla")}</strong>
+                          </a>
+                        </>
+                      )) ||
+                      (state.errorImageFormat && (
+                        <>
+                          {l("page.submit.error_image_format")}{" "}
+                          <strong>jpg</strong>, <strong>png</strong> or{" "}
+                          <strong>gif</strong>
+                        </>
+                      )) ||
+                      state.errorImageServer ||
+                      l("page.submit.image_recommended_size")
+                    }
+                  >
+                    <div className="ImageInput__Description">
+                      <AddCoverButton />
+                      <Paragraph>
+                        <span className="ImageInput__Description__Primary">
+                          {l("page.submit.browse")}
+                        </span>{" "}
+                        {l("page.submit.browse_line1_label")}
+                        <br />
+                        {l("page.submit.browse_line2_label")}
+                        <br />
+                        <i style={{ opacity: 0.8 }}>
+                          {l("page.submit.image_recommended_size")}
+                        </i>
+                      </Paragraph>
+                    </div>
+                  </ImageInput>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  {editing.background.length > 0 && (
                     <div className="schedule-edit__background-gradient-wrapper">
                       <Label>
                         {l("page.schedule_edit.background_preview")}
@@ -328,104 +252,223 @@ export default function ScheduleEditPage() {
                         style={styleBackground}
                       ></div>
                     </div>
-                  </div>
-                )}
-              </Grid.Column>
-            </Grid.Row>
-
-            <Grid.Row>
-              <Grid.Column mobile="8">
-                <Field
-                  label={l("page.schedule_edit.active_since_date_label")}
-                  name="active_since_date"
-                  type="date"
-                  error={
-                    !!errors["active_since"] || !!errors["active_since_date"]
-                  }
-                  message={errors["active_since_date"]}
-                  value={editActions.getActiveSinceDate()}
-                  min={Time.from(Date.now())
-                    .startOf("day")
-                    .format(Time.Formats.InputDate)}
-                  onChange={editActions.handleChange}
-                />
-              </Grid.Column>
-              <Grid.Column mobile="6">
-                <Field
-                  label={l("page.schedule_edit.active_since_time_label")}
-                  name="active_since_time"
-                  type="time"
-                  error={
-                    !!errors["active_since_at"] || !!errors["active_since_time"]
-                  }
-                  message={errors["active_since_time"]}
-                  value={editActions.getActiveSinceTime()}
-                  onChange={editActions.handleChange}
-                />
-              </Grid.Column>
-              <Grid.Column mobile="2">
-                <Paragraph className="FieldNote">{l("general.utc")}</Paragraph>
-              </Grid.Column>
-            </Grid.Row>
-
-            <Grid.Row>
-              <Grid.Column mobile="8">
-                <Field
-                  label={l("page.schedule_edit.active_until_date_label")}
-                  name="active_until_date"
-                  type="date"
-                  error={
-                    !!errors["active_until"] || !!errors["active_until_date"]
-                  }
-                  message={errors["active_until_date"]}
-                  value={editActions.getActiveUntilDate()}
-                  min={Time.from(Date.now())
-                    .startOf("day")
-                    .format(Time.Formats.InputDate)}
-                  onChange={editActions.handleChange}
-                />
-              </Grid.Column>
-              <Grid.Column mobile="6">
-                <Field
-                  label={l("page.schedule_edit.active_until_time_label")}
-                  name="active_until_time"
-                  type="time"
-                  error={
-                    !!errors["active_until_at"] || !!errors["active_until_time"]
-                  }
-                  message={errors["active_until_time"]}
-                  value={editActions.getActiveUntilTime()}
-                  onChange={editActions.handleChange}
-                />
-              </Grid.Column>
-              <Grid.Column mobile="2">
-                <Paragraph className="FieldNote">{l("general.utc")}</Paragraph>
-              </Grid.Column>
-            </Grid.Row>
-
-            <Grid.Row>
-              <Grid.Column mobile="6">
-                <Button
-                  primary
-                  loading={submitting}
-                  disabled={submitting}
-                  style={{ width: "100%" }}
-                  onClick={submit}
-                >
-                  {l("page.submit.submit")}
-                </Button>
-              </Grid.Column>
-            </Grid.Row>
-            {state.error && (
+                  )}
+                </Grid.Column>
+              </Grid.Row>
               <Grid.Row>
                 <Grid.Column mobile="16">
-                  <Paragraph style={{ color: "#ff0000" }}>
-                    {state.error}
+                  <Field
+                    label={l("page.schedule_edit.name_label")}
+                    placeholder={l("page.schedule_edit.name_placeholder")}
+                    style={{ width: "100%" }}
+                    name="name"
+                    error={!!errors["name"]}
+                    message={errors["name"]}
+                    value={editing.name}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <Textarea
+                    minHeight={72}
+                    maxHeight={500}
+                    label={l("page.schedule_edit.description_label")}
+                    placeholder={l(
+                      "page.schedule_edit.description_placeholder"
+                    )}
+                    name="description"
+                    error={!!errors["description"]}
+                    message={errors["description"]}
+                    value={editing.description}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <Header sub>
+                    {l("page.schedule_edit.background_label")}
+                  </Header>
+
+                  <div className="schedule-edit__background-selected-wrapper">
+                    {editing.background.map((color, index) => (
+                      <SelectionLabel
+                        key={index}
+                        className={
+                          "schedule-edit__background-selected-label-wrapper"
+                        }
+                        style={{
+                          background: color,
+                          color: getAppropriateBlackWhiteFontColor(color),
+                          position: "relative",
+                        }}
+                        onClick={() => {
+                          if (backgroundRef && backgroundRef.current) {
+                            backgroundRef.current[index].click()
+                          }
+                        }}
+                      >
+                        {l("page.schedule_edit.background_selected_label", {
+                          color: color,
+                        })}
+                        <Icon
+                          className={"schedule-edit__background-selected-label"}
+                          name="delete"
+                          circular
+                          onClick={(event: React.ChangeEvent<any>) => {
+                            event.stopPropagation()
+                            editActions.handleChange(event, {
+                              name: "background_remove",
+                              value: index,
+                            })
+                          }}
+                        />
+                        <input
+                          type="color"
+                          style={{
+                            opacity: 0,
+                            position: "absolute",
+                            left: 0,
+                            bottom: 0,
+                          }}
+                          ref={(el) => {
+                            backgroundRef.current[index] = el
+                          }}
+                          onChange={(event: any) => {
+                            editActions.handleChange(event, {
+                              name: "background",
+                              value: {
+                                color: event.currentTarget.value,
+                                position: index,
+                              },
+                            })
+                          }}
+                        ></input>
+                      </SelectionLabel>
+                    ))}
+                    <Button
+                      primary
+                      className="schedule-edit__background-selected-button"
+                      onClick={(event) => {
+                        editActions.handleChange(event, {
+                          name: "background",
+                          value: {
+                            color: getScheduleBackground({ background: [] }),
+                          },
+                        })
+                      }}
+                    >
+                      {l("page.schedule_edit.background_add_button")}
+                    </Button>
+                  </div>
+                </Grid.Column>
+              </Grid.Row>
+
+              <Grid.Row>
+                <Grid.Column mobile="8">
+                  <Field
+                    label={l("page.schedule_edit.active_since_date_label")}
+                    name="active_since_date"
+                    type="date"
+                    error={
+                      !!errors["active_since"] || !!errors["active_since_date"]
+                    }
+                    message={errors["active_since_date"]}
+                    value={editActions.getActiveSinceDate()}
+                    min={Time.from(Date.now())
+                      .startOf("day")
+                      .format(Time.Formats.InputDate)}
+                    max={Time.from(Date.now())
+                      .startOf("day")
+                      .format(Time.Formats.InputDate)}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="6">
+                  <Field
+                    label={l("page.schedule_edit.active_since_time_label")}
+                    name="active_since_time"
+                    type="time"
+                    error={
+                      !!errors["active_since_at"] ||
+                      !!errors["active_since_time"]
+                    }
+                    message={errors["active_since_time"]}
+                    value={editActions.getActiveSinceTime()}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="2">
+                  <Paragraph className="FieldNote">
+                    {l("general.utc")}
                   </Paragraph>
                 </Grid.Column>
               </Grid.Row>
-            )}
-          </Grid>
+
+              <Grid.Row>
+                <Grid.Column mobile="8">
+                  <Field
+                    label={l("page.schedule_edit.active_until_date_label")}
+                    name="active_until_date"
+                    type="date"
+                    error={
+                      !!errors["active_until"] || !!errors["active_until_date"]
+                    }
+                    message={errors["active_until_date"]}
+                    value={editActions.getActiveUntilDate()}
+                    min={Time.from(Date.now())
+                      .startOf("day")
+                      .format(Time.Formats.InputDate)}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="6">
+                  <Field
+                    label={l("page.schedule_edit.active_until_time_label")}
+                    name="active_until_time"
+                    type="time"
+                    error={
+                      !!errors["active_until_at"] ||
+                      !!errors["active_until_time"]
+                    }
+                    message={errors["active_until_time"]}
+                    value={editActions.getActiveUntilTime()}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="2">
+                  <Paragraph className="FieldNote">
+                    {l("general.utc")}
+                  </Paragraph>
+                </Grid.Column>
+              </Grid.Row>
+
+              <Grid.Row>
+                <Grid.Column mobile="6">
+                  <Button
+                    primary
+                    loading={submitting}
+                    disabled={submitting}
+                    style={{ width: "100%" }}
+                    onClick={submit}
+                  >
+                    {l("page.submit.submit")}
+                  </Button>
+                </Grid.Column>
+              </Grid.Row>
+              {state.error && (
+                <Grid.Row>
+                  <Grid.Column mobile="16">
+                    <Paragraph style={{ color: "#ff0000" }}>
+                      {state.error}
+                    </Paragraph>
+                  </Grid.Column>
+                </Grid.Row>
+              )}
+            </Grid>
+          </ItemLayout>
         )}
       </Container>
     </>
