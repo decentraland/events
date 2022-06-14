@@ -287,6 +287,28 @@ export function calculateRecurrentProperties(
   return recurrent
 }
 
+export function calculateNextRecurrentDates(
+  event: EventAttributes
+): Pick<EventAttributes, "next_start_at" | "next_finish_at"> {
+  const now = Date.now()
+
+  let temp_start_time_at = event.start_at
+
+  if (
+    !temp_start_time_at ||
+    (temp_start_time_at && temp_start_time_at.getTime() + event.duration <= now)
+  ) {
+    temp_start_time_at =
+      event.recurrent_dates.find(
+        (date) => date.getTime() + event.duration > now
+      ) || event.recurrent_dates[event.recurrent_dates.length - 1]
+  }
+  return {
+    next_start_at: temp_start_time_at,
+    next_finish_at: Time(temp_start_time_at).add(event.duration).toDate(),
+  }
+}
+
 export function getEventType(type: string | null) {
   switch (type) {
     case EventType.One:
