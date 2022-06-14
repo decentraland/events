@@ -12,7 +12,11 @@ import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 import EventModel from "./model"
 import { EventAttributes } from "./types"
-import { calculateRecurrentProperties, eventUrl } from "./utils"
+import {
+  calculateNextRecurrentDates,
+  calculateRecurrentProperties,
+  eventUrl,
+} from "./utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()
@@ -20,11 +24,7 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
   for (const event of events) {
     const update = {
       ...calculateRecurrentProperties(event),
-      next_start_at: EventModel.selectNextStartAt(
-        event.duration,
-        event.start_at,
-        event.recurrent_dates
-      ),
+      ...calculateNextRecurrentDates(event),
     }
 
     ctx.log(`updating next_start_at for event: "${event.id}"`)
