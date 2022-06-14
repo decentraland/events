@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react"
+import React, { useMemo, useRef } from "react"
 
 import { Helmet } from "react-helmet"
 
@@ -18,10 +18,6 @@ import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import Header from "semantic-ui-react/dist/commonjs/elements/Header"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import Input, {
-  InputOnChangeData,
-  InputProps,
-} from "semantic-ui-react/dist/commonjs/elements/Input/Input"
 import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 
 import Events, { EditSchedule } from "../api/Events"
@@ -31,7 +27,6 @@ import Label from "../components/Form/Label"
 import Textarea from "../components/Form/Textarea"
 import ItemLayout from "../components/Layout/ItemLayout"
 import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
-//import { canEditAnySchedule } from "../entities/ProfileSettings/utils"
 import { getScheduleBackground } from "../entities/Schedule/utils"
 import useScheduleEditor from "../hooks/useScheduleEditor"
 import locations from "../modules/locations"
