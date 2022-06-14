@@ -1,9 +1,11 @@
 import React from "react"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
+
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
-import { SessionEventAttributes } from "../../entities/Event/types"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+
 import { useEventsContext } from "../../context/Event"
+import { SessionEventAttributes } from "../../entities/Event/types"
 
 import "./EditButtons.css"
 

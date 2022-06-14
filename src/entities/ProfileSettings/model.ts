@@ -1,12 +1,13 @@
-import { DEFAULT_PROFILE_SETTINGS, ProfileSettingsAttributes } from "./types"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
-import isEmail from "validator/lib/isEmail"
+import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import {
   SQL,
   table,
   values,
 } from "decentraland-gatsby/dist/entities/Database/utils"
-import { Model } from "decentraland-gatsby/dist/entities/Database/model"
+import isEmail from "validator/lib/isEmail"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
+import { DEFAULT_PROFILE_SETTINGS, ProfileSettingsAttributes } from "./types"
 
 export default class ProfileSettingsModel extends Model<ProfileSettingsAttributes> {
   static tableName = "profile_settings"

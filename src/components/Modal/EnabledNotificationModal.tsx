@@ -1,14 +1,16 @@
 import React from "react"
-import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import locations from "../../modules/locations"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal"
+
 import closeIcon from "../../images/popup-close.svg"
+import locations from "../../modules/locations"
 
 import "./EnabledNotificationModal.css"
 

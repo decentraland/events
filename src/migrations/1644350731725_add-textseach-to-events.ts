@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import { MigrationBuilder } from "node-pg-migrate"
+
 import EventModel from "../entities/Event/model"
 
 export async function up(pgm: MigrationBuilder): Promise<void> {

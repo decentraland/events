@@ -1,29 +1,25 @@
 import React, { useMemo, useState } from "react"
-import Helmet from "react-helmet"
+
+import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
-
+import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-
 import { Container } from "decentraland-ui/dist/components/Container/Container"
-import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 
+import { ListEvents } from "../components/Event/ListEvents/ListEvents"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
-
-import { useEventsContext, useEventSchedule } from "../context/Event"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
-import { fromEventTime, getEventType } from "../entities/Event/utils"
-import useListEventsFiltered from "../hooks/useListEventsFiltered"
-import { ListEvents } from "../components/Event/ListEvents/ListEvents"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import { useEventSchedule, useEventsContext } from "../context/Event"
 import { getSchedules } from "../modules/events"
-import "./index.css"
 import { toEventFilters } from "../modules/locations"
+
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>

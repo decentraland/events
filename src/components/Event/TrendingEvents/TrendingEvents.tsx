@@ -5,9 +5,10 @@ import { Card } from "decentraland-ui/dist/components/Card/Card"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventCardMini from "../EventCardMini/EventCardMini"
-import { navigateEventDetail } from "../../../modules/events"
 import useListEventsTrending from "../../../hooks/useListEventsTrending"
+import { navigateEventDetail } from "../../../modules/events"
+import EventCardMini from "../EventCardMini/EventCardMini"
+
 import "./TrendingEvents.css"
 
 export type TrendingEventsProps = {

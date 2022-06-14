@@ -1,8 +1,11 @@
 import React from "react"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+
 import Live from "./Live"
+
 import "./StartIn.css"
 
 export type StartInProps = {

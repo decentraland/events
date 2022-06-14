@@ -1,9 +1,10 @@
 import { useState } from "react"
+
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 
-let service = new Map<string, ServiceWorkerRegistration>()
+const service = new Map<string, ServiceWorkerRegistration>()
 
-export default function useServiceWorker(path: string = "/sw.js") {
+export default function useServiceWorker(path = "/sw.js") {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(service.get(path) || null)
 

@@ -1,17 +1,19 @@
 import React, { useCallback, useMemo } from "react"
-import { Card } from "decentraland-ui/dist/components/Card/Card"
-import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
+
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
+import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import { Card } from "decentraland-ui/dist/components/Card/Card"
+
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import JumpInPosition from "../../Button/JumpInPosition"
+import locations from "../../../modules/locations"
+import StartIn from "../../Badge/StartIn"
 import AttendingButtons from "../../Button/AttendingButtons"
+import JumpInPosition from "../../Button/JumpInPosition"
+import EventDate from "../EventDate/EventDate"
 
 import "./EventCard.css"
-import EventDate from "../EventDate/EventDate"
-import StartIn from "../../Badge/StartIn"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import locations from "../../../modules/locations"
 
 const EVENTS_LIST = 3
 

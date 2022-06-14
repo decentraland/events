@@ -1,6 +1,7 @@
-import EventModel from "../model"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import EventModel from "../model"
 
 export async function getAttendingEventList(req: WithAuth) {
   const profile = await getMyProfileSettings(req)

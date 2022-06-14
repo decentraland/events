@@ -1,24 +1,26 @@
-import { v4 as uuid } from "uuid"
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
-import Land from "decentraland-gatsby/dist/utils/api/Land"
-import EventModel from "../model"
-import { eventTargetUrl, calculateRecurrentProperties } from "../utils"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import {
-  EventAttributes,
-  DeprecatedEventAttributes,
-  MAX_EVENT_DURATION,
-} from "../types"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
-import { notifyNewEvent } from "../../Slack/utils"
-import API from "decentraland-gatsby/dist/utils/api/API"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import { newEventSchema } from "../schemas"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+import API from "decentraland-gatsby/dist/utils/api/API"
+import Land from "decentraland-gatsby/dist/utils/api/Land"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import omit from "lodash/omit"
+import { v4 as uuid } from "uuid"
+
 import EventCategoryModel from "../../EventCategory/model"
 import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { notifyNewEvent } from "../../Slack/utils"
+import EventModel from "../model"
+import { newEventSchema } from "../schemas"
+import {
+  DeprecatedEventAttributes,
+  EventAttributes,
+  MAX_EVENT_DURATION,
+} from "../types"
+import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
 
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -27,13 +29,12 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
   const profile = await getMyProfileSettings(req)
-  let data = req.body as EventAttributes
+  const data = req.body as EventAttributes
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    const { authorization, ...headers } = req.headers
     throw new RequestError("Empty event data", RequestError.BadRequest, {
       body: data,
-      headers,
+      headers: omit(req.headers, ["authorization"]),
       user,
     })
   }

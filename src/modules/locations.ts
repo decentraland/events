@@ -1,4 +1,5 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
+
 import { EventType } from "../entities/Event/types"
 import {
   fromEventTime,

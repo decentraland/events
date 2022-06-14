@@ -1,19 +1,22 @@
-import { useState, useMemo } from "react"
-import isURL from "validator/lib/isURL"
+import React, { useMemo, useState } from "react"
+
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import {
-  Frequency,
-  WeekdayMask,
-  MonthMask,
-  Position,
-  MAX_EVENT_RECURRENT,
-  DEFAULT_EVENT_DURATION,
-  MAX_EVENT_DURATION,
-  MAX_CATAGORIES_ALLOWED,
-} from "../entities/Event/types"
-import { toWeekdayMask, toRecurrentSetpos } from "../entities/Event/utils"
+import omit from "lodash/omit"
+import isURL from "validator/lib/isURL"
+
 import { EditEvent } from "../api/Events"
 import { newEventSchema } from "../entities/Event/schemas"
+import {
+  DEFAULT_EVENT_DURATION,
+  Frequency,
+  MAX_CATAGORIES_ALLOWED,
+  MAX_EVENT_DURATION,
+  MAX_EVENT_RECURRENT,
+  MonthMask,
+  Position,
+  WeekdayMask,
+} from "../entities/Event/types"
+import { toRecurrentSetpos, toWeekdayMask } from "../entities/Event/utils"
 
 type EventEditorState = EditEvent & {
   errors: Record<string, string>
@@ -366,7 +369,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
           recurrent_setpos: null,
         })
 
-      case Frequency.MONTHLY:
+      case Frequency.MONTHLY: {
         const day = event.start_at.getUTCDate()
         return setValues({
           recurrent_frequency: Frequency.MONTHLY,
@@ -375,6 +378,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
           recurrent_monthday: day,
           recurrent_setpos: null,
         })
+      }
       default:
       // ignore
     }
@@ -660,8 +664,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function toObject() {
-    const { errors, ...data } = event
-    return data
+    return omit(event, ["errors"])
   }
 
   const actions = {

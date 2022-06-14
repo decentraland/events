@@ -2,21 +2,21 @@ import React, { useCallback, useMemo } from "react"
 
 import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
-import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-
-import { SessionEventAttributes } from "../../../entities/Event/types"
-import EventCardBig from "../EventCardBig/EventCardBig"
-import { navigateEventDetail } from "../../../modules/events"
-import { ScheduleAttributes } from "../../../entities/Schedule/types"
-import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import locations from "../../../modules/locations"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Container } from "decentraland-ui/dist/components/Container/Container"
+
+import { SessionEventAttributes } from "../../../entities/Event/types"
+import { ScheduleAttributes } from "../../../entities/Schedule/types"
 import { getScheduleBackground } from "../../../entities/Schedule/utils"
 import useListEventsMain from "../../../hooks/useListEventsMain"
-import "./CarouselEvents.css"
+import { navigateEventDetail } from "../../../modules/events"
+import locations from "../../../modules/locations"
 import ContainerWrapper from "../../Layout/ContainerWrapper"
+import EventCardBig from "../EventCardBig/EventCardBig"
+
+import "./CarouselEvents.css"
 
 export type CarouselEventsProps = {
   loading?: boolean
@@ -71,7 +71,10 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
   }
 
   return (
-    <ContainerWrapper style={style}>
+    <ContainerWrapper
+      style={style}
+      className="carousel-events__container-wrapper"
+    >
       <Container>
         {schedule && (
           <SubTitle className="carousel-events__title">

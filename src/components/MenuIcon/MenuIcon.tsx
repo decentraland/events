@@ -1,7 +1,9 @@
-import React from "react"
-import "./MenuIcon.css"
+import React, { useCallback } from "react"
+
 import Menu from "semantic-ui-react/dist/commonjs/collections/Menu"
 import Dropdown from "semantic-ui-react/dist/commonjs/modules/Dropdown"
+
+import "./MenuIcon.css"
 
 export type MenuIconChildreHeaderProps = {
   children?: string | React.ReactNode
@@ -47,7 +49,7 @@ export function MenuIconDivider() {
 export function MenuIconItem(props: MenuIconChildreItemProps) {
   const { children, onClick } = props
 
-  const handleClick = React.useCallback(
+  const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, data: MenuIconChildreItemProps) => {
       if (onClick) {
         onClick(e, data)

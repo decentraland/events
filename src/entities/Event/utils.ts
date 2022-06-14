@@ -1,18 +1,19 @@
-import padStart from "lodash/padStart"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import padStart from "lodash/padStart"
+import { RRule, Weekday } from "rrule"
+
+import { ScheduleAttributes } from "../Schedule/types"
 import {
   EventAttributes,
+  EventType,
+  MAX_EVENT_RECURRENT,
   MonthMask,
-  WeekdayMask,
-  Weekdays,
   Months,
   Position,
   RecurrentEventAttributes,
-  MAX_EVENT_RECURRENT,
-  EventType,
+  WeekdayMask,
+  Weekdays,
 } from "./types"
-import { RRule, Weekday } from "rrule"
-import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL =
   process.env.GATSBY_DECENTRALAND_URL ||
@@ -24,7 +25,7 @@ const EVENTS_URL =
   process.env.GATSBY_EVENTS_URL ||
   "https://events.decentraland.org/api"
 
-export function siteUrl(pathname: string = "") {
+export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_URL)
   target.pathname = pathname
   return target
@@ -284,6 +285,28 @@ export function calculateRecurrentProperties(
   }
 
   return recurrent
+}
+
+export function calculateNextRecurrentDates(
+  event: EventAttributes
+): Pick<EventAttributes, "next_start_at" | "next_finish_at"> {
+  const now = Date.now()
+
+  let temp_start_time_at = event.start_at
+
+  if (
+    !temp_start_time_at ||
+    (temp_start_time_at && temp_start_time_at.getTime() + event.duration <= now)
+  ) {
+    temp_start_time_at =
+      event.recurrent_dates.find(
+        (date) => date.getTime() + event.duration > now
+      ) || event.recurrent_dates[event.recurrent_dates.length - 1]
+  }
+  return {
+    next_start_at: temp_start_time_at,
+    next_finish_at: Time(temp_start_time_at).add(event.duration).toDate(),
+  }
 }
 
 export function getEventType(type: string | null) {

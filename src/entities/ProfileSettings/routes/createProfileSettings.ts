@@ -1,10 +1,11 @@
-import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import ProfileSettingsModel from "../model"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
-import { canEditAnyProfile } from "../utils"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
-import { getMyProfileSettings } from "./getMyProfileSettings"
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
+import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
+import isEthereumAddress from "validator/lib/isEthereumAddress"
+
+import ProfileSettingsModel from "../model"
+import { canEditAnyProfile } from "../utils"
+import { getMyProfileSettings } from "./getMyProfileSettings"
 
 export async function createProfileSettings(req: WithAuth) {
   const currentUserProfile = await getMyProfileSettings(req)

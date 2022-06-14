@@ -1,9 +1,10 @@
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { Request } from "express"
+
 import EventModel from "../Event/model"
 import { SITEMAP_ITEMS_PER_PAGE } from "../Event/types"
 import { eventUrl, scheduleUrl, siteUrl } from "../Event/utils"
-import { Request } from "express"
 import ScheduleModel from "../Schedule/model"
 
 export default routes((router) => {
@@ -80,7 +81,7 @@ export async function getEventsSitemap(req: Request) {
   ].join("")
 }
 
-export async function getSchedulesSitemap(req: Request) {
+export async function getSchedulesSitemap() {
   const schedules = await ScheduleModel.find()
   return [
     `<?xml version="1.0" encoding="UTF-8"?>` +
