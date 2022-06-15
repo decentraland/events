@@ -20,9 +20,7 @@ RUN apk add --no-cache --virtual native-deps \
   file \
   pkgconf
 
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
+RUN apk add --no-cache tini
 
 WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
@@ -61,7 +59,7 @@ RUN rm -rf \
   /usr/local/bin/yarnpkg \
   /opt/yarn-*
 
-COPY --from=compiler /tini /tini
+COPY --from=compiler /sbin/tini                /sbin/tini
 COPY --from=compiler /app/package.json         /app/package.json
 COPY --from=compiler /app/package-lock.json    /app/package-lock.json
 COPY --from=compiler /app/node_modules         /app/node_modules
