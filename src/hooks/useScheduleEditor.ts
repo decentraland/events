@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react"
 
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import omit from "lodash/omit"
 import isURL from "validator/lib/isURL"
+import isUUID from "validator/lib/isUUID"
 
-import { EditEvent, EditSchedule } from "../api/Events"
+import Events, { EditEvent, EditSchedule } from "../api/Events"
 import { DEFAULT_EVENT_DURATION } from "../entities/Event/types"
 import { newScheduleSchema } from "../entities/Schedule/schema"
 import { ScheduleAttributes } from "../entities/Schedule/types"
@@ -32,7 +34,7 @@ function getValue(
   }
 }
 
-export default function useScheduleEditor(
+export function useScheduleEditor(
   defaultSchedule: Partial<ScheduleAttributes> = {}
 ) {
   const l = useFormatMessage()
@@ -335,4 +337,16 @@ export default function useScheduleEditor(
   }
 
   return [schedule, actions] as const
+}
+
+export function useScheduleEditorId(scheduleId: string | null) {
+  return useAsyncMemo(async () => {
+    if (!scheduleId || !isUUID(scheduleId)) {
+      return null
+    }
+
+    const currentSchedule = await Events.get().getSchedule(scheduleId)
+
+    return currentSchedule
+  }, [scheduleId])
 }

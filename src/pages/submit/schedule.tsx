@@ -1,7 +1,8 @@
-import React, { useMemo, useRef } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 
 import { Helmet } from "react-helmet"
 
+import { useLocation } from "@gatsbyjs/reach-router"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
@@ -31,7 +32,10 @@ import {
   POSTER_FILE_TYPES,
 } from "../../entities/Poster/types"
 import { getScheduleBackground } from "../../entities/Schedule/utils"
-import useScheduleEditor from "../../hooks/useScheduleEditor"
+import {
+  useScheduleEditor,
+  useScheduleEditorId,
+} from "../../hooks/useScheduleEditor"
 import locations from "../../modules/locations"
 
 import "./schedule.css"
@@ -52,9 +56,26 @@ export default function ScheduleEditPage() {
   const l = useFormatMessage()
   const [state, patchState] = usePatchState<ScheduleEditPageState>({})
   const [account, accountState] = useAuthContext()
+  const location = useLocation()
+  const params = new URLSearchParams(location.search)
+
   const [editing, editActions] = useScheduleEditor()
+  const [original] = useScheduleEditorId(params.get("schedule"))
 
   const backgroundRef = useRef(new Array(0))
+
+  useEffect(() => {
+    if (original) {
+      editActions.setValues({
+        name: original.name,
+        description: original.description,
+        background: original.background,
+        image: original.image,
+        active_since: original.active_since,
+        active_until: original.active_until,
+      })
+    }
+  }, [original])
 
   const [uploadingPoster, uploadPoster] = useAsyncTask(
     async (file: File) => {
@@ -122,7 +143,9 @@ export default function ScheduleEditPage() {
 
       const data = editActions.toObject()
 
-      await Events.get().createSchedule(data as EditSchedule)
+      await (original
+        ? Events.get().updateSchedule(original.id, data as EditSchedule)
+        : Events.get().createSchedule(data as EditSchedule))
 
       navigate(locations.events(), { replace: true })
     } catch (err) {
