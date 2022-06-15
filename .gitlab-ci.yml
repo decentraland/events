@@ -51,11 +51,11 @@ build:code:
     - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
 
     # check repository exists
-    - export REPOSITORY_DESCRIPTION="$(aws --profile io ecr describe-repositories --repository-names $REPOSITORY_NAME)"
+    - export REPOSITORY_DESCRIPTION="$(aws ecr describe-repositories --repository-names $REPOSITORY_NAME)"
     - >
       if [ -z "$REPOSITORY_DESCRIPTION" ]; then
         echo "Creating repository $REPOSITORY_NAME";
-        aws --profile io ecr create-repository --repository-name $REPOSITORY_NAME
+        aws ecr create-repository --repository-name $REPOSITORY_NAME
       fi
 
     # build docker
