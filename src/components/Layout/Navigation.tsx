@@ -125,7 +125,7 @@ export default function Navigation(props: NavigationProps) {
               defaultValue={params.get("search") || ""}
             />
           )}
-          <SubmitButton as={Link} href={locations.submit()} />
+          <SubmitButton as={Link} href={locations.submitEvent()} />
         </div>
       </Tabs>
     </>

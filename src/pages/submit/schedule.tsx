@@ -20,18 +20,21 @@ import Header from "semantic-ui-react/dist/commonjs/elements/Header"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 
-import Events, { EditSchedule } from "../api/Events"
-import AddCoverButton from "../components/Button/AddCoverButton"
-import ImageInput from "../components/Form/ImageInput"
-import Label from "../components/Form/Label"
-import Textarea from "../components/Form/Textarea"
-import ItemLayout from "../components/Layout/ItemLayout"
-import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
-import { getScheduleBackground } from "../entities/Schedule/utils"
-import useScheduleEditor from "../hooks/useScheduleEditor"
-import locations from "../modules/locations"
+import Events, { EditSchedule } from "../../api/Events"
+import AddCoverButton from "../../components/Button/AddCoverButton"
+import ImageInput from "../../components/Form/ImageInput"
+import Label from "../../components/Form/Label"
+import Textarea from "../../components/Form/Textarea"
+import ItemLayout from "../../components/Layout/ItemLayout"
+import {
+  POSTER_FILE_SIZE,
+  POSTER_FILE_TYPES,
+} from "../../entities/Poster/types"
+import { getScheduleBackground } from "../../entities/Schedule/utils"
+import useScheduleEditor from "../../hooks/useScheduleEditor"
+import locations from "../../modules/locations"
 
-import "./scheduleEdit.css"
+import "./schedule.css"
 
 type ScheduleEditPageState = {
   loading?: boolean
