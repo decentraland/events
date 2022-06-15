@@ -291,7 +291,7 @@ export default function useScheduleEditor(
     }
   }
 
-  function validate(options: { new?: boolean }) {
+  function validate() {
     const errors: Record<string, string> = {}
 
     if (!schedule.name) {

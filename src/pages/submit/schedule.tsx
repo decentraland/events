@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
+
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -26,19 +27,16 @@ import AddCoverButton from "../../components/Button/AddCoverButton"
 import ImageInput from "../../components/Form/ImageInput"
 import Label from "../../components/Form/Label"
 import Textarea from "../../components/Form/Textarea"
+import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../../entities/Poster/types"
+import { getScheduleBackground } from "../../entities/Schedule/utils"
+import useScheduleEditor from "../../hooks/useScheduleEditor"
 import ItemLayout from "../../components/Layout/ItemLayout"
 import {
-  POSTER_FILE_SIZE,
-  POSTER_FILE_TYPES,
-} from "../../entities/Poster/types"
-import { getScheduleBackground } from "../../entities/Schedule/utils"
-import {
-  useScheduleEditor,
   useScheduleEditorId,
 } from "../../hooks/useScheduleEditor"
-import locations from "../../modules/locations"
 
 import "./schedule.css"
+import locations from "../../modules/locations"
 
 type ScheduleEditPageState = {
   loading?: boolean

@@ -98,7 +98,6 @@ export default {
   myEvents: () => url("/me/"),
   pendingEvents: () => url("/pending/"),
   schedule: (id: string) => url("/schedule/", { id }),
-  scheduleEdit: () => url("/scheduleEdit/"),
 
   submitEvent: () => url("/submit/"),
   editEvent: (event: string) =>
