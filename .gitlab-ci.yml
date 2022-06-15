@@ -59,10 +59,15 @@ build:code:
       fi
 
     # build docker
-    - DOCKER_BUILDKIT=1 docker build --pull -t $CI_REGISTRY_IMAGE .
-
-    # push docker
-    - docker push $CI_REGISTRY_IMAGE
+    - export REPOSITORY_IMAGE_DESCRIPTION="$(aws ecr describe-images --repository-name $REPOSITORY_NAME --image-ids imageTag=$CI_COMMIT_SHA)"
+    - >
+      if [ -z "$REPOSITORY_IMAGE_DESCRIPTION" ]; then
+        echo "Building image $CI_REGISTRY_IMAGE"
+        docker build --pull -t $CI_REGISTRY_IMAGE .
+        docker push $CI_REGISTRY_IMAGE
+      else
+        echo "Image $CI_REGISTRY_IMAGE is already build"
+      fi
 
     # push server
     - pulumi plugin install resource aws v4.36.0
