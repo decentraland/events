@@ -71,4 +71,4 @@ COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
 
 VOLUME [ "/data" ]
 
-ENTRYPOINT ["/tini", "--", "/app/entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
