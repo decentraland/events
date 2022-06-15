@@ -12,6 +12,7 @@ build:code:
   image: decentraland/ci-node:latest
   variables:
     PULUMI_STACK: "website-events"
+    REPOSITORY_NAME: "events"
   only:
     - master
     - staging
@@ -44,7 +45,24 @@ build:code:
     - source ./node_modules/.bin/setup-environment
 
     - env | grep GATSBY_ > .env
-    # - echo .env
+
+    # login repository
+    - export CI_REGISTRY_IMAGE="$CI_REGISTRY_REPOSITORY_AWS/$REPOSITORY_NAME:$CI_COMMIT_SHA"
+    - aws ecr get-login-password --region $CI_REGISTRY_REGION | docker login --username AWS --password-stdin "$CI_REGISTRY_REPOSITORY_AWS"
+
+    # check repository exists
+    - export REPOSITORY_DESCRIPTION="$(aws --profile io ecr describe-repositories --repository-names $REPOSITORY_NAME)"
+    - >
+      if [ -z "$REPOSITORY_DESCRIPTION" ]; then
+        echo "Creating repository $REPOSITORY_NAME";
+        aws --profile io ecr create-repository --repository-name $REPOSITORY_NAME
+      fi
+
+    # build docker
+    - DOCKER_BUILDKIT=1 docker build --pull -t $CI_REGISTRY_IMAGE .
+
+    # push docker
+    - docker push $CI_REGISTRY_IMAGE
 
     # push server
     - pulumi plugin install resource aws v4.36.0

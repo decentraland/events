@@ -1,6 +1,6 @@
 // import { resolve } from "path";
-import { buildGatsby } from "decentraland-gatsby-deploy/dist/recepies/buildGatsby"
 import { variable } from "decentraland-gatsby-deploy/dist/pulumi/env"
+import { buildGatsby } from "decentraland-gatsby-deploy/dist/recepies/buildGatsby"
 
 export = async function main() {
   return buildGatsby({
@@ -11,7 +11,8 @@ export = async function main() {
     // contentRoutingRules: {
     //   '/en/*': '/$1'
     // },
-    serviceSource: ".",
+    // serviceSource: ".",
+    serviceImage: process.env["CI_REGISTRY_IMAGE"],
     serviceMemory: 1024,
     serviceEnvironment: [variable("NODE_ENV", "production")],
     servicePaths: [
