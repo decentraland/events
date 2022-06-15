@@ -52,6 +52,15 @@ RUN npm prune --production
 FROM node:16.14-alpine
 WORKDIR /app
 
+RUN rm -rf \
+  /usr/local/lib/node_modules/npm/ \
+  /usr/local/bin/npm \
+  /usr/local/bin/npx \
+  /usr/local/bin/corepack \
+  /usr/local/bin/yarn \
+  /usr/local/bin/yarnpkg \
+  /opt/yarn-*
+
 COPY --from=compiler /tini /tini
 COPY --from=compiler /app/package.json         /app/package.json
 COPY --from=compiler /app/package-lock.json    /app/package-lock.json
@@ -64,4 +73,4 @@ COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
 
 VOLUME [ "/data" ]
 
-ENTRYPOINT [ "./entrypoint.sh" ]
+ENTRYPOINT ["/tini", "--", "./entrypoint.sh"]
