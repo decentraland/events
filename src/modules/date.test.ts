@@ -13,26 +13,39 @@ describe("Date module", () => {
       showTimezoneLabel(Time.tz(Date.now(), "America/New_York"), false)
     ).toBe("(UTC)")
   })
-  test("Return of timezone label for -5 (-4 with DTS)", () => {
-    // When time is not in UTC (-4 or -5) and setting.use_local_time is true
-    expect(
-      ["(UTC-5)", "(UTC-4)"].includes(
-        showTimezoneLabel(Time.tz(Date.now(), "America/New_York"), true)
-      )
-    ).toBe(true)
+
+  const tz = Object.entries({
+    Iceland: "(UTC)",
+    "Asia/Dubai": "(UTC+4)",
+    "Australia/ACT": "(UTC+10)",
+    "Pacific/Rarotonga": "(UTC-10)",
+    "US/Samoa": "(UTC-11)",
+    "Asia/Calcutta": "(UTC+5:30)",
   })
-  test("Return of timezone label for -3:30 (-2:30 with DTS)", () => {
-    // When time is not in UTC (-2:30) and setting.use_local_time is true
-    expect(
-      ["(UTC-2:30)", "(UTC-3:40)"].includes(
-        showTimezoneLabel(Time.tz(Date.now(), "Canada/Newfoundland"), true)
-      )
-    ).toBe(true)
+
+  for (const [name, expected] of tz) {
+    test(`should return label ${expected} for timezone "${name}"`, () => {
+      const label = showTimezoneLabel(Time.tz(Date.now(), name), true)
+      expect(label).toBe(expected)
+    })
+  }
+
+  const dts = Object.entries({
+    CET: ["(UTC+1)", "(UTC+2)"],
+    "America/New_York": ["(UTC-5)", "(UTC-4)"],
+    "Canada/Newfoundland": ["(UTC-3:30)", "(UTC-2:30)"],
+    "Antarctica/Troll": ["(UTC)", "(UTC+2)"],
+    "Asia/Beirut": ["(UTC+2)", "(UTC+3)"],
+    "Asia/Tehran": ["(UTC+3:30)", "(UTC+4:30)"],
+    "Australia/LHI": ["(UTC+11)", "(UTC+10:30)"],
   })
-  test("Return of timezone label for +4", () => {
-    // When time is not in UTC (+4) and setting.use_local_time is true
-    expect(showTimezoneLabel(Time.tz(Date.now(), "Asia/Dubai"), true)).toBe(
-      "(UTC+4)"
-    )
-  })
+
+  for (const [name, expected] of dts) {
+    test(`should returns label ${expected[0]} with SDT and ${expected[1]} with DTS for timezone "${name}"`, () => {
+      const labelSDT = showTimezoneLabel(Time.tz("2020-01-01", name), true)
+      const labelDTS = showTimezoneLabel(Time.tz("2020-06-01", name), true)
+      expect(labelSDT).toBe(expected[0])
+      expect(labelDTS).toBe(expected[1])
+    })
+  }
 })

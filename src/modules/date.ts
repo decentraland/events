@@ -2,29 +2,37 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 /**
  * Return a formatted label like (UTC) of with different timezone than UTC like (UTC -3)
- * @param timeParam
+ * @param time
  * @param useLocalTime
  * @returns
  */
 const showTimezoneLabel = (
-  timeParam: Time.Dayjs,
-  useLocalTime: boolean | null | undefined
+  time: Time.Dayjs | Date,
+  useLocalTime: boolean | null | undefined = true
 ) => {
-  if (!useLocalTime || timeParam.isUTC()) {
+  time = Time.from(time)
+  if (!useLocalTime || time.isUTC()) {
     return "(UTC)"
   }
 
-  let timeZone = timeParam.format("Z")
-  const timeZoneSplitted = timeZone.split(":")
-  // In case of +/- timezone with oclock time erase the extra 0 // -0300 => -3
-  if (timeZoneSplitted[1] === "00") {
-    timeZone = timeParam.format("ZZ").replace(/0/g, "")
-  } else {
-    // else add the minutes to the timezone // -0230 => -2:30
-    timeZone = timeZoneSplitted[0].replace(/0/g, "") + ":" + timeZoneSplitted[1]
+  const zone = time.format("ZZ") // ±HHmm
+  const sign = zone.slice(0, 1)
+  const hours = zone.slice(1, 3)
+  const minutes = zone.slice(3)
+
+  if (hours === "00" && minutes === "00") {
+    return "(UTC)"
   }
 
-  return `(UTC${timeZone})`
+  let result = "(UTC" + sign + String(Number(hours))
+
+  if (minutes !== "00") {
+    result += ":" + minutes
+  }
+
+  result += ")"
+
+  return result
 }
 
 export { showTimezoneLabel }
