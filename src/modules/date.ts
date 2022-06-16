@@ -20,6 +20,10 @@ const showTimezoneLabel = (
   const hours = zone.slice(1, 3)
   const minutes = zone.slice(3)
 
+  if (hours === "00" && minutes === "00") {
+    return "(UTC)"
+  }
+
   let result = "(UTC" + sign + String(Number(hours))
 
   if (minutes !== "00") {

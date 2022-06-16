@@ -15,6 +15,7 @@ describe("Date module", () => {
   })
 
   const tz = Object.entries({
+    Iceland: "(UTC)",
     "Asia/Dubai": "(UTC+4)",
     "Australia/ACT": "(UTC+10)",
     "Pacific/Rarotonga": "(UTC-10)",
