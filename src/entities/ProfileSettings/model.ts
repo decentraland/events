@@ -41,6 +41,15 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     return this.query<ProfileSettingsAttributes>(query)
   }
 
+  static async list() {
+    const query = SQL`
+      SELECT *
+      FROM ${table(this)}
+      WHERE "permissions" > array[]::varchar[]
+    `
+    return this.query<ProfileSettingsAttributes>(query)
+  }
+
   static async unsubscribe(user: string, email: string) {
     if (!isEthereumAddress(user) || !isEmail(email)) {
       return false

@@ -58,7 +58,7 @@ export type EmailSubscription = {
   exp: number
 }
 
-export const updateProfileSettingsSchema: AjvObjectSchema = {
+export const updateProfileSettingsSchema = {
   type: "object",
   additionalProperties: false,
   required: [],
@@ -78,7 +78,7 @@ export const updateProfileSettingsSchema: AjvObjectSchema = {
   },
 }
 
-export const updateMyProfileSettingsSchema: AjvObjectSchema = {
+export const updateMyProfileSettingsSchema = {
   type: "object",
   additionalProperties: false,
   required: [],

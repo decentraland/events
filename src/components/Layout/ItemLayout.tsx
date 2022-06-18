@@ -5,6 +5,7 @@ import { Back } from "decentraland-ui/dist/components/Back/Back"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 
 type ItemLayoutState = {
+  full?: boolean
   children?: React.ReactNode
 }
 
@@ -19,7 +20,10 @@ export default function ItemLayout(props: ItemLayoutState) {
         <Grid.Column style={{ width: "58px", padding: "5px 8px 5px 3px" }}>
           <Back onClick={handleBack} />
         </Grid.Column>
-        <Grid.Column mobile="15" style={{ maxWidth: "670px" }}>
+        <Grid.Column
+          mobile="15"
+          style={props.full ? {} : { maxWidth: "670px" }}
+        >
           {props.children}
         </Grid.Column>
       </Grid.Row>

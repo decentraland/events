@@ -5,6 +5,7 @@ import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
 import ProfileSettingsModel from "../model"
+import { ProfileSettingsAttributes } from "../types"
 import { canEditAnyProfile } from "../utils"
 import { getMyProfileSettings } from "./getMyProfileSettings"
 
@@ -15,14 +16,12 @@ export const getProfileSettings = oncePerRequest(async (req: WithAuth) => {
   }
 
   const user = req.params.profile_id.toLowerCase()
-  if (isEthereumAddress(user)) {
-    throw new RequestError(`Not found "${user}" profile`, RequestError.NotFound)
+  if (!isEthereumAddress(user)) {
+    throw new RequestError(
+      `Not found "${user}" profile: invalid address`,
+      RequestError.NotFound
+    )
   }
 
-  const profile = ProfileSettingsModel.findOne({ user })
-  if (!profile) {
-    throw new RequestError(`Not found "${user}" profile`, RequestError.NotFound)
-  }
-
-  return profile
+  return ProfileSettingsModel.findOne<ProfileSettingsAttributes>({ user })
 })

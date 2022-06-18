@@ -1,22 +1,21 @@
 import React, { useCallback, useMemo } from "react"
 
-import { navigate } from "gatsby"
-
 import { useLocation } from "@gatsbyjs/reach-router"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import { Link } from "decentraland-gatsby/dist/plugins/intl"
+import { Link, navigate } from "decentraland-gatsby/dist/plugins/intl"
 import debounce from "decentraland-gatsby/dist/utils/function/debounce"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import { useEventsContext } from "../../context/Event"
 import { getCurrentSchedules } from "../../entities/Schedule/utils"
 import { getSchedules } from "../../modules/events"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
-import SubmitButton from "../Button/SubmitButton"
 import SearchInput from "../Form/SearchInput"
 
 import "./Navigation.css"
@@ -28,8 +27,14 @@ export enum NavigationTab {
   Schedule = "schedule",
 }
 
+export enum NavigationAction {
+  SubmitEvent = "event",
+  SubmitUser = "user",
+}
+
 export type NavigationProps = {
   activeTab?: NavigationTab
+  action?: NavigationAction | false | null
   search?: boolean
 }
 
@@ -40,6 +45,17 @@ export default function Navigation(props: NavigationProps) {
     () => new URLSearchParams(location.search),
     [location.search]
   )
+  const action = useMemo(() => {
+    switch (props.action) {
+      case false:
+      case null:
+        return false
+      case NavigationAction.SubmitUser:
+        return NavigationAction.SubmitUser
+      default:
+        return NavigationAction.SubmitEvent
+    }
+  }, [props.action])
   const [events] = useEventsContext()
   const [account] = useAuthContext()
   const [schedules] = useAsyncMemo(getSchedules)
@@ -125,7 +141,21 @@ export default function Navigation(props: NavigationProps) {
               defaultValue={params.get("search") || ""}
             />
           )}
-          <SubmitButton as={Link} href={locations.submit()} />
+          {action === NavigationAction.SubmitEvent && (
+            <Button primary size="small" as={Link} href={locations.submit()}>
+              <Icon name="plus" /> {l("navigation.submit_events")}
+            </Button>
+          )}
+          {action === NavigationAction.SubmitUser && (
+            <Button
+              primary
+              size="small"
+              as={Link}
+              href={locations.submitUser()}
+            >
+              <Icon name="add user" /> {l("navigation.submit_users")}
+            </Button>
+          )}
         </div>
       </Tabs>
     </>

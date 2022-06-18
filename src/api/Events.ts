@@ -142,7 +142,7 @@ export default class Events extends API {
     auth: string
   }) {
     return this.fetch<{}>(
-      "/profiles/subscriptions",
+      `/profiles/subscriptions`,
       this.options()
         .authorization({ sign: true })
         .json(subscription)
@@ -152,14 +152,14 @@ export default class Events extends API {
 
   async removeSubscriptions() {
     return this.fetch<{}>(
-      "/profiles/subscriptions",
+      `/profiles/subscriptions`,
       this.options().authorization({ sign: true }).method("DELETE")
     )
   }
 
   async getMyProfileSettings() {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profiles/settings",
+      `/profiles/me/settings`,
       this.options().authorization({ sign: true })
     )
 
@@ -170,11 +170,41 @@ export default class Events extends API {
     settings: Partial<ProfileSettingsAttributes> = {}
   ) {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profiles/settings",
+      `/profiles/me/settings`,
       this.options()
         .method("PATCH")
         .authorization({ sign: true })
         .json(settings)
+    )
+
+    return Events.parseSettings(data)
+  }
+
+  async getProfileSettings() {
+    const data = await this.fetch<ProfileSettingsAttributes[]>(
+      `/profiles/settings`,
+      this.options().authorization({ sign: true })
+    )
+
+    return data.map((settings) => Events.parseSettings(settings))
+  }
+
+  async getProfileSetting(id: string) {
+    const data = await this.fetch<ProfileSettingsAttributes>(
+      `/profiles/${id}/settings`,
+      this.options().authorization({ sign: true })
+    )
+
+    return data && Events.parseSettings(data)
+  }
+
+  async updateProfileSetting(
+    id: string,
+    update: Pick<ProfileSettingsAttributes, "permissions">
+  ) {
+    const data = await this.fetch<ProfileSettingsAttributes>(
+      `/profiles/${id}/settings`,
+      this.options().method("PATCH").authorization({ sign: true }).json(update)
     )
 
     return Events.parseSettings(data)
@@ -200,7 +230,7 @@ export default class Events extends API {
 
   async createEvent(event: EditEvent) {
     return this.fetchOne(
-      "/events",
+      `/events`,
       this.options().method("POST").authorization({ sign: true }).json(event)
     )
   }
