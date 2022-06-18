@@ -122,6 +122,7 @@ export default function SubmitPage() {
     }).map((categoryOption) => ({
       ...categoryOption,
       text: l(categoryOption.text),
+      selected: false,
     }))
   }, [categories, editing.categories])
 
@@ -1020,6 +1021,7 @@ export default function SubmitPage() {
                     onChange={editActions.handleChange}
                     value={""}
                     disabled={categoryOptions.length === 0}
+                    selectOnBlur={false}
                   />
                   {editing.categories.map((category, key) => (
                     <SelectionLabel
