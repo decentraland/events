@@ -10,14 +10,8 @@ import { Request } from "express"
 import omit from "lodash/omit"
 import { v4 as uuid } from "uuid"
 
-import {
-  getMyProfileSettings,
-  getMyProfileSettings,
-} from "../ProfileSettings/routes/getMyProfileSettings"
-import {
-  canEditAnySchedule,
-  canEditAnySchedule,
-} from "../ProfileSettings/utils"
+import { getMyProfileSettings } from "../ProfileSettings/routes/getMyProfileSettings"
+import { canEditAnySchedule } from "../ProfileSettings/utils"
 import ScheduleModel from "./model"
 import { ScheduleAttributes } from "./types"
 
