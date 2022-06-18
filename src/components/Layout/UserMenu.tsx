@@ -6,8 +6,10 @@ import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import locations from "../../modules/locations"
 import { useProfileSettingsContext } from "../../context/ProfileSetting"
 import { canEditAnyProfile } from "../../entities/ProfileSettings/utils"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 
 export default React.memo(function UserMenu() {
+  const l = useFormatMessage()
   const [settings] = useProfileSettingsContext()
   const handleClickUsers = useCallback(() => navigate(locations.users()), [])
   const handleClickSettings = useCallback(
@@ -27,12 +29,12 @@ export default React.memo(function UserMenu() {
           {canEditAnyProfile(settings) && (
             <MenuItem onClick={handleClickUsers}>
               <Icon name="users" />
-              {" Users & Permissions"}
+              {l("user_menu.users")}
             </MenuItem>
           )}
           <MenuItem onClick={handleClickDocs}>
             <Icon name="code" />
-            {" API"}
+            {l("user_menu.api")}
           </MenuItem>
         </>
       }

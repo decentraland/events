@@ -218,7 +218,7 @@ export default class Events extends API {
       this.options().authorization({ sign: true })
     )
 
-    return Events.parseSettings(data)
+    return data && Events.parseSettings(data)
   }
 
   async updateProfileSetting(

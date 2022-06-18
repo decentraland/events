@@ -110,6 +110,8 @@ export default {
   // cloneSchedule: (shcedule: string) => url("/submit/", { shcedule, view: SubmitView.Clone }),
 
   users: () => url("/users/"),
+  submitUser: () => url("/user/"),
+  editUser: (user: string) => url("/user/", { user }),
   settings: () => url("/settings/"),
 
   docs: () => url("/docs/"),

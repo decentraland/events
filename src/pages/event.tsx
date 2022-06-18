@@ -8,11 +8,12 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 
+import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
+import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
+import EventSection from "../components/Event/EventSection"
 import AttendingButtons from "../components/Button/AttendingButtons"
 import EditButtons from "../components/Button/EditButtons"
-import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
 import EventStatusBanner from "../components/Event/EventModal/EventStatusBanner/EventStatusBanner"
-import EventSection from "../components/Event/EventSection"
 import ItemLayout from "../components/Layout/ItemLayout"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { useEventIdContext } from "../context/Event"
@@ -32,7 +33,7 @@ export default function EventPage() {
   const l = useFormatMessage()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
-  const [event] = useEventIdContext(params.get("id"))
+  const [event, eventState] = useEventIdContext(params.get("id"))
   const [settings] = useProfileSettingsContext()
 
   const [enabledNotification, setEnabledNotification] = useState(false)
@@ -42,6 +43,16 @@ export default function EventPage() {
       (event && event.user === settings.user && canApproveOwnEvent(settings)),
     [settings, event]
   )
+
+  if (!eventState.loading && !event) {
+    return (
+      <Container style={{ paddingTop: "75px" }}>
+        <ItemLayout full>
+          <NotFound />
+        </ItemLayout>
+      </Container>
+    )
+  }
 
   return (
     <>
@@ -91,10 +102,10 @@ export default function EventPage() {
       />
       <Container style={{ paddingTop: "75px" }}>
         <ItemLayout>
-          {!event && (
+          {eventState.loading && (
             <Loader active size="massive" style={{ position: "relative" }} />
           )}
-          {event && (
+          {!eventState.loading && event && (
             <>
               <ImgFixed src={event.image || ""} dimension="wide" />
               <EventStatusBanner event={event!} />

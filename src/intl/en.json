@@ -12,7 +12,12 @@
     "my_events": "My Events",
     "pending_events": "Pending Events",
     "submit_events": "Submit Event",
+    "submit_users": "Add User",
     "search": "Search..."
+  },
+  "user_menu": {
+    "api": "API",
+    "users": "Users"
   },
   "page": {
     "404": {
@@ -136,13 +141,34 @@
       }
     },
     "users": {
+      "not_found": "No user found",
+      "section_label_profile": "PROFILE",
+      "section_label_permissions": "PERMISSIONS",
       "permissions": {
-        "approve_own_event": "Approve events",
-        "approve_any_event": "Approve own events",
-        "edit_any_event": "Edit events",
-        "edit_any_schedule": "Edit schedules",
-        "edit_any_profile": "Edit Users",
-        "test_any_notification": "Test notifications"
+        "approve_own_event": {
+          "name": "Approve events",
+          "description": "User can approve events from any other user"
+        },
+        "approve_any_event": {
+          "name": "Approve own events",
+          "description": "User can approve events created by it self"
+        },
+        "edit_any_event": {
+          "name": "Edit events",
+          "description": "User can edit event's details from any other user"
+        },
+        "edit_any_schedule": {
+          "name": "Edit schedules",
+          "description": "User can create, edit and remove schedules"
+        },
+        "edit_any_profile": {
+          "name": "Edit Users",
+          "description": "User can grant permissions to any other user"
+        },
+        "test_any_notification": {
+          "name": "Test notifications",
+          "description": "User can send test notifications to it self"
+        }
       }
     },
     "schedule_edit": {
