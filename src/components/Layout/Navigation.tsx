@@ -1,7 +1,4 @@
 import React, { useCallback, useMemo } from "react"
-import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
@@ -10,6 +7,9 @@ import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Link, navigate } from "decentraland-gatsby/dist/plugins/intl"
 import debounce from "decentraland-gatsby/dist/utils/function/debounce"
+import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import { useEventsContext } from "../../context/Event"
 import { getCurrentSchedules } from "../../entities/Schedule/utils"

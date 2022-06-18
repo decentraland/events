@@ -12,12 +12,11 @@ import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Field } from "decentraland-ui/dist/components/Field/Field"
+import { Header } from "decentraland-ui/dist/components/Header/Header"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
-import { Header } from "decentraland-ui/dist/components/Header/Header"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
-
 import isEmail from "validator/lib/isEmail"
 
 import Navigation from "../components/Layout/Navigation"

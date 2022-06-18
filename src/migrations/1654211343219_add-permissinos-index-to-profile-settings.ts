@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate"
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+
 import ProfileSettings from "../entities/ProfileSettings/model"
 
 export const shorthands: ColumnDefinitions | undefined = undefined

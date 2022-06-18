@@ -2,11 +2,11 @@ import { auth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 
-import { updateProfileSettings } from "./routes/updateProfileSettings"
-import { updateMyProfileSettings } from "./routes/updateMyProfileSettings"
-import { getProfileSettings } from "./routes/getProfileSettings"
 import { getMyProfileSettings } from "./routes/getMyProfileSettings"
+import { getProfileSettings } from "./routes/getProfileSettings"
 import { listProfileSettings } from "./routes/listProfileSettings"
+import { updateMyProfileSettings } from "./routes/updateMyProfileSettings"
+import { updateProfileSettings } from "./routes/updateProfileSettings"
 
 export default routes((router) => {
   const withAuth = auth()
