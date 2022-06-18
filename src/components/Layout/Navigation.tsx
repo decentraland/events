@@ -30,6 +30,7 @@ export enum NavigationTab {
 export enum NavigationAction {
   SubmitEvent = "event",
   SubmitUser = "user",
+  SubmitSchedule = "schedule",
 }
 
 export type NavigationProps = {
@@ -50,6 +51,8 @@ export default function Navigation(props: NavigationProps) {
       case false:
       case null:
         return false
+      case NavigationAction.SubmitSchedule:
+        return NavigationAction.SubmitSchedule
       case NavigationAction.SubmitUser:
         return NavigationAction.SubmitUser
       default:
@@ -142,7 +145,12 @@ export default function Navigation(props: NavigationProps) {
             />
           )}
           {action === NavigationAction.SubmitEvent && (
-            <Button primary size="small" as={Link} href={locations.submitEvent()}>
+            <Button
+              primary
+              size="small"
+              as={Link}
+              href={locations.submitEvent()}
+            >
               <Icon name="plus" /> {l("navigation.submit_events")}
             </Button>
           )}
@@ -154,6 +162,16 @@ export default function Navigation(props: NavigationProps) {
               href={locations.submitUser()}
             >
               <Icon name="add user" /> {l("navigation.submit_users")}
+            </Button>
+          )}
+          {action === NavigationAction.SubmitSchedule && (
+            <Button
+              primary
+              size="small"
+              as={Link}
+              href={locations.submitSchedule()}
+            >
+              <Icon name="calendar plus" /> {l("navigation.submit_schedules")}
             </Button>
           )}
         </div>

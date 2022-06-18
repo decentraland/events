@@ -13,6 +13,7 @@
     "pending_events": "Pending Events",
     "submit_events": "Submit Event",
     "submit_users": "Add User",
+    "submit_schedules": "Add Schedule",
     "search": "Search..."
   },
   "user_menu": {
@@ -187,7 +188,7 @@
       "active_until_time_label": "Active until time",
       "background_preview": "Example of background color",
       "background_select_color_label": "Click to select a color",
-      "background_add_button": "Add",
+      "background_add_button": "Add color",
       "background_selected_label": "Color: {color}"
     }
   },

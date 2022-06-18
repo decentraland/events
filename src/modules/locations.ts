@@ -105,8 +105,9 @@ export default {
   cloneEvent: (event: string) =>
     url("/submit/", { event, view: SubmitView.Clone }),
 
+  schedules: () => url("/schedules/"),
   submitSchedule: () => url("/submit/schedule/"),
-  // editSchedule: (schedule: string) => url("/submit/", { schedule, view: SubmitView.Edit }),
+  editSchedule: (schedule: string) => url("/submit/schedule/", { schedule }),
   // cloneSchedule: (shcedule: string) => url("/submit/", { shcedule, view: SubmitView.Clone }),
 
   users: () => url("/users/"),

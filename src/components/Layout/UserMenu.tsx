@@ -7,11 +7,15 @@ import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
 
 import { useProfileSettingsContext } from "../../context/ProfileSetting"
-import { canEditAnyProfile, canEditAnySchedule } from "../../entities/ProfileSettings/utils"
+import {
+  canEditAnyProfile,
+  canEditAnySchedule,
+} from "../../entities/ProfileSettings/utils"
 import locations from "../../modules/locations"
 
 const handleClickUsers = () => navigate(locations.users())
 const handleClickSettings = () => navigate(locations.settings())
+const handleClickSchedules = () => navigate(locations.schedules())
 const handleClickDocs = () => navigate(locations.docs())
 
 export default React.memo(function UserMenu() {
@@ -32,10 +36,12 @@ export default React.memo(function UserMenu() {
               {l("user_menu.users")}
             </MenuItem>
           )}
-          {canEditAnySchedule(settings) && <MenuItem onClick={handleClickDocs}>
-            <Icon name="calendar alternate" />
-            {l("user_menu.schedules")}
-          </MenuItem>}
+          {canEditAnySchedule(settings) && (
+            <MenuItem onClick={handleClickSchedules}>
+              <Icon name="calendar alternate" />
+              {l("user_menu.schedules")}
+            </MenuItem>
+          )}
           <MenuItem onClick={handleClickDocs}>
             <Icon name="code" />
             {l("user_menu.api")}
