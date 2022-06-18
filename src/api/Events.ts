@@ -44,6 +44,16 @@ export type EditEvent = Pick<
   | "schedules"
 >
 
+export type EditSchedule = Pick<
+  ScheduleAttributes,
+  | "name"
+  | "description"
+  | "image"
+  | "background"
+  | "active_since"
+  | "active_until"
+>
+
 export default class Events extends API {
   static Url =
     process.env.GATSBY_EVENTS_URL || `https://events.decentraland.org/api`
@@ -112,6 +122,19 @@ export default class Events extends API {
     } as ProfileSettingsAttributes
   }
 
+  static parseSchedule(schedule: ScheduleAttributes): ScheduleAttributes {
+    const active_since =
+      schedule.active_since && Time.date(schedule.active_since)
+    const active_until =
+      schedule.active_until && Time.date(schedule.active_until)
+
+    return {
+      ...schedule,
+      active_since,
+      active_until,
+    } as ScheduleAttributes
+  }
+
   async fetch<T extends Record<string, any>>(
     url: string,
     options: Options = new Options({})
@@ -142,7 +165,7 @@ export default class Events extends API {
     auth: string
   }) {
     return this.fetch<{}>(
-      "/profiles/subscriptions",
+      `/profiles/subscriptions`,
       this.options()
         .authorization({ sign: true })
         .json(subscription)
@@ -152,14 +175,14 @@ export default class Events extends API {
 
   async removeSubscriptions() {
     return this.fetch<{}>(
-      "/profiles/subscriptions",
+      `/profiles/subscriptions`,
       this.options().authorization({ sign: true }).method("DELETE")
     )
   }
 
   async getMyProfileSettings() {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profiles/settings",
+      `/profiles/me/settings`,
       this.options().authorization({ sign: true })
     )
 
@@ -170,11 +193,41 @@ export default class Events extends API {
     settings: Partial<ProfileSettingsAttributes> = {}
   ) {
     const data = await this.fetch<ProfileSettingsAttributes>(
-      "/profiles/settings",
+      `/profiles/me/settings`,
       this.options()
         .method("PATCH")
         .authorization({ sign: true })
         .json(settings)
+    )
+
+    return Events.parseSettings(data)
+  }
+
+  async getProfileSettings() {
+    const data = await this.fetch<ProfileSettingsAttributes[]>(
+      `/profiles/settings`,
+      this.options().authorization({ sign: true })
+    )
+
+    return data.map((settings) => Events.parseSettings(settings))
+  }
+
+  async getProfileSetting(id: string) {
+    const data = await this.fetch<ProfileSettingsAttributes>(
+      `/profiles/${id}/settings`,
+      this.options().authorization({ sign: true })
+    )
+
+    return data && Events.parseSettings(data)
+  }
+
+  async updateProfileSetting(
+    id: string,
+    update: Pick<ProfileSettingsAttributes, "permissions">
+  ) {
+    const data = await this.fetch<ProfileSettingsAttributes>(
+      `/profiles/${id}/settings`,
+      this.options().method("PATCH").authorization({ sign: true }).json(update)
     )
 
     return Events.parseSettings(data)
@@ -200,7 +253,7 @@ export default class Events extends API {
 
   async createEvent(event: EditEvent) {
     return this.fetchOne(
-      "/events",
+      `/events`,
       this.options().method("POST").authorization({ sign: true }).json(event)
     )
   }
@@ -287,6 +340,25 @@ export default class Events extends API {
   }
 
   async getSchedule(schedule_id: string): Promise<ScheduleAttributes> {
-    return this.fetch(`/schedules/${schedule_id}`)
+    const result = await this.fetch<ScheduleAttributes>(
+      `/schedules/${schedule_id}`
+    )
+    return Events.parseSchedule(result)
+  }
+
+  async createSchedule(schedule: EditSchedule) {
+    return this.fetch(
+      "/schedules",
+      this.options().method("POST").authorization({ sign: true }).json(schedule)
+    )
+  }
+
+  async updateSchedule(scheduleId: string, schedule: Partial<EditSchedule>) {
+    return this.fetch(
+      `/schedules/${scheduleId}`,
+      this.options({ method: "PATCH" })
+        .authorization({ sign: true })
+        .json(schedule)
+    )
   }
 }

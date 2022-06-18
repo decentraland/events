@@ -1,12 +1,10 @@
 encryptionsalt: v1:9oCf235QAQ8=:v1:uRW+FkAVO8o424II:P+oGJS3OY1Krmv/3faRNcy6mGYpZNw==
 config:
   aws:region: us-east-1
-  events:ADMIN_ADDRESSES:
-    secure: v1:h3FvGp9x0zDkooAm:cxJxvtm07FXy0m4W7yrNMIVyjdP0WhLwDZopeWQaIPE+XGCznX4kTUH0HbRyiKt//E8DjoEMpPVrsy6HJc1rIO8dyZ7ky+CRJi+v3ruMiojqhx0Xh6knu8/pnsx3e7pFptAgFz6vVAcznLb4RpdpIk68ChSHdg1Qsyt+Oau3vTj7zPq+Lh/thKf152T6Ww+s3zgb3aa0RdTy0rYN5eTLhzKTq0Sd/ZeIkCf8ggpAT9ZFxiGMnFncXGQkOCRFEgAk0v5X6c/amHRkeDMsoJ/c68RouHXSo7hoYdev6GL8OHhiyQOUHfOdOVVoq7SK3NpUfNSJEyK8YfNT2PeuCh7FQ5+DQw8s3DbHpKMpQlQdQRRDAfjLGYvNqUr/dD6LGIfuVp7kthIEnptX3P/JMtif+oY8mxJJrz5Syy3oFK4+tYQrv8Q9mrRrJJ9sGeQ+kgbPrfhX6yzZxLp6z3pBsgMNIhlEdQFBYZr3x3CcVpu1xDtDNINjqJeWmnGVNY5+UUi7PLIVQ+dmSVWi/7SfwM5jh9xfiBFdZ/OAPJ+mdyf2TyJH3F5WSsZYqW5/LLxnsjOR0DX64Dh8Ai2SJ8G5xJooJ5XDkauYo0me8rVriA/q/cVSIgbU5Pou5a+9/kzt7B7pX3KWHYJgKOxT6QbvmNRiG2agy5V+vP6aRI2U2msuf8SH3z53HFi1gqIEUADrNtnL5u4y
   events:AWS_BUCKET_URL: https://events.decentraland.org
   events:CONNECTION_STRING:
     secure: v1:+ENLPDJ1vziMEZz3:vHMhEu64mNHnit53Yf3l5kvvYbnBj3EZTWvTBIUcOXrV+X0mtYboiZt0v0GSb0rgQojXFOz8Rvx0fQiX5yRBw5hVpRKgKV2CS+qgLepF8lo1aFxHqe0H0WWOgpLhVlXwk84DJeocVVoRM+6tktUUluhJ+u+QWqR2+vyXKeMi
-  events:GATSBY_CHAIN_ID: "1,137"
+  events:GATSBY_CHAIN_ID: 1,137
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
   events:GATSBY_EVENTS_URL: https://events.decentraland.org/api
   events:GATSBY_LAND_URL: https://api.decentraland.org

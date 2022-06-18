@@ -192,8 +192,8 @@ export default function MyEventsPage() {
                   <Paragraph secondary>
                     {l("page.me.you_are_not_hosting")}{" "}
                     <Link
-                      href={locations.submit()}
-                      onClick={prevent(() => navigate(locations.submit()))}
+                      href={locations.submitEvent()}
+                      onClick={prevent(() => navigate(locations.submitEvent()))}
                     >
                       {l("page.me.new_event")}
                     </Link>

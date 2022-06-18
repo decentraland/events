@@ -1,48 +1,38 @@
-import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
-import intersection from "lodash/intersection"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 
 import ProfileSettingsModel from "../model"
 import {
   ProfileSettingsAttributes,
   updateProfileSettingsSchema,
 } from "../types"
-import { canEditAnyProfile } from "../utils"
-import { getMyProfileSettings } from "./getMyProfileSettings"
+import { getProfileSettings } from "./getProfileSettings"
 
 export const validateProfileSettings =
-  createValidator<ProfileSettingsAttributes>(updateProfileSettingsSchema)
+  createValidator<ProfileSettingsAttributes>(
+    updateProfileSettingsSchema as AjvObjectSchema
+  )
 
 export async function updateProfileSettings(req: WithAuth) {
-  const currentUserProfile = await getMyProfileSettings(req)
-  if (!isAdmin(req.auth) && !canEditAnyProfile(currentUserProfile)) {
-    throw new RequestError(`Forbidden`, RequestError.Forbidden)
-  }
-
   const user = req.params.profile_id.toLowerCase()
-  if (isEthereumAddress(user)) {
-    throw new RequestError(`Not found "${user}" profile`, RequestError.NotFound)
-  }
-
-  const profile = ProfileSettingsModel.findOne({ user })
+  const profile = await getProfileSettings(req)
+  const attributes = validateProfileSettings(req.body)
   if (!profile) {
-    throw new RequestError(`Not found "${user}" profile`, RequestError.NotFound)
-  }
+    const newProfile: ProfileSettingsAttributes = {
+      ...ProfileSettingsModel.getDefault(user),
+      ...attributes,
+    }
 
-  const updateAttributes = validateProfileSettings(req.body)
-  const newProfile: ProfileSettingsAttributes = {
-    ...profile,
-    ...updateAttributes,
-  }
+    await ProfileSettingsModel.create(newProfile)
+    return newProfile
+  } else {
+    const updatedProfile: ProfileSettingsAttributes = {
+      ...profile,
+      ...attributes,
+    }
 
-  // grant only permissions that the current user have
-  newProfile.permissions = intersection(
-    currentUserProfile.permissions,
-    newProfile.permissions
-  )
-  await ProfileSettingsModel.update(newProfile, { user })
-  return newProfile
+    await ProfileSettingsModel.update(updatedProfile, { user })
+    return updatedProfile
+  }
 }

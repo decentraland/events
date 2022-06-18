@@ -37,3 +37,7 @@ export function canTestAnyNotification(settings: ProfileSettingsAttributes) {
     settings.permissions.includes(ProfilePermissions.EditAnyEvent)
   )
 }
+
+export function canEditAnySchedule(settings: ProfileSettingsAttributes) {
+  return settings.permissions.includes(ProfilePermissions.EditAnySchedule)
+}

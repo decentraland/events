@@ -10,6 +10,8 @@ import { Request } from "express"
 import omit from "lodash/omit"
 import { v4 as uuid } from "uuid"
 
+import { getMyProfileSettings } from "../ProfileSettings/routes/getMyProfileSettings"
+import { canEditAnySchedule } from "../ProfileSettings/utils"
 import ScheduleModel from "./model"
 import { ScheduleAttributes } from "./types"
 
@@ -39,6 +41,7 @@ export async function getScheduleById(req: Request<{ schedule_id: string }>) {
 export async function createSchedule(req: WithAuth) {
   const user = req.auth!
   const data = req.body as ScheduleAttributes
+  const profile = await getMyProfileSettings(req)
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
     throw new RequestError("Empty schedule data", RequestError.BadRequest, {
@@ -48,7 +51,7 @@ export async function createSchedule(req: WithAuth) {
     })
   }
 
-  if (!isAdmin(user)) {
+  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
@@ -70,6 +73,7 @@ export async function updateSchedule(req: WithAuth) {
   const id = req.params.schedule_id
   const data = req.body as ScheduleAttributes
   const user = req.auth!
+  const profile = await getMyProfileSettings(req)
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
     throw new RequestError("Empty schedule data", RequestError.BadRequest, {
@@ -79,7 +83,7 @@ export async function updateSchedule(req: WithAuth) {
     })
   }
 
-  if (!isAdmin(user)) {
+  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 
@@ -103,8 +107,9 @@ export async function updateSchedule(req: WithAuth) {
 export async function deleteSchedule(req: WithAuth) {
   const id = req.params.schedule_id
   const user = req.auth!
+  const profile = await getMyProfileSettings(req)
 
-  if (!isAdmin(user)) {
+  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }
 

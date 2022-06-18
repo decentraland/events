@@ -12,6 +12,7 @@ import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Field } from "decentraland-ui/dist/components/Field/Field"
+import { Header } from "decentraland-ui/dist/components/Header/Header"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
@@ -19,7 +20,6 @@ import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 import isEmail from "validator/lib/isEmail"
 
 import Navigation from "../components/Layout/Navigation"
-import Section from "../components/Text/Section"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import check from "../images/check.svg"
 
@@ -110,7 +110,7 @@ export default function SettingsPage() {
           />
           <meta name="twitter:site" content={l("social.home.site") || ""} />
         </Helmet>
-        <Navigation />
+        <Navigation action={false} />
         <Container>
           <SignIn
             isConnecting={accountState.loading}
@@ -145,12 +145,12 @@ export default function SettingsPage() {
         <meta name="twitter:creator" content={l("social.home.creator") || ""} />
         <meta name="twitter:site" content={l("social.home.site") || ""} />
       </Helmet>
-      <Navigation />
+      <Navigation action={false} />
       <Container className="SettingsPage">
         <Grid style={{ paddingTop: "4rem" }}>
           <Grid.Row>
             <Grid.Column tablet="4">
-              <Section uppercase>{l(`settings.profile_section.label`)}</Section>
+              <Header sub>{l(`settings.profile_section.label`)}</Header>
             </Grid.Column>
             <Grid.Column tablet="8">
               <Paragraph small secondary style={{ margin: 0 }}>
@@ -215,12 +215,9 @@ export default function SettingsPage() {
         <Grid style={{ paddingTop: "4rem" }}>
           <Grid.Row>
             <Grid.Column tablet="4">
-              <Section uppercase>{l(`settings.event_section.label`)}</Section>
+              <Header sub>{l(`settings.event_section.timezone_title`)}</Header>
             </Grid.Column>
             <Grid.Column tablet="8">
-              <Paragraph small secondary>
-                {l(`settings.event_section.timezone_title`)}
-              </Paragraph>
               <div className="SettingsSection">
                 <div className="SettingsDetails">
                   <Paragraph small semiBold>
@@ -249,16 +246,11 @@ export default function SettingsPage() {
         </Grid>
         <Grid style={{ paddingTop: "4rem" }}>
           <Grid.Row>
-            <Grid.Column tablet="4"></Grid.Column>
-            <Grid.Column tablet="8">
-              <Paragraph small secondary>
+            <Grid.Column tablet="4">
+              <Header sub>
                 {l(`settings.event_section.notification_title`)}
-              </Paragraph>
+              </Header>
             </Grid.Column>
-            <Grid.Column tablet="4"></Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column tablet="4"></Grid.Column>
             <Grid.Column tablet="8">
               <div className="SettingsSection">
                 <div
@@ -272,7 +264,11 @@ export default function SettingsPage() {
                       `settings.event_section.notification_by_email_description`
                     )}
                   </Paragraph>
-                  <Paragraph primary tiny>
+                  <Paragraph
+                    primary
+                    tiny
+                    style={{ textTransform: "uppercase" }}
+                  >
                     {l(`settings.event_section.notification_by_email_message`)}
                   </Paragraph>
                 </div>

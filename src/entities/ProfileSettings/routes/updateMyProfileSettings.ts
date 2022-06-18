@@ -1,5 +1,6 @@
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { sign } from "decentraland-gatsby/dist/utils/sign"
 import isEmail from "validator/lib/isEmail"
@@ -18,7 +19,9 @@ import {
 import { SIGN_SECRET } from "./subscriptions"
 
 export const validateProfileSettings =
-  createValidator<ProfileSettingsAttributes>(updateMyProfileSettingsSchema)
+  createValidator<ProfileSettingsAttributes>(
+    updateMyProfileSettingsSchema as AjvObjectSchema
+  )
 
 export async function updateMyProfileSettings(req: WithAuth) {
   const now = new Date()

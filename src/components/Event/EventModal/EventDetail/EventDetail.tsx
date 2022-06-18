@@ -89,8 +89,10 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
                   basic
                   className="edit-detail__menu-icon__button"
                   as="a"
-                  href={locations.edit(event.id)}
-                  onClick={prevent(() => navigate(locations.edit(event.id)))}
+                  href={locations.editEvent(event.id)}
+                  onClick={prevent(() =>
+                    navigate(locations.editEvent(event.id))
+                  )}
                 >
                   <Icon name="edit" /> Edit
                 </Button>
@@ -100,8 +102,10 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
                   basic
                   className="edit-detail__menu-icon__button"
                   as="a"
-                  href={locations.clone(event.id)}
-                  onClick={prevent(() => navigate(locations.clone(event.id)))}
+                  href={locations.cloneEvent(event.id)}
+                  onClick={prevent(() =>
+                    navigate(locations.cloneEvent(event.id))
+                  )}
                 >
                   <Icon name="clone" /> Clone
                 </Button>

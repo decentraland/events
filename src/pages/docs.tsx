@@ -14,7 +14,7 @@ import {
 import { eventAttendeeListScheme } from "../entities/EventAttendee/schemas"
 import { eventCategoryListScheme } from "../entities/EventCategory/schema"
 import {
-  getScheduleParamsSchema,
+  getScheduleSchema,
   scheduleListScheme,
   scheduleScheme,
 } from "../entities/Schedule/schema"
@@ -143,7 +143,7 @@ export default function DocsPage() {
             title="Request"
             cors="*"
             authorization
-            params={getScheduleParamsSchema}
+            params={getScheduleSchema}
           />
           <ApiDetails title="Response" cors="*" params={scheduleScheme} />
         </ApiCard>
@@ -158,7 +158,7 @@ export default function DocsPage() {
             title="Request"
             cors="*"
             authorization
-            params={getScheduleParamsSchema}
+            params={getScheduleSchema}
           />
           <ApiDetails title="Response" cors="*" params={scheduleScheme} />
         </ApiCard>
@@ -173,7 +173,7 @@ export default function DocsPage() {
             title="Request"
             cors="*"
             authorization
-            params={getScheduleParamsSchema}
+            params={getScheduleSchema}
           />
           <ApiDetails title="Response" cors="*" params={scheduleScheme} />
         </ApiCard>

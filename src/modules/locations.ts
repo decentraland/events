@@ -99,10 +99,20 @@ export default {
   pendingEvents: () => url("/pending/"),
   schedule: (id: string) => url("/schedule/", { id }),
 
-  submit: () => url("/submit/"),
-  edit: (event: string) => url("/submit/", { event, view: SubmitView.Edit }),
-  clone: (event: string) => url("/submit/", { event, view: SubmitView.Clone }),
+  submitEvent: () => url("/submit/"),
+  editEvent: (event: string) =>
+    url("/submit/", { event, view: SubmitView.Edit }),
+  cloneEvent: (event: string) =>
+    url("/submit/", { event, view: SubmitView.Clone }),
 
+  schedules: () => url("/schedules/"),
+  submitSchedule: () => url("/submit/schedule/"),
+  editSchedule: (schedule: string) => url("/submit/schedule/", { schedule }),
+  // cloneSchedule: (shcedule: string) => url("/submit/", { shcedule, view: SubmitView.Clone }),
+
+  users: () => url("/users/"),
+  submitUser: () => url("/submit/user/"),
+  editUser: (user: string) => url("/submit/user/", { user }),
   settings: () => url("/settings/"),
 
   docs: () => url("/docs/"),
