@@ -174,8 +174,8 @@ export default function MyEventsPage() {
                 <Paragraph secondary>
                   {l("page.pending.you_dont_have_any_pending")}{" "}
                   <Link
-                    href={locations.submit()}
-                    onClick={prevent(() => navigate(locations.submit()))}
+                    href={locations.submitEvent()}
+                    onClick={prevent(() => navigate(locations.submitEvent()))}
                   >
                     {l("page.pending.new_event")}
                   </Link>

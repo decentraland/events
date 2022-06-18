@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react"
 
-import Helmet from "react-helmet"
+import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
@@ -28,45 +28,48 @@ import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 
-import Events, { EditEvent } from "../api/Events"
-import AddCoverButton from "../components/Button/AddCoverButton"
-import ImageInput from "../components/Form/ImageInput"
-import Label from "../components/Form/Label"
-import RadioGroup from "../components/Form/RadioGroup"
-import Textarea from "../components/Form/Textarea"
-import ItemLayout from "../components/Layout/ItemLayout"
-import ConfirmModal from "../components/Modal/ConfirmModal"
-import { useCategoriesContext } from "../context/Category"
-import { useEventIdContext, useEventsContext } from "../context/Event"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
+import Events, { EditEvent } from "../../api/Events"
+import AddCoverButton from "../../components/Button/AddCoverButton"
+import ImageInput from "../../components/Form/ImageInput"
+import Label from "../../components/Form/Label"
+import RadioGroup from "../../components/Form/RadioGroup"
+import Textarea from "../../components/Form/Textarea"
+import ItemLayout from "../../components/Layout/ItemLayout"
+import ConfirmModal from "../../components/Modal/ConfirmModal"
+import { useCategoriesContext } from "../../context/Category"
+import { useEventIdContext, useEventsContext } from "../../context/Event"
+import { useProfileSettingsContext } from "../../context/ProfileSetting"
 import {
   Frequency,
   MAX_EVENT_RECURRENT,
   Position,
   WeekdayMask,
-} from "../entities/Event/types"
+} from "../../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
   toRRuleDates,
   toRecurrentSetposName,
-} from "../entities/Event/utils"
-import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../entities/Poster/types"
+} from "../../entities/Event/utils"
+import {
+  POSTER_FILE_SIZE,
+  POSTER_FILE_TYPES,
+} from "../../entities/Poster/types"
 import {
   canApproveAnyEvent,
   canEditAnyEvent,
   canTestAnyNotification,
-} from "../entities/ProfileSettings/utils"
-import useEventEditor from "../hooks/useEventEditor"
-import infoIcon from "../images/info.svg"
+} from "../../entities/ProfileSettings/utils"
+import useEventEditor from "../../hooks/useEventEditor"
+import infoIcon from "../../images/info.svg"
 import {
   getCategoriesOptionsActives,
   getSchedules,
   getSchedulesOptions,
-} from "../modules/events"
-import locations from "../modules/locations"
-import { getServerOptions, getServers } from "../modules/servers"
+} from "../../modules/events"
+import locations from "../../modules/locations"
+import { getServerOptions, getServers } from "../../modules/servers"
 
-import "./submit.css"
+import "./index.css"
 
 type SubmitPageState = {
   loading?: boolean
