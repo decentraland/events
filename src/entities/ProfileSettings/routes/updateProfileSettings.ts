@@ -1,6 +1,6 @@
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
-import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
+import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 
 import ProfileSettingsModel from "../model"
 import {

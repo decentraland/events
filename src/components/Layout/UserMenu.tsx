@@ -1,12 +1,14 @@
 import React, { useCallback } from "react"
+
 import Menu from "decentraland-gatsby/dist/components/User/UserMenu"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon"
-import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import locations from "../../modules/locations"
+
 import { useProfileSettingsContext } from "../../context/ProfileSetting"
 import { canEditAnyProfile } from "../../entities/ProfileSettings/utils"
-import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import locations from "../../modules/locations"
 
 export default React.memo(function UserMenu() {
   const l = useFormatMessage()
