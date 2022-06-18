@@ -340,8 +340,9 @@ export default class Events extends API {
   }
 
   async getSchedule(schedule_id: string): Promise<ScheduleAttributes> {
-    const result = (await this.fetch(`/schedules/${schedule_id}`)) as any
-
+    const result = await this.fetch<ScheduleAttributes>(
+      `/schedules/${schedule_id}`
+    )
     return Events.parseSchedule(result)
   }
 
