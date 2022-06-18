@@ -20,17 +20,15 @@ import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 import Input from "semantic-ui-react/dist/commonjs/elements/Input"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
-import Events from "../api/Events"
-import Navigation from "../components/Layout/Navigation"
-import { useProfileSettingsContext } from "../context/ProfileSetting"
+import Events from "../../api/Events"
+import Navigation from "../../components/Layout/Navigation"
+import { useProfileSettingsContext } from "../../context/ProfileSetting"
 import {
   ProfilePermissions,
   updateProfileSettingsSchema,
-} from "../entities/ProfileSettings/types"
-import { canEditAnyProfile } from "../entities/ProfileSettings/utils"
-import locations from "../modules/locations"
-
-import "./users.css"
+} from "../../entities/ProfileSettings/types"
+import { canEditAnyProfile } from "../../entities/ProfileSettings/utils"
+import locations from "../../modules/locations"
 
 const availablePermissions =
   updateProfileSettingsSchema.properties.permissions.items.enum
