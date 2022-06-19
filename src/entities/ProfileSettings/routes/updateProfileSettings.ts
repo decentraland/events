@@ -1,7 +1,9 @@
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
+import difference from "lodash/difference"
 
+import { notifyProfileSettingUpdate } from "../../Slack/utils"
 import ProfileSettingsModel from "../model"
 import {
   ProfileSettingsAttributes,
@@ -25,6 +27,10 @@ export async function updateProfileSettings(req: WithAuth) {
     }
 
     await ProfileSettingsModel.create(newProfile)
+    if (newProfile.permissions.length > 0) {
+      await notifyProfileSettingUpdate(newProfile)
+    }
+
     return newProfile
   } else {
     const updatedProfile: ProfileSettingsAttributes = {
@@ -33,6 +39,12 @@ export async function updateProfileSettings(req: WithAuth) {
     }
 
     await ProfileSettingsModel.update(updatedProfile, { user })
+    if (
+      profile.permissions.length !== updatedProfile.permissions.length ||
+      difference(profile.permissions, updatedProfile.permissions).length > 0
+    ) {
+      await notifyProfileSettingUpdate(updatedProfile)
+    }
     return updatedProfile
   }
 }
