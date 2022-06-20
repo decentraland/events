@@ -6,8 +6,10 @@ import env from "decentraland-gatsby/dist/utils/env"
 import fetch from "isomorphic-fetch"
 import isURL from "validator/lib/isURL"
 
+import en from "../../intl/en.json"
 import { DeprecatedEventAttributes } from "../Event/types"
 import { eventUrl } from "../Event/utils"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 
 const SLACK_WEBHOOK = env("SLACK_WEBHOOK", "")
 const DECENTRALAND_URL = env(
@@ -203,5 +205,45 @@ async function sendToSlack(body: {}) {
     if (error instanceof Error) {
       logger.error(`Slack service error: ` + error.message, error)
     }
+  }
+}
+
+export async function notifyProfileSettingUpdate(
+  profile: ProfileSettingsAttributes
+) {
+  if (profile.permissions.length === 0) {
+    await sendToSlack({
+      // :x:
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `:magic_wand: user \`${profile.user}\` just lost all his/her permissions`,
+          },
+        },
+      ],
+    })
+  } else {
+    const permissions = profile.permissions
+      .map((permission) => {
+        const details = en.page.users.permissions[permission]
+        return details
+          ? `- *${details.name}*: _${details.description}_`
+          : `- *${permission}*`
+      })
+      .join("\n")
+
+    await sendToSlack({
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `:magic_wand: user \`${profile.user}\` has new permissions:\n\n${permissions}`,
+          },
+        },
+      ],
+    })
   }
 }
