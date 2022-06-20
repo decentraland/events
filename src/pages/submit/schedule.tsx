@@ -158,32 +158,7 @@ export default function ScheduleEditPage() {
   return (
     <>
       <Helmet>
-        <title>{l("social.submit.title") || ""}</title>
-        <meta
-          name="description"
-          content={l("social.submit.description") || ""}
-        />
-
-        <meta property="og:title" content={l("social.submit.title") || ""} />
-        <meta
-          property="og:description"
-          content={l("social.submit.description") || ""}
-        />
-        <meta property="og:image" content={l("social.submit.image") || ""} />
-        <meta property="og:site" content={l("social.submit.site") || ""} />
-
-        <meta name="twitter:title" content={l("social.submit.title") || ""} />
-        <meta
-          name="twitter:description"
-          content={l("social.submit.description") || ""}
-        />
-        <meta name="twitter:image" content={l("social.submit.image") || ""} />
-        <meta name="twitter:card" content={l("social.submit.card") || ""} />
-        <meta
-          name="twitter:creator"
-          content={l("social.submit.creator") || ""}
-        />
-        <meta name="twitter:site" content={l("social.submit.site") || ""} />
+        <title>{l("social.schedule_edit.title") || ""}</title>
       </Helmet>
       <Container style={{ paddingTop: "75px" }}>
         {loading && (
@@ -208,7 +183,7 @@ export default function ScheduleEditPage() {
         {!loading && account && (
           <ItemLayout>
             <Title style={{ fontSize: "34px", lineHeight: "42px" }}>
-              {l("page.submit.submit_event")}
+              {l("page.schedule_edit.title")}
             </Title>
             <Grid stackable>
               <Grid.Row>

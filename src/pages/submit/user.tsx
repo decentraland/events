@@ -44,7 +44,7 @@ export default function SettingsPage() {
   )
   const actionProps = useMemo(
     () => ({
-      content: "Load user",
+      content: l("page.users.load_user"),
       color: "primary",
       disabled: !isEthereumAddress(value),
       onClick: () => {

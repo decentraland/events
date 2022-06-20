@@ -146,6 +146,7 @@
       "not_found": "No user found",
       "section_label_profile": "PROFILE",
       "section_label_permissions": "PERMISSIONS",
+      "load_user": "Load users",
       "permissions": {
         "approve_own_event": {
           "name": "Approve events",
