@@ -25,12 +25,6 @@ import useListEventsByMonth from "../../../hooks/useListEventsByMonth"
 import useListEventsCategories from "../../../hooks/useListEventsCategories"
 import useListEventsFiltered from "../../../hooks/useListEventsFiltered"
 import { showTimezoneLabel } from "../../../modules/date"
-import {
-  FilterCategoryVariant,
-  FilterTimeVariant,
-  FilterTypeVariant,
-  Flags,
-} from "../../../modules/features"
 import { EventFilters, fromEventFilters, url } from "../../../modules/locations"
 import { SegmentEvent } from "../../../modules/segment"
 import { NoEvents } from "../NoEvents/NoEvents"
@@ -70,7 +64,6 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
   const location = useLocation()
   const track = useTrackContext()
   const l = useFormatMessage()
-  const [ff] = useFeatureFlagContext()
   const [categories] = useCategoriesContext()
   const filteredEvents = useListEventsFiltered(
     props.events,
@@ -125,38 +118,7 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
     [props.filters]
   )
 
-  const showFilterByType = useMemo(
-    () =>
-      ff.name<FilterTypeVariant>(
-        Flags.FilterTypeVariant,
-        FilterTypeVariant.disabled
-      ) === FilterTypeVariant.enabled,
-    [ff]
-  )
-
-  const showFilterByCategory = useMemo(
-    () =>
-      ff.name<FilterCategoryVariant>(
-        Flags.FilterCategoryVariant,
-        FilterCategoryVariant.disabled
-      ) === FilterCategoryVariant.enabled && categoriesFiltered.length > 0,
-    [ff, categoriesFiltered]
-  )
-
-  const showFilterByTime = useMemo(
-    () =>
-      ff.name<FilterTimeVariant>(
-        Flags.FilterTimeVariant,
-        FilterTimeVariant.disabled
-      ) === FilterTimeVariant.enabled,
-    [ff]
-  )
-
-  const showFilters =
-    !loading &&
-    !disabledFilters &&
-    (showFilterByType || showFilterByTime || showFilterByCategory)
-
+  const showFilters = !loading && !disabledFilters
   const itemsPerRow = showFilters ? 2 : 3
 
   const handleTypeChange = useCallback(
@@ -232,16 +194,14 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
       <Grid.Row>
         {showFilters && (
           <Grid.Column tablet={4}>
-            {showFilterByType && (
-              <ToggleBox
-                header="Type"
-                onClick={handleTypeChange}
-                items={typeItems}
-                value={props.filters.type}
-              />
-            )}
+            <ToggleBox
+              header="Type"
+              onClick={handleTypeChange}
+              items={typeItems}
+              value={props.filters.type}
+            />
 
-            {showFilterByCategory && (
+            {categoriesFiltered.length > 0 && (
               <ToggleBox
                 header="Category"
                 onClick={handleCategoryChange}
@@ -251,18 +211,16 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               />
             )}
 
-            {showFilterByTime && (
-              <SliderField
-                range={true}
-                header="Event Time"
-                min={0}
-                max={48}
-                defaultValue={timeRangeValue}
-                onChange={handleRangeChange}
-                onMouseUp={handleRangeAfterChange}
-                label={timeRangeLabel}
-              />
-            )}
+            <SliderField
+              range={true}
+              header="Event Time"
+              min={0}
+              max={48}
+              defaultValue={timeRangeValue}
+              onChange={handleRangeChange}
+              onMouseUp={handleRangeAfterChange}
+              label={timeRangeLabel}
+            />
           </Grid.Column>
         )}
         <Grid.Column tablet={showFilters ? 12 : 16}>
