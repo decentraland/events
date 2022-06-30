@@ -13,7 +13,7 @@
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
-    "aws-sdk": "^2.1002.0",
+    "aws-sdk": "^2.1165.0",
     "babel-jest": "^27.5.1",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
