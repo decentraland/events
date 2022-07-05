@@ -1,7 +1,5 @@
 import React, { useMemo } from "react"
 
-import { loadavg } from "os"
-
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
@@ -14,7 +12,7 @@ import EventCard from "../EventCard/EventCard"
 export type ListMonthEventsProps = {
   events?: SessionEventAttributes[]
   date?: Date
-  itemsPerRow?: 2 | 3
+  itemsPerRow?: 1 | 2 | 3
   loading?: boolean
 }
 
