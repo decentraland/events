@@ -33,5 +33,6 @@ export = async function main() {
     ],
     useBucket: ["/poster/*"],
     useEmail: true,
+    useSecurityHeaders: true,
   })
 }
