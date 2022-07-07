@@ -1,7 +1,5 @@
 import React, { useMemo } from "react"
 
-import { loadavg } from "os"
-
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
