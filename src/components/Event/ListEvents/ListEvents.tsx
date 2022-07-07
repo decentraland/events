@@ -3,9 +3,9 @@ import React, { useCallback, useMemo } from "react"
 import { useLocation } from "@gatsbyjs/reach-router"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import { useMobileMediaQuery } from "decentraland-ui/dist/components/Media"
 import { SliderField } from "decentraland-ui/dist/components/SliderField/SliderField"
 import {
   ToggleBox,
@@ -72,7 +72,7 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
   )
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const categoriesFiltered = useListEventsCategories(props.events, categories)
-  const isMobile = useMobileDetector()
+  const isMobile = useMobileMediaQuery()
 
   const categoryItems = useMemo(() => {
     let categoriesToReturn = [
