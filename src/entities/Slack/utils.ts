@@ -65,6 +65,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
 
 export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
   logger.log(`sending approved event "${event.id}" to slack`)
+  const selfApproved = event.user === event.approved_by ? "(him/her self)" : ""
   await sendToSlack({
     blocks: [
       {
@@ -75,7 +76,9 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
             `:white_check_mark: new event approved: *<${eventUrl(event)}|${
               event.name
             }>*` +
-            (event.approved_by ? `\n_by:_ \`${event.approved_by}\`` : ``),
+            (event.approved_by
+              ? `\n_by:_ \`${event.approved_by}\` _${selfApproved}_`
+              : ``),
         },
       },
     ],
@@ -84,6 +87,7 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
 
 export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
   logger.log(`sending rejected event "${event.id}" to slack`)
+  const selfRejected = event.user === event.rejected_by ? "(him/her self)" : ""
   await sendToSlack({
     blocks: [
       {
@@ -92,7 +96,9 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
           type: "mrkdwn",
           text:
             `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*` +
-            (event.rejected_by ? `\n_by:_\`${event.rejected_by}\`` : ``),
+            (event.rejected_by
+              ? `\n_by:_ \`${event.rejected_by}\` _${selfRejected}_`
+              : ``),
         },
       },
     ],
