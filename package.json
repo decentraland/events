@@ -20,7 +20,7 @@
     "decentraland-gatsby": "^5.21.0",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
-    "gatsby": "^4.1.2",
+    "gatsby": "^4.18.2",
     "gatsby-plugin-image": "^2.13.0",
     "gatsby-plugin-manifest": "^4.13.0",
     "gatsby-plugin-offline": "^5.13.0",
