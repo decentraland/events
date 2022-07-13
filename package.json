@@ -14,7 +14,7 @@
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
     "aws-sdk": "^2.1002.0",
-    "babel-jest": "^27.5.1",
+    "babel-jest": "^28.1.2",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
     "decentraland-gatsby": "^5.21.0",
