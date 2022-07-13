@@ -4,10 +4,10 @@ import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 
 import ProfileSettingsModel from "../model"
 import { canEditAnyProfile } from "../utils"
-import { getMyProfileSettings } from "./getMyProfileSettings"
+import { getAuthProfileSettings } from "./getAuthProfileSettings"
 
 export async function listProfileSettings(req: WithAuth) {
-  const currentUserProfile = await getMyProfileSettings(req)
+  const currentUserProfile = await getAuthProfileSettings(req)
   if (!isAdmin(req.auth) && !canEditAnyProfile(currentUserProfile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
   }

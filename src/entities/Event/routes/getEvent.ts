@@ -6,7 +6,7 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import isUUID from "validator/lib/isUUID"
 
 import EventAttendee from "../../EventAttendee/model"
-import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import { ProfileSettingsAttributes } from "../../ProfileSettings/types"
 import {
   canApproveAnyEvent,
@@ -21,7 +21,7 @@ export const validateGetEventParams =
 
 export const getEvent = oncePerRequest(async (req: WithAuth) => {
   const user = req.auth
-  const profile = await getMyProfileSettings(req)
+  const profile = await getAuthProfileSettings(req)
   const params = validateGetEventParams(req.params)
   if (!isUUID(params.event_id)) {
     throw new RequestError(

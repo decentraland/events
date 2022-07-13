@@ -14,7 +14,7 @@ import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import ProfileSettingsModel from "../../ProfileSettings/model"
-import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import { canTestAnyNotification } from "../../ProfileSettings/utils"
 import ProfileSubscriptionModel from "../../ProfileSubscription/model"
 import { notify } from "../cron"
@@ -62,7 +62,7 @@ async function notifyEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
   const event = await getEvent(req)
-  const profile = await getMyProfileSettings(req)
+  const profile = await getAuthProfileSettings(req)
   if (!isAdmin(profile.user) || !canTestAnyNotification(profile)) {
     return {}
   }
