@@ -2,9 +2,9 @@
 import React from "react"
 
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import { EventAttributes } from "../../../../entities/Event/types"
+import { isPastEvent } from "../../../../entities/Event/utils"
 
 import "./EventStatusBanner.css"
 
@@ -20,11 +20,7 @@ export default React.memo(function EventStatusBanner({
     return null
   }
 
-  const isPast = React.useMemo(() => {
-    const now = Date.now()
-    const start_at = Time.date(event.start_at)
-    return start_at.getTime() < now
-  }, [event])
+  const isPast = React.useMemo(() => isPastEvent(event), [event])
 
   if (!event.approved && !event.rejected && isPast) {
     return (
