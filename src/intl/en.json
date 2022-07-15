@@ -296,7 +296,8 @@
         "event_status_banner": {
           "this_event_was_rejected": "This event was rejected",
           "this_event_was_rejected_by": "This event was rejected (by {user})",
-          "this_event_is_pending_approval": "This event is pending approval"
+          "this_event_is_pending_approval": "This event is pending approval",
+          "this_event_is_in_the_past": "This event is in the past"
         }
       }
     },
