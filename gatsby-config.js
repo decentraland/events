@@ -9,10 +9,16 @@ module.exports = {
     description: `Decentraland`,
     author: `@decentraland`,
   },
-  developMiddleware: developMiddleware({
-    prefix: `/api`,
-    url: `http://localhost:4000`,
-  }),
+  developMiddleware: developMiddleware([
+    {
+      prefix: `/api`,
+      url: `http://localhost:4000`,
+    },
+    {
+      prefix: `/poster`,
+      url: `https://events.decentraland.zone`,
+    },
+  ]),
   plugins: [
     `gatsby-plugin-react-helmet`,
     `gatsby-plugin-postcss`,

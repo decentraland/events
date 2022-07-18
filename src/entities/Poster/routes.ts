@@ -1,3 +1,4 @@
+import fs from "fs"
 import { promisify } from "util"
 
 import AWS from "aws-sdk"
@@ -12,13 +13,19 @@ import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
 import fileUpload, { UploadedFile } from "express-fileupload"
+import fetch from "node-fetch"
 
+import { siteUrl } from "../Event/utils"
 import {
   POSTER_FILE_SIZE,
   POSTER_FILE_TYPES,
   PosterAttributes,
   extension,
 } from "./types"
+/* 
+
+
+var FormData = require("form-data") */
 
 let BUCKET_CHECKED = false
 let BUCKET_CHECKED_JOB: Promise<void> | null = null
@@ -52,9 +59,87 @@ export default routes((router) => {
     withFile,
     handle(uploadPoster)
   )
+  router.post(
+    "/posterSignedUrl",
+    withAuth,
+    withAuthProfile(),
+    withFile,
+    handle(getPosterSignedUrl)
+  )
 })
 
-export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
+export async function getPosterSignedUrl(
+  req: WithAuth
+): Promise<Pick<PosterAttributes, "filename" | "signedUrl" | "url">> {
+  const initial = Date.now()
+  const auth = req.auth as string
+
+  const ext = extension(req.body.type)
+  const timeHash = Math.floor(initial / 1000)
+    .toString(16)
+    .toLowerCase()
+  const userHash = auth.slice(-8).toLowerCase()
+  const filename = BUCKET_DIR + "/" + userHash + timeHash + ext
+  await ensure()
+
+  const signedUrlExpireSeconds = 60 * 1000
+
+  const signedUrl = s3.getSignedUrl("putObject", {
+    Bucket: BUCKET_NAME,
+    Key: filename,
+    Expires: signedUrlExpireSeconds,
+    ContentType: req.body.type,
+    ACL: "public-read",
+    CacheControl: "public, max-age=31536000, immutable",
+  })
+
+  const time = ((Date.now() - initial) / 1000).toFixed(3)
+  console.log(signedUrl)
+
+  const url = new URL(signedUrl)
+  url.host = "localhost" // siteUrl().host
+
+  const result = {
+    filename,
+    url: BUCKET_URL + "/" + filename,
+    signedUrl: url.toString(),
+  }
+
+  /* const form = new FormData()
+  form.append(
+    "file",
+    fs.createReadStream("/Users/braianmellor/Downloads/15f70ddd62cdfe24.jpg")
+  ) */
+
+  //Send the file to File-system
+  console.log("Sending file to S3...")
+  const resp = await fetch(url.toString(), {
+    method: "PUT",
+    body: fs.readFileSync("/Users/braianmellor/Downloads/15f70ddd62cdfe24.jpg"),
+    headers: {
+      "Content-Type": req.body.type,
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  }).catch((err) => {
+    console.log("------------------------")
+    console.log(err)
+    return null
+  })
+
+  console.log("@@@@@@@@@@@@@@@")
+  console.log(resp)
+  console.log(resp?.body)
+
+  logger.log(`new poster created: ${JSON.stringify(result)} (time: ${time}s)`, {
+    poster: result,
+    time,
+  })
+  return result
+}
+
+export async function uploadPoster(
+  req: WithAuth
+): Promise<Pick<PosterAttributes, "filename" | "size" | "url" | "type">> {
   if (!req.files || !req.files.poster) {
     throw new RequestError(`Poster param is required`, RequestError.BadRequest)
   }

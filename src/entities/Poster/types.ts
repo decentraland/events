@@ -6,6 +6,7 @@ export type PosterAttributes = {
   url: string
   size: number
   type: string
+  signedUrl: string
 }
 
 export function extension(type: string) {

@@ -29,6 +29,7 @@ import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 
 import Events, { EditEvent } from "../../api/Events"
+import S3 from "../../api/S3"
 import AddCoverButton from "../../components/Button/AddCoverButton"
 import ImageInput from "../../components/Form/ImageInput"
 import Label from "../../components/Form/Label"
@@ -217,8 +218,14 @@ export default function SubmitPage() {
           errorImageServer: null,
         })
         try {
-          const poster = await Events.get().uploadPoster(file)
-          editActions.setValue("image", poster.url)
+          const posterData = await Events.get().getPresignedUrl(file.type)
+          const poster = await S3.get(posterData.signedUrl).uploadRemotePoster(
+            file
+          )
+          console.log("poster: ", poster)
+          console.log("after uploadPoster")
+          console.log(posterData)
+          editActions.setValue("image", posterData.url)
         } catch (err) {
           patchState({ errorImageServer: (err as any).message })
         }
