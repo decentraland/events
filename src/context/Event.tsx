@@ -274,16 +274,20 @@ export function useEventSchedule(
 
 export function useEventIdContext(eventId?: string | null) {
   const [events, state] = useContext(EventsContext)
-  return useAsyncMemo(async () => {
-    if (!eventId || !isUUID(eventId) || state.loading) {
-      return null
-    }
+  return useAsyncMemo(
+    async () => {
+      if (!eventId || !isUUID(eventId) || state.loading) {
+        return null
+      }
 
-    const currentEvent = events.find((event) => event.id === eventId)
-    if (currentEvent) {
-      return currentEvent
-    }
+      const currentEvent = events.find((event) => event.id === eventId)
+      if (currentEvent) {
+        return currentEvent
+      }
 
-    return Events.get().getEventById(eventId)
-  }, [eventId, events, state.loading])
+      return Events.get().getEventById(eventId)
+    },
+    [eventId, events, events.length, !state.loading],
+    { callWithTruthyDeps: true }
+  )
 }
