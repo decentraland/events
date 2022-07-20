@@ -3,6 +3,7 @@ import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { Avatar } from "decentraland-gatsby/dist/utils/api/Catalyst"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
+import { escape } from "html-escaper"
 import fetch from "isomorphic-fetch"
 import isURL from "validator/lib/isURL"
 
@@ -29,7 +30,22 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: ":tada: New event submitted:",
+          text: `:tada: New event submitted: <${eventUrl(event)}|${event.id}>`,
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: [
+            `${event.name} by ${event.user_name || "Guest"}`,
+            event.description || "No description",
+          ].join("\n\n"),
+        },
+        accessory: {
+          type: "image",
+          image_url: event.image,
+          alt_text: event.scene_name || "Decentraland",
         },
       },
       {
@@ -37,11 +53,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         text: {
           type: "mrkdwn",
           text: [
-            `*<${eventUrl(event)}|${event.name}>* by ${
-              event.user_name || "Guest"
-            }`,
-            `_${event.description || "No description"}_`,
-            "",
+            `at <${eventUrl(event)}|Events page>`,
             event.url &&
               event.url.startsWith(DECENTRALAND_URL) &&
               `at <${event.url}|${
@@ -52,11 +64,6 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
           ]
             .filter(Boolean)
             .join("\n"),
-        },
-        accessory: {
-          type: "image",
-          image_url: event.image,
-          alt_text: event.scene_name || "Decentraland",
         },
       },
     ],
@@ -72,16 +79,26 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text:
-            `:white_check_mark: new event approved: *<${eventUrl(event)}|${
-              event.name
-            }>*` +
-            (event.approved_by
-              ? `\n_by:_ \`${event.approved_by}\` _${selfApproved}_`
-              : ``),
+          text: `:white_check_mark: new event approved: *<${eventUrl(event)}|${
+            event.id
+          }>*`,
         },
       },
-    ],
+      {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: event.name,
+        },
+      },
+      event.approved_by && {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `\n_by:_ \`${event.approved_by}\` _${selfApproved}_`,
+        },
+      },
+    ].filter(Boolean),
   })
 }
 
@@ -94,14 +111,24 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text:
-            `:x: new event rejected: *<${eventUrl(event)}|${event.name}>*` +
-            (event.rejected_by
-              ? `\n_by:_ \`${event.rejected_by}\` _${selfRejected}_`
-              : ``),
+          text: `:x: new event rejected: *<${eventUrl(event)}|${event.id}>*`,
         },
       },
-    ],
+      {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: event.name,
+        },
+      },
+      event.approved_by && {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `\n_by:_ \`${event.approved_by}\` _${selfRejected}_`,
+        },
+      },
+    ].filter(Boolean),
   })
 }
 
@@ -123,7 +150,14 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
           type: "mrkdwn",
           text: `:pencil2: user ${
             event.user_name || "Guest"
-          } just edited his event: *<${eventUrl(event)}|${event.name}>*`,
+          } just edited his event: *<${eventUrl(event)}|${event.id}>*`,
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: event.name,
         },
       },
     ],
