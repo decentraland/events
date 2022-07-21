@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet"
 import { useLocation } from "@gatsbyjs/reach-router"
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
+import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
@@ -31,6 +32,7 @@ export type EventPageState = {
 
 export default function EventPage() {
   const l = useFormatMessage()
+  const [, accountState] = useAuthContext()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const [event, eventState] = useEventIdContext(params.get("id"))
@@ -43,8 +45,9 @@ export default function EventPage() {
       (event && event.user === settings.user && canApproveOwnEvent(settings)),
     [settings, event]
   )
+  const loading = accountState.loading || eventState.loading
 
-  if (!eventState.loading && !event) {
+  if (!loading && !event && eventState.version !== 0) {
     return (
       <Container style={{ paddingTop: "75px" }}>
         <ItemLayout full>

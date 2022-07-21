@@ -6,7 +6,7 @@ import { bool } from "decentraland-gatsby/dist/entities/Route/param"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
-import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import {
   canApproveAnyEvent,
   canEditAnyEvent,
@@ -17,7 +17,7 @@ import { EventListOptions, EventListParams, EventListType } from "../types"
 
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth) {
-  const profile = await getMyProfileSettings(req)
+  const profile = await getAuthProfileSettings(req)
   const query = validate(req.query)
   const options: EventListOptions = {
     user: profile.user,

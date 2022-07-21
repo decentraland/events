@@ -14,7 +14,7 @@ import pick from "lodash/pick"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
-import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import {
   canApproveAnyEvent,
   canApproveOwnEvent,
@@ -49,7 +49,7 @@ const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
-  const profile = await getMyProfileSettings(req)
+  const profile = await getAuthProfileSettings(req)
   const updatedAttributes = {
     ...pick(event, editEventAttributes),
     ...pick(req.body, editEventAttributes),

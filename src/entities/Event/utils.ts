@@ -389,3 +389,9 @@ export function formatMinutesDuration(minutes: number) {
       ].join("")
     : "2400"
 }
+
+export function isPastEvent(event: EventAttributes) {
+  const now = Date.now()
+  const finish_at = Time.date(event.finish_at)
+  return finish_at.getTime() < now
+}

@@ -17,7 +17,7 @@
     "babel-jest": "^27.5.1",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
-    "decentraland-gatsby": "^5.17.6",
+    "decentraland-gatsby": "^5.21.0",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.1.2",
@@ -50,6 +50,7 @@
     "xml": "^1.0.1"
   },
   "devDependencies": {
+    "@dcl/eslint-config": "^1.0.6",
     "@types/apicache": "^1.6.0",
     "@types/express": "^4.17.3",
     "@types/express-fileupload": "^1.1.7",
@@ -65,7 +66,7 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "concurrently": "^7.2.1",
-    "decentraland-gatsby-deploy": "^1.18.2",
+    "decentraland-gatsby-deploy": "^1.19.1",
     "devcert": "^1.1.2",
     "dotenv": "^8.6.0",
     "eslint": "^7.32.0",
@@ -77,6 +78,7 @@
     "eslint-plugin-css-import-order": "^1.1.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "http-proxy-middleware": "^2.0.6",
     "husky": "^7.0.4",
     "jest": "^27.5.1",
     "lint-staged": "12.3.8",

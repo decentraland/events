@@ -6,6 +6,7 @@ import { Button } from "decentraland-ui/dist/components/Button/Button"
 
 import { useEventsContext } from "../../context/Event"
 import { SessionEventAttributes } from "../../entities/Event/types"
+import { isPastEvent } from "../../entities/Event/utils"
 
 import "./EditButtons.css"
 
@@ -21,6 +22,8 @@ export default function EditButtons(props: EditButtonsProps) {
     return null
   }
 
+  const isPast = React.useMemo(() => isPastEvent(event), [event])
+
   const loading = state.modifying.has(event.id)
 
   return (
@@ -31,7 +34,7 @@ export default function EditButtons(props: EditButtonsProps) {
           size="small"
           onClick={prevent(() => state.reject(event.id))}
           loading={loading}
-          disabled={loading}
+          disabled={loading || isPast}
         >
           {l("components.button.edit_buttons.reject")}
         </Button>
@@ -53,7 +56,7 @@ export default function EditButtons(props: EditButtonsProps) {
         size="small"
         onClick={prevent(() => state.approve(event.id))}
         loading={loading}
-        disabled={loading}
+        disabled={loading || isPast}
       >
         {l("components.button.edit_buttons.approve")}
       </Button>

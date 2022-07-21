@@ -11,7 +11,7 @@ import omit from "lodash/omit"
 import { v4 as uuid } from "uuid"
 
 import EventCategoryModel from "../../EventCategory/model"
-import { getMyProfileSettings } from "../../ProfileSettings/routes/getMyProfileSettings"
+import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import { notifyNewEvent } from "../../Slack/utils"
 import EventModel from "../model"
 import { newEventSchema } from "../schemas"
@@ -28,7 +28,7 @@ const validateNewEvent = createValidator<EventAttributes>(
 export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
-  const profile = await getMyProfileSettings(req)
+  const profile = await getAuthProfileSettings(req)
   const data = req.body as EventAttributes
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
