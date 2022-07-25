@@ -15,7 +15,7 @@ config:
   events:SIGN_SECRET:
     secure: v1:2CPj0nTySIfhSQDL:k2WmqQ028cjQlorb6p+mSPRFVUGz8HNAgQH+L0qszykoHdF0
   events:SLACK_WEBHOOK:
-    secure: v1:NWr0trrwq0pMoJpl:lvKFqEsSkEbwOIqGvoz0iGkaXgxMpOhuwmQjlKtYs1OgSoyPKIWfYy5SXZJ+Z/+/RJFe9dlcvjdBTWT+kCbg0hnONWyj4iPt71w43mYJIZ9UD3gJGOF47k2LXaL/JTw=
+    secure: v1:0kvmsN0EjwZoLUK6:Z+qfwxDfokRLPsLcd3UhYwjJIUHL7WilTW+o0ignZANVg+9wZUbuQBf5dO9eBKuoI1PQaGEccWue5yeu75Liw/MU93V5BPCiqge020Hnsp/SH/MmTlp8OdlDy1Yxq7U=
   events:USE_PUBLIC_TLD: "true"
   events:WEB_PUSH_SECRET:
     secure: v1:IxyqzdspUvg/SwMi:JTK03pF96nZuqzY0dLX0PjoQ6tW4cyP7i3NQ2mgQv0BZI+e7FjAyukhI34/W/6vX8VQ8lkHsyuY1h8c=
