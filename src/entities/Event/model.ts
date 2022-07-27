@@ -191,7 +191,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       FROM ${table(EventModel)} e
       WHERE
         e.rejected IS FALSE
-        AND e.approved IS TRUE
         AND e.recurrent IS TRUE
         AND e.finish_at > now()
         AND (e.next_start_at + (e.duration * '1 millisecond'::interval)) < now()
