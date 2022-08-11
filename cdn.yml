@@ -11,11 +11,3 @@ matches:
 
   - match: "+(0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f|-).js?(.map)"
     immutable: true
-
-  - match: ".well-known/matrix/**/*"
-    immutable: true
-    contentType: "application/json"
-
-  - match: "ping"
-    contentType: "application/json"
-    cacheControl: "public,no-transform,max-age=31536000,immutable"
