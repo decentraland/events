@@ -95,7 +95,7 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `\n_by: _\`${event.approved_by}\`_` + selfApproved,
+          text: `\n_by:_ \`${event.approved_by}\`` + selfApproved,
         },
       },
     ].filter(Boolean),
@@ -126,7 +126,7 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `\n_by: _\`${event.approved_by}\`_` + selfRejected,
+          text: `\n_by:_ \`${event.approved_by}\`` + selfRejected,
         },
       },
     ].filter(Boolean),
