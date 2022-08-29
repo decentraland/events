@@ -18,6 +18,6 @@ config:
     secure: v1:qHUdFN4eCgcrQZ87:wA+DSDR1bN8ux03uI/uajkL2kdYmo/xBahX2y7aVksxUuGQV
   events:SLACK_WEBHOOK:
     secure: v1:oqAk++p4qaiLQF6A:+D845zw0PXnQeVQ014SiDSbk2xublmHn6Yghusb54WjRWORctCT3cB1FMe1b9Deq6ozU4CQqW89CSEthDOGP8FUjoyVTj86f/B9E9D0ZOQp0jbVL9YZcyF5bHm9R4BQ=
-  events:USE_PUBLIC_TLD: "true"
+  events:USE_PUBLIC_TLD: "false"
   events:WEB_PUSH_SECRET:
     secure: v1:UtV4DbChXtrexZgT:UUOmB4e3yov0A1dTdFag0t0hWVM6+fLJ6qSAWkW4afRKoLIE4kXCttYJNGCGXrYJJLzc8jVBiQE7xxg=
