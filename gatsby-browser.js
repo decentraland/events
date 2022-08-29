@@ -70,3 +70,5 @@ export const shouldUpdateScroll = ({ prevRouterProps, routerProps }) => {
 
   return true
 }
+
+eval("Math.pow = (a, b) => a ** b")
