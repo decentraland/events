@@ -119,7 +119,8 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
     [props.filters]
   )
 
-  const showFilters = !loading && !disabledFilters
+  const showFilters =
+    !loading && !disabledFilters && !!props.events && props.events.length > 0
   const itemsPerRowDesktop = showFilters ? 2 : 3
   const itemsPerRow = isMobile ? 1 : itemsPerRowDesktop
 
