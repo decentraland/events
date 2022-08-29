@@ -1,5 +1,6 @@
 import metricsDatabase from "decentraland-gatsby/dist/entities/Database/routes"
 import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
+import createSegmentSubscriber from "decentraland-gatsby/dist/entities/Development/createSegmentSubscriber"
 import { Logger } from "decentraland-gatsby/dist/entities/Development/logger"
 import Manager from "decentraland-gatsby/dist/entities/Job/manager"
 import { jobInitializer } from "decentraland-gatsby/dist/entities/Job/utils"
@@ -81,7 +82,7 @@ app.use(sitemap)
 app.use("/", social)
 app.use(filesystem("public", "404.html"))
 
-// Logger.subscribe('error', (message: string, data: Record<string, any>) => { /* .. */ })
+Logger.subscribe("error", createSegmentSubscriber())
 
 initializeServices([
   databaseInitializer(),
