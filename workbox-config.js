@@ -1,6 +1,6 @@
-module.exports = {
-  globDirectory: "src/",
-  globPatterns: ["**/*.{ts,css,tsx,js,png,svg,json}"],
-  swDest: "static/sw.js",
+export default {
+  globDirectory: "public/",
+  globPatterns: ["**/*.{html,css,js,jpg,png,svg,json}"],
+  swDest: "public/sw.js",
   ignoreURLParametersMatching: [/^utm_/, /^fbclid$/],
 }
