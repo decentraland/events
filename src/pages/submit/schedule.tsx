@@ -10,11 +10,11 @@ import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Field } from "decentraland-ui/dist/components/Field/Field"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
+import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import Header from "semantic-ui-react/dist/commonjs/elements/Header"
@@ -70,6 +70,7 @@ export default function ScheduleEditPage() {
         description: original.description,
         background: original.background,
         image: original.image,
+        active: original.active,
         active_since: original.active_since,
         active_until: original.active_until,
       })
@@ -304,7 +305,7 @@ export default function ScheduleEditPage() {
                     ))}
                     <Button
                       basic
-                      small
+                      size="small"
                       className="schedule-edit__background-selected-button"
                       onClick={(event) => {
                         editActions.handleChange(event, {
@@ -351,7 +352,30 @@ export default function ScheduleEditPage() {
                   />
                 </Grid.Column>
               </Grid.Row>
-
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <SelectField
+                    label={l("page.schedule_edit.active_label")}
+                    name="active"
+                    error={!!errors["active"]}
+                    message={errors["active"]}
+                    value={!!editing.active}
+                    onChange={editActions.handleChange}
+                    options={[
+                      {
+                        key: 1,
+                        value: true,
+                        text: l("page.schedule_edit.active_option_true"),
+                      },
+                      {
+                        key: 0,
+                        value: false,
+                        text: l("page.schedule_edit.active_option_false"),
+                      },
+                    ]}
+                  />
+                </Grid.Column>
+              </Grid.Row>
               <Grid.Row>
                 <Grid.Column mobile="8">
                   <Field
@@ -363,12 +387,6 @@ export default function ScheduleEditPage() {
                     }
                     message={errors["active_since_date"]}
                     value={editActions.getActiveSinceDate()}
-                    min={Time.from(Date.now())
-                      .startOf("day")
-                      .format(Time.Formats.InputDate)}
-                    max={Time.from(Date.now())
-                      .startOf("day")
-                      .format(Time.Formats.InputDate)}
                     onChange={editActions.handleChange}
                   />
                 </Grid.Column>
@@ -404,9 +422,6 @@ export default function ScheduleEditPage() {
                     }
                     message={errors["active_until_date"]}
                     value={editActions.getActiveUntilDate()}
-                    min={Time.from(Date.now())
-                      .startOf("day")
-                      .format(Time.Formats.InputDate)}
                     onChange={editActions.handleChange}
                   />
                 </Grid.Column>

@@ -1,4 +1,3 @@
-import metricsDatabase from "decentraland-gatsby/dist/entities/Database/routes"
 import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
 import createSegmentSubscriber from "decentraland-gatsby/dist/entities/Development/createSegmentSubscriber"
 import { Logger } from "decentraland-gatsby/dist/entities/Development/logger"
@@ -70,13 +69,6 @@ app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
 app.use(metrics)
-app.use(metricsDatabase)
-app.get(
-  "/metrics/*",
-  handle(async () => {
-    throw new RequestError("NotFound", RequestError.NotFound)
-  })
-)
 
 app.use(sitemap)
 app.use("/", social)

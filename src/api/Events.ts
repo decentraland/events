@@ -50,6 +50,7 @@ export type EditSchedule = Pick<
   | "description"
   | "image"
   | "background"
+  | "active"
   | "active_since"
   | "active_until"
 >

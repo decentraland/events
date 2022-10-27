@@ -62,7 +62,7 @@ export default function Navigation(props: NavigationProps) {
   const [events] = useEventsContext()
   const [account] = useAuthContext()
   const [schedules] = useAsyncMemo(getSchedules)
-  const scheduleInfo = useMemo(
+  const currentSchedule = useMemo(
     () => getCurrentSchedules(schedules),
     [schedules]
   )
@@ -127,10 +127,10 @@ export default function Navigation(props: NavigationProps) {
               </Tabs.Tab>
             </Link>
           )}
-          {scheduleInfo && (
-            <Link href={locations.schedule(scheduleInfo.id)}>
+          {currentSchedule && (
+            <Link href={locations.schedule(currentSchedule.id)}>
               <Tabs.Tab active={props.activeTab === NavigationTab.Schedule}>
-                {scheduleInfo.name}
+                {currentSchedule.name}
               </Tabs.Tab>
             </Link>
           )}
