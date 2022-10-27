@@ -16,9 +16,16 @@ export function getMissingSchedules(
 
 export function getCurrentSchedules(schedules: ScheduleAttributes[] | null) {
   const now = Date.now()
-  return (schedules || []).find((schedule) =>
-    Time.from(now).isBetween(schedule.active_since, schedule.active_until)
-  )
+  return (schedules || []).find((schedule) => {
+    if (!schedule.active) {
+      return false
+    }
+
+    return Time.from(now).isBetween(
+      schedule.active_since,
+      schedule.active_until
+    )
+  })
 }
 
 export function getScheduleBackground(

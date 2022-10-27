@@ -31,8 +31,13 @@ export const getScheduleSchema: AjvObjectSchema = {
       maxLength: 255,
       description: "The url of an image for this schedule",
     },
+    active: {
+      type: "boolean",
+      description:
+        "Whether the schedule can be displayed in the listing or not",
+    },
     active_since: {
-      description: "the time the schedule is going to start",
+      description: "The time the schedule is going to start",
       type: "string",
       format: "date-time",
     },
@@ -118,6 +123,7 @@ export const newScheduleSchema = {
     "description",
     "image",
     "background",
+    "active",
     "active_since",
     "active_until",
   ],
@@ -145,6 +151,11 @@ export const newScheduleSchema = {
       minLength: 0,
       maxLength: 255,
       description: "The url of an image for this schedule",
+    },
+    active: {
+      type: "boolean",
+      description:
+        "Whether the schedule can be displayed in the listing or not",
     },
     active_since: {
       description: "the time the schedule is going to start",

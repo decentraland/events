@@ -174,15 +174,30 @@
         }
       }
     },
+    "schedules": {
+      "not_found": "No schedule found",
+      "name": "NAME",
+      "active_since": "ACTIVE SINCE",
+      "active_until": "ACTIVE UNTIL",
+      "active": "VISIBILITY",
+      "active_true": "Main Page + API",
+      "active_false": "API Only",
+      "actions": "ACTIONS",
+      "open": "VIEW",
+      "edit": "EDIT"
+    },
     "schedule_edit": {
       "title": "Submit schedule",
       "name_label": "Name",
-      "name_placeholder": "Name of Event Schedule",
+      "name_placeholder": "Name of the Schedule",
       "schedule_cover_label": "Schedule cover",
       "error_image_size": "This image is too heavy (more than 500Kb), try with",
       "description_label": "Description",
       "description_placeholder": "This description is important for SEO",
       "background_label": "Background color",
+      "active_label": "Visibility",
+      "active_option_true": "Main Page + API",
+      "active_option_false": "API Only",
       "active_since_date_label": "Active since date",
       "active_since_time_label": "Active since time",
       "active_until_date_label": "Active until date",

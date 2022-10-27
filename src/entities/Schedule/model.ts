@@ -14,14 +14,13 @@ export default class ScheduleModel extends Model<ScheduleAttributes> {
 
   static async getSchedules() {
     const now = Time.from()
-    const query = SQL`SELECT * FROM ${table(
-      this
-    )} WHERE "active_until" > ${now}`
-    return this.query<ScheduleAttributes[]>(query)
+    const query = SQL`SELECT * FROM ${table(this)}
+      WHERE "active_until" > ${now}`
+    return this.namedQuery<ScheduleAttributes[]>("get_schedules", query)
   }
 
   static async getScheduleList(ids: string[]) {
     const query = SQL`SELECT * FROM ${table(this)} WHERE "id" in ${values(ids)}`
-    return this.query<ScheduleAttributes>(query)
+    return this.namedQuery<ScheduleAttributes>("get_schedule_list", query)
   }
 }

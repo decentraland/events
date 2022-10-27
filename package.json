@@ -17,7 +17,7 @@
     "babel-jest": "^27.5.1",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
-    "decentraland-gatsby": "^5.30.0",
+    "decentraland-gatsby": "^5.32.2",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.1.2",

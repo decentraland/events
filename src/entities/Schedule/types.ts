@@ -4,9 +4,9 @@ export type ScheduleAttributes = {
   description: string
   image: string
   background: string[]
+  active: boolean
   active_since: Date
   active_until: Date
-  active: boolean
   created_at: Date
   updated_at: Date
 }

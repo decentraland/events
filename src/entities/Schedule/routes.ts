@@ -8,11 +8,13 @@ import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { Request } from "express"
 import omit from "lodash/omit"
+import pick from "lodash/pick"
 import { v4 as uuid } from "uuid"
 
 import { getAuthProfileSettings } from "../ProfileSettings/routes/getAuthProfileSettings"
 import { canEditAnySchedule } from "../ProfileSettings/utils"
 import ScheduleModel from "./model"
+import { newScheduleSchema } from "./schema"
 import { ScheduleAttributes } from "./types"
 
 export default routes((router) => {
@@ -21,7 +23,6 @@ export default routes((router) => {
   router.get("/schedules/:schedule_id", handle(getScheduleById))
   router.post("/schedules", withAuth, handle(createSchedule))
   router.patch("/schedules/:schedule_id", withAuth, handle(updateSchedule))
-  router.delete("/schedules/:schedule_id", withAuth, handle(deleteSchedule))
 })
 
 export async function getScheduleList() {
@@ -40,6 +41,7 @@ export async function getScheduleById(req: Request<{ schedule_id: string }>) {
 
 export async function createSchedule(req: WithAuth) {
   const user = req.auth!
+  // TODO: validate input data
   const data = req.body as ScheduleAttributes
   const profile = await getAuthProfileSettings(req)
 
@@ -63,7 +65,7 @@ export async function createSchedule(req: WithAuth) {
     background: data.background,
     active_since: data.active_since,
     active_until: data.active_until,
-    active: true,
+    active: data.active ?? true,
     created_at: new Date(),
     updated_at: new Date(),
   })
@@ -71,6 +73,7 @@ export async function createSchedule(req: WithAuth) {
 
 export async function updateSchedule(req: WithAuth) {
   const id = req.params.schedule_id
+  // TODO: validate input data
   const data = req.body as ScheduleAttributes
   const user = req.auth!
   const profile = await getAuthProfileSettings(req)
@@ -92,42 +95,12 @@ export async function updateSchedule(req: WithAuth) {
   if (!schedule) {
     throw new RequestError(`Schedule "${id}" not found`, RequestError.NotFound)
   }
-  const updatedData = {
-    name: data.name || schedule.name,
-    description: data.description || schedule.description,
-    image: data.image || schedule.image,
-    background: data.background || schedule.background,
-    active_since: data.active_since || schedule.active_since,
-    active_until: data.active_until || schedule.active_until,
-  }
+
+  const updatedData = Object.assign(
+    pick(schedule, Object.keys(newScheduleSchema.properties)),
+    pick(data, Object.keys(newScheduleSchema.properties))
+  )
+
   await ScheduleModel.update(updatedData, { id: id })
   return updatedData
-}
-
-export async function deleteSchedule(req: WithAuth) {
-  const id = req.params.schedule_id
-  const user = req.auth!
-  const profile = await getAuthProfileSettings(req)
-
-  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
-    throw new RequestError(`Forbidden`, RequestError.Forbidden)
-  }
-
-  const schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
-
-  if (!schedule) {
-    throw new RequestError(`Schedule "${id}" not found`, RequestError.NotFound)
-  }
-
-  if (!schedule.active) {
-    throw new RequestError(
-      `Schedule "${id}" already deactivated`,
-      RequestError.NotFound
-    )
-  }
-  const updatedData = {
-    active: false,
-  }
-  await ScheduleModel.update(updatedData, { id: id })
-  return await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
 }

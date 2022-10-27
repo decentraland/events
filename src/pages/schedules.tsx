@@ -8,26 +8,20 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Link } from "decentraland-gatsby/dist/plugins/intl"
-import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { Address } from "decentraland-ui/dist/components/Address/Address"
-import { Blockie } from "decentraland-ui/dist/components/Blockie/Blockie"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
+import { Header } from "decentraland-ui/dist/components/Header/Header"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import { Table } from "decentraland-ui/dist/components/Table/Table"
-import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
-import Input from "semantic-ui-react/dist/commonjs/elements/Input"
 
 import Events from "../api/Events"
 import Navigation, { NavigationAction } from "../components/Layout/Navigation"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
-import {
-  canEditAnyProfile,
-  canEditAnySchedule,
-} from "../entities/ProfileSettings/utils"
+import { canEditAnySchedule } from "../entities/ProfileSettings/utils"
 import { ScheduleAttributes } from "../entities/Schedule/types"
+import { getScheduleBackground } from "../entities/Schedule/utils"
 import { showTimezoneLabel } from "../modules/date"
 import locations from "../modules/locations"
 
@@ -77,22 +71,45 @@ export default function SettingsPage() {
   return (
     <>
       <Navigation action={NavigationAction.SubmitSchedule} />
-      <Container className="UsersPage" style={{ paddingTop: "2rem" }}>
+      <Container className="SchedulesPage" style={{ paddingTop: "2rem" }}>
         {schedules.length === 0 && (
           <div>
             <Divider />
             <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.users.not_found")}
+              {l("page.schedules.not_found")}
             </Paragraph>
             <Divider />
           </div>
         )}
         {schedules.length > 0 && (
           <Table padded>
+            <Table.Header>
+              <Table.HeaderCell style={{ padding: 0 }}></Table.HeaderCell>
+              <Table.HeaderCell></Table.HeaderCell>
+              <Table.HeaderCell>{l("page.schedules.name")}</Table.HeaderCell>
+              <Table.HeaderCell textAlign="center">
+                {l("page.schedules.active_since")}
+                <Icon name="arrow right" style={{ margin: "0 1rem" }} />
+                {l("page.schedules.active_until")}
+              </Table.HeaderCell>
+              <Table.HeaderCell textAlign="center">
+                {l("page.schedules.active")}
+              </Table.HeaderCell>
+              <Table.HeaderCell textAlign="right">
+                {l("page.schedules.actions")}
+              </Table.HeaderCell>
+            </Table.Header>
             <Table.Body>
               {schedules.map((schedule) => {
                 return (
                   <Table.Row key={schedule.id}>
+                    <Table.Cell
+                      style={{
+                        background: getScheduleBackground(schedule),
+                        padding: 0,
+                        width: "10px",
+                      }}
+                    />
                     <Table.Cell
                       style={{
                         backgroundImage: `url('${schedule.image}')`,
@@ -126,13 +143,27 @@ export default function SettingsPage() {
                         </span>
                       </Paragraph>
                     </Table.Cell>
+                    <Table.Cell textAlign="center">
+                      <Header sub>
+                        {schedule.active
+                          ? l("page.schedules.active_true")
+                          : l("page.schedules.active_false")}
+                      </Header>
+                    </Table.Cell>
                     <Table.Cell textAlign="right">
                       <Button
                         basic
                         as={Link}
                         href={locations.editSchedule(schedule.id)}
                       >
-                        EDIT
+                        {l("page.schedules.edit")}
+                      </Button>
+                      <Button
+                        basic
+                        as={Link}
+                        href={locations.schedule(schedule.id)}
+                      >
+                        {l("page.schedules.open")}
                       </Button>
                     </Table.Cell>
                   </Table.Row>
