@@ -17,7 +17,6 @@ describe("Date module", () => {
   const tz = Object.entries({
     Iceland: "(UTC)",
     "Asia/Dubai": "(UTC+4)",
-    "Australia/ACT": "(UTC+10)",
     "Pacific/Rarotonga": "(UTC-10)",
     "US/Samoa": "(UTC-11)",
     "Asia/Calcutta": "(UTC+5:30)",
@@ -38,6 +37,7 @@ describe("Date module", () => {
     "Asia/Beirut": ["(UTC+2)", "(UTC+3)"],
     "Asia/Tehran": ["(UTC+3:30)", "(UTC+4:30)"],
     "Australia/LHI": ["(UTC+11)", "(UTC+10:30)"],
+    "Australia/ACT": ["(UTC+11)", "(UTC+10)"],
   })
 
   for (const [name, expected] of dts) {
