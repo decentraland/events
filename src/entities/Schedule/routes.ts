@@ -6,6 +6,7 @@ import {
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { Request } from "express"
 import omit from "lodash/omit"
 import pick from "lodash/pick"
@@ -14,8 +15,13 @@ import { v4 as uuid } from "uuid"
 import { getAuthProfileSettings } from "../ProfileSettings/routes/getAuthProfileSettings"
 import { canEditAnySchedule } from "../ProfileSettings/utils"
 import ScheduleModel from "./model"
-import { newScheduleSchema } from "./schema"
-import { ScheduleAttributes } from "./types"
+import { createScheduleSchema, updateScheduleSchema } from "./schema"
+import { NewScheduleAttributes, ScheduleAttributes } from "./types"
+
+const createScheduleValidator =
+  createValidator<NewScheduleAttributes>(createScheduleSchema)
+const updateScheduleValidator =
+  createValidator<NewScheduleAttributes>(updateScheduleSchema)
 
 export default routes((router) => {
   const withAuth = auth({ optional: false })
@@ -42,16 +48,8 @@ export async function getScheduleById(req: Request<{ schedule_id: string }>) {
 export async function createSchedule(req: WithAuth) {
   const user = req.auth!
   // TODO: validate input data
-  const data = req.body as ScheduleAttributes
+  const data = createScheduleValidator(req.body || {})
   const profile = await getAuthProfileSettings(req)
-
-  if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    throw new RequestError("Empty schedule data", RequestError.BadRequest, {
-      body: data,
-      headers: omit(req.headers, ["authorization"]),
-      user,
-    })
-  }
 
   if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
@@ -60,9 +58,10 @@ export async function createSchedule(req: WithAuth) {
   return await ScheduleModel.create<ScheduleAttributes>({
     id: uuid(),
     name: data.name,
-    description: data.description,
-    image: data.image,
-    background: data.background,
+    description: data.description || null,
+    image: data.image || null,
+    theme: null,
+    background: data.background || [],
     active_since: data.active_since,
     active_until: data.active_until,
     active: data.active ?? true,
@@ -74,17 +73,9 @@ export async function createSchedule(req: WithAuth) {
 export async function updateSchedule(req: WithAuth) {
   const id = req.params.schedule_id
   // TODO: validate input data
-  const data = req.body as ScheduleAttributes
+  const data = updateScheduleValidator(req.body || {})
   const user = req.auth!
   const profile = await getAuthProfileSettings(req)
-
-  if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    throw new RequestError("Empty schedule data", RequestError.BadRequest, {
-      body: data,
-      headers: omit(req.headers, ["authorization"]),
-      user,
-    })
-  }
 
   if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
@@ -97,8 +88,8 @@ export async function updateSchedule(req: WithAuth) {
   }
 
   const updatedData = Object.assign(
-    pick(schedule, Object.keys(newScheduleSchema.properties)),
-    pick(data, Object.keys(newScheduleSchema.properties))
+    pick(schedule, Object.keys(updateScheduleSchema.properties as {})),
+    pick(data, Object.keys(updateScheduleSchema.properties as {}))
   )
 
   await ScheduleModel.update(updatedData, { id: id })

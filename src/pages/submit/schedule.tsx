@@ -31,6 +31,7 @@ import {
   POSTER_FILE_SIZE,
   POSTER_FILE_TYPES,
 } from "../../entities/Poster/types"
+import { ScheduleTheme } from "../../entities/Schedule/types"
 import { getScheduleBackground } from "../../entities/Schedule/utils"
 import useScheduleEditor, {
   useScheduleEditorId,
@@ -61,6 +62,41 @@ export default function ScheduleEditPage() {
   const [editing, editActions] = useScheduleEditor()
   const [original] = useScheduleEditorId(params.get("schedule"))
 
+  const activeOptions = useMemo(
+    () => [
+      {
+        key: 1,
+        value: true,
+        text: l("page.schedule_edit.active_option_true"),
+      },
+      {
+        key: 0,
+        value: false,
+        text: l("page.schedule_edit.active_option_false"),
+      },
+    ],
+    []
+  )
+
+  const themeOptions = useMemo(
+    () => [
+      {
+        key: 0,
+        value: false,
+        text: l("page.schedule_edit.theme_option_empty"),
+      },
+      {
+        key: ScheduleTheme.MetaverseFestival2022,
+        value: ScheduleTheme.MetaverseFestival2022,
+        text: l(
+          "page.schedule_edit.theme_option_" +
+            ScheduleTheme.MetaverseFestival2022
+        ),
+      },
+    ],
+    []
+  )
+
   const backgroundRef = useRef(new Array(0))
 
   useEffect(() => {
@@ -69,7 +105,8 @@ export default function ScheduleEditPage() {
         name: original.name,
         description: original.description,
         background: original.background,
-        image: original.image,
+        image: original.image || null,
+        theme: original.theme || null,
         active: original.active,
         active_since: original.active_since,
         active_until: original.active_until,
@@ -147,7 +184,7 @@ export default function ScheduleEditPage() {
         ? Events.get().updateSchedule(original.id, data as EditSchedule)
         : Events.get().createSchedule(data as EditSchedule))
 
-      navigate(locations.events(), { replace: true })
+      navigate(locations.schedules(), { replace: true })
     } catch (err) {
       patchState({
         loading: false,
@@ -238,89 +275,106 @@ export default function ScheduleEditPage() {
               </Grid.Row>
               <Grid.Row>
                 <Grid.Column mobile="16">
-                  <Header sub>
-                    {l("page.schedule_edit.background_label")}
-                  </Header>
-
-                  <div
-                    className="schedule-edit__background-gradient-preview"
-                    style={styleBackground}
-                  ></div>
-
-                  <div className="schedule-edit__background-selected-wrapper">
-                    {editing.background.map((color, index) => (
-                      <SelectionLabel
-                        key={index}
-                        className={
-                          "schedule-edit__background-selected-label-wrapper"
-                        }
-                        style={{
-                          background: color,
-                          color: getAppropriateBlackWhiteFontColor(color),
-                          position: "relative",
-                        }}
-                        onClick={() => {
-                          if (backgroundRef && backgroundRef.current) {
-                            backgroundRef.current[index].click()
-                          }
-                        }}
-                      >
-                        {l("page.schedule_edit.background_selected_label", {
-                          color: color,
-                        })}
-                        <Icon
-                          className={"schedule-edit__background-selected-label"}
-                          name="delete"
-                          circular
-                          onClick={(event: React.ChangeEvent<any>) => {
-                            event.stopPropagation()
-                            editActions.handleChange(event, {
-                              name: "background_remove",
-                              value: index,
-                            })
-                          }}
-                        />
-                        <input
-                          type="color"
-                          style={{
-                            opacity: 0,
-                            position: "absolute",
-                            left: 0,
-                            bottom: 0,
-                          }}
-                          ref={(el) => {
-                            backgroundRef.current[index] = el
-                          }}
-                          onChange={(event: any) => {
-                            editActions.handleChange(event, {
-                              name: "background",
-                              value: {
-                                color: event.currentTarget.value,
-                                position: index,
-                              },
-                            })
-                          }}
-                        ></input>
-                      </SelectionLabel>
-                    ))}
-                    <Button
-                      basic
-                      size="small"
-                      className="schedule-edit__background-selected-button"
-                      onClick={(event) => {
-                        editActions.handleChange(event, {
-                          name: "background",
-                          value: {
-                            color: getScheduleBackground({ background: [] }),
-                          },
-                        })
-                      }}
-                    >
-                      {l("page.schedule_edit.background_add_button")}
-                    </Button>
-                  </div>
+                  <SelectField
+                    label={l("page.schedule_edit.theme_label")}
+                    name="theme"
+                    error={!!errors["theme"]}
+                    message={errors["theme"]}
+                    value={editing.theme || false}
+                    onChange={editActions.handleChange}
+                    options={themeOptions}
+                  />
                 </Grid.Column>
               </Grid.Row>
+              {editing.theme === null && (
+                <Grid.Row>
+                  <Grid.Column mobile="16">
+                    <Header sub>
+                      {l("page.schedule_edit.background_label")}
+                    </Header>
+
+                    <div
+                      className="schedule-edit__background-gradient-preview"
+                      style={styleBackground}
+                    ></div>
+
+                    <div className="schedule-edit__background-selected-wrapper">
+                      {editing.background.map((color, index) => (
+                        <SelectionLabel
+                          key={index}
+                          className={
+                            "schedule-edit__background-selected-label-wrapper"
+                          }
+                          style={{
+                            background: color,
+                            color: getAppropriateBlackWhiteFontColor(color),
+                            position: "relative",
+                          }}
+                          onClick={() => {
+                            if (backgroundRef && backgroundRef.current) {
+                              backgroundRef.current[index].click()
+                            }
+                          }}
+                        >
+                          {l("page.schedule_edit.background_selected_label", {
+                            color: color,
+                          })}
+                          <Icon
+                            className={
+                              "schedule-edit__background-selected-label"
+                            }
+                            name="delete"
+                            circular
+                            onClick={(event: React.ChangeEvent<any>) => {
+                              event.stopPropagation()
+                              editActions.handleChange(event, {
+                                name: "background_remove",
+                                value: index,
+                              })
+                            }}
+                          />
+                          <input
+                            type="color"
+                            style={{
+                              opacity: 0,
+                              position: "absolute",
+                              left: 0,
+                              bottom: 0,
+                            }}
+                            ref={(el) => {
+                              backgroundRef.current[index] = el
+                            }}
+                            onChange={(event: any) => {
+                              editActions.handleChange(event, {
+                                name: "background",
+                                value: {
+                                  color: event.currentTarget.value,
+                                  position: index,
+                                },
+                              })
+                            }}
+                          ></input>
+                        </SelectionLabel>
+                      ))}
+                      <Button
+                        basic
+                        size="small"
+                        className="schedule-edit__background-selected-button"
+                        onClick={(event) => {
+                          editActions.handleChange(event, {
+                            name: "background",
+                            value: {
+                              color: getScheduleBackground({ background: [] }),
+                            },
+                          })
+                        }}
+                      >
+                        {l("page.schedule_edit.background_add_button")}
+                      </Button>
+                    </div>
+                  </Grid.Column>
+                </Grid.Row>
+              )}
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <Field
@@ -361,18 +415,7 @@ export default function ScheduleEditPage() {
                     message={errors["active"]}
                     value={!!editing.active}
                     onChange={editActions.handleChange}
-                    options={[
-                      {
-                        key: 1,
-                        value: true,
-                        text: l("page.schedule_edit.active_option_true"),
-                      },
-                      {
-                        key: 0,
-                        value: false,
-                        text: l("page.schedule_edit.active_option_false"),
-                      },
-                    ]}
+                    options={activeOptions}
                   />
                 </Grid.Column>
               </Grid.Row>

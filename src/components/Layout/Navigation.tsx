@@ -12,11 +12,13 @@ import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import { useEventsContext } from "../../context/Event"
+import { ScheduleTheme } from "../../entities/Schedule/types"
 import { getCurrentSchedules } from "../../entities/Schedule/utils"
 import { getSchedules } from "../../modules/events"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import SearchInput from "../Form/SearchInput"
+import { Rabbit } from "../Icon/Rabbit"
 
 import "./Navigation.css"
 
@@ -111,13 +113,6 @@ export default function Navigation(props: NavigationProps) {
               {l("navigation.events")}
             </Tabs.Tab>
           </Link>
-          {account && (
-            <Link href={locations.myEvents()}>
-              <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
-                {l("navigation.my_events")}
-              </Tabs.Tab>
-            </Link>
-          )}
           {hasPendingEvents && (
             <Link href={locations.pendingEvents()}>
               <Tabs.Tab
@@ -130,7 +125,16 @@ export default function Navigation(props: NavigationProps) {
           {currentSchedule && (
             <Link href={locations.schedule(currentSchedule.id)}>
               <Tabs.Tab active={props.activeTab === NavigationTab.Schedule}>
+                {currentSchedule.theme ===
+                  ScheduleTheme.MetaverseFestival2022 && <Rabbit />}
                 {currentSchedule.name}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {account && (
+            <Link href={locations.myEvents()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
+                {l("navigation.my_events")}
               </Tabs.Tab>
             </Link>
           )}

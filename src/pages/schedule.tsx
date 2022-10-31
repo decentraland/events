@@ -10,16 +10,20 @@ import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import { ListEvents } from "../components/Event/ListEvents/ListEvents"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { useEventSchedule, useEventsContext } from "../context/Event"
+import { ScheduleTheme } from "../entities/Schedule/types"
+import mvmfImage from "../images/mvmf.jpg"
 import { getSchedules } from "../modules/events"
 import { toEventFilters } from "../modules/locations"
 
 import "./index.css"
+import "./schedule.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -91,30 +95,42 @@ export default function IndexPage() {
       />
       <Navigation activeTab={schedule && NavigationTab.Schedule} search />
 
-      <Container>
-        {!loading && !schedule && <NotFound />}
-        {!loading && events.length === 0 && (
-          <div>
-            <Divider />
-            <Paragraph secondary style={{ textAlign: "center" }}>
-              {l("page.events.no_events")}
-            </Paragraph>
-            <Divider />
-          </div>
-        )}
-        {!loading && schedule && (
-          <SubTitle className="events__all-events-title">
-            {schedule?.name}
-          </SubTitle>
-        )}
+      <div
+        className={TokenList.join([
+          "scheduled-events",
+          !!schedule?.theme && "scheduled-events--" + schedule.theme,
+        ])}
+      >
+        <Container>
+          {!loading && !schedule && <NotFound />}
+          {!loading && schedule && schedule.theme === null && (
+            <SubTitle className="events__all-events-title">
+              {schedule?.name}
+            </SubTitle>
+          )}
 
-        <ListEvents
-          disabledFilters={true}
-          loading={loading}
-          events={events}
-          filters={filters}
-        />
-      </Container>
+          {!loading &&
+            schedule &&
+            schedule.theme === ScheduleTheme.MetaverseFestival2022 && (
+              <div
+                className={TokenList.join([
+                  "scheduled-events__title",
+                  !!schedule?.theme &&
+                    "scheduled-events__title--" + schedule.theme,
+                ])}
+              >
+                <img src={mvmfImage} width="930" height="290" />
+              </div>
+            )}
+
+          <ListEvents
+            disabledFilters={true}
+            loading={loading}
+            events={events}
+            filters={filters}
+          />
+        </Container>
+      </div>
     </>
   )
 }

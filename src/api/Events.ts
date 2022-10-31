@@ -49,6 +49,7 @@ export type EditSchedule = Pick<
   | "name"
   | "description"
   | "image"
+  | "theme"
   | "background"
   | "active"
   | "active_since"

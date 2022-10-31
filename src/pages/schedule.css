@@ -1,0 +1,27 @@
+.scheduled-events--mvmf_2022 {
+  background: black;
+  background-color: #000404;
+  background-repeat: no-repeat;
+  background-image: url("../images/mvmf-corner.svg"),
+    url("../images/mvmf-corner.svg"), url("../images/mvmf-corner.svg"),
+    url("../images/mvmf-corner.svg");
+  background-position: top 40px left 40px, bottom 40px left 40px,
+    top 40px right 40px, bottom 40px right 40px;
+}
+
+.scheduled-events--mvmf_2022 .scheduled-events__title--mvmf_2022 {
+  padding: 50px 0;
+  text-align: center;
+}
+
+.scheduled-events--mvmf_2022 .scheduled-events__title--mvmf_2022 img {
+  height: 150px;
+  width: auto;
+  margin: 0 auto;
+}
+
+@media only screen and (max-width: 991px) {
+  .scheduled-events--mvmf_2022 {
+    background-image: none;
+  }
+}
