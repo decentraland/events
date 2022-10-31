@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react"
 
+import { AjvStringSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -9,7 +10,7 @@ import isUUID from "validator/lib/isUUID"
 
 import Events, { EditSchedule } from "../api/Events"
 import { DEFAULT_EVENT_DURATION } from "../entities/Event/types"
-import { newScheduleSchema } from "../entities/Schedule/schema"
+import { createScheduleSchema } from "../entities/Schedule/schema"
 import { ScheduleAttributes } from "../entities/Schedule/types"
 
 type ScheduleEditorState = EditSchedule & {
@@ -51,7 +52,8 @@ export default function useScheduleEditor(
   const [schedule, setEvent] = useState<ScheduleEditorState>({
     name: defaultSchedule.name || "",
     description: defaultSchedule.description || "",
-    image: defaultSchedule.image || "",
+    image: defaultSchedule.image || null,
+    theme: defaultSchedule.theme || null,
     background: defaultSchedule.background || ["#f3f2f5"],
     active: defaultSchedule.active ?? true,
     active_since: defaultSchedule.active_since || currentDate.toDate(),
@@ -264,12 +266,14 @@ export default function useScheduleEditor(
           name,
           String(value || "").slice(
             0,
-            newScheduleSchema.properties[name].maxLength
+            (createScheduleSchema.properties![name] as AjvStringSchema)
+              .maxLength!
           )
         )
 
       case "image":
-        return setValue(name, value)
+      case "theme":
+        return setValue(name, value || null)
 
       case "active":
         return setValue(name, !!value)

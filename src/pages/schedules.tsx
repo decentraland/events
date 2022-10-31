@@ -32,7 +32,15 @@ export default function SettingsPage() {
   const [account, accountState] = useAuthContext()
   const [settings, settingsState] = useProfileSettingsContext()
   const [schedules, schedulesState] = useAsyncMemo(
-    () => Events.get().getSchedules(),
+    async () => {
+      const schedules = await Events.get().getSchedules()
+      return schedules.sort((a, b) => {
+        return (
+          Time.date(a.active_since).getTime() -
+          Time.date(b.active_since).getTime()
+        )
+      })
+    },
     [account],
     {
       callWithTruthyDeps: true,
