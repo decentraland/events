@@ -17,7 +17,6 @@ describe("Date module", () => {
   const tz = Object.entries({
     Iceland: "(UTC)",
     "Asia/Dubai": "(UTC+4)",
-    "Australia/ACT": "(UTC+10)",
     "Pacific/Rarotonga": "(UTC-10)",
     "US/Samoa": "(UTC-11)",
     "Asia/Calcutta": "(UTC+5:30)",
@@ -35,6 +34,7 @@ describe("Date module", () => {
     "America/New_York": ["(UTC-5)", "(UTC-4)"],
     "Canada/Newfoundland": ["(UTC-3:30)", "(UTC-2:30)"],
     "Antarctica/Troll": ["(UTC)", "(UTC+2)"],
+    "Australia/ACT": ["(UTC+11)", "(UTC+10)"],
     "Asia/Beirut": ["(UTC+2)", "(UTC+3)"],
     "Asia/Tehran": ["(UTC+3:30)", "(UTC+4:30)"],
     "Australia/LHI": ["(UTC+11)", "(UTC+10:30)"],
