@@ -49,7 +49,7 @@ export const wrapRootElement = ({ element }) => (
 export const wrapPageElement = ({ element, props }) => {
   return (
     <IntlProvider {...props.pageContext.intl}>
-      <Layout {...props} rightMenu={<UserMenu />}>
+      <Layout {...props} rightMenu={<UserMenu />} activePage="events">
         {element}
       </Layout>
     </IntlProvider>
