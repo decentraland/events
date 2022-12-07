@@ -8,6 +8,8 @@
 import React from "react"
 import "core-js/features/set-immediate"
 
+import "./src/config"
+
 // eslint-disable-next-line css-import-order/css-import-order
 import "semantic-ui-css/semantic.min.css"
 // eslint-disable-next-line css-import-order/css-import-order

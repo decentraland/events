@@ -41,24 +41,15 @@ export function onPreRenderHTML(
   })
 
   const postBodyComponents = [...getPostBodyComponents()]
+  postBodyComponents.push(
+    <Segment
+      key="segment"
+      analyticsKey={process.env.GATSBY_SEGMENT_KEY}
+      trackPage={false}
+    />
+  )
 
-  if (process.env.GATSBY_SEGMENT_KEY) {
-    postBodyComponents.push(
-      <Segment
-        key="segment"
-        analyticsKey={process.env.GATSBY_SEGMENT_KEY}
-        trackPage={false}
-      />
-    )
-  } else {
-    console.warn("Missing GATSBY_SEGMENT_KEY environment")
-  }
-
-  if (process.env.GATSBY_ROLLBAR_TOKEN) {
-    postBodyComponents.push(<Rollbar key="rollbar" />)
-  } else {
-    console.warn("Missing GATSBY_ROLLBAR_TOKEN environment")
-  }
+  postBodyComponents.push(<Rollbar key="rollbar" />)
 
   replaceHeadComponents(headComponents)
   replacePostBodyComponents(postBodyComponents)

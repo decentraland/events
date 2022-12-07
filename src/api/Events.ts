@@ -57,8 +57,7 @@ export type EditSchedule = Pick<
 >
 
 export default class Events extends API {
-  static Url =
-    process.env.GATSBY_EVENTS_URL || `https://events.decentraland.org/api`
+  static Url = env("EVENTS_URL", `https://events.decentraland.org/api`)
 
   static Cache = new Map<string, Events>()
 

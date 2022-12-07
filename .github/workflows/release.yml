@@ -9,6 +9,9 @@ jobs:
 
   release:
     runs-on: ubuntu-20.04
+    outputs:
+      registry-path: ${{ steps.push-to-quay.outputs.registry-path }}
+      registry-paths: ${{ steps.push-to-quay.outputs.registry-paths }}
 
     steps:
       - uses: actions/checkout@v2
@@ -41,13 +44,13 @@ jobs:
       - name: testing
         run: npm test -- --coverage
 
-      # - name: coveralls
-      #   uses: coverallsapp/github-action@v1.1.2
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: export public env
-        run: env | grep GATSBY_ > .env
+      - name: setup envs
+        run: touch .env
 
       - name: build image
         id: build-image
@@ -68,5 +71,20 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: print image url
-        run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+      - name: Print image url
+        run: |
+          echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+
+  deployment:
+    needs: [build-push]
+    name: "Deploy to: dev"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deployment
+        id: deploy
+        uses: decentraland/dcl-deploy-action@main
+        with:
+          dockerImage: "${{ needs.build-push.outputs.registry-path }}"
+          serviceName: events2
+          env: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
