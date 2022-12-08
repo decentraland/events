@@ -1,3 +1,5 @@
+import { resolve } from "path"
+
 import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
 import createSegmentSubscriber from "decentraland-gatsby/dist/entities/Development/createSegmentSubscriber"
 import { Logger } from "decentraland-gatsby/dist/entities/Development/logger"
@@ -13,10 +15,8 @@ import {
   withDDosProtection,
   withLogs,
 } from "decentraland-gatsby/dist/entities/Route/middleware"
-import {
-  filesystem,
-  status,
-} from "decentraland-gatsby/dist/entities/Route/routes"
+import gatsby from "decentraland-gatsby/dist/entities/Route/routes/filesystem2/gatsby"
+import status from "decentraland-gatsby/dist/entities/Route/routes/status"
 import { initializeServices } from "decentraland-gatsby/dist/entities/Server/handler"
 import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/utils"
 import express from "express"
@@ -72,7 +72,35 @@ app.use(metrics)
 
 app.use(sitemap)
 app.use("/", social)
-app.use(filesystem("public", "404.html"))
+
+app.use(
+  gatsby(resolve(__filename, "../../public"), {
+    contentSecurityPolicy: {
+      scriptSrc: [
+        "https://decentraland.org",
+        "https://*.decentraland.org",
+        "https://connect.facebook.net",
+        "http://*.hotjar.com:*",
+        "https://*.hotjar.com:*",
+        "http://*.hotjar.io",
+        "https://*.hotjar.io",
+        "wss://*.hotjar.com",
+        "https://*.twitter.com",
+        "https://cdn.segment.com",
+        "https://cdn.rollbar.com",
+        "https://ajax.cloudflare.com",
+        "https://googleads.g.doubleclick.net",
+        "https://ssl.google-analytics.com",
+        "https://tagmanager.google.com",
+        "https://www.google-analytics.com",
+        "https://www.google-analytics.com",
+        "https://www.google.com",
+        "https://www.googleadservices.com",
+        "https://www.googletagmanager.com",
+      ].join(" "),
+    },
+  })
+)
 
 Logger.subscribe("error", createSegmentSubscriber())
 
