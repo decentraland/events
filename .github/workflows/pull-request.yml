@@ -39,7 +39,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: testing
-        run: NODE_OPTIONS="--max-old-space-size=2048" npm test -- --coverage
+        run: NODE_OPTIONS="--max-old-space-size=4096" npm test -- --coverage
 
       - name: building
-        run: NODE_OPTIONS="--max-old-space-size=2048" npm run build
+        run: NODE_OPTIONS="--max-old-space-size=4096" npm run build
