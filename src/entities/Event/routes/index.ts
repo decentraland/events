@@ -24,7 +24,10 @@ import { getEvent } from "./getEvent"
 import { getEventList } from "./getEventList"
 import { updateEvent } from "./updateEvent"
 
-export const DECENTRALAND_URL = env("DECENTRALAND_URL", "")
+export const DECENTRALAND_URL = env(
+  "DECENTRALAND_URL",
+  "https://play.decentraland.org"
+)
 
 export default routes((router) => {
   const withAuth = auth()

@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Reconfigure git to use HTTP authentication
         run: >
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: node.js 16
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16.14.2
           registry-url: https://registry.npmjs.org/
@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: linters
-        uses: wearerequired/lint-action@v1
+        uses: wearerequired/lint-action@v2
         with:
           prettier: true
           prettier_extensions: ts,tsx,js,jsx,json,md,mdx,css
@@ -39,7 +39,21 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: testing
-        run: npm test -- --coverage
+        run: NODE_OPTIONS="--max-old-space-size=4096" npm test -- --coverage
 
-      - name: building
-        run: npm run build
+      - name: coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: setup envs
+        run: touch .env
+
+      - name: build image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: events
+          tags: ${{ github.sha }}
+          dockerfiles: |
+            ./Dockerfile

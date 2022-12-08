@@ -1,5 +1,6 @@
 import useAsyncEffect from "decentraland-gatsby/dist/hooks/useAsyncEffect"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
+import env from "decentraland-gatsby/dist/utils/env"
 import { fromWebPushKey } from "decentraland-gatsby/dist/utils/string/base64"
 
 import useServiceWorker from "./useServiceWorker"
@@ -9,9 +10,7 @@ export type PushSubscriptionState = {
   subscription: PushSubscription | null
 }
 
-const applicationServerKey = fromWebPushKey(
-  process.env.GATSBY_WEB_PUSH_KEY || ""
-)
+const applicationServerKey = fromWebPushKey(env("WEB_PUSH_KEY", ""))
 
 export default function usePushSubscription(path = "/sw.js") {
   const registration = useServiceWorker(path)
