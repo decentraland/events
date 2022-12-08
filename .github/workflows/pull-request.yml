@@ -46,6 +46,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: setup envs
+        run: touch .env
+
       - name: build image
         id: build-image
         uses: redhat-actions/buildah-build@v2
