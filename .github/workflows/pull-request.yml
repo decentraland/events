@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Reconfigure git to use HTTP authentication
         run: >
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: node.js 16
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16.14.2
           registry-url: https://registry.npmjs.org/
@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: linters
-        uses: wearerequired/lint-action@v1
+        uses: wearerequired/lint-action@v2
         with:
           prettier: true
           prettier_extensions: ts,tsx,js,jsx,json,md,mdx,css
