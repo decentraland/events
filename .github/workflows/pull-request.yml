@@ -41,5 +41,16 @@ jobs:
       - name: testing
         run: NODE_OPTIONS="--max-old-space-size=4096" npm test -- --coverage
 
-      - name: building
-        run: NODE_OPTIONS="--max-old-space-size=4096" npm run build
+      - name: coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: events
+          tags: ${{ github.sha }}
+          dockerfiles: |
+            ./Dockerfile
