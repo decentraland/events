@@ -102,7 +102,7 @@ app.use(
   })
 )
 
-Logger.subscribe("error", createSegmentSubscriber())
+// Logger.subscribe("error", createSegmentSubscriber())
 
 initializeServices([
   databaseInitializer(),
