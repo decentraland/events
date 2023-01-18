@@ -34,50 +34,50 @@ export default function SettingsPage() {
   const currentEmailIsValid = useMemo(() => isEmail(email || ""), [email])
   useEffect(() => setEmail(settings.email), [settings.email])
 
-  const emailNextVerificationDate = useMemo(() => {
-    return settings.email_updated_at
-      ? new Date(settings.email_updated_at.getTime() + Time.Minute)
-      : new Date()
-  }, [settings.email_updated_at?.getTime()])
+  // const emailNextVerificationDate = useMemo(() => {
+  //   return settings.email_updated_at
+  //     ? new Date(settings.email_updated_at.getTime() + Time.Minute)
+  //     : new Date()
+  // }, [settings.email_updated_at?.getTime()])
 
-  const emailVerificationCountdown = useCountdown(emailNextVerificationDate)
-  const emailVerificationAvailable = useMemo(() => {
-    if (
-      settings &&
-      settings.email &&
-      !settings.email_verified &&
-      emailVerificationCountdown.time === 0
-    ) {
-      return true
-    }
+  // const emailVerificationCountdown = useCountdown(emailNextVerificationDate)
+  // const emailVerificationAvailable = useMemo(() => {
+  //   if (
+  //     settings &&
+  //     settings.email &&
+  //     !settings.email_verified &&
+  //     emailVerificationCountdown.time === 0
+  //   ) {
+  //     return true
+  //   }
 
-    return false
-  }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
+  //   return false
+  // }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
 
-  const emailMessageField = useMemo(() => {
-    if (!settings.email || settings.email_verified) {
-      return ""
-    }
+  // const emailMessageField = useMemo(() => {
+  //   if (!settings.email || settings.email_verified) {
+  //     return ""
+  //   }
 
-    if (emailVerificationCountdown.time === 0) {
-      return l(`settings.profile_section.email_reverifying_message`) || ""
-    }
+  //   if (emailVerificationCountdown.time === 0) {
+  //     return l(`settings.profile_section.email_reverifying_message`) || ""
+  //   }
 
-    const seconds =
-      emailVerificationCountdown.minutes * 60 +
-      emailVerificationCountdown.seconds
-    return (
-      l(`settings.profile_section.email_verifying_message`, { seconds }) || ""
-    )
-  }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
+  //   const seconds =
+  //     emailVerificationCountdown.minutes * 60 +
+  //     emailVerificationCountdown.seconds
+  //   return (
+  //     l(`settings.profile_section.email_verifying_message`, { seconds }) || ""
+  //   )
+  // }, [settings.email, settings.email_verified, emailVerificationCountdown.time])
 
-  function handleSaveEmail() {
-    if (!currentEmailIsValid) {
-      return
-    }
+  // function handleSaveEmail() {
+  //   if (!currentEmailIsValid) {
+  //     return
+  //   }
 
-    state.update({ email })
-  }
+  //   state.update({ email })
+  // }
 
   if (!account || accountState.loading) {
     return (
@@ -147,7 +147,7 @@ export default function SettingsPage() {
       </Helmet>
       <Navigation action={false} />
       <Container className="SettingsPage">
-        <Grid style={{ paddingTop: "4rem" }}>
+        {/* <Grid style={{ paddingTop: "4rem" }}>
           <Grid.Row>
             <Grid.Column tablet="4">
               <Header sub>{l(`settings.profile_section.label`)}</Header>
@@ -211,7 +211,7 @@ export default function SettingsPage() {
               </div>
             </Grid.Column>
           </Grid.Row>
-        </Grid>
+        </Grid> */}
         <Grid style={{ paddingTop: "4rem" }}>
           <Grid.Row>
             <Grid.Column tablet="4">
@@ -251,7 +251,7 @@ export default function SettingsPage() {
                 {l(`settings.event_section.notification_title`)}
               </Header>
             </Grid.Column>
-            <Grid.Column tablet="8">
+            {/* <Grid.Column tablet="8">
               <div className="SettingsSection">
                 <div
                   className={TokenList.join([
@@ -289,7 +289,7 @@ export default function SettingsPage() {
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column tablet="4"></Grid.Column>
+            <Grid.Column tablet="4"></Grid.Column> */}
             <Grid.Column tablet="8">
               <div className="SettingsSection">
                 <div
