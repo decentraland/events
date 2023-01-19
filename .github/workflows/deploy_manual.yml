@@ -28,7 +28,7 @@ jobs:
         id: deploy
         uses: decentraland/dcl-deploy-action@main
         with:
-          dockerImage: 'quay.io/decentraland/places:${{ inputs.tag }}'
+          dockerImage: 'quay.io/decentraland/events:${{ inputs.tag }}'
           serviceName: 'events2'
           env: ${{ inputs.deployment-environment }}
           token: ${{ secrets.GITHUB_TOKEN }}
