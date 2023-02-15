@@ -78,7 +78,7 @@ export default function SettingsPage() {
   )
 
   const [avatar] = useAsyncMemo(
-    async () => user && Catalyst.get().getProfile(user!),
+    async () => user && Catalyst.getInstance().getProfile(user!),
     [user]
   )
 

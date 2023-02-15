@@ -1,14 +1,14 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
-import Catalyst, {
-  CommsStatus,
-} from "decentraland-gatsby/dist/utils/api/Catalyst"
+import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
+import { CommsAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
 import once from "decentraland-gatsby/dist/utils/function/once"
+import { memo } from "radash/dist/curry"
 
-export const getServers = once(async () => {
-  const servers = await Catalyst.get().getServers()
+export const getServers = memo(async () => {
+  const servers = await Catalyst.getInstance().getServers()
   return Promise.all(
     servers.map((server) => {
-      return API.catch(Catalyst.from(server.baseUrl).getCommsStatus())
+      return API.catch(Catalyst.getInstanceFrom(server.baseUrl).getCommsAbout())
     })
   )
 })
@@ -17,16 +17,21 @@ export type Option = { key: string; value: string; text: string }
 
 // TODO: replace with `loadash.uniqBy `
 export function getServerOptions(
-  servers: (CommsStatus | null)[] | null
+  servers: (CommsAbout | null)[] | null
 ): Option[] {
   const result: Option[] = [{ key: "default", value: "", text: "any server" }]
 
   const names = new Set<string>()
   if (servers) {
     for (const server of servers) {
-      if (server && !names.has(server.name)) {
-        names.add(server.name)
-        result.push({ key: server.name, value: server.name, text: server.name })
+      if (
+        server &&
+        server?.configurations?.realmName &&
+        !names.has(server.configurations.realmName)
+      ) {
+        const name = server.configurations.realmName
+        names.add(name)
+        result.push({ key: name, value: name, text: name })
       }
     }
   }

@@ -66,7 +66,9 @@ export default function SettingsPage() {
 
   const [avatars] = useAsyncMemo(
     async () =>
-      Catalyst.get().getProfiles(profiles.map((profile) => profile.user)),
+      Catalyst.getInstance().getProfiles(
+        profiles.map((profile) => profile.user)
+      ),
     [profiles]
   )
 

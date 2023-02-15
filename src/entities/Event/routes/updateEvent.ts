@@ -142,7 +142,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
-  const userProfiles = await Catalyst.get().getProfiles([event.user])
+  const userProfiles = await Catalyst.getInstance().getProfiles([event.user])
   if (
     userProfiles &&
     userProfiles[0] &&
