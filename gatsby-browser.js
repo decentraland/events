@@ -34,7 +34,7 @@ import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
 import ProfileSettings from "./src/context/ProfileSetting"
 
-export const registerServiceWorker = () => true
+export const registerServiceWorker = () => false
 
 export const wrapRootElement = ({ element }) => (
   <AuthProvider>

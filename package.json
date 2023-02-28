@@ -93,7 +93,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:server && npm run build:sw && npm run build:front",
+    "build": "npm run build:server && npm run build:front",
     "build:server": "tsc -p .",
     "build:front": "gatsby build",
     "build:sw": "workbox generateSW workbox-config.js",
