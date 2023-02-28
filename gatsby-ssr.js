@@ -40,6 +40,15 @@ export function onPreRenderHTML(
     )
   })
 
+  headComponents.push(
+    <script
+      dangerouslySetInnerHTML={{
+        __html:
+          "if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {window.navigator.serviceWorker.getRegistrations().then(registrations => {registrations.forEach(r => r.unregister())})}",
+      }}
+    ></script>
+  )
+
   const postBodyComponents = [...getPostBodyComponents()]
   postBodyComponents.push(
     <Segment
