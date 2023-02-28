@@ -1,4 +1,4 @@
-import {
+/* import {
   registerCatalystImmutableFiles,
   registerGatsbyImmutableFiles,
   registerImmutableFiles,
@@ -22,3 +22,4 @@ registerImmutableFiles(
     self.location.hostname === url.hostname &&
     url.pathname.startsWith("/poster/")
 )
+ */
