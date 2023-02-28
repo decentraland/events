@@ -61,6 +61,5 @@ module.exports = {
         // option to redirect to `/ko` when connecting `/`
       },
     },
-    `gatsby-plugin-remove-serviceworker`,
   ],
 }
