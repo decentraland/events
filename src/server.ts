@@ -48,10 +48,10 @@ const app = express()
 app.set("x-powered-by", false)
 app.use(withLogs())
 app.use("/api", [
-  status(),
   withCors(),
   withDDosProtection(),
   withBody(),
+  status(),
   categories,
   events,
   poster,
