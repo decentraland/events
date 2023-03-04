@@ -7,6 +7,7 @@
 // You can delete this file if you're not using it
 import React from "react"
 
+import Intercom from "decentraland-gatsby/dist/components/Development/Intercom"
 import Rollbar from "decentraland-gatsby/dist/components/Development/Rollbar"
 import Segment from "decentraland-gatsby/dist/components/Development/Segment"
 export { wrapPageElement, wrapRootElement } from "./gatsby-browser"
@@ -50,14 +51,8 @@ export function onPreRenderHTML(
   )
 
   const postBodyComponents = [...getPostBodyComponents()]
-  postBodyComponents.push(
-    <Segment
-      key="segment"
-      analyticsKey={process.env.GATSBY_SEGMENT_KEY}
-      trackPage={false}
-    />
-  )
-
+  postBodyComponents.push(<Segment key="segment" trackPage={false} />)
+  postBodyComponents.push(<Intercom key="intercom" />)
   postBodyComponents.push(<Rollbar key="rollbar" />)
 
   replaceHeadComponents(headComponents)
