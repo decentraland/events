@@ -97,6 +97,9 @@ app.use(
         "https://www.google.com",
         "https://www.googleadservices.com",
         "https://www.googletagmanager.com",
+        "https://app.intercom.io",
+        "https://widget.intercom.io",
+        "https://js.intercomcdn.com",
       ].join(" "),
     },
   })
