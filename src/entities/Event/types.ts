@@ -177,6 +177,7 @@ export type EventListParams = {
   estate_id?: string
   only_attendee?: boolean
   search?: string
+  schedule?: string
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -192,6 +193,7 @@ export type EventListOptions = {
   estate_id?: string
   only_attendee?: boolean
   search?: string
+  schedule?: string
   limit?: number
   offset?: number
   order?: "asc" | "desc"
