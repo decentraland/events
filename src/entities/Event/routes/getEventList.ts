@@ -45,6 +45,10 @@ export async function getEventList(req: WithAuth) {
     options.search = query.search
   }
 
+  if (query.schedule) {
+    options.schedule = query.schedule
+  }
+
   if (query.position) {
     const [x, y] = query.position.split(",").slice(0, 2).map(Number) as [
       number,

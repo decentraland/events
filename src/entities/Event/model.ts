@@ -266,6 +266,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !!options.estate_id,
           SQL`AND e.estate_id = ${options.estate_id}`
         )}
+        ${conditional(
+          !!options.schedule,
+          SQL`AND ${options.schedule} = ANY(e.schedules)`
+        )}
 
       ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}
       ${limit(options.limit, { max: 500 })}
