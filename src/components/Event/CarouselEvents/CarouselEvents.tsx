@@ -15,6 +15,7 @@ import {
 } from "../../../entities/Schedule/types"
 import { getScheduleBackground } from "../../../entities/Schedule/utils"
 import useListEventsMain from "../../../hooks/useListEventsMain"
+import mvfwLogo from "../../../images/mvfw.svg"
 import mvmfImage from "../../../images/mvmf.jpg"
 import { navigateEventDetail } from "../../../modules/events"
 import locations from "../../../modules/locations"
@@ -112,6 +113,25 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
                 onClick={handleClickFullSchedule}
               >
                 View line up
+              </Button>
+            </div>
+          )}
+        {!props.loading &&
+          schedule &&
+          schedule.theme === ScheduleTheme.MetaverseFashionWeek2023 && (
+            <div
+              className={
+                "carousel-events__title--" +
+                ScheduleTheme.MetaverseFashionWeek2023
+              }
+            >
+              <img src={mvfwLogo} width="342" height="89" />
+              <Button
+                as="a"
+                href={locations.schedule(schedule.id)}
+                onClick={handleClickFullSchedule}
+              >
+                view the agenda
               </Button>
             </div>
           )}

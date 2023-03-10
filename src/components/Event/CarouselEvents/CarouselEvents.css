@@ -43,16 +43,51 @@
   min-width: 200px;
 }
 
+.carousel-events--mvfw_2023 {
+  /* background: linear-gradient(180deg, #C86689 0%, rgba(219, 125, 156, 0) 100%); */
+  background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 70%,
+      rgba(255, 255, 255, 0.2) 80%,
+      rgb(255, 255, 255) 98%
+    ),
+    url("../../../images/mvfw.jpeg");
+  background-position: 50% top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  padding-top: 32px;
+}
+
+.carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 32px;
+}
+
+.carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 img {
+  height: 89px;
+  width: auto;
+}
+
+.carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 .ui.button {
+  background: #242129;
+  color: white;
+  min-width: 200px;
+}
+
 @media only screen and (max-width: 991px) {
   .carousel-events--mvmf_2022 {
     background-image: none;
   }
 
-  .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022 {
+  .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022,
+  .carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 {
     flex-direction: column;
   }
 
-  .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022 img {
+  .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022 img,
+  .carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 img {
     margin-bottom: 20px;
   }
 }

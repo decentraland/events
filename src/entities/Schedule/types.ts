@@ -19,4 +19,5 @@ export type NewScheduleAttributes = Omit<
 
 export enum ScheduleTheme {
   MetaverseFestival2022 = "mvmf_2022",
+  MetaverseFashionWeek2023 = "mvfw_2023",
 }
