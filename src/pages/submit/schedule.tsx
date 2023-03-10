@@ -93,6 +93,14 @@ export default function ScheduleEditPage() {
             ScheduleTheme.MetaverseFestival2022
         ),
       },
+      {
+        key: ScheduleTheme.MetaverseFashionWeek2023,
+        value: ScheduleTheme.MetaverseFashionWeek2023,
+        text: l(
+          "page.schedule_edit.theme_option_" +
+            ScheduleTheme.MetaverseFashionWeek2023
+        ),
+      },
     ],
     []
   )

@@ -4,8 +4,6 @@ import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
-import Divider from "decentraland-gatsby/dist/components/Text/Divider"
-import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
@@ -18,6 +16,7 @@ import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { useEventSchedule, useEventsContext } from "../context/Event"
 import { ScheduleTheme } from "../entities/Schedule/types"
+import mvfwLogo from "../images/mvfw.svg"
 import mvmfImage from "../images/mvmf.jpg"
 import { getSchedules } from "../modules/events"
 import { toEventFilters } from "../modules/locations"
@@ -120,6 +119,20 @@ export default function IndexPage() {
                 ])}
               >
                 <img src={mvmfImage} width="930" height="290" />
+              </div>
+            )}
+
+          {!loading &&
+            schedule &&
+            schedule.theme === ScheduleTheme.MetaverseFashionWeek2023 && (
+              <div
+                className={TokenList.join([
+                  "scheduled-events__title",
+                  !!schedule?.theme &&
+                    "scheduled-events__title--" + schedule.theme,
+                ])}
+              >
+                <img src={mvfwLogo} width="342" />
               </div>
             )}
 

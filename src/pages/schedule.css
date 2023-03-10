@@ -20,6 +20,27 @@
   margin: 0 auto;
 }
 
+.scheduled-events--mvfw_2023 {
+  background-image: url("../images/mvfw.jpeg");
+  background-position: 50% top;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.scheduled-events--mvfw_2023 .scheduled-events__title--mvfw_2023 {
+  padding: 32px 0 0;
+  text-align: center;
+}
+
+.scheduled-events--mvfw_2023 .scheduled-events__title--mvfw_2023 img {
+  height: 89px;
+  width: auto;
+  margin: 0 auto;
+}
+.scheduled-events--mvfw_2023 .list-events__group-title .dg.SubTitle {
+  opacity: 0;
+}
+
 @media only screen and (max-width: 991px) {
   .scheduled-events--mvmf_2022 {
     background-image: none;

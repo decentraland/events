@@ -33,7 +33,11 @@ export const scheduleScheme: AjvObjectSchema = {
       description: "The url of an image for this schedule",
     },
     theme: {
-      enum: [null, ScheduleTheme.MetaverseFestival2022],
+      enum: [
+        null,
+        ScheduleTheme.MetaverseFestival2022,
+        ScheduleTheme.MetaverseFashionWeek2023,
+      ],
       description: "Pre-build theme for the schedule",
     },
     background: {
@@ -101,7 +105,11 @@ export const createScheduleSchema: AjvObjectSchema = {
       description: "The url of an image for this schedule",
     },
     theme: {
-      enum: [null, ScheduleTheme.MetaverseFestival2022],
+      enum: [
+        null,
+        ScheduleTheme.MetaverseFestival2022,
+        ScheduleTheme.MetaverseFashionWeek2023,
+      ],
       description: "Pre-build theme for the schedule",
     },
     background: {
