@@ -1,8 +1,6 @@
 import { resolve } from "path"
 
 import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
-import createSegmentSubscriber from "decentraland-gatsby/dist/entities/Development/createSegmentSubscriber"
-import { Logger } from "decentraland-gatsby/dist/entities/Development/logger"
 import Manager from "decentraland-gatsby/dist/entities/Job/manager"
 import { jobInitializer } from "decentraland-gatsby/dist/entities/Job/utils"
 import profile from "decentraland-gatsby/dist/entities/Profile/routes"
