@@ -44,6 +44,6 @@ body {
 }
 
 .ui.two.cards > .ui.card:nth-child(2n),
-.LayoutMainContainer .right.Column .ui.cards > .ui.card:nth-child(3n) {
+.ui.two.cards > .ui.card:nth-child(3n) {
   margin-right: 1em;
 }
