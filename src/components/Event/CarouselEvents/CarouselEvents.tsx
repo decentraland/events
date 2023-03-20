@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo } from "react"
 
-import Carousel from "decentraland-gatsby/dist/components/Carousel/Carousel"
+import Carousel2, {
+  IndicatorType,
+} from "decentraland-gatsby/dist/components/Carousel2/Carousel2"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
@@ -88,11 +90,6 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
       ])}
     >
       <Container>
-        {props.loading && (
-          <Carousel>
-            <EventCardBig loading />
-          </Carousel>
-        )}
         {!props.loading && schedule && schedule.theme === null && (
           <SubTitle className="carousel-events__title">
             {schedule.name}
@@ -135,17 +132,11 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
               </Button>
             </div>
           )}
-        {!props.loading && (
-          <Carousel>
-            {mainEvents.map((event) => (
-              <EventCardBig
-                key={"live:" + event.id}
-                event={event}
-                onClick={navigateEventDetail}
-              />
-            ))}
-          </Carousel>
-        )}
+        <Carousel2
+          loading={props.loading}
+          items={mainEvents}
+          component={CarouselEventItem}
+        />
         {!props.loading && schedule && schedule.theme === null && (
           <div className="carousel-events__action-wrapper">
             <Button
@@ -160,5 +151,19 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
         )}
       </Container>
     </ContainerWrapper>
+  )
+})
+
+const CarouselEventItem = React.memo(function CarouselEventItem({
+  item,
+}: {
+  item: SessionEventAttributes
+}) {
+  return (
+    <EventCardBig
+      key={"live:" + item.id}
+      event={item}
+      onClick={navigateEventDetail}
+    />
   )
 })
