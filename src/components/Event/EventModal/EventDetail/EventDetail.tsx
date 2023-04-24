@@ -3,16 +3,18 @@ import React, { useCallback } from "react"
 import DateBox from "decentraland-gatsby/dist/components/Date/DateBox"
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
 import Italic from "decentraland-gatsby/dist/components/Text/Italic"
-import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import Link from "decentraland-gatsby/dist/plugins/intl/Link"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import isEmail from "validator/lib/isEmail"
 
+import Places from "../../../../api/Places"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import { SessionEventAttributes } from "../../../../entities/Event/types"
 import { canEditAnyEvent } from "../../../../entities/ProfileSettings/utils"
@@ -21,6 +23,7 @@ import friendsIcon from "../../../../images/secondary-friends.svg"
 import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
 import locations from "../../../../modules/locations"
+import placesLocations from "../../../../modules/placesLocations"
 import JumpInButton from "../../../Button/JumpInPosition"
 import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
 import EventSection from "../../EventSection"
@@ -61,6 +64,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const [settings] = useProfileSettingsContext()
   const advance = event.user === settings.user || canEditAnyEvent(settings)
   const utc = props.utc ?? !settings.use_local_time
+
+  const [place, placeStatus] = useAsyncMemo(
+    async () =>
+      event && (await Places.get().getPlaceByPosition(`${event.x},${event.y}`)),
+    [event]
+  )
 
   const handleAttendees = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -164,7 +173,18 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         <EventSection>
           <EventSection.Icon src={pinIcon} width="16" height="16" />
           <EventSection.Detail>
-            <Paragraph bold>{event.scene_name || "Decentraland"}</Paragraph>
+            <Link
+              href={
+                (placeStatus.loaded &&
+                  place &&
+                  placesLocations.place(place.base_position)) ||
+                ""
+              }
+            >
+              {event.scene_name ||
+                (placeStatus.loaded && place && place.title) ||
+                "Decentraland"}
+            </Link>
           </EventSection.Detail>
           <EventSection.Action>
             <JumpInButton event={event} />
