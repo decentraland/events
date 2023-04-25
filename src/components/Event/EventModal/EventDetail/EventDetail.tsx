@@ -173,18 +173,18 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         <EventSection>
           <EventSection.Icon src={pinIcon} width="16" height="16" />
           <EventSection.Detail>
-            <Link
-              href={
-                (placeStatus.loaded &&
-                  place &&
-                  placesLocations.place(place.base_position)) ||
-                ""
-              }
-            >
-              {event.scene_name ||
-                (placeStatus.loaded && place && place.title) ||
-                "Decentraland"}
-            </Link>
+            {placeStatus.loaded && place && (
+              <Link href={placesLocations.place(place.base_position)}>
+                {place.title}
+              </Link>
+            )}
+            {(!placeStatus.loaded || !place) && (
+              <Paragraph bold>
+                {event.scene_name ||
+                  (placeStatus.loaded && place && place.title) ||
+                  "Decentraland"}
+              </Paragraph>
+            )}
           </EventSection.Detail>
           <EventSection.Action>
             <JumpInButton event={event} />
