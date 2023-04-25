@@ -21,3 +21,5 @@ config:
   events:USE_PUBLIC_TLD: "false"
   events:WEB_PUSH_SECRET:
     secure: v1:UtV4DbChXtrexZgT:UUOmB4e3yov0A1dTdFag0t0hWVM6+fLJ6qSAWkW4afRKoLIE4kXCttYJNGCGXrYJJLzc8jVBiQE7xxg=
+  events:GATSBY_PLACES_API_URL: https://places.decentraland.org/api
+  events:GATSBY_PLACES_URL: https://places.decentraland.org
