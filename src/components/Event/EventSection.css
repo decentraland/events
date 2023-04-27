@@ -55,6 +55,11 @@
   word-break: break-word;
 }
 
+.EventSection .EventSection__Detail a.dg.Link {
+  font-weight: 600;
+  font-size: 15px;
+}
+
 .EventSection .EventSection__Detail .dg.ImgAvatar {
   margin-right: 8px;
   width: 32px;
