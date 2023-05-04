@@ -7,6 +7,7 @@ import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import Link from "decentraland-gatsby/dist/plugins/intl/Link"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
@@ -24,6 +25,7 @@ import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
 import locations from "../../../../modules/locations"
 import placesLocations from "../../../../modules/placesLocations"
+import AttendingButtons from "../../../Button/AttendingButtons"
 import JumpInButton from "../../../Button/JumpInPosition"
 import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
 import EventSection from "../../EventSection"
@@ -52,6 +54,7 @@ export type EventDetailProps = {
 }
 
 export default function EventDetail({ event, ...props }: EventDetailProps) {
+  const l = useFormatMessage()
   const now = Date.now()
   const { next_start_at } = event || { next_start_at: new Date(now) }
   const completed = event.finish_at.getTime() < now
@@ -81,13 +84,15 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   )
 
   return (
-    <div className={"EventDetail"}>
+    <div className="EventDetail">
       <div className="EventDetail__Header">
         <DateBox date={next_start_at} utc={utc} />
         <div className="EventDetail__Header__Event">
           <SubTitle>{event.name}</SubTitle>
           <Paragraph className="EventDetail__Header__Event__By" secondary>
-            Public, Organized by <Link>{event.user_name || "Guest"}</Link>
+            {l("components.event.event_detail.public_organized_by", {
+              organizer: <Link>{event.user_name || "Guest"}</Link>,
+            })}
           </Paragraph>
         </div>
         {props.showEdit !== false && advance && (
@@ -124,6 +129,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         )}
       </div>
 
+      {event.approved && (
+        <EventSection>
+          <AttendingButtons event={event} />
+        </EventSection>
+      )}
+
       {/* DESCRIPTION */}
       {props.showDescription !== false && <EventSection.Divider />}
       {props.showDescription !== false && (
@@ -132,7 +143,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <EventSection.Detail>
             {!event.description && (
               <Paragraph secondary={!event.description}>
-                <Italic>No description</Italic>
+                <Italic>
+                  {l("components.event.event_detail.no_description")}
+                </Italic>
               </Paragraph>
             )}
             {event.description && <Markdown children={event.description} />}
@@ -215,7 +228,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
               ))}
             {event.total_attendees === 0 && (
               <Paragraph secondary>
-                <Italic>Nobody confirmed yet</Italic>
+                <Italic>
+                  {l("components.event.event_detail.nobody_confirmed_yet")}
+                </Italic>
               </Paragraph>
             )}
           </EventSection.Detail>
@@ -252,7 +267,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             )}
             {!event.contact && (
               <Paragraph secondary={!event.contact}>
-                <Italic>No contact</Italic>
+                <Italic>{l("components.event.event_detail.no_contact")}</Italic>
               </Paragraph>
             )}
           </EventSection.Detail>
@@ -271,7 +286,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {event.details && <Paragraph>{event.details}</Paragraph>}
             {!event.details && (
               <Paragraph secondary={!event.details}>
-                <Italic>No details</Italic>
+                <Italic>{l("components.event.event_detail.no_details")}</Italic>
               </Paragraph>
             )}
           </EventSection.Detail>

@@ -318,6 +318,13 @@
           "this_event_is_pending_approval": "This event is pending approval",
           "this_event_is_in_the_past": "This event has finished, can't be approve or rejected"
         }
+      },
+      "event_detail": {
+        "public_organized_by": "Public, Organized by {organizer}",
+        "no_description": "No description",
+        "nobody_confirmed_yet": "Nobody confirmed yet",
+        "no_contact": "No contact",
+        "no_details": "No details"
       }
     },
     "modal": {
