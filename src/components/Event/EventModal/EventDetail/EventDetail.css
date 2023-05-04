@@ -14,7 +14,7 @@
 
 .EventDetail .EventDetail__Header {
   display: flex;
-  padding: 18px 24px;
+  padding: 18px 24px 0;
 }
 
 .EventDetail .EventDetail__Header .EventDetail__Header__Event {
@@ -117,6 +117,11 @@
 
 .EventDetail .EventDetail__Detail .EventDetail__Detail__Action {
   flex: 0 0 auto;
+}
+
+.EventDetail .AttendingButtons {
+  width: 100%;
+  max-width: none;
 }
 
 @media only screen and (max-width: 767px) {

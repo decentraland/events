@@ -117,11 +117,6 @@ export default function EventPage() {
               {(event.approved || canApproveThisEvent) && (
                 <EventSection.Divider />
               )}
-              {event.approved && (
-                <EventSection>
-                  <AttendingButtons event={event} />
-                </EventSection>
-              )}
 
               {!event.approved && canApproveThisEvent && (
                 <EventSection>
