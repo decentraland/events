@@ -69,9 +69,6 @@ export default React.memo(function EventCardBig(props: EventCardBigProps) {
               showCountdownDate={true}
             />
           )}
-          <EventSection>
-            {event && <AttendingButtons event={event} />}
-          </EventSection>
         </Card.Content>
       </div>
     </Card>
