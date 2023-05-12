@@ -46,9 +46,11 @@
 }
 
 .JumpInPosition .JumpInPosition__Icon {
-  padding: 5px;
+  padding: 4px;
   border-radius: 4px;
-  display: block;
+  display: flex;
+  vertical-align: middle;
+  justify-content: center;
   background-color: var(--primary);
   width: 24px;
   height: 24px;
