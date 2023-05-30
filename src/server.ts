@@ -4,7 +4,8 @@ import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/
 import Manager from "decentraland-gatsby/dist/entities/Job/manager"
 import { jobInitializer } from "decentraland-gatsby/dist/entities/Job/utils"
 import profile from "decentraland-gatsby/dist/entities/Profile/routes"
-import metrics from "decentraland-gatsby/dist/entities/Prometheus/routes"
+import { gatsbyRegister } from "decentraland-gatsby/dist/entities/Prometheus/metrics"
+import metrics from "decentraland-gatsby/dist/entities/Prometheus/routes/utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import {
@@ -18,6 +19,7 @@ import status from "decentraland-gatsby/dist/entities/Route/routes/status"
 import { initializeServices } from "decentraland-gatsby/dist/entities/Server/handler"
 import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/utils"
 import express from "express"
+import { register } from "prom-client"
 
 import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
 import events from "./entities/Event/routes"
@@ -66,7 +68,7 @@ app.use("/api", [
 app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
-app.use(metrics)
+app.use(metrics([gatsbyRegister, register]))
 
 app.use(sitemap)
 app.use("/", social)
