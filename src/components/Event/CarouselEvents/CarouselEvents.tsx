@@ -18,7 +18,8 @@ import {
 import { getScheduleBackground } from "../../../entities/Schedule/utils"
 import useListEventsMain from "../../../hooks/useListEventsMain"
 import mvfwLogo from "../../../images/mvfw.svg"
-import mvmfImage from "../../../images/mvmf.jpg"
+import mvmfLogo from "../../../images/mvmf.jpg"
+import prideLogo from "../../../images/pride-2023.png"
 import { navigateEventDetail } from "../../../modules/events"
 import locations from "../../../modules/locations"
 import ContainerWrapper from "../../Layout/ContainerWrapper"
@@ -86,6 +87,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
       style={style}
       className={TokenList.join([
         "carousel-events__container-wrapper",
+        !!schedule?.theme && "carousel-events--with-theme",
         !!schedule?.theme && "carousel-events--" + schedule.theme,
       ])}
     >
@@ -95,49 +97,13 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
             {schedule.name}
           </SubTitle>
         )}
-        {!props.loading &&
-          schedule &&
-          schedule.theme === ScheduleTheme.MetaverseFestival2022 && (
-            <div
-              className={
-                "carousel-events__title--" + ScheduleTheme.MetaverseFestival2022
-              }
-            >
-              <img src={mvmfImage} width="930" height="290" />
-              <Button
-                as="a"
-                href={locations.schedule(schedule.id)}
-                onClick={handleClickFullSchedule}
-              >
-                View line up
-              </Button>
-            </div>
-          )}
-        {!props.loading &&
-          schedule &&
-          schedule.theme === ScheduleTheme.MetaverseFashionWeek2023 && (
-            <div
-              className={
-                "carousel-events__title--" +
-                ScheduleTheme.MetaverseFashionWeek2023
-              }
-            >
-              <img src={mvfwLogo} width="342" height="89" />
-              <Button
-                as="a"
-                href={locations.schedule(schedule.id)}
-                onClick={handleClickFullSchedule}
-              >
-                view the agenda
-              </Button>
-            </div>
-          )}
+        {<CarouselThemeHeader schedule={schedule} />}
         <Carousel2
           loading={props.loading}
           items={mainEvents}
           component={CarouselEventItem}
         />
-        {!props.loading && schedule && schedule.theme === null && (
+        {!props.loading && schedule && !schedule?.theme && (
           <div className="carousel-events__action-wrapper">
             <Button
               primary
@@ -165,5 +131,56 @@ const CarouselEventItem = React.memo(function CarouselEventItem({
       event={item}
       onClick={navigateEventDetail}
     />
+  )
+})
+
+const CarouselThemeHeaderLogo = {
+  [ScheduleTheme.MetaverseFashionWeek2023]: (
+    <img src={mvfwLogo} width="342" height="89" />
+  ),
+  [ScheduleTheme.MetaverseFestival2022]: (
+    <img src={mvmfLogo} width="930" height="290" />
+  ),
+  [ScheduleTheme.PrideWeek2023]: (
+    <img src={prideLogo} width="271" height="100" />
+  ),
+}
+
+const CarouselThemeHeaderCTA = {
+  [ScheduleTheme.MetaverseFashionWeek2023]: "view the agenda",
+  [ScheduleTheme.MetaverseFestival2022]: "view line up",
+  [ScheduleTheme.PrideWeek2023]: "view the agenda",
+}
+
+const CarouselThemeHeader = React.memo(function CarouselThemeHeader({
+  schedule,
+}: {
+  schedule?: ScheduleAttributes
+}) {
+  const handleClickFullSchedule = useCallback(
+    prevent(() => schedule && navigate(locations.schedule(schedule.id))),
+    [schedule]
+  )
+
+  if (!schedule?.theme) {
+    return null
+  }
+
+  return (
+    <div
+      className={
+        "carousel-events__title carousel-events__title--" + schedule.theme
+      }
+    >
+      {CarouselThemeHeaderLogo[schedule.theme]}
+      <Button
+        as="a"
+        primary
+        href={locations.schedule(schedule.id)}
+        onClick={handleClickFullSchedule}
+      >
+        {CarouselThemeHeaderCTA[schedule.theme]}
+      </Button>
+    </div>
   )
 })

@@ -18,11 +18,13 @@ import { useEventSchedule, useEventsContext } from "../context/Event"
 import { ScheduleTheme } from "../entities/Schedule/types"
 import mvfwLogo from "../images/mvfw.svg"
 import mvmfImage from "../images/mvmf.jpg"
+import pride2023Image from "../images/pride-2023.png"
 import { getSchedules } from "../modules/events"
 import { toEventFilters } from "../modules/locations"
+import { formatDateRange } from "../utils/date"
 
-import "./index.css"
 import "./schedule.css"
+import "./index.css"
 
 export type IndexPageState = {
   updating: Record<string, boolean>
@@ -100,6 +102,9 @@ export default function IndexPage() {
           !!schedule?.theme && "scheduled-events--" + schedule.theme,
         ])}
       >
+        {schedule?.theme === ScheduleTheme.PrideWeek2023 && (
+          <svg className="background" width="1439" height="575" />
+        )}
         <Container>
           {!loading && !schedule && <NotFound />}
           {!loading && schedule && schedule.theme === null && (
@@ -108,33 +113,54 @@ export default function IndexPage() {
             </SubTitle>
           )}
 
-          {!loading &&
-            schedule &&
-            schedule.theme === ScheduleTheme.MetaverseFestival2022 && (
-              <div
-                className={TokenList.join([
-                  "scheduled-events__title",
-                  !!schedule?.theme &&
-                    "scheduled-events__title--" + schedule.theme,
-                ])}
-              >
-                <img src={mvmfImage} width="930" height="290" />
-              </div>
-            )}
+          {schedule?.theme === ScheduleTheme.PrideWeek2023 && (
+            <div
+              className={TokenList.join([
+                "scheduled-events__title",
+                !!schedule?.theme &&
+                  "scheduled-events__title--" + schedule.theme,
+              ])}
+            >
+              <img src={pride2023Image} width="271" height="100" />
+            </div>
+          )}
 
-          {!loading &&
-            schedule &&
-            schedule.theme === ScheduleTheme.MetaverseFashionWeek2023 && (
-              <div
-                className={TokenList.join([
-                  "scheduled-events__title",
-                  !!schedule?.theme &&
-                    "scheduled-events__title--" + schedule.theme,
-                ])}
-              >
-                <img src={mvfwLogo} width="342" />
-              </div>
-            )}
+          {schedule?.theme === ScheduleTheme.MetaverseFestival2022 && (
+            <div
+              className={TokenList.join([
+                "scheduled-events__title",
+                !!schedule?.theme &&
+                  "scheduled-events__title--" + schedule.theme,
+              ])}
+            >
+              <img src={mvmfImage} width="930" height="290" />
+            </div>
+          )}
+
+          {schedule?.theme === ScheduleTheme.MetaverseFashionWeek2023 && (
+            <div
+              className={TokenList.join([
+                "scheduled-events__title",
+                !!schedule?.theme &&
+                  "scheduled-events__title--" + schedule.theme,
+              ])}
+            >
+              <img src={mvfwLogo} width="342" />
+            </div>
+          )}
+
+          {schedule && (
+            <div className="scheduled-events__date">
+              {schedule.active_since && schedule.active_until && (
+                <span>
+                  {formatDateRange(
+                    schedule.active_since,
+                    schedule.active_until
+                  )}
+                </span>
+              )}
+            </div>
+          )}
 
           <ListEvents
             disabledFilters={true}

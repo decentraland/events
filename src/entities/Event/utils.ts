@@ -20,7 +20,6 @@ const DECENTRALAND_URL = env(
   "DECENTRALAND_URL",
   "https://play.decentraland.org"
 )
-
 const EVENTS_URL = env("EVENTS_URL", "https://events.decentraland.org/api")
 
 export function siteUrl(pathname = "") {
