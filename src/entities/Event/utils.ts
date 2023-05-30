@@ -1,5 +1,5 @@
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import env from "decentraland-gatsby/dist/utils/env"
+// import env from "decentraland-gatsby/dist/utils/env"
 import padStart from "lodash/padStart"
 import { RRule, Weekday } from "rrule"
 
@@ -16,12 +16,14 @@ import {
   Weekdays,
 } from "./types"
 
-const DECENTRALAND_URL = env(
-  "DECENTRALAND_URL",
-  "https://play.decentraland.org"
-)
+// const DECENTRALAND_URL = env(
+//   "DECENTRALAND_URL",
+//   "https://play.decentraland.org"
+// )
+// const EVENTS_URL = env("EVENTS_URL", "https://events.decentraland.org/api")
 
-const EVENTS_URL = env("EVENTS_URL", "https://events.decentraland.org/api")
+const DECENTRALAND_URL = "https://play.decentraland.org"
+const EVENTS_URL = "https://events.decentraland.org/api"
 
 export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_URL)
