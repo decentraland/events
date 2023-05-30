@@ -2,13 +2,16 @@
   padding-bottom: 18px;
 }
 
-.carousel-events__title {
-  margin-bottom: 30px;
-}
-
 .carousel-events__action-wrapper {
   padding-top: 1rem;
   text-align: center;
+}
+
+.carousel-events--with-theme .carousel-events__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 30px;
 }
 
 .carousel-events--mvmf_2022 {
@@ -74,6 +77,15 @@
   background: #242129;
   color: white;
   min-width: 200px;
+}
+
+.carousel-events--pride_2023 {
+  background-color: white;
+  background-repeat: no-repeat;
+  background-image: url("../../../images/pride-2023-background-gradient.jpg");
+  background-size: contain;
+  padding-top: 32px;
+  padding-bottom: 50px;
 }
 
 @media only screen and (max-width: 991px) {

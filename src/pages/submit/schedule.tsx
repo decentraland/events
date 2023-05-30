@@ -101,6 +101,13 @@ export default function ScheduleEditPage() {
             ScheduleTheme.MetaverseFashionWeek2023
         ),
       },
+      {
+        key: ScheduleTheme.PrideWeek2023,
+        value: ScheduleTheme.PrideWeek2023,
+        text: l(
+          "page.schedule_edit.theme_option_" + ScheduleTheme.PrideWeek2023
+        ),
+      },
     ],
     []
   )

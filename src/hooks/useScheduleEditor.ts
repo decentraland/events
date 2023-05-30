@@ -21,7 +21,7 @@ function getName(
   schedule: React.ChangeEvent<any>,
   props?: { name: string; value: string; type: string; checked: boolean } | any
 ): string {
-  return (props && props.name) || schedule.target.name
+  return (props && props.name) || schedule?.target?.name
 }
 
 function getValue(
@@ -37,7 +37,7 @@ function getValue(
         return props.value || ""
     }
   } else {
-    return schedule.target.value
+    return schedule?.target?.value
   }
 }
 
