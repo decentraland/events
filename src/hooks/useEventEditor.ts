@@ -26,7 +26,7 @@ function getName(
   event: React.ChangeEvent<any>,
   props?: { name: string; value: string; type: string; checked: boolean } | any
 ): string {
-  return (props && props.name) || event?.target?.name
+  return props?.name || event?.target?.name
 }
 
 function getValue(
