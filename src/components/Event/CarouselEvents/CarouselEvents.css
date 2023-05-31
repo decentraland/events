@@ -9,6 +9,7 @@
 
 .carousel-events--with-theme .carousel-events__title {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding-bottom: 30px;
@@ -82,8 +83,13 @@
 .carousel-events--pride_2023 {
   background-color: white;
   background-repeat: no-repeat;
-  background-image: url("../../../images/pride-2023-background-gradient.jpg");
-  background-size: contain;
+  background-image: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    ),
+    url("../../../images/pride-2023-background.jpg");
+  background-size: cover;
   padding-top: 32px;
   padding-bottom: 50px;
 }
@@ -93,13 +99,11 @@
     background-image: none;
   }
 
-  .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022,
-  .carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 {
+  .carousel-events--with-theme .carousel-events__title {
     flex-direction: column;
   }
 
-  .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022 img,
-  .carousel-events--mvfw_2023 .carousel-events__title--mvfw_2023 img {
+  .carousel-events--with-theme .carousel-events__title img {
     margin-bottom: 20px;
   }
 }
