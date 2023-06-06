@@ -5,7 +5,6 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
 import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
@@ -46,7 +45,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const [fallbackShare, setFallbackShare] = useState(false)
   const [, actions] = useAuthContext()
   const location = useLocation()
-  const isMobile = useMobileDetector()
   const [, state] = useEventsContext()
   const track = useTrackContext()
   const l = useFormatMessage()
@@ -190,7 +188,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare && isLive && (actions.provider || !isMobile) && (
+      {!fallbackShare && isLive && (
         <Button
           primary
           size="small"
@@ -215,7 +213,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare && !isLive && (actions.provider || !isMobile) && (
+      {!fallbackShare && !isLive && (
         <Button
           inverted
           size="small"
@@ -238,30 +236,27 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare &&
-        !isLive &&
-        event?.attending &&
-        (actions.provider || !isMobile) && (
-          <Button
-            inverted
-            primary
-            size="small"
-            className="share"
-            disabled={loading || sharing || !approved}
-            onClick={handleNotify}
-          >
-            <img
-              src={
-                (event?.notify && notificationEnabledIcon) ||
-                notificationDisabledIcon
-              }
-              width="22"
-              height="22"
-            />
-          </Button>
-        )}
+      {!fallbackShare && !isLive && event?.attending && (
+        <Button
+          inverted
+          primary
+          size="small"
+          className="share"
+          disabled={loading || sharing || !approved}
+          onClick={handleNotify}
+        >
+          <img
+            src={
+              (event?.notify && notificationEnabledIcon) ||
+              notificationDisabledIcon
+            }
+            width="22"
+            height="22"
+          />
+        </Button>
+      )}
 
-      {!fallbackShare && (actions.provider || !isMobile) && (
+      {!fallbackShare && (
         <Button
           inverted
           primary
@@ -271,20 +266,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           onClick={handleShare}
         >
           <img src={shareIcon} width="14" height="14" />
-        </Button>
-      )}
-
-      {!fallbackShare && !actions.provider && isMobile && (
-        <Button
-          inverted
-          primary
-          size="small"
-          className="share fluid"
-          disabled={loading || sharing || !approved}
-          onClick={handleShare}
-        >
-          <img src={shareIcon} width="14" height="14" />{" "}
-          {l("components.button.attending_buttons.share")}
         </Button>
       )}
     </div>
