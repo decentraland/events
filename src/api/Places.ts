@@ -116,4 +116,20 @@ export default class Places extends API {
     )
     return places.length > 0 ? places[0] : null
   }
+
+  async getPlaceByPositions(positions: string[]) {
+    if (positions.length === 0) {
+      return []
+    }
+
+    const query = new URLSearchParams()
+    for (const position of positions) {
+      query.append("positions", position)
+    }
+
+    return this.fetchMany(
+      `/places/?${query.toString()}`,
+      this.options().authorization({ sign: true, optional: true })
+    )
+  }
 }
