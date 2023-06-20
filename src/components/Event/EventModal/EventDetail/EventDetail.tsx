@@ -24,6 +24,7 @@ import friendsIcon from "../../../../images/secondary-friends.svg"
 import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
 import locations from "../../../../modules/locations"
+import { places } from "../../../../modules/places"
 import placesLocations from "../../../../modules/placesLocations"
 import AttendingButtons from "../../../Button/AttendingButtons"
 import JumpInButton from "../../../Button/JumpInPosition"
@@ -69,9 +70,11 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const utc = props.utc ?? !settings.use_local_time
 
   const [place, placeStatus] = useAsyncMemo(
-    async () =>
-      event && (await Places.get().getPlaceByPosition(`${event.x},${event.y}`)),
-    [event]
+    async () => places.load(`${event.x},${event.y}`),
+    [event],
+    {
+      callWithTruthyDeps: true,
+    }
   )
 
   const handleAttendees = useCallback(
