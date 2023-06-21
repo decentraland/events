@@ -54,6 +54,8 @@ export type EditSchedule = Pick<
   | "active"
   | "active_since"
   | "active_until"
+  | "event_since"
+  | "event_until"
 >
 
 export default class Events extends API {
@@ -128,11 +130,15 @@ export default class Events extends API {
       schedule.active_since && Time.date(schedule.active_since)
     const active_until =
       schedule.active_until && Time.date(schedule.active_until)
+    const event_since = schedule.event_since && Time.date(schedule.event_since)
+    const event_until = schedule.event_until && Time.date(schedule.event_until)
 
     return {
       ...schedule,
       active_since,
       active_until,
+      event_since,
+      event_until,
     } as ScheduleAttributes
   }
 

@@ -51,12 +51,22 @@ export const scheduleScheme: AjvObjectSchema = {
       },
     },
     active_since: {
-      description: "the time the schedule is going to start",
+      description: "the time the schedule is going to start showing",
       type: "string",
       format: "date-time",
     },
     active_until: {
-      description: "The time the schedule is going to end",
+      description: "The time the schedule is going to end showing",
+      type: "string",
+      format: "date-time",
+    },
+    event_since: {
+      description: "the time the event's schedule is actually going to start",
+      type: "string",
+      format: "date-time",
+    },
+    event_until: {
+      description: "the time the event's schedule is actually going to end",
       type: "string",
       format: "date-time",
     },
@@ -129,12 +139,22 @@ export const createScheduleSchema: AjvObjectSchema = {
         "Whether the schedule can be displayed in the listing or not",
     },
     active_since: {
-      description: "the time the schedule is going to start",
+      description: "the time the schedule is going to start showing",
       type: "string",
       format: "date-time",
     },
     active_until: {
-      description: "The time the schedule is going to end",
+      description: "The time the schedule is going to end showing",
+      type: "string",
+      format: "date-time",
+    },
+    event_since: {
+      description: "the time the event's schedule is actually going to start",
+      type: "string",
+      format: "date-time",
+    },
+    event_until: {
+      description: "The time the event's schedule is actually going to end",
       type: "string",
       format: "date-time",
     },

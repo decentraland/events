@@ -151,12 +151,9 @@ export default function IndexPage() {
 
           {schedule && (
             <div className="scheduled-events__date">
-              {schedule.active_since && schedule.active_until && (
+              {schedule.event_since && schedule.event_until && (
                 <span>
-                  {formatDateRange(
-                    schedule.active_since,
-                    schedule.active_until
-                  )}
+                  {formatDateRange(schedule.event_since, schedule.event_until)}
                 </span>
               )}
             </div>

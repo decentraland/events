@@ -125,6 +125,8 @@ export default function ScheduleEditPage() {
         active: original.active,
         active_since: original.active_since,
         active_until: original.active_until,
+        event_since: original.event_since,
+        event_until: original.event_until,
       })
     }
   }, [original])
@@ -194,7 +196,6 @@ export default function ScheduleEditPage() {
       }
 
       const data = editActions.toObject()
-
       await (original
         ? Events.get().updateSchedule(original.id, data as EditSchedule)
         : Events.get().createSchedule(data as EditSchedule))
@@ -434,6 +435,7 @@ export default function ScheduleEditPage() {
                   />
                 </Grid.Column>
               </Grid.Row>
+
               <Grid.Row>
                 <Grid.Column mobile="8">
                   <Field
@@ -494,6 +496,74 @@ export default function ScheduleEditPage() {
                     }
                     message={errors["active_until_time"]}
                     value={editActions.getActiveUntilTime()}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="2">
+                  <Paragraph className="FieldNote">
+                    {l("general.utc")}
+                  </Paragraph>
+                </Grid.Column>
+              </Grid.Row>
+
+              <Grid.Row>
+                <Grid.Column mobile="8">
+                  <Field
+                    label={l("page.schedule_edit.event_since_date_label")}
+                    name="event_since_date"
+                    type="date"
+                    error={
+                      !!errors["event_since"] || !!errors["event_since_date"]
+                    }
+                    message={errors["event_since_date"]}
+                    value={editActions.getEventSinceDate()}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="6">
+                  <Field
+                    label={l("page.schedule_edit.event_since_time_label")}
+                    name="event_since_time"
+                    type="time"
+                    error={
+                      !!errors["event_since_at"] || !!errors["event_since_time"]
+                    }
+                    message={errors["event_since_time"]}
+                    value={editActions.getEventSinceTime()}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="2">
+                  <Paragraph className="FieldNote">
+                    {l("general.utc")}
+                  </Paragraph>
+                </Grid.Column>
+              </Grid.Row>
+
+              <Grid.Row>
+                <Grid.Column mobile="8">
+                  <Field
+                    label={l("page.schedule_edit.event_until_date_label")}
+                    name="event_until_date"
+                    type="date"
+                    error={
+                      !!errors["event_until"] || !!errors["event_until_date"]
+                    }
+                    message={errors["event_until_date"]}
+                    value={editActions.getEventUntilDate()}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="6">
+                  <Field
+                    label={l("page.schedule_edit.event_until_time_label")}
+                    name="event_until_time"
+                    type="time"
+                    error={
+                      !!errors["event_until_at"] || !!errors["event_until_time"]
+                    }
+                    message={errors["event_until_time"]}
+                    value={editActions.getEventUntilTime()}
                     onChange={editActions.handleChange}
                   />
                 </Grid.Column>

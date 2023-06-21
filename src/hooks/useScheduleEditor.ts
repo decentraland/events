@@ -60,6 +60,10 @@ export default function useScheduleEditor(
     active_until:
       defaultSchedule.active_until ||
       currentDate.add(DEFAULT_EVENT_DURATION).toDate(),
+    event_since: defaultSchedule.event_since || currentDate.toDate(),
+    event_until:
+      defaultSchedule.event_until ||
+      currentDate.add(DEFAULT_EVENT_DURATION).toDate(),
     errors: {},
   })
 
@@ -77,6 +81,23 @@ export default function useScheduleEditor(
     [schedule.active_until]
   )
 
+  const event_since = useMemo(() => {
+    console.log("schedule.active_since", schedule.active_since)
+    console.log("schedule.active_since", typeof schedule.active_since)
+    console.log("schedule.event_since", schedule.event_since)
+    console.log("schedule.event_since", typeof schedule.event_since)
+    return (
+      schedule.event_since && Time.from(schedule.event_since.getTime(), { utc })
+    )
+  }, [schedule.event_since])
+
+  const event_until = useMemo(
+    () =>
+      schedule.event_until &&
+      Time.from(schedule.event_until.getTime(), { utc }),
+    [schedule.event_until]
+  )
+
   function getActiveSinceDate() {
     return active_since && active_since.format(Time.Formats.InputDate)
   }
@@ -91,6 +112,22 @@ export default function useScheduleEditor(
 
   function getActiveUntilTime() {
     return active_until && active_until.format(Time.Formats.InputTime)
+  }
+
+  function getEventSinceDate() {
+    return event_since && event_since.format(Time.Formats.InputDate)
+  }
+
+  function getEventSinceTime() {
+    return event_since && event_since.format(Time.Formats.InputTime)
+  }
+
+  function getEventUntilDate() {
+    return event_until && event_until.format(Time.Formats.InputDate)
+  }
+
+  function getEventUntilTime() {
+    return event_until && event_until.format(Time.Formats.InputTime)
   }
 
   function setError(key: string, description: string) {
@@ -227,6 +264,91 @@ export default function useScheduleEditor(
     }
   }
 
+  function handleChangeEventSinceDate(value?: string) {
+    if (!value) {
+      return
+    }
+
+    const event_since = Time.from(value, {
+      utc,
+      format: Time.Formats.InputDate,
+    }).toDate()
+
+    if (
+      event_since.getTime() !== schedule.event_since.getTime() &&
+      schedule.event_until.getTime() < event_since.getTime()
+    ) {
+      setValues({
+        event_since,
+        event_until: event_since,
+      })
+    } else if (event_since.getTime() !== schedule.event_since.getTime()) {
+      setValues({
+        event_since,
+      })
+    }
+  }
+
+  function handleChangeEventSinceTime(value?: string) {
+    if (!value) {
+      return
+    }
+
+    const event_since_date = Time.utc(schedule.event_since).startOf("day")
+    const event_since_time = Time.utc(value, Time.Formats.InputTime)
+    const event_since = Time.utc(
+      event_since_date.getTime() + event_since_time.getTime()
+    ).toDate()
+    if (
+      event_since.getTime() !== schedule.event_since.getTime() &&
+      schedule.event_until.getTime() < event_since.getTime()
+    ) {
+      setValues({
+        event_since,
+        event_until: event_since,
+      })
+    } else if (event_since.getTime() !== schedule.event_since.getTime()) {
+      setValues({ event_since })
+    }
+  }
+
+  function handleChangeEventUntilDate(value?: string) {
+    if (!value) {
+      return
+    }
+
+    const event_until = Time.from(value, {
+      utc,
+      format: Time.Formats.InputDate,
+    }).toDate()
+    if (
+      event_until.getTime() !== schedule.event_until.getTime() &&
+      schedule.event_since.getTime() <= event_until.getTime()
+    ) {
+      setValues({
+        event_until,
+      })
+    }
+  }
+
+  function handleChangeEventUntilTime(value?: string) {
+    if (!value) {
+      return
+    }
+
+    const event_until_date = Time.utc(schedule.event_until).startOf("day")
+    const event_until_time = Time.utc(value, Time.Formats.InputTime)
+    const event_until = Time.utc(
+      event_until_date.getTime() + event_until_time.getTime()
+    ).toDate()
+    if (
+      event_until.getTime() !== schedule.event_until.getTime() &&
+      schedule.event_since.getTime() < event_until.getTime()
+    ) {
+      setValues({ event_until })
+    }
+  }
+
   function handleAddBackground(props: { color: string; position?: number }) {
     const { color, position } = props
     const colors = schedule.background
@@ -290,6 +412,18 @@ export default function useScheduleEditor(
       case "active_until_time":
         return handleChangeActiveUntilTime(value)
 
+      case "event_since_date":
+        return handleChangeEventSinceDate(value)
+
+      case "event_since_time":
+        return handleChangeEventSinceTime(value)
+
+      case "event_until_date":
+        return handleChangeEventUntilDate(value)
+
+      case "event_until_time":
+        return handleChangeEventUntilTime(value)
+
       case "background":
         return handleAddBackground(value)
 
@@ -346,6 +480,10 @@ export default function useScheduleEditor(
     getActiveSinceTime,
     getActiveUntilDate,
     getActiveUntilTime,
+    getEventSinceDate,
+    getEventSinceTime,
+    getEventUntilDate,
+    getEventUntilTime,
     setValue,
     setValues,
     setError,

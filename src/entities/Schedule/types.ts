@@ -8,6 +8,8 @@ export type ScheduleAttributes = {
   active: boolean
   active_since: Date
   active_until: Date
+  event_since: Date
+  event_until: Date
   created_at: Date
   updated_at: Date
 }

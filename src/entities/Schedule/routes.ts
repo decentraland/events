@@ -64,6 +64,8 @@ export async function createSchedule(req: WithAuth) {
     background: data.background || [],
     active_since: data.active_since,
     active_until: data.active_until,
+    event_since: data.event_since,
+    event_until: data.event_until,
     active: data.active ?? true,
     created_at: new Date(),
     updated_at: new Date(),
