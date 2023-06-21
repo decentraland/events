@@ -21,7 +21,6 @@ import mvmfImage from "../images/mvmf.jpg"
 import pride2023Image from "../images/pride-2023.png"
 import { getSchedules } from "../modules/events"
 import { toEventFilters } from "../modules/locations"
-import { formatDateRange } from "../utils/date"
 
 import "./schedule.css"
 import "./index.css"
@@ -149,16 +148,9 @@ export default function IndexPage() {
             </div>
           )}
 
-          {schedule && (
+          {schedule?.theme === ScheduleTheme.PrideWeek2023 && (
             <div className="scheduled-events__date">
-              {schedule.active_since && schedule.active_until && (
-                <span>
-                  {formatDateRange(
-                    schedule.active_since,
-                    schedule.active_until
-                  )}
-                </span>
-              )}
+              <span>27th - 29th JUN</span>
             </div>
           )}
 
