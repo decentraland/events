@@ -100,6 +100,7 @@ app.use(
         "https://app.intercom.io",
         "https://widget.intercom.io",
         "https://js.intercomcdn.com",
+        "https://verify.walletconnect.com",
       ].join(" "),
     },
   })
