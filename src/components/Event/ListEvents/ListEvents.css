@@ -13,3 +13,25 @@
   color: #736e7d;
   text-transform: uppercase;
 }
+
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-left
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-from,
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-right
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-to {
+  visibility: hidden;
+}
+
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-left:hover
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-from,
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-right:hover
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-to {
+  visibility: visible;
+}

@@ -73,6 +73,10 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
   const eventsByMonth = useListEventsByMonth(filteredEvents)
   const categoriesFiltered = useListEventsCategories(props.events, categories)
   const isMobile = useMobileMediaQuery()
+  const [[labelFrom, LabelTo], setLabel] = React.useState<[string, string]>([
+    props.filters.timeFrom?.toString() ?? "0:00",
+    props.filters.timeTo?.toString() ?? "24:00",
+  ])
 
   const categoryItems = useMemo(() => {
     let categoriesToReturn = [
@@ -107,6 +111,7 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
         : Time.duration(props.filters.timeTo, "minutes").format("HH:mm")
 
     const timezone = showTimezoneLabel(Time.from(), settings?.use_local_time)
+    setLabel([from, to])
     return `${from} - ${to} ${timezone}`
   }, [props.filters])
 
@@ -223,6 +228,8 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               onChange={handleRangeChange}
               onMouseUp={handleRangeAfterChange}
               label={timeRangeLabel}
+              labelFrom={labelFrom}
+              labelTo={LabelTo}
             />
           </Grid.Column>
         )}
