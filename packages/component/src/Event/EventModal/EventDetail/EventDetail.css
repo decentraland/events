@@ -1,0 +1,80 @@
+.event-detail input,
+.event-detail textarea {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 14px;
+  width: 100%;
+}
+
+.event-detail input.error,
+.event-detail textarea.error {
+  border: 1px solid #ff0000;
+}
+
+.event-detail .event-detail__header {
+  display: flex;
+  padding: 18px 24px 0;
+}
+
+.event-detail .event-detail__header .event-detail__header-event {
+  padding-left: 16px;
+  flex: 1;
+}
+
+.event-detail .event-detail__header .event-detail__header-event .dg.SubTitle {
+  font-size: 21px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 30px;
+  letter-spacing: 0.3px;
+  padding-top: 2px;
+  margin: 0;
+}
+
+.event-detail
+  .event-detail__header
+  .event-detail__header-event
+  .event-detail__header-event__By {
+  font-size: 17px;
+  line-height: 26px;
+}
+
+.event-detail .event-detail__header .event-detail__header-actions {
+  padding-left: 1em;
+}
+
+.event-detail .event-detail__detail-show-attendees {
+  display: inline-flex;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 0.7em 0 0.5em;
+  border-radius: 32px;
+  background: #37333d;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: normal;
+  color: white;
+  cursor: pointer;
+}
+
+.event-detail .attending-buttons {
+  width: 100%;
+  max-width: none;
+}
+
+.event-detail
+  .event-detail__header
+  .event-detail__header-actions
+  .edit-detail__menu-icon-button {
+  color: black !important;
+  width: 100%;
+  text-align: left;
+}

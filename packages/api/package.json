@@ -1,0 +1,21 @@
+{
+  "name": "events-api",
+  "version": "0.0.0-development",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/events.git"
+  },
+  "author": "Decentraland",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/decentraland/events/issues"
+  },
+  "homepage": "https://github.com/decentraland/events#readme",
+  "devDependencies": {
+    "events-type": "^0.0.0-development"
+  }
+}

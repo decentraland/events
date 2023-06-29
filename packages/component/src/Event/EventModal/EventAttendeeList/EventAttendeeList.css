@@ -1,0 +1,58 @@
+.event-attendee-list {
+  position: relative;
+  min-height: 400px;
+  padding: 24px;
+}
+
+.event-attendee-list .event-attendee-list__header {
+  text-align: center;
+  align-items: center;
+  position: relative;
+  padding-bottom: 24px;
+}
+
+.event-attendee-list .event-attendee-list__header img {
+  display: block;
+  position: absolute;
+  cursor: pointer;
+  box-sizing: content-box;
+}
+
+.event-attendee-list
+  .event-attendee-list__header
+  img.event-attendee-list__header-back {
+  width: 8px;
+  height: 14px;
+  padding: 29px 35px 29px 29px;
+  left: -24px;
+  top: -24px;
+}
+
+.event-attendee-list
+  .event-attendee-list__header
+  img.event-attendee-list__header-close {
+  width: 14px;
+  height: 14px;
+  padding: 29px;
+  right: -24px;
+  top: -24px;
+}
+
+.event-attendee-list .event-attendee-list__header .SubTitle {
+  margin: 0;
+  font-size: 21px;
+  width: 100%;
+}
+
+.event-attendee-list .event-attendee-list__item {
+  padding: 12px 0;
+  display: flex;
+}
+
+.event-attendee-list .event-attendee-list__item img {
+  margin-right: 12px;
+}
+
+.event-attendee-list .event-attendee-list__item .Paragraph {
+  font-weight: 600;
+}

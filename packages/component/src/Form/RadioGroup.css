@@ -1,0 +1,14 @@
+.radio-group .ui.sub.header {
+  margin-bottom: 0.7em;
+}
+
+.radio-group .ui.input {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 0.7em;
+}
+
+.radio-group .ui.checkbox input.hidden + label {
+  font-size: 18px;
+}

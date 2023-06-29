@@ -1,0 +1,70 @@
+.jumpin-position {
+  display: inline-block;
+  display: flex;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
+.jumpin-position .jumpin-position__position {
+  padding: 4px 8px 4px 5px;
+  border-radius: 4px;
+  display: block;
+  background-color: var(--secondary);
+  margin-right: 2px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: 24px;
+}
+
+.jumpin-position.jumpin-position--compact .jumpin-position__position {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 100%;
+  z-index: 1000;
+}
+
+.jumpin-position.jumpin-position--compact:hover .jumpin-position__position {
+  display: flex;
+}
+
+.jumpin-position .jumpin-position__position img {
+  width: 16px;
+  margin-right: 4px;
+  display: block;
+}
+
+.jumpin-position .jumpin-position__position span {
+  font-size: 13px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 16px;
+  display: block;
+  color: #736e7d;
+}
+
+.jumpin-position .jumpin-position__icon {
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  vertical-align: middle;
+  justify-content: center;
+  background-color: var(--primary);
+  width: 24px;
+  height: 24px;
+}
+
+.jumpin-position .jumpin-position__icon img {
+  width: 14px;
+  height: auto;
+  display: block;
+}
+
+.ui.card .jumpin-position .jumpin-position__icon img,
+.ui.card .jumpin-position .jumpin-position__position img,
+.ui.cards > .card .jumpin-position .jumpin-position__icon img,
+.ui.cards > .card .jumpin-position .jumpin-position__position img {
+  vertical-align: super;
+}

@@ -1,0 +1,42 @@
+.accordion {
+  transition: width 0.3 ease;
+}
+
+.accordion .accordion-title {
+  display: flex;
+  align-items: center;
+}
+
+.accordion .accordion-title__content {
+  flex: 1;
+}
+
+.accordion .accordion-title__description {
+  opacity: 0.7;
+}
+
+.accordion .accordion-title__action {
+  cursor: pointer;
+  min-width: 10%;
+  display: flex;
+  justify-content: center;
+}
+
+.accordion .accordion-title__action img {
+  display: block;
+  transform: rotate(0deg);
+  transition: 0.3s ease transform;
+}
+
+.accordion.accordion--open .accordion-title__action img {
+  transform: rotate(90deg);
+}
+
+.accordion .accordion__content {
+  overflow: hidden;
+  transition: 0.3s ease height;
+}
+
+.accordion .accordion__content > div {
+  padding-top: 16px;
+}

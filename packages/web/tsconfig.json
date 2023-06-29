@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "rootDirs": [
+      "src"
+    ],
+    "outDir": "lib",
+    "rootDir": "src"
+  },
+  "extends": "../../tsconfig.json",
+  "include": ["src"]
+}

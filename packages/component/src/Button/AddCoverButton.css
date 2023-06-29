@@ -1,0 +1,9 @@
+.add-cover__button {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: solid 1.2px rgba(115, 110, 125, 0.32);
+  border-radius: 100%;
+}

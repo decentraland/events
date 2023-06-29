@@ -1,0 +1,8 @@
+.event-date-detail--capitalize {
+  text-transform: capitalize;
+}
+
+.event-date-detail__span {
+  width: "3.5em";
+  display: "inline-block";
+}

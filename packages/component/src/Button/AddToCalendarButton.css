@@ -1,0 +1,5 @@
+.ui.button.add-calendar__button {
+  padding: 0;
+  line-height: 13px;
+  display: inherit;
+}
