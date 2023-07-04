@@ -22,7 +22,7 @@
     "events-type": "^0.0.0-development",
     "events-web": "^0.0.0-development",
     "prettier": "^2.6.2",
-    "typescript": "^4.9.5"
+    "typescript": "^4.7.2"
   },
   "dependencies": {
     "autoprefixer": "^10.4.14",
