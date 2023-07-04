@@ -18,10 +18,10 @@
 .carousel-events--mvmf_2022 {
   background-color: #000404;
   background-repeat: no-repeat;
-  background-image: url("../../../images/mvmf-corner.svg"),
-    url("../../../images/mvmf-corner.svg"),
-    url("../../../images/mvmf-corner.svg"),
-    url("../../../images/mvmf-corner.svg");
+  background-image: url("../../images/mvmf-corner.svg"),
+    url("../../images/mvmf-corner.svg"),
+    url("../../images/mvmf-corner.svg"),
+    url("../../images/mvmf-corner.svg");
   background-position: top 40px left 40px, bottom 40px left 40px,
     top 40px right 40px, bottom 40px right 40px;
   padding-top: 32px;
@@ -55,7 +55,7 @@
       rgba(255, 255, 255, 0.2) 80%,
       rgb(255, 255, 255) 98%
     ),
-    url("../../../images/mvfw.jpeg");
+    url("../../images/mvfw.jpeg");
   background-position: 50% top;
   background-repeat: no-repeat;
   background-size: 100% auto;
@@ -88,7 +88,7 @@
       rgba(255, 255, 255, 1),
       rgba(255, 255, 255, 0)
     ),
-    url("../../../images/pride-2023-background.jpg");
+    url("../../images/pride-2023-background.jpg");
   background-size: cover;
   padding-top: 32px;
   padding-bottom: 50px;
