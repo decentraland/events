@@ -1,5 +1,5 @@
 {
-  "name": "events",
+  "name": "@dcl/events-web",
   "private": true,
   "description": "Decentraland Events Monorepo",
   "version": "0.0.0-development",
@@ -13,12 +13,9 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "start:web": "npm run start -w packages/web"
+    "start": "npm run start -w packages/web"
   },
   "workspaces": [
-    "packages/web",
-    "packages/component",
-    "packages/api",
-    "packages/type"
+    "packages/*"
   ]
 }
