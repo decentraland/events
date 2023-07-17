@@ -38,9 +38,6 @@ jobs:
           continue_on_error: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: setup environment
-        run: source ./node_modules/.bin/setup-environment $PWD website-events-prd
-
       - name: testing
         run: npm test -- --coverage
 
