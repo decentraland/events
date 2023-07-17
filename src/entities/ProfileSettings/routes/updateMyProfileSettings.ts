@@ -1,22 +1,22 @@
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { sign } from "decentraland-gatsby/dist/utils/sign"
-import isEmail from "validator/lib/isEmail"
-import isEthereumAddress from "validator/lib/isEthereumAddress"
+// import Time from "decentraland-gatsby/dist/utils/date/Time"
+// import { sign } from "decentraland-gatsby/dist/utils/sign"
+// import isEmail from "validator/lib/isEmail"
+// import isEthereumAddress from "validator/lib/isEthereumAddress"
 
-import { siteUrl } from "../../Event/utils"
-import { sendEmailVerification } from "../../Notification/utils"
+// import { siteUrl } from "../../Event/utils"
+// import { sendEmailVerification } from "../../Notification/utils"
 import ProfileSettingsModel from "../model"
 import {
-  DATA_PARAM,
-  EmailSubscription,
+  // DATA_PARAM,
+  // EmailSubscription,
   ProfileSettingsAttributes,
-  SUBSCRIPTION_PATH,
+  // SUBSCRIPTION_PATH,
   updateMyProfileSettingsSchema,
 } from "../types"
-import { SIGN_SECRET } from "./subscriptions"
+// import { SIGN_SECRET } from "./subscriptions"
 
 export const validateProfileSettings =
   createValidator<ProfileSettingsAttributes>(
@@ -70,13 +70,15 @@ export async function updateMyProfileSettings(req: WithAuth) {
   }
 
   if (emailVerificationRequired) {
-    await sendVerification(profile.user, newProfile.email!)
+    // TODO: remove
+    //await sendVerification(profile.user, newProfile.email!)
   }
 
   return newProfile
 }
 
-async function sendVerification(user: string, email: string) {
+// TODO: remove
+/* async function sendVerification(user: string, email: string) {
   if (isEthereumAddress(user) && isEmail(email)) {
     const verificationData: EmailSubscription = {
       action: "verify",
@@ -92,4 +94,4 @@ async function sendVerification(user: string, email: string) {
     )
     await sendEmailVerification(email, verificationUrl.toString())
   }
-}
+} */
