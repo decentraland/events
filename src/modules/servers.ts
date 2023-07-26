@@ -1,17 +1,20 @@
+import { cache } from "dcl-catalyst-client/dist/contracts-snapshots/data"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
-import once from "decentraland-gatsby/dist/utils/function/once"
 import { memo } from "radash/dist/curry"
 
-export const getServers = memo(async () => {
-  const servers = await Catalyst.getInstance().getServers()
-  return Promise.all(
-    servers.map((server) => {
-      return API.catch(Catalyst.getInstanceFrom(server.baseUrl).getAbout())
-    })
-  )
-})
+export const getServers = memo(
+  async () => {
+    const servers = cache.catalysts.mainnet
+    return Promise.all(
+      servers.map((server) => {
+        return API.catch(Catalyst.getInstanceFrom(server.address).getAbout())
+      })
+    )
+  },
+  { ttl: Infinity }
+)
 
 export type Option = { key: string; value: string; text: string }
 
