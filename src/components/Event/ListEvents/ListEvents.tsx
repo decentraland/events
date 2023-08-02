@@ -89,8 +89,7 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
 
     if (categoriesFiltered) {
       const categoriesOptions = categoriesFiltered?.map((category) => ({
-        // should be category.i18n[locale] when we have more languages
-        title: category.i18n.en,
+        title: l(`categories.${category.name}`),
         description: "",
         value: category.name,
       }))

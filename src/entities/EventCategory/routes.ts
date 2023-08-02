@@ -2,7 +2,7 @@ import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 
-import { categories } from "./i18n"
+import { categories } from "../../intl/en.json"
 import EventCategoryModel from "./model"
 import { EventCategoryAttributes } from "./types"
 
@@ -24,7 +24,7 @@ export async function getEventCategoryList() {
   ).map((category) => ({
     ...category,
     i18n: {
-      en: categories.en[category.name],
+      en: (categories as Record<string, string>)[category.name],
     },
   }))
 }
