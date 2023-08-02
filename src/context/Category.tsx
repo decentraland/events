@@ -4,9 +4,11 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 
 import Events from "../api/Events"
-import { EventCategoryAttributes } from "../entities/EventCategory/types"
+import { EventCategoryAttributesWithI18N } from "../entities/EventCategory/types"
 
-const defaultProfileSettings = [[] as EventCategoryAttributes[]] as const
+const defaultProfileSettings = [
+  [] as EventCategoryAttributesWithI18N[],
+] as const
 
 export function useCategories() {
   const [account, accountState] = useAuthContext()
@@ -19,7 +21,7 @@ export function useCategories() {
       return Events.get().getCategories()
     },
     [account, accountState.loading],
-    { initialValue: [] as EventCategoryAttributes[] }
+    { initialValue: [] as EventCategoryAttributesWithI18N[] }
   )
 
   return [categories] as const
