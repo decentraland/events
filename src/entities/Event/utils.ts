@@ -21,6 +21,16 @@ const DECENTRALAND_URL = env(
   "https://play.decentraland.org"
 )
 const EVENTS_URL = env("EVENTS_URL", "https://events.decentraland.org/api")
+const PROFILE_SITE_URL = env(
+  "PROFILE_SITE_URL",
+  "https://profile.decentraland.org"
+)
+
+export function profileSiteUrl(address: string) {
+  const target = new URL(PROFILE_SITE_URL)
+  target.pathname = `/accounts/${address}`
+  return target.toString()
+}
 
 export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_URL)

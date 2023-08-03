@@ -8,6 +8,7 @@ config:
     secure: v1:Qnl9UxZmPaJEnQKR:m9O+4z453mTgx6OsHhWXsl+EPIKz85GKp+xX+ALd/CXnf6cpqBpx2YufgyegT1eSzxJ92p7A7RUPo4+uJlW66C9Oi4mhvzJIX2H3uRU56tjxwg9Qv0kGj1f5x3iSUrQEWuXka6YtEeYcIdYJEAFiaGXbrVjR+fC7bCuKZ7j/
   events:GATSBY_CHAIN_ID: 1,137
   events:GATSBY_DECENTRALAND_URL: https://play.decentraland.org
+  events:GATSBY_PROFILE_SITE_URL: https://profile.decentraland.org
   events:GATSBY_EVENTS_URL: https://events.decentraland.io/api
   events:GATSBY_LAND_URL: https://api.decentraland.org
   events:GATSBY_PROFILE_URL: https://peer.decentraland.org
