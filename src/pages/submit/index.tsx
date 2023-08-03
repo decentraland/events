@@ -1031,7 +1031,7 @@ export default function SubmitPage() {
                       key={key}
                       className={"submit__category-select-wrapper"}
                     >
-                      {l(`page.events.categories.${category}`)}
+                      {l(`categories.${category}`)}
                       <Icon
                         className={"submit__category-select-label"}
                         name="delete"

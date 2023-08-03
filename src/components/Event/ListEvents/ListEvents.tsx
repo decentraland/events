@@ -89,7 +89,7 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
 
     if (categoriesFiltered) {
       const categoriesOptions = categoriesFiltered?.map((category) => ({
-        title: l(`page.events.categories.${category.name}`),
+        title: l(`categories.${category.name}`),
         description: "",
         value: category.name,
       }))
