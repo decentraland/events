@@ -31,7 +31,7 @@ export const getCategoriesOptionsActives = (
     .map((category) => ({
       key: category.name,
       value: category.name,
-      text: `page.events.categories.${category.name}`,
+      text: `categories.${category.name}`,
     }))
 }
 

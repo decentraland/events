@@ -8,7 +8,7 @@ import {
   SessionEventAttributes,
 } from "../entities/Event/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
-import { EventCategoryAttributes } from "../entities/EventCategory/types"
+import { EventCategoryAttributesWithI18N } from "../entities/EventCategory/types"
 import { PosterAttributes } from "../entities/Poster/types"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 import { ScheduleAttributes } from "../entities/Schedule/types"
@@ -332,7 +332,7 @@ export default class Events extends API {
     )
   }
 
-  async getCategories(): Promise<EventCategoryAttributes[]> {
+  async getCategories(): Promise<EventCategoryAttributesWithI18N[]> {
     return this.fetch(`/events/categories`)
   }
 
