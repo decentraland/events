@@ -28,7 +28,7 @@ const PROFILE_SITE_URL = env(
 
 export function profileSiteUrl(address: string) {
   const target = new URL(PROFILE_SITE_URL)
-  target.pathname = address
+  target.pathname = `/accounts/${address}`
   return target.toString()
 }
 
