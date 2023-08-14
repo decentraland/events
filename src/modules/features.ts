@@ -1,1 +1,3 @@
-export enum Flags {}
+export enum Flags {
+  ProfileSite = "dapps-profile",
+}
