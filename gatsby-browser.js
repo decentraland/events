@@ -38,7 +38,7 @@ import ProfileSettings from "./src/context/ProfileSetting"
 export const registerServiceWorker = () => false
 
 export const wrapRootElement = ({ element }) => (
-  <AuthProvider ssoEnabled ssoUrl={env("SSO_URL")}>
+  <AuthProvider sso={env("SSO_URL")}>
     <FeatureFlagProvider applicationName={["events", "dapps"]}>
       <ProfileSettings>
         <Events>
