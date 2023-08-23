@@ -87,7 +87,6 @@ app.use(
         "wss://*.hotjar.com",
         "https://*.twitter.com",
         "https://cdn.segment.com",
-        "https://cdn.rollbar.com",
         "https://ajax.cloudflare.com",
         "https://googleads.g.doubleclick.net",
         "https://ssl.google-analytics.com",
