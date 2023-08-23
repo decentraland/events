@@ -28,6 +28,7 @@ import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
 import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
+import env from "decentraland-gatsby/dist/utils/env"
 
 import UserMenu from "./src/components/Layout/UserMenu"
 import Categories from "./src/context/Category"
@@ -36,8 +37,10 @@ import ProfileSettings from "./src/context/ProfileSetting"
 
 export const registerServiceWorker = () => false
 
+const ssoUrl = env("SSO_URL")
+
 export const wrapRootElement = ({ element }) => (
-  <AuthProvider>
+  <AuthProvider sso={ssoUrl}>
     <FeatureFlagProvider applicationName={["events", "dapps"]}>
       <ProfileSettings>
         <Events>
