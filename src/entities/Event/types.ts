@@ -130,6 +130,7 @@ export type EventAttributes = {
   schedules: string[]
   approved_by: string | null
   rejected_by: string | null
+  world: boolean
 }
 
 export type GetEventParams = {
@@ -178,6 +179,7 @@ export type EventListParams = {
   only_attendee?: boolean
   search?: string
   schedule?: string
+  world?: boolean
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -194,6 +196,7 @@ export type EventListOptions = {
   only_attendee?: boolean
   search?: string
   schedule?: string
+  world?: boolean
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -220,6 +223,7 @@ export const editEventAttributes = [
   "recurrent_count",
   "recurrent_until",
   "categories",
+  "world",
 ] as const
 
 export const editOwnEventAttributes = ["contact", "details"] as const
@@ -245,3 +249,8 @@ export enum EventType {
 }
 
 export const MAX_CATAGORIES_ALLOWED = 1
+
+export enum eventLocations {
+  LAND = "land",
+  WORLD = "world",
+}

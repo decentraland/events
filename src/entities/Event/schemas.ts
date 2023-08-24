@@ -1,6 +1,7 @@
 import {
   AjvArraySchema,
   AjvObjectSchema,
+  BooleanEnum,
   TruthyEnum,
   apiResultSchema,
 } from "decentraland-gatsby/dist/entities/Schema/types"
@@ -87,6 +88,11 @@ export const getEventListQuery: AjvObjectSchema = {
       description: "List order",
       default: "asc",
       enum: ["asc", "desc"],
+    },
+    world: {
+      enum: BooleanEnum.filter((value) => typeof value === "string"),
+      description:
+        "True for events in Worlds, false for events not in Worlds, null for all events",
     },
   },
 }
@@ -335,6 +341,10 @@ export const eventSchema = {
       type: "boolean",
       description: "If event is live",
     },
+    world: {
+      type: "boolean",
+      description: "True if the event is in a World",
+    },
   },
 }
 
@@ -458,6 +468,9 @@ export const newEventSchema = {
     schedules: {
       type: ["array", "null"],
       items: { type: "string", format: "uuid" },
+    },
+    world: {
+      type: "boolean",
     },
   },
 }

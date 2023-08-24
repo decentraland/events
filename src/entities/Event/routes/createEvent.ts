@@ -88,15 +88,23 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   const now = new Date()
   const event_id = uuid()
-  const tiles = await API.catch(Land.get().getTiles([x, y], [x, y]))
-  const tile = tiles && tiles[[x, y].join(",")]
-  const estate_id = tile?.estateId || null
-  const estate_name = tile?.name || null
-  const image =
-    data.image ||
-    (estate_id
-      ? Land.get().getEstateImage(estate_id)
-      : Land.get().getParcelImage([x, y]))
+  let estate_name: string | null = null
+  let image = ""
+  let estate_id = null
+  if (!data.world) {
+    const tiles = await API.catch(Land.getInstance().getTiles([x, y], [x, y]))
+    const tile = tiles && tiles[[x, y].join(",")]
+    estate_id = tile?.estateId || null
+    estate_name = tile?.name || null
+    image =
+      data.image ||
+      (estate_id
+        ? Land.getInstance().getEstateImage(estate_id)
+        : Land.getInstance().getParcelImage([x, y]))
+  } else {
+    image = data.image || "https://localhost:8000/images/event-default.jpg"
+  }
+
   const user_name = userProfile.name || null
   const next_start_at = EventModel.selectNextStartAt(
     recurrent.duration,

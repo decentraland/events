@@ -28,6 +28,9 @@ export type PlaceAttributes = {
   disabled_at: Date | null
   created_at: Date
   updated_at: Date
+  world: boolean
+  world_name: string | null
+  hidden: boolean
 }
 
 export type AggregatePlaceAttributes = PlaceAttributes & {
@@ -38,6 +41,7 @@ export type AggregatePlaceAttributes = PlaceAttributes & {
   user_visits?: number
   deployed_at?: Date
   realms_detail?: Realm[]
+  textsearch: string | null
 }
 
 export default class Places extends API {
@@ -75,6 +79,8 @@ export default class Places extends API {
       user_like: Boolean(place.user_like),
       user_dislike: Boolean(place.user_dislike),
       user_favorite: Boolean(place.user_favorite),
+      world: Boolean(place.world),
+      hidden: Boolean(place.hidden),
     } as AggregatePlaceAttributes
   }
 
@@ -129,6 +135,13 @@ export default class Places extends API {
 
     return this.fetchMany(
       `/places/?${query.toString()}`,
+      this.options().authorization({ sign: true, optional: true })
+    )
+  }
+
+  async getWorlds() {
+    return this.fetchMany(
+      `/worlds`,
       this.options().authorization({ sign: true, optional: true })
     )
   }

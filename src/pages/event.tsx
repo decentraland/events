@@ -10,7 +10,6 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 
-import AttendingButtons from "../components/Button/AttendingButtons"
 import EditButtons from "../components/Button/EditButtons"
 import EventDetail from "../components/Event/EventModal/EventDetail/EventDetail"
 import EventStatusBanner from "../components/Event/EventModal/EventStatusBanner/EventStatusBanner"

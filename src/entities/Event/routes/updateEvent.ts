@@ -178,11 +178,17 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     }
   }
 
-  const tile = await API.catch(Land.get().getTile([x, y]))
-  updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
-  updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
-  updatedAttributes.scene_name = updatedAttributes.estate_name
+  // Update data from worlds
+  const tile = await API.catch(Land.getInstance().getTile([x, y]))
   updatedAttributes.coordinates = [x, y]
+
+  if (!updatedAttributes.world) {
+    updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
+    updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
+    updatedAttributes.scene_name = updatedAttributes.estate_name
+  }
+  updatedAttributes.image =
+    updatedAttributes.image || "https://localhost:8000/images/event-default.jpg"
 
   Object.assign(
     updatedAttributes,
