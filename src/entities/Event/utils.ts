@@ -58,7 +58,7 @@ export function eventTargetUrl(
   target.searchParams.set("position", [event.x || 0, event.y || 0].join(","))
 
   if (event.server) {
-    target.searchParams.set("server", event.server)
+    target.searchParams.set("realm", event.server)
   }
 
   return target.toString()

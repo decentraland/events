@@ -1,4 +1,4 @@
-export enum SegemntPage {
+export enum SegmentPage {
   Home = "Home",
   Event = "Event",
   Submit = "Submit",

@@ -12,4 +12,5 @@ export function url(
 
 export default {
   place: (position: string) => url("/place/", { position }),
+  world: (name: string) => url("/world/", { name }),
 }

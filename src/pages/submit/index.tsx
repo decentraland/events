@@ -9,6 +9,7 @@ import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFileDrop from "decentraland-gatsby/dist/hooks/useFileDrop"
@@ -44,6 +45,7 @@ import {
   MAX_EVENT_RECURRENT,
   Position,
   WeekdayMask,
+  eventLocations,
 } from "../../entities/Event/types"
 import {
   isLatestRecurrentSetpos,
@@ -66,8 +68,10 @@ import {
   getSchedules,
   getSchedulesOptions,
 } from "../../modules/events"
+import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 import { getServerOptions, getServers } from "../../modules/servers"
+import { getWorlds, getWorldsOptions } from "../../modules/worlds"
 
 import "./index.css"
 
@@ -84,6 +88,20 @@ type SubmitPageState = {
 }
 
 const options = { utc: true }
+
+const locationOptions = [
+  {
+    key: eventLocations.LAND,
+    text: eventLocations.LAND,
+    value: eventLocations.LAND,
+  },
+  {
+    key: eventLocations.WORLD,
+    text: eventLocations.WORLD,
+    value: eventLocations.WORLD,
+  },
+]
+
 const recurrentOptions = [
   { value: false, text: "Does not repeat" },
   { value: true, text: "Repeat every" },
@@ -103,17 +121,29 @@ const recurrentEndsOptions = [
 export default function SubmitPage() {
   const l = useFormatMessage()
   const location = useLocation()
+
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
+  const [worlds] = useAsyncMemo(getWorlds)
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
+
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
   const [, eventsState] = useEventsContext()
   const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
-  const serverOptions = useMemo(() => getServerOptions(servers), [servers])
+  const [ff] = useFeatureFlagContext()
+
+  const serverOptions = useMemo(() => {
+    if (editing.world) {
+      return getWorldsOptions(worlds)
+    } else {
+      return getServerOptions(servers)
+    }
+  }, [editing, servers, worlds])
+
   const scheduleOptions = useMemo(
     () => getSchedulesOptions(schedules, { exclude: editing.schedules }),
     [schedules, editing.schedules]
@@ -192,6 +222,7 @@ export default function SubmitPage() {
         recurrent_monthday: original.recurrent_monthday,
         categories: original.categories,
         schedules: original.schedules,
+        world: original.world,
       })
     }
   }, [original])
@@ -594,26 +625,6 @@ export default function SubmitPage() {
                   <Divider size="tiny" />
                 </Grid.Column>
               </Grid.Row>
-              {/* DEPRECATED // TODO: since max duration is 24hrs, this needs to be rebuild or erased
-              <Grid.Row>
-                <Grid.Column mobile="16">
-                  <Label style={{ cursor: "pointer" }}>
-                    All day event ?
-                    <Radio
-                      toggle
-                      name="all_day"
-                      checked={editing.all_day}
-                      onClick={(e, data) =>
-                        editActions.handleChange(e, {
-                          ...data,
-                          checked: !editing.all_day,
-                        })
-                      }
-                      style={{ marginLeft: "1em", verticalAlign: "bottom" }}
-                    />
-                  </Label>
-                </Grid.Column>
-                    </Grid.Row>*/}
               <Grid.Row>
                 <Grid.Column mobile="8">
                   <Field
@@ -1053,6 +1064,46 @@ export default function SubmitPage() {
                   <Divider size="tiny" />
                 </Grid.Column>
               </Grid.Row>
+              {!ff.flags[Flags.HideEventsInWorlds] && (
+                <Grid.Row>
+                  <Grid.Column mobile="16">
+                    <SelectField
+                      label={l("page.submit.location_label")}
+                      placeholder={l("page.submit.location_placeholder")}
+                      name="event_location"
+                      options={locationOptions}
+                      value={
+                        editing.world
+                          ? eventLocations.WORLD
+                          : eventLocations.LAND
+                      }
+                      onChange={editActions.handleChange}
+                    />
+                  </Grid.Column>
+                </Grid.Row>
+              )}
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <SelectField
+                    label={
+                      editing.world
+                        ? l("page.submit.world_label")
+                        : l("page.submit.server_label")
+                    }
+                    placeholder={
+                      editing.world
+                        ? l("page.submit.world_placeholder")
+                        : l("page.submit.server_placeholder")
+                    }
+                    name="server"
+                    error={!!errors["server"]}
+                    message={errors["server"]}
+                    options={serverOptions}
+                    value={editing.server || ""}
+                    onChange={editActions.handleChange}
+                  />
+                </Grid.Column>
+              </Grid.Row>
 
               <Grid.Row>
                 <Grid.Column mobile="4">
@@ -1078,18 +1129,6 @@ export default function SubmitPage() {
                     error={!!errors["y"]}
                     message={errors["y"]}
                     value={editing.y}
-                    onChange={editActions.handleChange}
-                  />
-                </Grid.Column>
-                <Grid.Column mobile="8">
-                  <SelectField
-                    label={l("page.submit.server_label")}
-                    placeholder={l("page.submit.server_placeholder")}
-                    name="server"
-                    error={!!errors["server"]}
-                    message={errors["server"]}
-                    options={serverOptions}
-                    value={editing.server || ""}
                     onChange={editActions.handleChange}
                   />
                 </Grid.Column>

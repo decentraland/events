@@ -15,6 +15,7 @@ import {
   MonthMask,
   Position,
   WeekdayMask,
+  eventLocations,
 } from "../entities/Event/types"
 import { toRecurrentSetpos, toWeekdayMask } from "../entities/Event/utils"
 
@@ -80,6 +81,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     recurrent_month_mask: 0,
     recurrent_until: null,
     recurrent_count: null,
+    world: false,
 
     errors: {},
   })
@@ -457,6 +459,14 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     }
   }
 
+  function handleChangeEventLocation(value: eventLocations) {
+    if (value === eventLocations.WORLD) {
+      setValue("world", true)
+    } else {
+      setValue("world", false)
+    }
+  }
+
   function handleChange(
     e: React.ChangeEvent<any>,
     props?:
@@ -595,6 +605,9 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       case "categories":
       case "schedules":
         return handleChangeList(name, value)
+
+      case "event_location":
+        return handleChangeEventLocation(value)
 
       default:
       // ignore change

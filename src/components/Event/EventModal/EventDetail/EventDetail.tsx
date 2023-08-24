@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 
 import DateBox from "decentraland-gatsby/dist/components/Date/DateBox"
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
@@ -28,6 +28,7 @@ import { Flags } from "../../../../modules/features"
 import locations from "../../../../modules/locations"
 import { places } from "../../../../modules/places"
 import placesLocations from "../../../../modules/placesLocations"
+import { worlds } from "../../../../modules/worlds"
 import AttendingButtons from "../../../Button/AttendingButtons"
 import JumpInButton from "../../../Button/JumpInPosition"
 import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
@@ -73,7 +74,13 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const [ff] = useFeatureFlagContext()
 
   const [place, placeStatus] = useAsyncMemo(
-    async () => places.load(`${event.x},${event.y}`),
+    async () => {
+      if (!event.world) {
+        return places.load(`${event.x},${event.y}`)
+      } else {
+        return worlds.load(`${event.server}`)
+      }
+    },
     [event],
     {
       callWithTruthyDeps: true,
@@ -88,6 +95,14 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     },
     [props.onClickAttendees]
   )
+
+  const placesUrl = useMemo(() => {
+    if (event.world) {
+      return placesLocations.world(event.server!)
+    } else {
+      return placesLocations.place(`${event.x},${event.y}`)
+    }
+  }, [event])
 
   return (
     <div className="EventDetail">
@@ -203,9 +218,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <EventSection.Icon src={pinIcon} width="16" height="16" />
           <EventSection.Detail>
             {placeStatus.loaded && place && (
-              <Link href={placesLocations.place(place.base_position)}>
-                {place.title}
-              </Link>
+              <Link href={placesUrl}>{place.title}</Link>
             )}
             {(!placeStatus.loaded || !place) && (
               <Paragraph bold>
