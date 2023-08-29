@@ -2,6 +2,7 @@
   "GATSBY_CHAIN_ID": "1,137",
   "GATSBY_DECENTRALAND_URL": "https://play.decentraland.org",
   "GATSBY_EVENTS_URL": "/api",
+  "GATSBY_EVENTS_BASE_URL": "https://localhost:8000",
   "GATSBY_LAND_URL": "https://api.decentraland.org",
   "GATSBY_PROFILE_URL": "https://peer.decentraland.org",
   "GATSBY_INTERCOM_APP_ID": "z0h94kay",

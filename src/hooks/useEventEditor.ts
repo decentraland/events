@@ -667,6 +667,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       errors["finish_date"] = "End date should be after start date"
     }
 
+    if (event.world && (event.server === null || event.server === "")) {
+      errors["server"] = "World name is required"
+    }
+    console.log(errors)
     if (Object.values(errors).filter(Boolean).length) {
       setErrors({ ...event.errors, ...errors })
       return false
