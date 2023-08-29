@@ -464,9 +464,9 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
   function handleChangeEventLocation(value: eventLocations) {
     if (value === eventLocations.WORLD) {
-      setValue("world", true)
+      setValues({ world: true, server: null })
     } else {
-      setValue("world", false)
+      setValues({ world: false, server: null })
     }
   }
 
