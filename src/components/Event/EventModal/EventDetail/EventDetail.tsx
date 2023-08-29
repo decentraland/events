@@ -24,6 +24,7 @@ import extraIcon from "../../../../images/info.svg"
 import friendsIcon from "../../../../images/secondary-friends.svg"
 import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
+import WorldIcon from "../../../../images/worlds-icon.svg"
 import { Flags } from "../../../../modules/features"
 import locations from "../../../../modules/locations"
 import { places } from "../../../../modules/places"
@@ -215,7 +216,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {props.showPlace !== false && <EventSection.Divider />}
       {props.showPlace !== false && (
         <EventSection>
-          <EventSection.Icon src={pinIcon} width="16" height="16" />
+          {!event.world && (
+            <EventSection.Icon src={pinIcon} width="16" height="16" />
+          )}
+          {event.world && (
+            <EventSection.Icon src={WorldIcon} width="20" height="20" />
+          )}
           <EventSection.Detail>
             {placeStatus.loaded && place && (
               <Link href={placesUrl}>{place.title}</Link>
