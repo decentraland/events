@@ -86,34 +86,28 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     errors: {},
   })
 
-  // const finish_at = useMemo(() => new Datetime(new Date(event.start_at.getTime() + event.duration), options), [event.start_at.getTime(), event.duration])
   const finish_at = useMemo(
     () => Time.from(event.start_at.getTime() + event.duration, { utc }),
     [event.start_at.getTime(), event.duration]
   )
-  const start_at = useMemo(
-    () => Time.from(event.start_at.getTime(), { utc }),
-    [event.start_at.getTime()]
-  )
+  const start_at = useMemo(() => {
+    return Time.from(event.start_at.getTime(), { utc })
+  }, [event.start_at.getTime()])
 
   function getStartDate() {
-    // return start_at.toInputDate()
     return start_at.format(Time.Formats.InputDate)
   }
 
   function getStartTime() {
     return start_at.format(Time.Formats.InputTime)
-    // return start_at.toInputTime()
   }
 
   function getFinishDate() {
     return finish_at.format(Time.Formats.InputDate)
-    // return finish_at.toInputDate()
   }
 
   function getFinishTime() {
     return finish_at.format(Time.Formats.InputTime)
-    // return finish_at.toInputTime()
   }
 
   /**
@@ -179,10 +173,18 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return
     }
 
-    const start_at = Time.from(value, {
+    const start_at_original = Time.from(value, {
       utc,
       format: Time.Formats.InputDate,
-    }).toDate()
+    })
+
+    const hours = Time(event.start_at).toDate().getUTCHours()
+    const minutes = Time(event.start_at).toDate().getUTCMinutes()
+
+    const start_at = start_at_original
+      .set("hour", hours)
+      .set("minute", minutes)
+      .toDate()
 
     if (start_at.getTime() !== event.start_at.getTime()) {
       let recurrent_until = event.recurrent_until
@@ -217,6 +219,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const start_at = Time.utc(
       start_date.getTime() + start_time.getTime()
     ).toDate()
+
     if (start_at.getTime() !== event.start_at.getTime()) {
       setValues({ start_at })
     }

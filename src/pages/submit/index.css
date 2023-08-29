@@ -70,3 +70,17 @@ p.FieldNote {
 .error {
   color: var(--error);
 }
+
+.dcl.select-field .ui.dropdown > .text > .image,
+.ui.dropdown > .text > img {
+  margin-top: -2px;
+}
+
+.dcl.select-field .dropdown .menu > .item > .image,
+.ui.dropdown .menu > .item > img {
+  margin-top: -2px;
+}
+
+.dcl.select-field .ui.dropdown .text {
+  text-transform: capitalize;
+}
