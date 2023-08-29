@@ -70,4 +70,10 @@
 .ui.card.EventCard > .content > .header:not(.ui),
 .ui.cards > .card.EventCard > .content > .header:not(.ui) {
   margin-top: 0;
+  display: flex;
+}
+
+.ui.card.EventCard > .content > .header:not(.ui) img,
+.ui.cards > .card.EventCard > .content > .header:not(.ui) img {
+  margin-right: 10px;
 }

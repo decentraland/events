@@ -7,9 +7,7 @@ import { Card } from "decentraland-ui/dist/components/Card/Card"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import locations from "../../../modules/locations"
-import AttendingButtons from "../../Button/AttendingButtons"
 import EventDetail from "../EventModal/EventDetail/EventDetail"
-import EventSection from "../EventSection"
 
 import "./EventCardBig.css"
 

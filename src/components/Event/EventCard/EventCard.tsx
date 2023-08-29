@@ -7,11 +7,13 @@ import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
+import WorldIcon from "../../../images/worlds-icon.svg"
 import locations from "../../../modules/locations"
 import StartIn from "../../Badge/StartIn"
 import AttendingButtons from "../../Button/AttendingButtons"
 import JumpInPosition from "../../Button/JumpInPosition"
 import EventDate from "../EventDate/EventDate"
+import EventSection from "../EventSection"
 
 import "./EventCard.css"
 
@@ -91,7 +93,12 @@ export default React.memo(function EventCard(props: EventCardProps) {
           </div>
         )}
 
-        <Card.Header>{event?.name || " "}</Card.Header>
+        <Card.Header>
+          {event?.world && (
+            <EventSection.Icon src={WorldIcon} width="20" height="20" />
+          )}
+          {event?.name || " "}
+        </Card.Header>
         <Card.Description>
           <AttendingButtons event={event} />
         </Card.Description>
