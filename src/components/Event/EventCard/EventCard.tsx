@@ -60,7 +60,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
     <Card
       link
       className={TokenList.join([
-        "EventCard",
+        "event-card",
         props.loading && "loading",
         event && !event.approved && "pending",
       ])}
@@ -68,14 +68,14 @@ export default React.memo(function EventCard(props: EventCardProps) {
       onClick={handleClick}
     >
       {event && <StartIn date={nextStartAt} />}
-      <div className="EventCard__Cover">
+      <div className="event-card__cover">
         {event && event.total_attendees > 0 && (
-          <div className="EventCard__Attendees">
+          <div className="event-card__attendees">
             {event.latest_attendees.slice(0, EVENTS_LIST).map((address) => (
               <Avatar size="mini" key={address} address={address} />
             ))}
             {event.total_attendees > EVENTS_LIST && (
-              <div className="EventCard__Attendees__More">
+              <div className="event-card__attendees-more">
                 <div>+{Math.max(event.total_attendees - EVENTS_LIST, 0)}</div>
               </div>
             )}

@@ -16,8 +16,8 @@ function EventSection({ highlight, maxHeight, ...props }: EventSectionProps) {
       {...props}
       style={{ maxHeight: maxHeight, ...props.style }}
       className={TokenList.join([
-        "EventSection",
-        highlight && "EventSection--highlight",
+        "event-section",
+        highlight && "event-section--highlight",
         props.className,
       ])}
     />
@@ -36,8 +36,8 @@ function Icon({ src, width, height, center, ...props }: IconProps) {
     <div
       {...props}
       className={TokenList.join([
-        "EventSection__Icon",
-        center && "EventSection__Icon--center",
+        "event-section__icon",
+        center && "event-section__icon--center",
         props.className,
       ])}
     >
@@ -55,7 +55,7 @@ function Detail(props: DetailProps) {
     <div
       {...props}
       style={{ maxHeight: props.maxHeight, ...props.style }}
-      className={TokenList.join(["EventSection__Detail", props.className])}
+      className={TokenList.join(["event-section__detail", props.className])}
     />
   )
 }
@@ -66,13 +66,13 @@ function Action(props: ActionProps) {
   return (
     <div
       {...props}
-      className={TokenList.join(["EventSection__Action", props.className])}
+      className={TokenList.join(["event-section__action", props.className])}
     />
   )
 }
 
 function Divider() {
-  return <DividerComponent line className="EventSection__Divider" />
+  return <DividerComponent line className="event-section__divider" />
 }
 
 export default Object.assign(EventSection, { Icon, Detail, Action, Divider })

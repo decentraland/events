@@ -26,6 +26,7 @@ import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import shareIcon from "../../images/share.svg"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
+import { Star } from "../Icon/Star"
 
 import "./AttendingButtons.css"
 
@@ -146,17 +147,17 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     [event, state]
   )
 
-  const handleNotify = useCallback(
+  /*   const handleNotify = useCallback(
     (e: React.MouseEvent<any>) => {
       e.preventDefault()
       e.stopPropagation()
       event && state.notify(event.id, !event.notify)
     },
     [event, state]
-  )
+  ) */
 
   return (
-    <div className="AttendingButtons">
+    <div className="attending-buttons">
       {fallbackShare && (
         <Button
           inverted
@@ -226,6 +227,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             event?.attending && "attending",
           ])}
         >
+          {event && <Star active={event.attending} />}
           {!event && " "}
           {event &&
             event.attending &&
@@ -233,26 +235,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           {event &&
             !event.attending &&
             l("components.button.attending_buttons.want_to_go")}
-        </Button>
-      )}
-
-      {!fallbackShare && !isLive && event?.attending && (
-        <Button
-          inverted
-          primary
-          size="small"
-          className="share"
-          disabled={loading || sharing || !approved}
-          onClick={handleNotify}
-        >
-          <img
-            src={
-              (event?.notify && notificationEnabledIcon) ||
-              notificationDisabledIcon
-            }
-            width="22"
-            height="22"
-          />
         </Button>
       )}
 
