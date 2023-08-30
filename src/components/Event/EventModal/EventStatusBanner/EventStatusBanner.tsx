@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React from "react"
 
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -24,7 +23,7 @@ export default React.memo(function EventStatusBanner({
 
   if (!event.approved && !event.rejected && isPast) {
     return (
-      <div className="EventStatusBanner EventStatusBanner--error">
+      <div className="event-status-banner event-status-banner--error">
         <code>
           {l(
             "components.event.event_modal.event_status_banner.this_event_is_in_the_past"
@@ -35,7 +34,7 @@ export default React.memo(function EventStatusBanner({
   }
   if (event.rejected) {
     return (
-      <div className="EventStatusBanner EventStatusBanner--error">
+      <div className="event-status-banner event-status-banner--error">
         <code>
           {event.rejected_by
             ? l(
@@ -57,7 +56,7 @@ export default React.memo(function EventStatusBanner({
 
   if (!event.approved) {
     return (
-      <div className="EventStatusBanner">
+      <div className="event-status-banner">
         <code>
           {l(
             "components.event.event_modal.event_status_banner.this_event_is_pending_approval"

@@ -45,22 +45,6 @@
   padding-left: 1em;
 }
 
-/* .event-detail .event-detail__Actions,
-.event-detail .event-detail__Detail {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  padding: 18px 24px;
-} */
-
-/* .event-detail .event-detail__Actions .AttendingButtons {
-  width: 100%;
-} */
-
-/* .event-detail .event-detail__Detail.extra {
-  background-color: #ffeed6;
-} */
-
 .event-detail .event-detail__show-attendees {
   display: inline-flex;
   min-width: 32px;
@@ -81,21 +65,10 @@
   cursor: pointer;
 }
 
-/* .event-detail .event-detail__Detail .event-detail__Detail__Action {
-  flex: 0 0 auto;
-} */
-
 .event-detail .attending-buttons {
   width: 100%;
   max-width: none;
 }
-
-/* @media only screen and (max-width: 767px) {
-  .event-detail .event-detail__Actions,
-  .event-detail .event-detail__Detail {
-    justify-content: flex-end;
-  }
-} */
 
 .event-detail
   .event-detail__header

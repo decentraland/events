@@ -59,7 +59,6 @@ p.FieldNote {
 }
 
 .admin-area {
-  /* background: var(--secondary); */
   width: 100%;
   border: 2px solid var(--secondary);
   border-radius: 8px;

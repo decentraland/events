@@ -67,37 +67,6 @@
   border-radius: 8px 0 0 8px;
 }
 
-/* .ui.card.event-card-big .event-card-big__Attendees {
-  position: absolute;
-  z-index: 10;
-  top: 6px;
-  right: 6px;
-}
-
-.ui.card.event-card-big .event-card-big__Attendees .dg.ImgAvatar {
-  margin-right: -10px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-} */
-
-/* .ui.card.event-card-big .event-card-big__Attendees .event-card-big__Attendees__More {
-  display: inline-block;
-  min-width: 20px;
-  height: 20px;
-  background: white;
-  color: #37333d;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 0 0.4em;
-  box-sizing: content-box;
-  line-height: 20px;
-} */
-/* 
-.ui.card.event-card-big:hover
-  .JumpInButton.JumpInButton--compact
-  .JumpInButton__Position {
-  display: flex;
-} */
-
 .ui.card.event-card-big > .content > .header:not(.ui),
 .ui.cards > .card.event-card-big > .content > .header:not(.ui) {
   margin-top: 0;
