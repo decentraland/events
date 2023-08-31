@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react"
 
 import { useLocation } from "@gatsbyjs/reach-router"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -19,13 +18,12 @@ import {
 } from "../../entities/Event/utils"
 import facebookIcon from "../../images/icon-facebook.svg"
 import twitterIcon from "../../images/icon-twitter.svg"
-import notificationDisabledIcon from "../../images/notification-disabled.svg"
-import notificationEnabledIcon from "../../images/notification-enabled.svg"
 import closeIcon from "../../images/popup-close.svg"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import shareIcon from "../../images/share.svg"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
+import { Star } from "../Icon/Star"
 
 import "./AttendingButtons.css"
 
@@ -43,7 +41,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   )
   const isLive = useTimeout(nextStartAt)
   const [fallbackShare, setFallbackShare] = useState(false)
-  const [, actions] = useAuthContext()
   const location = useLocation()
   const [, state] = useEventsContext()
   const track = useTrackContext()
@@ -146,17 +143,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     [event, state]
   )
 
-  const handleNotify = useCallback(
-    (e: React.MouseEvent<any>) => {
-      e.preventDefault()
-      e.stopPropagation()
-      event && state.notify(event.id, !event.notify)
-    },
-    [event, state]
-  )
-
   return (
-    <div className="AttendingButtons">
+    <div className="attending-buttons">
       {fallbackShare && (
         <Button
           inverted
@@ -226,6 +214,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             event?.attending && "attending",
           ])}
         >
+          {event && <Star active={event.attending} />}
           {!event && " "}
           {event &&
             event.attending &&
@@ -233,26 +222,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           {event &&
             !event.attending &&
             l("components.button.attending_buttons.want_to_go")}
-        </Button>
-      )}
-
-      {!fallbackShare && !isLive && event?.attending && (
-        <Button
-          inverted
-          primary
-          size="small"
-          className="share"
-          disabled={loading || sharing || !approved}
-          onClick={handleNotify}
-        >
-          <img
-            src={
-              (event?.notify && notificationEnabledIcon) ||
-              notificationDisabledIcon
-            }
-            width="22"
-            height="22"
-          />
         </Button>
       )}
 

@@ -56,16 +56,16 @@ export default function JumpInPosition({
       onClick={handleClick}
       href={to}
       className={TokenList.join([
-        "JumpInPosition",
-        compact && "JumpInPosition--compact",
+        "jump-in-position",
+        compact && "jump-in-position--compact",
         props.className,
       ])}
     >
-      <span className="JumpInPosition__Position">
+      <span className="jump-in-position__position">
         {isPosition && <img src={secondaryPinIcon} width="16" height="16" />}
         <span>{event?.world ? event.server : position}</span>
       </span>
-      <span className="JumpInPosition__Icon">
+      <span className="jump-in-position__icon">
         <img src={primaryJumpInIcon} width={16} height={16} />
       </span>
     </Link>

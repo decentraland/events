@@ -26,7 +26,6 @@
     top 40px right 40px, bottom 40px right 40px;
   padding-top: 32px;
   padding-bottom: 50px;
-  /* bac: 'mvmf-corner.svg' */
 }
 
 .carousel-events--mvmf_2022 .carousel-events__title--mvmf_2022 {
@@ -48,7 +47,6 @@
 }
 
 .carousel-events--mvfw_2023 {
-  /* background: linear-gradient(180deg, #C86689 0%, rgba(219, 125, 156, 0) 100%); */
   background-image: linear-gradient(
       to bottom,
       rgba(255, 255, 255, 0) 70%,

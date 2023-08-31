@@ -76,22 +76,3 @@ export async function updateMyProfileSettings(req: WithAuth) {
 
   return newProfile
 }
-
-// TODO: remove
-/* async function sendVerification(user: string, email: string) {
-  if (isEthereumAddress(user) && isEmail(email)) {
-    const verificationData: EmailSubscription = {
-      action: "verify",
-      user: user,
-      email: email,
-      exp: Date.now() + 15 * Time.Minute,
-    }
-
-    const verificationUrl = siteUrl(SUBSCRIPTION_PATH)
-    verificationUrl.searchParams.set(
-      DATA_PARAM,
-      sign(verificationData, SIGN_SECRET)
-    )
-    await sendEmailVerification(email, verificationUrl.toString())
-  }
-} */

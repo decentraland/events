@@ -48,7 +48,7 @@ export default React.memo(function EventCardMini(props: EventCardMiniProps) {
   return (
     <Card
       className={TokenList.join([
-        "EventCardMini",
+        "event-card-mini",
         props.loading && "loading",
         event && !event.approved && "pending",
       ])}
@@ -59,11 +59,11 @@ export default React.memo(function EventCardMini(props: EventCardMiniProps) {
         <JumpInPosition event={event} compact onClick={handleJumpIn} />
       )}
       <div style={{ display: "flex" }}>
-        <div className="EventCardMini__Cover">
+        <div className="event-card-mini__cover">
           <ImgFixed src={event?.image || ""} dimension="square" />
           {event && !props.loading && (
-            <div className="EventCardMini__Attendees">
-              <div className="EventCardMini__Attendees__More">
+            <div className="event-card-mini__attendees">
+              <div className="event-card-mini__attendees-more">
                 +{event.total_attendees}
               </div>
             </div>
