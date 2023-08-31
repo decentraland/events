@@ -93,12 +93,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
           </div>
         )}
 
-        <Card.Header>
-          {event?.world && (
-            <EventSection.Icon src={WorldIcon} width="20" height="20" />
-          )}
-          {event?.name || " "}
-        </Card.Header>
+        <Card.Header>{event?.name || " "}</Card.Header>
         <Card.Description>
           <AttendingButtons event={event} />
         </Card.Description>

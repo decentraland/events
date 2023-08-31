@@ -270,10 +270,10 @@ export default function ScheduleEditPage() {
                       l("page.submit.image_recommended_size")
                     }
                   >
-                    <div className="ImageInput__Description">
+                    <div className="image-input__description">
                       <AddCoverButton />
                       <Paragraph>
-                        <span className="ImageInput__Description__Primary">
+                        <span className="image-input__description-primary">
                           {l("page.submit.browse")}
                         </span>{" "}
                         {l("page.submit.browse_line1_label")}

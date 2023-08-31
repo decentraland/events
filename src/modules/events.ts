@@ -17,24 +17,6 @@ export type GetCategoriesOptions = Partial<{
   exclude: string[]
 }>
 
-export const getCategoriesOptionsActives = (
-  categories: EventCategoryAttributes[] | null,
-  options: GetCategoriesOptions = {}
-): Option[] => {
-  if (!categories || categories.length === 0) {
-    return []
-  }
-
-  const exclude = new Set(options.exclude)
-  return categories
-    .filter((category) => !exclude.has(category.name))
-    .map((category) => ({
-      key: category.name,
-      value: category.name,
-      text: `categories.${category.name}`,
-    }))
-}
-
 export type GetSchedulesOptions = Partial<{
   exclude: string[]
 }>
