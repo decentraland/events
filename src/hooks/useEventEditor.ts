@@ -450,7 +450,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setValue("recurrent_until", recurrent_until)
   }
 
-  function handleChangeList(name: "categories" | "schedules", value: string) {
+  function handleChangeList(name: "schedules", value: string) {
     const list = event[name]
     if (list.includes(value)) {
       setValue(
@@ -606,6 +606,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         return handleChangeRecurrentUntil(value)
 
       case "categories":
+        return setValue(name, [value])
       case "schedules":
         return handleChangeList(name, value)
 

@@ -64,11 +64,7 @@ import {
 import useEventEditor from "../../hooks/useEventEditor"
 import infoIcon from "../../images/info.svg"
 import WorldIcon from "../../images/worlds-icon.svg"
-import {
-  getCategoriesOptionsActives,
-  getSchedules,
-  getSchedulesOptions,
-} from "../../modules/events"
+import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 import { getServerOptions, getServers } from "../../modules/servers"
@@ -214,14 +210,12 @@ export default function SubmitPage() {
   )
 
   const categoryOptions = useMemo(() => {
-    return getCategoriesOptionsActives(categories, {
-      exclude: editing.categories,
-    }).map((categoryOption) => ({
-      ...categoryOption,
-      text: l(categoryOption.text),
-      selected: false,
+    return categories.map((category) => ({
+      key: category.name,
+      value: category.name,
+      text: l(`categories.${category.name}`),
     }))
-  }, [categories, editing.categories])
+  }, [categories])
 
   const loading = accountState.loading && eventState.loading
 
@@ -531,14 +525,26 @@ export default function SubmitPage() {
                           <strong>gif</strong>
                         </>
                       )) ||
-                      state.errorImageServer ||
-                      l("page.submit.image_recommended_size")
+                      state.errorImageServer || (
+                        <>
+                          <img
+                            src={infoIcon}
+                            width="16"
+                            height="16"
+                            style={{
+                              verticalAlign: "middle",
+                              marginRight: ".5rem",
+                            }}
+                          />
+                          {l("page.submit.image_recommended_label")}
+                        </>
+                      )
                     }
                   >
-                    <div className="ImageInput__Description">
+                    <div className="image-input__description">
                       <AddCoverButton />
                       <Paragraph>
-                        <span className="ImageInput__Description__Primary">
+                        <span className="image-input__description-primary">
                           {l("page.submit.browse")}
                         </span>{" "}
                         {l("page.submit.browse_line1_label")}
@@ -656,7 +662,7 @@ export default function SubmitPage() {
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
-                <Grid.Column mobile="16">
+                <Grid.Column mobile="16" className="submit__row-description">
                   <Radio
                     toggle
                     label={l("page.submit.preview_label")}
@@ -742,10 +748,22 @@ export default function SubmitPage() {
                     error={!!errors["finish_at"] || !!errors["finish_date"]}
                     message={
                       errors["finish_at"] ||
-                      errors["finish_date"] ||
-                      l("page.submit.maximum_allowed_duration") +
-                        " " +
-                        editActions.getMaxHoursAllowedLabel()
+                      errors["finish_date"] || (
+                        <>
+                          <img
+                            src={infoIcon}
+                            width="16"
+                            height="16"
+                            style={{
+                              verticalAlign: "middle",
+                              marginRight: ".5rem",
+                            }}
+                          />
+                          {l("page.submit.maximum_allowed_duration") +
+                            " " +
+                            editActions.getMaxHoursAllowedLabel()}
+                        </>
+                      )
                     }
                     value={editActions.getFinishDate()}
                     min={editActions.getStartDate()}
@@ -1115,30 +1133,12 @@ export default function SubmitPage() {
                     message={errors["categories"]}
                     options={categoryOptions}
                     onChange={editActions.handleChange}
-                    value={""}
+                    value={
+                      editing.categories.length > 0 ? editing.categories[0] : ""
+                    }
                     disabled={categoryOptions.length === 0}
-                    selectOnBlur={false}
                     border
                   />
-                  {editing.categories.map((category, key) => (
-                    <SelectionLabel
-                      key={key}
-                      className={"submit__category-select-wrapper"}
-                    >
-                      {l(`categories.${category}`)}
-                      <Icon
-                        className={"submit__category-select-label"}
-                        name="delete"
-                        circular
-                        onClick={(event: React.ChangeEvent<any>) =>
-                          editActions.handleChange(event, {
-                            name: "categories",
-                            value: category,
-                          })
-                        }
-                      />
-                    </SelectionLabel>
-                  ))}
                 </Grid.Column>
               </Grid.Row>
 
@@ -1223,6 +1223,14 @@ export default function SubmitPage() {
                             {l("page.submit.renters")}
                           </Link>
                         ),
+                        dao_proposal: (
+                          <Link
+                            href={l("page.submit.worlds_proposal_url")}
+                            target="_blank"
+                          >
+                            {l("page.submit.dao_proposal")}
+                          </Link>
+                        ),
                       })}
                     </Paragraph>
                   )}
@@ -1286,7 +1294,7 @@ export default function SubmitPage() {
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
-                <Grid.Column mobile="16">
+                <Grid.Column mobile="16" className="submit__row-details">
                   <TextAreaField
                     disabled={
                       original ? original.user !== settings.user : false
@@ -1361,19 +1369,6 @@ export default function SubmitPage() {
                   </Grid.Column>
                 </Grid.Row>
               )}
-              <Grid.Row>
-                <Grid.Column mobile="16">
-                  <Paragraph secondary tiny>
-                    <img
-                      src={infoIcon}
-                      width="16"
-                      height="16"
-                      style={{ verticalAlign: "middle", marginRight: ".5rem" }}
-                    />
-                    {l("page.submit.event_submission_will_be_reviewed")}
-                  </Paragraph>
-                </Grid.Column>
-              </Grid.Row>
             </Grid>
           </ItemLayout>
         )}

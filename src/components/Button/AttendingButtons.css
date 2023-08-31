@@ -15,15 +15,9 @@
   align-items: center;
 }
 
-.attending-buttons .ui.button.attending-status.attending,
-.attending-buttons .ui.button.attending-status:not(.attending):hover {
+.attending-buttons .ui.button.attending-status.attending {
   color: var(--primary);
   border-color: var(--primary);
-}
-
-.attending-buttons .ui.button.attending-status.attending:hover {
-  color: var(--text);
-  border-color: var(--text);
 }
 
 .ui.modal .attending-buttons .ui.button.inverted,
