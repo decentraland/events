@@ -77,3 +77,7 @@
 .ui.cards > .card.event-card > .content > .header:not(.ui) img {
   margin-right: 10px;
 }
+
+.event-card .icon-star {
+  margin-right: 6px;
+}
