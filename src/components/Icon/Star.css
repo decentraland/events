@@ -14,11 +14,11 @@
 }
 
 :hover > .icon-star:not(.active) path {
-  fill: #ff2d55;
-  stroke: #ff2d55;
+  fill: #000;
+  stroke: #000;
 }
 
 :hover > .icon-star.active path {
   fill: transparent;
-  stroke: #000;
+  stroke: #ff2d55;
 }
