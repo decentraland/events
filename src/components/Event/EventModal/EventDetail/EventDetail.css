@@ -1,5 +1,5 @@
-.EventDetail input,
-.EventDetail textarea {
+.event-detail input,
+.event-detail textarea {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 0.5em 1em;
@@ -7,22 +7,22 @@
   width: 100%;
 }
 
-.EventDetail input.error,
-.EventDetail textarea.error {
+.event-detail input.error,
+.event-detail textarea.error {
   border: 1px solid #ff0000;
 }
 
-.EventDetail .EventDetail__Header {
+.event-detail .event-detail__header {
   display: flex;
   padding: 18px 24px 0;
 }
 
-.EventDetail .EventDetail__Header .EventDetail__Header__Event {
+.event-detail .event-detail__header .event-detail__header-event {
   padding-left: 16px;
   flex: 1;
 }
 
-.EventDetail .EventDetail__Header .EventDetail__Header__Event .dg.SubTitle {
+.event-detail .event-detail__header .event-detail__header-event .dg.SubTitle {
   font-size: 21px;
   font-weight: 600;
   font-stretch: normal;
@@ -33,69 +33,19 @@
   margin: 0;
 }
 
-.EventDetail
-  .EventDetail__Header
-  .EventDetail__Header__Event
-  .EventDetail__Header__Event__By {
+.event-detail
+  .event-detail__header
+  .event-detail__header-event
+  .event-detail__header-event-by {
   font-size: 17px;
   line-height: 26px;
 }
 
-.EventDetail .EventDetail__Header .EventDetail__Header__Actions {
+.event-detail .event-detail__header .event-detail__header-actions {
   padding-left: 1em;
 }
 
-.EventDetail .EventDetail__Actions,
-.EventDetail .EventDetail__Detail {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  padding: 18px 24px;
-}
-
-.EventDetail .EventDetail__Actions .AttendingButtons {
-  width: 100%;
-}
-
-.EventDetail .EventDetail__Detail.extra {
-  background-color: #ffeed6;
-}
-
-.EventDetail .EventDetail__Detail .EventDetail__Detail__Icon {
-  flex: 0 0 28px;
-}
-
-.EventDetail
-  .EventDetail__Detail.EventDetail__Detail--edit
-  .EventDetail__Detail__Icon {
-  padding-top: 0.5em;
-}
-
-.EventDetail .EventDetail__Detail .EventDetail__Detail__Icon.center {
-  display: flex;
-  align-items: center;
-}
-
-.EventDetail .EventDetail__Detail .EventDetail__Detail__Item {
-  flex: 1 1 auto;
-  max-width: 90%;
-}
-
-.EventDetail .EventDetail__Detail .EventDetail__Detail__Item .dg.ImgAvatar {
-  margin-right: 8px;
-  width: 32px;
-  height: 32px;
-}
-
-.EventDetail .EventDetail__Detail .EventDetail__Detail__Item code {
-  font-size: 14px;
-  margin: 0;
-  white-space: pre;
-  font-family: sf mono, Menlo, Monaco, Consolas, Lucida Console, Liberation Mono,
-    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
-}
-
-.EventDetail .EventDetail__Detail__ShowAttendees {
+.event-detail .event-detail__show-attendees {
   display: inline-flex;
   min-width: 32px;
   min-height: 32px;
@@ -115,27 +65,38 @@
   cursor: pointer;
 }
 
-.EventDetail .EventDetail__Detail .EventDetail__Detail__Action {
-  flex: 0 0 auto;
-}
-
-.EventDetail .AttendingButtons {
+.event-detail .attending-buttons {
   width: 100%;
   max-width: none;
 }
 
-@media only screen and (max-width: 767px) {
-  .EventDetail .EventDetail__Actions,
-  .EventDetail .EventDetail__Detail {
-    justify-content: flex-end;
-  }
-}
-
-.EventDetail
-  .EventDetail__Header
-  .EventDetail__Header__Actions
-  .edit-detail__menu-icon__button {
+.event-detail
+  .event-detail__header
+  .event-detail__header-actions
+  .edit-detail__menu-icon-button {
   color: black !important;
   width: 100%;
   text-align: left;
+}
+
+.event-detail__place {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.event-detail__place .event-section__icon {
+  display: flex;
+  align-items: center;
+}
+
+.event-detail__place .event-section__detail {
+  overflow: hidden;
+}
+
+.event-detail__place .event-section__detail a {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
 }

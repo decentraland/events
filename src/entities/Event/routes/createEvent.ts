@@ -7,6 +7,7 @@ import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import env from "decentraland-gatsby/dist/utils/env"
 import omit from "lodash/omit"
 import { v4 as uuid } from "uuid"
 
@@ -25,6 +26,12 @@ import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
 )
+
+const EVENTS_BASE_URL = env(
+  "EVENTS_BASE_URL",
+  "https://events.decentraland.org"
+)
+
 export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
@@ -102,7 +109,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
         ? Land.getInstance().getEstateImage(estate_id)
         : Land.getInstance().getParcelImage([x, y]))
   } else {
-    image = data.image || "https://localhost:8000/images/event-default.jpg"
+    image = data.image || `${EVENTS_BASE_URL}/images/event-default.jpg`
   }
 
   const user_name = userProfile.name || null

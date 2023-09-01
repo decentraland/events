@@ -25,6 +25,7 @@ import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { Radio } from "decentraland-ui/dist/components/Radio/Radio"
 import { SelectField } from "decentraland-ui/dist/components/SelectField/SelectField"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
+import { TextAreaField } from "decentraland-ui/dist/components/TextAreaField/TextAreaField"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
@@ -34,7 +35,6 @@ import AddCoverButton from "../../components/Button/AddCoverButton"
 import ImageInput from "../../components/Form/ImageInput"
 import Label from "../../components/Form/Label"
 import RadioGroup from "../../components/Form/RadioGroup"
-import Textarea from "../../components/Form/Textarea"
 import ItemLayout from "../../components/Layout/ItemLayout"
 import ConfirmModal from "../../components/Modal/ConfirmModal"
 import { useCategoriesContext } from "../../context/Category"
@@ -63,11 +63,8 @@ import {
 } from "../../entities/ProfileSettings/utils"
 import useEventEditor from "../../hooks/useEventEditor"
 import infoIcon from "../../images/info.svg"
-import {
-  getCategoriesOptionsActives,
-  getSchedules,
-  getSchedulesOptions,
-} from "../../modules/events"
+import WorldIcon from "../../images/worlds-icon.svg"
+import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 import { getServerOptions, getServers } from "../../modules/servers"
@@ -87,6 +84,68 @@ type SubmitPageState = {
   error?: string | null
 }
 
+// TODO: work with timezones to show into the UI and storing it
+/* type Options = {
+  key: string
+  text: string
+  value: string
+}
+const allTimezones = Intl.supportedValuesOf("timeZone")
+
+const offsetOptions = [
+  ...(allTimezones
+    .map((timezoneName) => {
+      if (Time.tz(Date.now(), timezoneName).utcOffset() < 0) {
+        return null
+      }
+      const offset = Time.tz(Date.now(), timezoneName).format("ZZ")
+      const text = timezoneName.replace(/_/g, " ")
+
+      return {
+        key: timezoneName,
+        text: `(GMT${offset}) ${text}`,
+        value: timezoneName,
+      }
+    })
+    .filter((option) => !!option)
+    .sort((a, b) => {
+      const offsetA = b!.text.replace("(GMT", "").split(") ")
+      const offsetB = a!.text.replace("(GMT", "").split(") ")
+      if (offsetA[0] === offsetB[0]) {
+        return offsetA[1].localeCompare(offsetB[1])
+      }
+      return b!.text.localeCompare(a!.text)
+    }) as Options[]),
+  {
+    key: "UTC",
+    text: "UTC",
+    value: "UTC",
+  },
+  ...(allTimezones
+    .map((timezoneName) => {
+      if (Time.tz(Date.now(), timezoneName).utcOffset() >= 0) {
+        return null
+      }
+      const offset = Time.tz(Date.now(), timezoneName).format("ZZ")
+      const text = timezoneName.replace(/_/g, " ")
+
+      return {
+        key: timezoneName,
+        text: `(GMT${offset}) ${text}`,
+        value: timezoneName,
+      }
+    })
+    .filter((option) => !!option)
+    .sort((a, b) => {
+      const offsetA = b!.text.replace("(GMT", "").split(") ")
+      const offsetB = a!.text.replace("(GMT", "").split(") ")
+      if (offsetA[0] === offsetB[0]) {
+        return offsetA[1].localeCompare(offsetB[1])
+      }
+      return a!.text.localeCompare(b!.text)
+    }) as Options[]),
+] */
+
 const options = { utc: true }
 
 const locationOptions = [
@@ -99,6 +158,7 @@ const locationOptions = [
     key: eventLocations.WORLD,
     text: eventLocations.WORLD,
     value: eventLocations.WORLD,
+    image: { src: WorldIcon },
   },
 ]
 
@@ -150,14 +210,12 @@ export default function SubmitPage() {
   )
 
   const categoryOptions = useMemo(() => {
-    return getCategoriesOptionsActives(categories, {
-      exclude: editing.categories,
-    }).map((categoryOption) => ({
-      ...categoryOption,
-      text: l(categoryOption.text),
-      selected: false,
+    return categories.map((category) => ({
+      key: category.name,
+      value: category.name,
+      text: l(`categories.${category.name}`),
     }))
-  }, [categories, editing.categories])
+  }, [categories])
 
   const loading = accountState.loading && eventState.loading
 
@@ -265,6 +323,7 @@ export default function SubmitPage() {
 
     try {
       const data = editActions.toObject()
+
       const submitted = await (original && !isNewEvent
         ? Events.get().updateEvent(original.id, data as EditEvent)
         : Events.get().createEvent(data as EditEvent))
@@ -429,12 +488,20 @@ export default function SubmitPage() {
             <Title style={{ fontSize: "34px", lineHeight: "42px" }}>
               {l("page.submit.submit_event")}
             </Title>
-            <Paragraph secondary>{l("page.submit.be_sure_to_fill")}</Paragraph>
+            <Paragraph secondary>
+              {l("page.submit.be_sure_to_fill", {
+                event: (
+                  <Link href={l("page.submit.events_faq_url")}>
+                    {l("page.submit.event")}
+                  </Link>
+                ),
+              })}
+            </Paragraph>
             <Grid stackable>
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <ImageInput
-                    label="Event Cover"
+                    label={l("page.submit.event_cover")}
                     value={editing.image || ""}
                     onFileChange={uploadPoster}
                     loading={uploadingPoster}
@@ -458,14 +525,26 @@ export default function SubmitPage() {
                           <strong>gif</strong>
                         </>
                       )) ||
-                      state.errorImageServer ||
-                      l("page.submit.image_recommended_size")
+                      state.errorImageServer || (
+                        <>
+                          <img
+                            src={infoIcon}
+                            width="16"
+                            height="16"
+                            style={{
+                              verticalAlign: "middle",
+                              marginRight: ".5rem",
+                            }}
+                          />
+                          {l("page.submit.image_recommended_label")}
+                        </>
+                      )
                     }
                   >
-                    <div className="ImageInput__Description">
+                    <div className="image-input__description">
                       <AddCoverButton />
                       <Paragraph>
-                        <span className="ImageInput__Description__Primary">
+                        <span className="image-input__description-primary">
                           {l("page.submit.browse")}
                         </span>{" "}
                         {l("page.submit.browse_line1_label")}
@@ -535,6 +614,7 @@ export default function SubmitPage() {
                             onChange={editActions.handleChange}
                             value={""}
                             disabled={scheduleOptions.length === 0}
+                            border
                           />
                           {editing.schedules.map((schedule) => {
                             const data = schedules?.find(
@@ -577,11 +657,12 @@ export default function SubmitPage() {
                     message={errors["name"]}
                     value={editing.name}
                     onChange={editActions.handleChange}
+                    kind="full"
                   />
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
-                <Grid.Column mobile="16">
+                <Grid.Column mobile="16" className="submit__row-description">
                   <Radio
                     toggle
                     label={l("page.submit.preview_label")}
@@ -592,14 +673,11 @@ export default function SubmitPage() {
                     style={{ position: "absolute", right: 0 }}
                   />
                   {!state.previewingDescription && (
-                    <Textarea
-                      minHeight={72}
-                      maxHeight={500}
+                    <TextAreaField
                       label={l("page.submit.description_label")}
                       placeholder={l("page.submit.description_placeholder")}
                       name="description"
-                      error={!!errors["description"]}
-                      message={errors["description"]}
+                      error={errors["description"]}
                       value={editing.description}
                       onChange={editActions.handleChange}
                     />
@@ -638,6 +716,7 @@ export default function SubmitPage() {
                       .startOf("day")
                       .format(Time.Formats.InputDate)}
                     onChange={editActions.handleChange}
+                    kind="full"
                   />
                 </Grid.Column>
                 {!editing.all_day && (
@@ -650,6 +729,7 @@ export default function SubmitPage() {
                       message={errors["start_time"]}
                       value={editActions.getStartTime()}
                       onChange={editActions.handleChange}
+                      kind="full"
                     />
                   </Grid.Column>
                 )}
@@ -668,14 +748,27 @@ export default function SubmitPage() {
                     error={!!errors["finish_at"] || !!errors["finish_date"]}
                     message={
                       errors["finish_at"] ||
-                      errors["finish_date"] ||
-                      l("page.submit.maximum_allowed_duration") +
-                        " " +
-                        editActions.getMaxHoursAllowedLabel()
+                      errors["finish_date"] || (
+                        <>
+                          <img
+                            src={infoIcon}
+                            width="16"
+                            height="16"
+                            style={{
+                              verticalAlign: "middle",
+                              marginRight: ".5rem",
+                            }}
+                          />
+                          {l("page.submit.maximum_allowed_duration") +
+                            " " +
+                            editActions.getMaxHoursAllowedLabel()}
+                        </>
+                      )
                     }
                     value={editActions.getFinishDate()}
                     min={editActions.getStartDate()}
                     onChange={editActions.handleChange}
+                    kind="full"
                   />
                 </Grid.Column>
                 {!editing.all_day && (
@@ -688,6 +781,7 @@ export default function SubmitPage() {
                       message={errors["finish_time"]}
                       value={editActions.getFinishTime()}
                       onChange={editActions.handleChange}
+                      kind="full"
                     />
                   </Grid.Column>
                 )}
@@ -712,6 +806,7 @@ export default function SubmitPage() {
                     options={recurrentOptions}
                     value={!!editing.recurrent}
                     onChange={editActions.handleChange}
+                    border
                   />
                 </Grid.Column>
                 {editing.recurrent && (
@@ -724,6 +819,7 @@ export default function SubmitPage() {
                       message={errors["recurrent_interval"]}
                       value={editing.recurrent_interval}
                       onChange={editActions.handleChange}
+                      kind="full"
                     />
                   </Grid.Column>
                 )}
@@ -738,6 +834,7 @@ export default function SubmitPage() {
                       options={recurrentFrequencyOptions}
                       value={editing.recurrent_frequency || Frequency.DAILY}
                       onChange={editActions.handleChange}
+                      border
                     />
                   </Grid.Column>
                 )}
@@ -941,6 +1038,7 @@ export default function SubmitPage() {
                       }
                       options={recurrentEndsOptions}
                       onChange={editActions.handleChange}
+                      border
                     />
                   </Grid.Column>
                 )}
@@ -954,6 +1052,7 @@ export default function SubmitPage() {
                       message={errors["recurrent_count"]}
                       value={editing.recurrent_count}
                       onChange={editActions.handleChange}
+                      kind="full"
                     />
                   </Grid.Column>
                 )}
@@ -975,6 +1074,7 @@ export default function SubmitPage() {
                       )}
                       onChange={editActions.handleChange}
                       min={Time.from(Date.now()).format(Time.Formats.InputDate)}
+                      kind="full"
                     />
                   </Grid.Column>
                 )}
@@ -1033,29 +1133,12 @@ export default function SubmitPage() {
                     message={errors["categories"]}
                     options={categoryOptions}
                     onChange={editActions.handleChange}
-                    value={""}
+                    value={
+                      editing.categories.length > 0 ? editing.categories[0] : ""
+                    }
                     disabled={categoryOptions.length === 0}
-                    selectOnBlur={false}
+                    border
                   />
-                  {editing.categories.map((category, key) => (
-                    <SelectionLabel
-                      key={key}
-                      className={"submit__category-select-wrapper"}
-                    >
-                      {l(`categories.${category}`)}
-                      <Icon
-                        className={"submit__category-select-label"}
-                        name="delete"
-                        circular
-                        onClick={(event: React.ChangeEvent<any>) =>
-                          editActions.handleChange(event, {
-                            name: "categories",
-                            value: category,
-                          })
-                        }
-                      />
-                    </SelectionLabel>
-                  ))}
                 </Grid.Column>
               </Grid.Row>
 
@@ -1078,7 +1161,24 @@ export default function SubmitPage() {
                           : eventLocations.LAND
                       }
                       onChange={editActions.handleChange}
+                      border
                     />
+                    {editing.world && (
+                      <Paragraph secondary tiny>
+                        <img
+                          src={infoIcon}
+                          width="16"
+                          height="16"
+                          style={{
+                            verticalAlign: "middle",
+                            marginRight: ".5rem",
+                          }}
+                        />
+                        {l("page.submit.limit_attendees_label", {
+                          limit: <b>{l("page.submit.limit_attendees")}</b>,
+                        })}
+                      </Paragraph>
+                    )}
                   </Grid.Column>
                 </Grid.Row>
               )}
@@ -1101,38 +1201,74 @@ export default function SubmitPage() {
                     options={serverOptions}
                     value={editing.server || ""}
                     onChange={editActions.handleChange}
+                    border
                   />
+                  {editing.world && (
+                    <Paragraph secondary tiny>
+                      <img
+                        src={infoIcon}
+                        width="16"
+                        height="16"
+                        style={{
+                          verticalAlign: "middle",
+                          marginRight: ".5rem",
+                        }}
+                      />
+                      {l("page.submit.worlds_policy", {
+                        renters: (
+                          <Link
+                            href={l("page.submit.worlds_proposal_url")}
+                            target="_blank"
+                          >
+                            {l("page.submit.renters")}
+                          </Link>
+                        ),
+                        dao_proposal: (
+                          <Link
+                            href={l("page.submit.worlds_proposal_url")}
+                            target="_blank"
+                          >
+                            {l("page.submit.dao_proposal")}
+                          </Link>
+                        ),
+                      })}
+                    </Paragraph>
+                  )}
                 </Grid.Column>
               </Grid.Row>
 
-              <Grid.Row>
-                <Grid.Column mobile="4">
-                  <Field
-                    label={l("page.submit.latitude_label")}
-                    type="number"
-                    name="x"
-                    min="-170"
-                    max="170"
-                    error={!!errors["x"]}
-                    message={errors["x"]}
-                    value={editing.x}
-                    onChange={editActions.handleChange}
-                  />
-                </Grid.Column>
-                <Grid.Column mobile="4">
-                  <Field
-                    label={l("page.submit.longitude_label")}
-                    type="number"
-                    name="y"
-                    min="-170"
-                    max="170"
-                    error={!!errors["y"]}
-                    message={errors["y"]}
-                    value={editing.y}
-                    onChange={editActions.handleChange}
-                  />
-                </Grid.Column>
-              </Grid.Row>
+              {!editing.world && (
+                <Grid.Row>
+                  <Grid.Column mobile="4">
+                    <Field
+                      label={l("page.submit.latitude_label")}
+                      type="number"
+                      name="x"
+                      min="-170"
+                      max="170"
+                      error={!!errors["x"]}
+                      message={errors["x"]}
+                      value={editing.x}
+                      onChange={editActions.handleChange}
+                      kind="full"
+                    />
+                  </Grid.Column>
+                  <Grid.Column mobile="4">
+                    <Field
+                      label={l("page.submit.longitude_label")}
+                      type="number"
+                      name="y"
+                      min="-170"
+                      max="170"
+                      error={!!errors["y"]}
+                      message={errors["y"]}
+                      value={editing.y}
+                      onChange={editActions.handleChange}
+                      kind="full"
+                    />
+                  </Grid.Column>
+                </Grid.Row>
+              )}
 
               <Grid.Row>
                 <Grid.Column mobile="16">
@@ -1153,23 +1289,21 @@ export default function SubmitPage() {
                     message={errors["contact"]}
                     value={editing.contact}
                     onChange={editActions.handleChange}
+                    kind="full"
                   />
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
-                <Grid.Column mobile="16">
-                  <Textarea
+                <Grid.Column mobile="16" className="submit__row-details">
+                  <TextAreaField
                     disabled={
                       original ? original.user !== settings.user : false
                     }
-                    minHeight={72}
-                    maxHeight={500}
                     label={l("page.submit.details_label")}
                     placeholder={l("page.submit.details_placeholder")}
                     name="details"
-                    error={!!errors["details"]}
+                    error={errors["details"]}
                     message={errors["details"]}
-                    value={editing.details}
                     onChange={editActions.handleChange}
                   />
                 </Grid.Column>
@@ -1235,19 +1369,6 @@ export default function SubmitPage() {
                   </Grid.Column>
                 </Grid.Row>
               )}
-              <Grid.Row>
-                <Grid.Column mobile="16">
-                  <Paragraph secondary tiny>
-                    <img
-                      src={infoIcon}
-                      width="16"
-                      height="16"
-                      style={{ verticalAlign: "middle", marginRight: ".5rem" }}
-                    />
-                    {l("page.submit.event_submission_will_be_reviewed")}
-                  </Paragraph>
-                </Grid.Column>
-              </Grid.Row>
             </Grid>
           </ItemLayout>
         )}

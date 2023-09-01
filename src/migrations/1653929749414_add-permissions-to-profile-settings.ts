@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { listAdmins } from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import { Type } from "decentraland-gatsby/dist/entities/Database/types"
 import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"

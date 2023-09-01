@@ -7,9 +7,7 @@ import { Card } from "decentraland-ui/dist/components/Card/Card"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import locations from "../../../modules/locations"
-import AttendingButtons from "../../Button/AttendingButtons"
 import EventDetail from "../EventModal/EventDetail/EventDetail"
-import EventSection from "../EventSection"
 
 import "./EventCardBig.css"
 
@@ -45,15 +43,15 @@ export default React.memo(function EventCardBig(props: EventCardBigProps) {
   return (
     <Card
       className={TokenList.join([
-        "EventCardBig",
+        "event-card-big",
         props.loading && "loading",
         event && !event.approved && "pending",
       ])}
       href={href}
       onClick={handleClick}
     >
-      <div className="EventCardBig__Container">
-        <div className="EventCardBig__Cover">
+      <div className="event-card-big__container">
+        <div className="event-card-big__cover">
           <ImgFixed src={event?.image || ""} dimension="wide" />
         </div>
         <Card.Content>

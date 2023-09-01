@@ -147,71 +147,6 @@ export default function SettingsPage() {
       </Helmet>
       <Navigation action={false} />
       <Container className="SettingsPage">
-        {/* <Grid style={{ paddingTop: "4rem" }}>
-          <Grid.Row>
-            <Grid.Column tablet="4">
-              <Header sub>{l(`settings.profile_section.label`)}</Header>
-            </Grid.Column>
-            <Grid.Column tablet="8">
-              <Paragraph small secondary style={{ margin: 0 }}>
-                {l(`settings.profile_section.email_title`)}
-              </Paragraph>
-              <Paragraph small semiBold>
-                {l(`settings.profile_section.email_description`)}
-              </Paragraph>
-              <div className="AddonField">
-                <Field
-                  label={l(`settings.profile_section.email_address_label`)}
-                  disabled={state.loading}
-                  placeholder={l(
-                    `settings.profile_section.email_address_placeholder`
-                  )}
-                  message={emailMessageField}
-                  value={email}
-                  onChange={(e, { value }) => setEmail(value || "")}
-                />
-                {currentEmailChanged && (
-                  <Button
-                    basic
-                    loading={state.loading}
-                    disabled={!currentEmailIsValid}
-                    onClick={handleSaveEmail}
-                  >
-                    {l(`settings.profile_section.email_save_action`)}
-                  </Button>
-                )}
-                {!currentEmailChanged &&
-                  settings.email &&
-                  settings.email_verified && (
-                    <Button basic>
-                      {l(`settings.profile_section.email_verified`)}{" "}
-                      <img src={check} width={18} height={18} />
-                    </Button>
-                  )}
-                {!currentEmailChanged &&
-                  settings.email &&
-                  !settings.email_verified &&
-                  emailVerificationAvailable && (
-                    <Button
-                      basic
-                      loading={state.loading}
-                      onClick={handleSaveEmail}
-                    >
-                      {l(`settings.profile_section.email_reverifying`)}
-                    </Button>
-                  )}
-                {!currentEmailChanged &&
-                  settings.email &&
-                  !settings.email_verified &&
-                  !emailVerificationAvailable && (
-                    <Button basic disabled>
-                      {l(`settings.profile_section.email_verifying`)}
-                    </Button>
-                  )}
-              </div>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid> */}
         <Grid style={{ paddingTop: "4rem" }}>
           <Grid.Row>
             <Grid.Column tablet="4">
@@ -251,45 +186,6 @@ export default function SettingsPage() {
                 {l(`settings.event_section.notification_title`)}
               </Header>
             </Grid.Column>
-            {/* <Grid.Column tablet="8">
-              <div className="SettingsSection">
-                <div
-                  className={TokenList.join([
-                    "SettingsDetails",
-                    !settings.email_verified && "SettingsDetails--disabled",
-                  ])}
-                >
-                  <Paragraph small semiBold>
-                    {l(
-                      `settings.event_section.notification_by_email_description`
-                    )}
-                  </Paragraph>
-                  <Paragraph
-                    primary
-                    tiny
-                    style={{ textTransform: "uppercase" }}
-                  >
-                    {l(`settings.event_section.notification_by_email_message`)}
-                  </Paragraph>
-                </div>
-                <div className="SettingsToggle">
-                  <Loader size="mini" active={state.loading} />
-                  <Radio
-                    toggle
-                    checked={settings.notify_by_email}
-                    disabled={!settings.email_verified || state.loading}
-                    onClick={prevent(() =>
-                      state.update({
-                        notify_by_email: !settings.notify_by_email,
-                      })
-                    )}
-                  />
-                </div>
-              </div>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column tablet="4"></Grid.Column> */}
             <Grid.Column tablet="8">
               <div className="SettingsSection">
                 <div

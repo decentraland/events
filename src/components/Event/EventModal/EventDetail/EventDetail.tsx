@@ -24,6 +24,7 @@ import extraIcon from "../../../../images/info.svg"
 import friendsIcon from "../../../../images/secondary-friends.svg"
 import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
+import WorldIcon from "../../../../images/worlds-icon.svg"
 import { Flags } from "../../../../modules/features"
 import locations from "../../../../modules/locations"
 import { places } from "../../../../modules/places"
@@ -105,12 +106,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   }, [event])
 
   return (
-    <div className="EventDetail">
-      <div className="EventDetail__Header">
+    <div className="event-detail">
+      <div className="event-detail__header">
         <DateBox date={next_start_at} utc={utc} />
-        <div className="EventDetail__Header__Event">
+        <div className="event-detail__header-event">
           <SubTitle>{event.name}</SubTitle>
-          <Paragraph className="EventDetail__Header__Event__By" secondary>
+          <Paragraph className="event-detail__header-event-by" secondary>
             {l("components.event.event_detail.public_organized_by", {
               organizer: (
                 <Link
@@ -127,12 +128,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           </Paragraph>
         </div>
         {props.showEdit !== false && advance && (
-          <div className="EventDetail__Header__Actions">
+          <div className="event-detail__header-actions">
             <MenuIcon>
               <MenuIconItem>
                 <Button
                   basic
-                  className="edit-detail__menu-icon__button"
+                  className="edit-detail__menu-icon-button"
                   as="a"
                   href={locations.editEvent(event.id)}
                   onClick={prevent(() =>
@@ -145,7 +146,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
               <MenuIconItem>
                 <Button
                   basic
-                  className="edit-detail__menu-icon__button"
+                  className="edit-detail__menu-icon-button"
                   as="a"
                   href={locations.cloneEvent(event.id)}
                   onClick={prevent(() =>
@@ -214,8 +215,13 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* PLACE */}
       {props.showPlace !== false && <EventSection.Divider />}
       {props.showPlace !== false && (
-        <EventSection>
-          <EventSection.Icon src={pinIcon} width="16" height="16" />
+        <EventSection className="event-detail__place">
+          {!event.world && (
+            <EventSection.Icon src={pinIcon} width="16" height="16" />
+          )}
+          {event.world && (
+            <EventSection.Icon src={WorldIcon} width="20" height="20" />
+          )}
           <EventSection.Detail>
             {placeStatus.loaded && place && (
               <Link href={placesUrl}>{place.title}</Link>
@@ -266,7 +272,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <EventSection.Action>
             {attendeesDiff > 0 && (
               <div
-                className="EventDetail__Detail__ShowAttendees"
+                className="event-detail__show-attendees"
                 onClick={handleAttendees}
               >
                 {`+${attendeesDiff}`}

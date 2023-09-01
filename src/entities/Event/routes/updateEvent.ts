@@ -9,6 +9,7 @@ import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import env from "decentraland-gatsby/dist/utils/env"
 import pick from "lodash/pick"
 
 import EventAttendeeModel from "../../EventAttendee/model"
@@ -44,6 +45,11 @@ import { DECENTRALAND_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
+)
+
+const EVENTS_BASE_URL = env(
+  "EVENTS_BASE_URL",
+  "https://events.decentraland.org"
 )
 
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
@@ -186,9 +192,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
     updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
     updatedAttributes.scene_name = updatedAttributes.estate_name
+  } else {
+    updatedAttributes.image =
+      updatedAttributes.image || `${EVENTS_BASE_URL}/images/event-default.jpg`
   }
-  updatedAttributes.image =
-    updatedAttributes.image || "https://localhost:8000/images/event-default.jpg"
 
   Object.assign(
     updatedAttributes,

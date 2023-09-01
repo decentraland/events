@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+import { MigrationBuilder } from "node-pg-migrate"
 
 import ScheduleModel from "../entities/Schedule/model"
 
