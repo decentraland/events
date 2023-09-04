@@ -12,6 +12,11 @@ import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import { useEventsContext } from "../../context/Event"
+import { useProfileSettingsContext } from "../../context/ProfileSetting"
+import {
+  canEditAnyProfile,
+  canEditAnySchedule,
+} from "../../entities/ProfileSettings/utils"
 import { ScheduleTheme } from "../../entities/Schedule/types"
 import { getCurrentSchedules } from "../../entities/Schedule/utils"
 import { getSchedules } from "../../modules/events"
@@ -27,6 +32,8 @@ export enum NavigationTab {
   MyEvents = "my_events",
   PendingEvents = "pending_events",
   Schedule = "schedule",
+  Users = "users",
+  ScheduleTab = "schedule_tab",
 }
 
 export enum NavigationAction {
@@ -63,6 +70,7 @@ export default function Navigation(props: NavigationProps) {
   }, [props.action])
   const [events] = useEventsContext()
   const [account] = useAuthContext()
+  const [settings] = useProfileSettingsContext()
   const [schedules] = useAsyncMemo(getSchedules)
   const currentSchedule = useMemo(
     () => getCurrentSchedules(schedules),
@@ -113,7 +121,7 @@ export default function Navigation(props: NavigationProps) {
               {l("navigation.events")}
             </Tabs.Tab>
           </Link>
-          {hasPendingEvents && (
+          {!hasPendingEvents && (
             <Link href={locations.pendingEvents()}>
               <Tabs.Tab
                 active={props.activeTab === NavigationTab.PendingEvents}
@@ -135,6 +143,20 @@ export default function Navigation(props: NavigationProps) {
             <Link href={locations.myEvents()}>
               <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
                 {l("navigation.my_events")}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {canEditAnyProfile(settings) && (
+            <Link href={locations.users()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.Users}>
+                {l("user_menu.users")}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {canEditAnySchedule(settings) && (
+            <Link href={locations.schedules()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.ScheduleTab}>
+                {l("user_menu.schedules")}
               </Tabs.Tab>
             </Link>
           )}

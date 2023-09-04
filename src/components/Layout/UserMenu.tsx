@@ -1,6 +1,8 @@
-import React, { useCallback } from "react"
+import React from "react"
 
+import UserInformation from "decentraland-gatsby/dist/components/User/UserInformation"
 import Menu from "decentraland-gatsby/dist/components/User/UserMenu"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import MenuItem from "semantic-ui-react/dist/commonjs/collections/Menu/MenuItem"
@@ -11,6 +13,7 @@ import {
   canEditAnyProfile,
   canEditAnySchedule,
 } from "../../entities/ProfileSettings/utils"
+import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 
 const handleClickUsers = () => navigate(locations.users())
@@ -21,8 +24,14 @@ const handleClickDocs = () => navigate(locations.docs())
 export default React.memo(function UserMenu() {
   const l = useFormatMessage()
   const [settings] = useProfileSettingsContext()
+  const [ff] = useFeatureFlagContext()
 
-  return (
+  return ff.flags[Flags.NewNavbarDropdown] ? (
+    <UserInformation
+      onClickSettings={handleClickSettings}
+      hasActivity={false}
+    />
+  ) : (
     <Menu
       onClickSettings={handleClickSettings}
       hasActivity={false}

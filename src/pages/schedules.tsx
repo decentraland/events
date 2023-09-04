@@ -17,7 +17,10 @@ import { Table } from "decentraland-ui/dist/components/Table/Table"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import Events from "../api/Events"
-import Navigation, { NavigationAction } from "../components/Layout/Navigation"
+import Navigation, {
+  NavigationAction,
+  NavigationTab,
+} from "../components/Layout/Navigation"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import { canEditAnySchedule } from "../entities/ProfileSettings/utils"
 import { ScheduleAttributes } from "../entities/Schedule/types"
@@ -78,7 +81,10 @@ export default function SettingsPage() {
 
   return (
     <>
-      <Navigation action={NavigationAction.SubmitSchedule} />
+      <Navigation
+        action={NavigationAction.SubmitSchedule}
+        activeTab={NavigationTab.ScheduleTab}
+      />
       <Container className="SchedulesPage" style={{ paddingTop: "2rem" }}>
         {schedules.length === 0 && (
           <div>

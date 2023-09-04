@@ -23,7 +23,10 @@ import Input from "semantic-ui-react/dist/commonjs/elements/Input"
 import Label from "semantic-ui-react/dist/commonjs/elements/Label"
 
 import Events from "../api/Events"
-import Navigation, { NavigationAction } from "../components/Layout/Navigation"
+import Navigation, {
+  NavigationAction,
+  NavigationTab,
+} from "../components/Layout/Navigation"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import {
   ProfileSettingsAttributes,
@@ -114,7 +117,10 @@ export default function SettingsPage() {
 
   return (
     <>
-      <Navigation action={NavigationAction.SubmitUser} />
+      <Navigation
+        action={NavigationAction.SubmitUser}
+        activeTab={NavigationTab.ScheduleTab}
+      />
       <Container className="UsersPage" style={{ paddingTop: "2rem" }}>
         <Grid>
           <Grid.Row>
