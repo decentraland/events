@@ -162,7 +162,7 @@ export default function Navigation(props: NavigationProps) {
           )}
         </div>
         <div style={{ flex: 1 }} />
-        <div className={"tabs__wrapper"}>
+        <div className={"botom_tabs__wrapper"}>
           {props.search && (
             <SearchInput
               placeholder={l("navigation.search")}
