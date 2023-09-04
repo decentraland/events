@@ -54,7 +54,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: events
-          tags: ${{ github.sha }} latest
+          tags: ${{ github.sha }} ${{ github.ref_name == 'master' && 'latest' || github.ref_name }}
           dockerfiles: |
             ./Dockerfile
 
