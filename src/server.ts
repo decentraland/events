@@ -104,6 +104,7 @@ app.use(
         "https://browser.sentry-cdn.com",
       ].join(" "),
       connectSrc: ["*.sentry.io"].join(" "),
+      workerSrc: ["'self'", "blob:"].join(" "),
     },
   })
 )
