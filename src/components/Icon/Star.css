@@ -19,6 +19,6 @@
 }
 
 :hover > .icon-star.active path {
-  fill: transparent;
+  fill: #ff2d55;
   stroke: #ff2d55;
 }
