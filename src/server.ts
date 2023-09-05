@@ -101,7 +101,9 @@ app.use(
         "https://js.intercomcdn.com",
         "https://verify.walletconnect.com",
         "https://js.sentry-cdn.com",
+        "https://browser.sentry-cdn.com",
       ].join(" "),
+      connectSrc: ["*.sentry.io"].join(" "),
     },
   })
 )
