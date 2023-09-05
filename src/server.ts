@@ -87,7 +87,6 @@ app.use(
         "wss://*.hotjar.com",
         "https://*.twitter.com",
         "https://cdn.segment.com",
-        "https://cdn.rollbar.com",
         "https://ajax.cloudflare.com",
         "https://googleads.g.doubleclick.net",
         "https://ssl.google-analytics.com",
@@ -101,7 +100,11 @@ app.use(
         "https://widget.intercom.io",
         "https://js.intercomcdn.com",
         "https://verify.walletconnect.com",
+        "https://js.sentry-cdn.com",
+        "https://browser.sentry-cdn.com",
       ].join(" "),
+      connectSrc: ["https:", "*.sentry.io"].join(" "),
+      workerSrc: ["'self'", "blob:"].join(" "),
     },
   })
 )
