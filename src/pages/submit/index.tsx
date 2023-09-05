@@ -35,6 +35,7 @@ import AddCoverButton from "../../components/Button/AddCoverButton"
 import ImageInput from "../../components/Form/ImageInput"
 import Label from "../../components/Form/Label"
 import RadioGroup from "../../components/Form/RadioGroup"
+import Info from "../../components/Info/Info"
 import ItemLayout from "../../components/Layout/ItemLayout"
 import ConfirmModal from "../../components/Modal/ConfirmModal"
 import { useCategoriesContext } from "../../context/Category"
@@ -62,7 +63,6 @@ import {
   canTestAnyNotification,
 } from "../../entities/ProfileSettings/utils"
 import useEventEditor from "../../hooks/useEventEditor"
-import infoIcon from "../../images/info.svg"
 import WorldIcon from "../../images/worlds-icon.svg"
 import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
@@ -526,18 +526,7 @@ export default function SubmitPage() {
                         </>
                       )) ||
                       state.errorImageServer || (
-                        <>
-                          <img
-                            src={infoIcon}
-                            width="16"
-                            height="16"
-                            style={{
-                              verticalAlign: "middle",
-                              marginRight: ".5rem",
-                            }}
-                          />
-                          {l("page.submit.image_recommended_label")}
-                        </>
+                        <Info text={l("page.submit.image_recommended_label")} />
                       )
                     }
                   >
@@ -749,20 +738,13 @@ export default function SubmitPage() {
                     message={
                       errors["finish_at"] ||
                       errors["finish_date"] || (
-                        <>
-                          <img
-                            src={infoIcon}
-                            width="16"
-                            height="16"
-                            style={{
-                              verticalAlign: "middle",
-                              marginRight: ".5rem",
-                            }}
-                          />
-                          {l("page.submit.maximum_allowed_duration") +
+                        <Info
+                          text={
+                            l("page.submit.maximum_allowed_duration") +
                             " " +
-                            editActions.getMaxHoursAllowedLabel()}
-                        </>
+                            editActions.getMaxHoursAllowedLabel()
+                          }
+                        />
                       )
                     }
                     value={editActions.getFinishDate()}
@@ -1154,6 +1136,7 @@ export default function SubmitPage() {
                       label={l("page.submit.location_label")}
                       placeholder={l("page.submit.location_placeholder")}
                       name="event_location"
+                      className="submit__location-select"
                       options={locationOptions}
                       value={
                         editing.world
@@ -1164,20 +1147,11 @@ export default function SubmitPage() {
                       border
                     />
                     {editing.world && (
-                      <Paragraph secondary tiny>
-                        <img
-                          src={infoIcon}
-                          width="16"
-                          height="16"
-                          style={{
-                            verticalAlign: "middle",
-                            marginRight: ".5rem",
-                          }}
-                        />
-                        {l("page.submit.limit_attendees_label", {
+                      <Info
+                        text={l("page.submit.limit_attendees_label", {
                           limit: <b>{l("page.submit.limit_attendees")}</b>,
                         })}
-                      </Paragraph>
+                      />
                     )}
                   </Grid.Column>
                 </Grid.Row>
@@ -1195,6 +1169,7 @@ export default function SubmitPage() {
                         ? l("page.submit.world_placeholder")
                         : l("page.submit.server_placeholder")
                     }
+                    className="submit__server-select"
                     name="server"
                     error={!!errors["server"]}
                     message={errors["server"]}
@@ -1204,25 +1179,8 @@ export default function SubmitPage() {
                     border
                   />
                   {editing.world && (
-                    <Paragraph secondary tiny>
-                      <img
-                        src={infoIcon}
-                        width="16"
-                        height="16"
-                        style={{
-                          verticalAlign: "middle",
-                          marginRight: ".5rem",
-                        }}
-                      />
-                      {l("page.submit.worlds_policy", {
-                        renters: (
-                          <Link
-                            href={l("page.submit.worlds_proposal_url")}
-                            target="_blank"
-                          >
-                            {l("page.submit.renters")}
-                          </Link>
-                        ),
+                    <Info
+                      text={l("page.submit.worlds_policy", {
                         dao_proposal: (
                           <Link
                             href={l("page.submit.worlds_proposal_url")}
@@ -1232,7 +1190,7 @@ export default function SubmitPage() {
                           </Link>
                         ),
                       })}
-                    </Paragraph>
+                    />
                   )}
                 </Grid.Column>
               </Grid.Row>
@@ -1369,6 +1327,13 @@ export default function SubmitPage() {
                   </Grid.Column>
                 </Grid.Row>
               )}
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <Info
+                    text={l("page.submit.event_submission_will_be_reviewed")}
+                  />
+                </Grid.Column>
+              </Grid.Row>
             </Grid>
           </ItemLayout>
         )}

@@ -91,3 +91,13 @@ p.FieldNote {
   font-weight: 400;
   line-height: 18px;
 }
+
+.submit__location-select,
+.submit__server-select {
+  margin-bottom: 8px;
+}
+
+.submit__location-select ~ .message,
+.submit__server-select ~ .message {
+  display: none;
+}
