@@ -20,6 +20,40 @@ body {
   position: relative;
 }
 
+.ui.container.full,
+.dcl.hero .ui.container,
+.ui.container.footer.LayoutFooterContainer,
+.LayoutNavbarContainer > .ui.container,
+.LayoutMainContainer > .dcl.tabs .ui.container,
+.navigation-menu.fullscreen .dcl.tabs .ui.container {
+  width: calc(100% -48px);
+}
+
+.LayoutMainContainer > .dcl.tabs .ui.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.botom_tabs__wrapper,
+.tabs__wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.dcl.tabs {
+  height: unset !important;
+}
+
+@media only screen and (max-width: 1370px) {
+  .botom_tabs__wrapper {
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+}
+
 @keyframes loading {
   to {
     background-position-x: -200%;
