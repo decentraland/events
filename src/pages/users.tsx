@@ -13,14 +13,11 @@ import { Address } from "decentraland-ui/dist/components/Address/Address"
 import { Blockie } from "decentraland-ui/dist/components/Blockie/Blockie"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
-import { Field } from "decentraland-ui/dist/components/Field/Field"
-import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 import { Table } from "decentraland-ui/dist/components/Table/Table"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid/Grid"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import Input from "semantic-ui-react/dist/commonjs/elements/Input"
-import Label from "semantic-ui-react/dist/commonjs/elements/Label"
 
 import Events from "../api/Events"
 import Navigation, {
@@ -33,7 +30,6 @@ import {
   updateProfileSettingsSchema,
 } from "../entities/ProfileSettings/types"
 import { canEditAnyProfile } from "../entities/ProfileSettings/utils"
-import check from "../images/check.svg"
 import locations from "../modules/locations"
 
 import "./users.css"
@@ -119,9 +115,9 @@ export default function SettingsPage() {
     <>
       <Navigation
         action={NavigationAction.SubmitUser}
-        activeTab={NavigationTab.ScheduleTab}
+        activeTab={NavigationTab.Users}
       />
-      <Container className="UsersPage" style={{ paddingTop: "2rem" }}>
+      <Container className="users-page" style={{ paddingTop: "2rem" }}>
         <Grid>
           <Grid.Row>
             <Grid.Column mobile="6">
