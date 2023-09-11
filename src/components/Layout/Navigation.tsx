@@ -121,7 +121,7 @@ export default function Navigation(props: NavigationProps) {
               {l("navigation.events")}
             </Tabs.Tab>
           </Link>
-          {!hasPendingEvents && (
+          {hasPendingEvents && (
             <Link href={locations.pendingEvents()}>
               <Tabs.Tab
                 active={props.activeTab === NavigationTab.PendingEvents}
