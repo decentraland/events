@@ -314,6 +314,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {props.showContact !== false && !event.approved && advance && (
         <EventSection.Divider />
       )}
+
       {props.showContact !== false && !event.approved && advance && (
         <EventSection highlight>
           <EventSection.Icon src={extraIcon} width="16" height="16" />

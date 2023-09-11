@@ -5,15 +5,12 @@ import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackCont
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFeatureSupported from "decentraland-gatsby/dist/hooks/useFeatureSupported"
-import API from "decentraland-gatsby/dist/utils/api/API"
-import { toBase64 } from "decentraland-gatsby/dist/utils/string/base64"
 
 import Events from "../api/Events"
 import {
   DEFAULT_PROFILE_SETTINGS,
   ProfileSettingsAttributes,
 } from "../entities/ProfileSettings/types"
-import usePushSubscription from "../hooks/usePushSubscription"
 import { SegmentEvent } from "../modules/segment"
 
 const defaultProfileSettings = [
@@ -22,10 +19,6 @@ const defaultProfileSettings = [
     error: null as Error | null,
     loading: false as boolean,
     reload: (() => null) as () => void,
-    subscriptionSupported: false as boolean,
-    subscribed: false as boolean,
-    unsubscribe: (() => null) as () => void,
-    subscribe: (() => null) as () => void,
     set: (() => null) as (settings: ProfileSettingsAttributes) => void,
     update: (() => null) as (
       settings: Partial<ProfileSettingsAttributes>
@@ -40,7 +33,6 @@ const UserSettingsContext = createContext(defaultProfileSettings)
 function useProfileSettings() {
   const [account] = useAuthContext()
   const track = useTrackContext()
-  const [pushSubscription, pushSubscriptionState] = usePushSubscription()
   const isNotificationSupported = useFeatureSupported("Notification")
   const isServiceWorkerSupported = useFeatureSupported("ServiceWorker")
   const isPushSupported = useFeatureSupported("PushManager")
@@ -71,66 +63,13 @@ function useProfileSettings() {
     [state, track]
   )
 
-  const [unsubscribing, unsubscribe] = useAsyncTask(async () => {
-    if (!pushSubscription) {
-      return
-    }
-
-    await pushSubscriptionState.unsubscribe()
-    await API.catch(Events.get().removeSubscriptions())
-    state.reload()
-  }, [state])
-
-  const [subscribing, subscribe] = useAsyncTask(async () => {
-    if (
-      !Notification ||
-      !Notification.permission ||
-      Notification.permission === "denied" ||
-      !isPushNotificationSupported ||
-      pushSubscription
-    ) {
-      return
-    }
-
-    const permission = await API.catch(Notification.requestPermission())
-    if (permission !== "granted") {
-      return
-    }
-
-    const subscription = await pushSubscriptionState.subscribe()
-    if (!subscription) {
-      return
-    }
-
-    const options = {
-      endpoint: subscription.endpoint,
-      p256dh: toBase64(subscription.getKey("p256dh") as any),
-      auth: toBase64(subscription.getKey("auth") as any),
-    }
-
-    await API.catch(Events.get().createSubscription(options))
-    state.reload()
-  }, [state])
-
   const profileState = useMemo(
     () => ({
       ...state,
-      loading: state.loading || updating || subscribing || unsubscribing,
-      subscriptionSupported: isPushNotificationSupported,
-      subscribed: !!pushSubscription,
-      unsubscribe,
-      subscribe,
+      loading: state.loading || updating,
       update,
     }),
-    [
-      state,
-      state.loading || updating || subscribing || unsubscribing,
-      isPushNotificationSupported,
-      !!pushSubscription,
-      unsubscribe,
-      subscribe,
-      update,
-    ]
+    [state, state.loading || updating, isPushNotificationSupported, update]
   )
 
   return [settings, profileState] as const

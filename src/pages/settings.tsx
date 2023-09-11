@@ -179,47 +179,6 @@ export default function SettingsPage() {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <Grid style={{ paddingTop: "4rem" }}>
-          <Grid.Row>
-            <Grid.Column tablet="4">
-              <Header sub>
-                {l(`settings.event_section.notification_title`)}
-              </Header>
-            </Grid.Column>
-            <Grid.Column tablet="8">
-              <div className="SettingsSection">
-                <div
-                  className={TokenList.join([
-                    "SettingsDetails",
-                    !state.subscriptionSupported && "SettingsDetails--disabled",
-                  ])}
-                >
-                  <Paragraph small semiBold>
-                    {l(
-                      `settings.event_section.notification_by_browser_description`
-                    )}
-                  </Paragraph>
-                  <Paragraph tiny secondary>
-                    {l(
-                      `settings.event_section.notification_by_browser_message`
-                    )}
-                  </Paragraph>
-                </div>
-                <div className="SettingsToggle">
-                  <Loader size="mini" active={state.loading} />
-                  <Radio
-                    toggle
-                    checked={!!state.subscribed}
-                    disabled={state.subscriptionSupported || state.loading}
-                    onClick={prevent(() =>
-                      state.subscribed ? state.unsubscribe() : state.subscribe()
-                    )}
-                  />
-                </div>
-              </div>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
       </Container>
     </>
   )

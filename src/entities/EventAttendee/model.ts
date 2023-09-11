@@ -18,6 +18,7 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
   static withTimestamps = false
   static primaryKey = "event_id"
 
+  /** @deprecated Notification no longer used */
   static async unsubscribe(user: string) {
     return this.update<EventAttendeeAttributes>(
       { notify: false },
@@ -25,6 +26,7 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     )
   }
 
+  /** @deprecated Notification no longer used */
   static async setNotified(attendees: EventAttendeeAttributes[]) {
     if (attendees.length === 0) {
       return 0
@@ -48,6 +50,7 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
     return attendees.length
   }
 
+  /** @deprecated Notification no longer used */
   static async getPendingNotification(events: string[]) {
     if (events.length == 0) {
       return []

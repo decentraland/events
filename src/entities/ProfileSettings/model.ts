@@ -50,6 +50,7 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     return this.query<ProfileSettingsAttributes>(query)
   }
 
+  /** @deprecated Notification no longer used */
   static async unsubscribe(user: string, email: string) {
     if (!isEthereumAddress(user) || !isEmail(email)) {
       return false
@@ -74,6 +75,7 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     return true
   }
 
+  /** @deprecated Notification no longer used */
   static async verify(user: string, email: string) {
     if (!isEthereumAddress(user) || !isEmail(email)) {
       return false

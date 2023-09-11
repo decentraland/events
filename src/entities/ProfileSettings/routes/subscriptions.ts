@@ -13,6 +13,7 @@ import {
 
 export const SIGN_SECRET = requiredEnv("SIGN_SECRET")
 
+/** @deprecated Notification no longer used */
 export async function verifySubscription(req: Request, res: Response) {
   return checkSubscription(
     req,
@@ -28,6 +29,7 @@ export async function verifySubscription(req: Request, res: Response) {
   )
 }
 
+/** @deprecated Notification no longer used */
 export async function removeSubscription(req: Request, res: Response) {
   return checkSubscription(
     req,
@@ -47,6 +49,7 @@ export async function removeSubscription(req: Request, res: Response) {
   )
 }
 
+/** @deprecated Notification no longer used */
 export async function checkSubscription(
   req: Request,
   res: Response,
