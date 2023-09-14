@@ -26,7 +26,7 @@ WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
 COPY ./package.json         /app/package.json
 
-RUN npm ci
+RUN npm install
 
 COPY ./src                  /app/src
 COPY ./static               /app/static
