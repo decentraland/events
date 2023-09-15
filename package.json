@@ -4,7 +4,6 @@
   "description": "A simple starter to get up and developing quickly with Gatsby",
   "version": "0.0.0-development",
   "author": "",
-  "main": "./Pulumi.ts",
   "engines": {
     "node": "18.*",
     "npm": "9.*"
