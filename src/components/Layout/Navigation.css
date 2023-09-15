@@ -48,6 +48,7 @@
     height: auto;
     align-items: flex-start;
     flex-direction: column;
+    width: 100%;
   }
 
   .LayoutMainContainer > .dcl.tabs .ui.container {
