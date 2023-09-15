@@ -55,17 +55,6 @@
     flex-direction: column;
   }
 
-  .LayoutMainContainer > .dcl.tabs .tabs__wrapper {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 16px;
-  }
-
-  .LayoutMainContainer > .dcl.tabs .tabs__wrapper:last-child {
-    margin-bottom: 8px;
-    width: 100%;
-  }
-
   .LayoutMainContainer > .dcl.tabs .SearchInput {
     min-width: 140px;
     flex: 1;
