@@ -81,3 +81,40 @@ body {
 .ui.two.cards > .ui.card:nth-child(3n) {
   margin-right: 1em;
 }
+
+.LayoutMainContainer.layout__main .dcl.tabs .tabs__wrapper {
+  display: flex;
+  flex-direction: row;
+  overflow: scroll;
+  width: 100%;
+  /* hide scrollbar IE and Edge */
+  -ms-overflow-style: none;
+  /* hide scrollbar Firefox */
+  scrollbar-width: none;
+  text-wrap: nowrap;
+  padding-right: 20px;
+}
+
+.LayoutMainContainer.layout__main .dcl.tabs .tabs__wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .LayoutMainContainer.layout__main .dcl.tabs .tabs__wrapper {
+    width: unset;
+  }
+}
+
+@media (max-width: 769px) {
+  .LayoutMainContainer > .dcl.tabs .dcl.tab.active {
+    border-bottom: 3px solid var(--primary);
+    border-left: 0;
+  }
+
+  .LayoutMainContainer > .dcl.tabs .dcl.tab,
+  .LayoutMainContainer > .dcl.tabs .dcl.tab.active {
+    padding: 0;
+    margin-left: 16px;
+    text-wrap: nowrap;
+  }
+}
