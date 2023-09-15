@@ -3,7 +3,6 @@ import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { Avatar } from "decentraland-gatsby/dist/utils/api/Catalyst"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
-import fetch from "isomorphic-fetch"
 import isURL from "validator/lib/isURL"
 
 import en from "../../intl/en.json"
