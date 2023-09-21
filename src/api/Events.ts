@@ -8,7 +8,7 @@ import {
   SessionEventAttributes,
 } from "../entities/Event/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
-import { EventCategoryAttributes } from "../entities/EventCategory/types"
+import { EventCategoryAttributesWithI18N } from "../entities/EventCategory/types"
 import { PosterAttributes } from "../entities/Poster/types"
 import { ProfileSettingsAttributes } from "../entities/ProfileSettings/types"
 import { ScheduleAttributes } from "../entities/Schedule/types"
@@ -42,6 +42,7 @@ export type EditEvent = Pick<
   | "details"
   | "categories"
   | "schedules"
+  | "world"
 >
 
 export type EditSchedule = Pick<
@@ -49,14 +50,15 @@ export type EditSchedule = Pick<
   | "name"
   | "description"
   | "image"
+  | "theme"
   | "background"
+  | "active"
   | "active_since"
   | "active_until"
 >
 
 export default class Events extends API {
-  static Url =
-    process.env.GATSBY_EVENTS_URL || `https://events.decentraland.org/api`
+  static Url = env("EVENTS_URL", `https://events.decentraland.org/api`)
 
   static Cache = new Map<string, Events>()
 
@@ -340,7 +342,7 @@ export default class Events extends API {
     )
   }
 
-  async getCategories(): Promise<EventCategoryAttributes[]> {
+  async getCategories(): Promise<EventCategoryAttributesWithI18N[]> {
     return this.fetch(`/events/categories`)
   }
 

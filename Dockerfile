@@ -1,4 +1,4 @@
-FROM node:16.14-alpine as compiler
+FROM node:18.8-alpine as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -26,7 +26,7 @@ WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
 COPY ./package.json         /app/package.json
 
-RUN npm ci
+RUN npm install
 
 COPY ./src                  /app/src
 COPY ./static               /app/static
@@ -40,14 +40,11 @@ COPY ./gatsby-node.js       /app/gatsby-node.js
 COPY ./gatsby-ssr.js        /app/gatsby-ssr.js
 COPY ./tsconfig.json        /app/tsconfig.json
 
-RUN sed -i.temp '/Pulumi\.ts/d' package.json
-
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:server
-RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:sw
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front
 RUN npm prune --production
 
-FROM node:16.14-alpine
+FROM node:18.8-alpine
 WORKDIR /app
 
 RUN rm -rf \

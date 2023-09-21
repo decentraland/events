@@ -1,0 +1,55 @@
+name: Deploy Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-environment:
+        required: true
+        type: choice
+        options:
+          - dev
+          - prd
+        default: prd
+        description: Environment
+      tag:
+        required: true
+        default: 'latest'
+        type: string
+        description: 'Docker tag (quay.io)'
+
+jobs:
+  deployment:
+    if: ${{ inputs.deployment-environment }}
+    name: 'Deploy to: ${{ inputs.deployment-environment }}'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.deployment-environment }}
+    steps:
+      - name: Checking docker image
+        run: |
+          echo "checking docker image quay.io/decentraland/events:${{ inputs.tag }}"
+
+          CODE=$(curl --write-out "%{http_code}" \
+                --silent \
+                --output /dev/stderr \
+                "https://quay.io/v1/repositories/decentraland/events/tags/${{ inputs.tag }}"
+              )
+
+          if test $CODE -ne 200; then
+            echo ""
+            echo "    Image quay.io/decentraland/events:${{ inputs.tag }} is not live (status: $CODE) !!!"
+            echo ""
+            exit 1
+          else
+            echo ""
+            echo "    Image quay.io/decentraland/events:${{ inputs.tag }} is live!!!"
+            echo ""
+          fi
+
+      - name: Trigger deployment
+        id: deploy
+        uses: decentraland/dcl-deploy-action@main
+        with:
+          dockerImage: 'quay.io/decentraland/events:${{ inputs.tag }}'
+          serviceName: 'events2'
+          env: ${{ inputs.deployment-environment }}
+          token: ${{ secrets.GITHUB_TOKEN }}

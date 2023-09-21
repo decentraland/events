@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 
 import { Helmet } from "react-helmet"
 
@@ -7,11 +7,9 @@ import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
-import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import { CarouselEvents } from "../components/Event/CarouselEvents/CarouselEvents"
-import EventModal from "../components/Event/EventModal/EventModal"
 import { ListEvents } from "../components/Event/ListEvents/ListEvents"
 import { NoEvents } from "../components/Event/NoEvents/NoEvents"
 import { TrendingEvents } from "../components/Event/TrendingEvents/TrendingEvents"
@@ -59,55 +57,40 @@ export default function IndexPage() {
   const filters = useMemo(() => toEventFilters(params), [params])
   const [enabledNotification, setEnabledNotification] = useState(false)
 
+  // redirect old urls to the new ones
+  useEffect(() => {
+    if (event) {
+      navigate(locations.event(event.id), { replace: true })
+    }
+  }, [event])
+
   return (
     <>
       <Helmet>
-        <title>{event?.name || l("social.home.title") || ""}</title>
-        <meta
-          name="description"
-          content={event?.description || l("social.home.description") || ""}
-        />
+        <title>{l("social.home.title") || ""}</title>
+        <meta name="description" content={l("social.home.description") || ""} />
 
-        <meta
-          property="og:title"
-          content={event?.name || l("social.home.title") || ""}
-        />
+        <meta property="og:title" content={l("social.home.title") || ""} />
         <meta
           property="og:description"
-          content={event?.description || l("social.home.description") || ""}
+          content={l("social.home.description") || ""}
         />
-        <meta
-          property="og:image"
-          content={event?.image || l("social.home.image") || ""}
-        />
+        <meta property="og:image" content={l("social.home.image") || ""} />
         <meta property="og:site" content={l("social.home.site") || ""} />
 
-        <meta
-          name="twitter:title"
-          content={event?.description || l("social.home.title") || ""}
-        />
+        <meta name="twitter:title" content={l("social.home.title") || ""} />
         <meta
           name="twitter:description"
-          content={event?.description || l("social.home.description") || ""}
+          content={l("social.home.description") || ""}
         />
-        <meta
-          name="twitter:image"
-          content={event?.image || l("social.home.image") || ""}
-        />
-        <meta
-          name="twitter:card"
-          content={event ? "summary_large_image" : l("social.home.card") || ""}
-        />
+        <meta name="twitter:image" content={l("social.home.image") || ""} />
+        <meta name="twitter:card" content={l("social.home.card") || ""} />
         <meta name="twitter:creator" content={l("social.home.creator") || ""} />
         <meta name="twitter:site" content={l("social.home.site") || ""} />
       </Helmet>
       <EnabledNotificationModal
         open={enabledNotification}
         onClose={() => setEnabledNotification(false)}
-      />
-      <EventModal
-        event={event}
-        onClose={prevent(() => navigate(locations.events()))}
       />
 
       <Navigation activeTab={NavigationTab.Events} search />

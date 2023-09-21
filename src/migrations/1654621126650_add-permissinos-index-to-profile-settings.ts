@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
 
 import ProfileSettings from "../entities/ProfileSettings/model"

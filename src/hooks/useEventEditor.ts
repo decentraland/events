@@ -15,6 +15,7 @@ import {
   MonthMask,
   Position,
   WeekdayMask,
+  eventLocations,
 } from "../entities/Event/types"
 import { toRecurrentSetpos, toWeekdayMask } from "../entities/Event/utils"
 
@@ -26,7 +27,7 @@ function getName(
   event: React.ChangeEvent<any>,
   props?: { name: string; value: string; type: string; checked: boolean } | any
 ): string {
-  return (props && props.name) || event.target.name
+  return props?.name || event?.target?.name
 }
 
 function getValue(
@@ -42,7 +43,7 @@ function getValue(
         return props.value || ""
     }
   } else {
-    return event.target.value
+    return event?.target?.value
   }
 }
 
@@ -80,38 +81,33 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     recurrent_month_mask: 0,
     recurrent_until: null,
     recurrent_count: null,
+    world: false,
 
     errors: {},
   })
 
-  // const finish_at = useMemo(() => new Datetime(new Date(event.start_at.getTime() + event.duration), options), [event.start_at.getTime(), event.duration])
   const finish_at = useMemo(
     () => Time.from(event.start_at.getTime() + event.duration, { utc }),
     [event.start_at.getTime(), event.duration]
   )
-  const start_at = useMemo(
-    () => Time.from(event.start_at.getTime(), { utc }),
-    [event.start_at.getTime()]
-  )
+  const start_at = useMemo(() => {
+    return Time.from(event.start_at.getTime(), { utc })
+  }, [event.start_at.getTime()])
 
   function getStartDate() {
-    // return start_at.toInputDate()
     return start_at.format(Time.Formats.InputDate)
   }
 
   function getStartTime() {
     return start_at.format(Time.Formats.InputTime)
-    // return start_at.toInputTime()
   }
 
   function getFinishDate() {
     return finish_at.format(Time.Formats.InputDate)
-    // return finish_at.toInputDate()
   }
 
   function getFinishTime() {
     return finish_at.format(Time.Formats.InputTime)
-    // return finish_at.toInputTime()
   }
 
   /**
@@ -177,10 +173,18 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       return
     }
 
-    const start_at = Time.from(value, {
+    const start_at_original = Time.from(value, {
       utc,
       format: Time.Formats.InputDate,
-    }).toDate()
+    })
+
+    const hours = Time(event.start_at).toDate().getUTCHours()
+    const minutes = Time(event.start_at).toDate().getUTCMinutes()
+
+    const start_at = start_at_original
+      .set("hour", hours)
+      .set("minute", minutes)
+      .toDate()
 
     if (start_at.getTime() !== event.start_at.getTime()) {
       let recurrent_until = event.recurrent_until
@@ -215,6 +219,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const start_at = Time.utc(
       start_date.getTime() + start_time.getTime()
     ).toDate()
+
     if (start_at.getTime() !== event.start_at.getTime()) {
       setValues({ start_at })
     }
@@ -445,7 +450,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     setValue("recurrent_until", recurrent_until)
   }
 
-  function handleChangeList(name: "categories" | "schedules", value: string) {
+  function handleChangeList(name: "schedules", value: string) {
     const list = event[name]
     if (list.includes(value)) {
       setValue(
@@ -454,6 +459,14 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       )
     } else {
       setValue(name, [...list, value])
+    }
+  }
+
+  function handleChangeEventLocation(value: eventLocations) {
+    if (value === eventLocations.WORLD) {
+      setValues({ world: true, server: null })
+    } else {
+      setValues({ world: false, server: null })
     }
   }
 
@@ -593,8 +606,12 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         return handleChangeRecurrentUntil(value)
 
       case "categories":
+        return setValue(name, [value])
       case "schedules":
         return handleChangeList(name, value)
+
+      case "event_location":
+        return handleChangeEventLocation(value)
 
       default:
       // ignore change
@@ -651,6 +668,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
       errors["finish_date"] = "End date should be after start date"
     }
 
+    if (event.world && (event.server === null || event.server === "")) {
+      errors["server"] = "World name is required"
+    }
+    console.log(errors)
     if (Object.values(errors).filter(Boolean).length) {
       setErrors({ ...event.errors, ...errors })
       return false

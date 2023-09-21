@@ -1,4 +1,5 @@
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import env from "decentraland-gatsby/dist/utils/env"
 import padStart from "lodash/padStart"
 import { RRule, Weekday } from "rrule"
 
@@ -15,15 +16,21 @@ import {
   Weekdays,
 } from "./types"
 
-const DECENTRALAND_URL =
-  process.env.GATSBY_DECENTRALAND_URL ||
-  process.env.DECENTRALAND_URL ||
+const DECENTRALAND_URL = env(
+  "DECENTRALAND_URL",
   "https://play.decentraland.org"
+)
+const EVENTS_URL = env("EVENTS_URL", "https://events.decentraland.org/api")
+const PROFILE_SITE_URL = env(
+  "PROFILE_SITE_URL",
+  "https://profile.decentraland.org"
+)
 
-const EVENTS_URL =
-  process.env.EVENTS_URL ||
-  process.env.GATSBY_EVENTS_URL ||
-  "https://events.decentraland.org/api"
+export function profileSiteUrl(address: string) {
+  const target = new URL(PROFILE_SITE_URL)
+  target.pathname = `/accounts/${address}`
+  return target.toString()
+}
 
 export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_URL)
@@ -51,7 +58,7 @@ export function eventTargetUrl(
   target.searchParams.set("position", [event.x || 0, event.y || 0].join(","))
 
   if (event.server) {
-    target.searchParams.set("server", event.server)
+    target.searchParams.set("realm", event.server)
   }
 
   return target.toString()
@@ -388,4 +395,10 @@ export function formatMinutesDuration(minutes: number) {
         padStart(duration.minutes().toString(), 2, "0"),
       ].join("")
     : "2400"
+}
+
+export function isPastEvent(event: EventAttributes) {
+  const now = Date.now()
+  const finish_at = Time.date(event.finish_at)
+  return finish_at.getTime() < now
 }

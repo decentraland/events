@@ -1,4 +1,5 @@
 import fs from "fs"
+import { resolve } from "path"
 import { promisify } from "util"
 
 import AWS from "aws-sdk"
@@ -11,7 +12,7 @@ import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middl
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import { requiredEnv } from "decentraland-gatsby/dist/utils/env"
+import env, { requiredEnv } from "decentraland-gatsby/dist/utils/env"
 import fileUpload, { UploadedFile } from "express-fileupload"
 import fetch from "node-fetch"
 
@@ -29,11 +30,11 @@ var FormData = require("form-data") */
 
 let BUCKET_CHECKED = false
 let BUCKET_CHECKED_JOB: Promise<void> | null = null
-const ACCESS_KEY = requiredEnv("AWS_ACCESS_KEY")
-const ACCESS_SECRET = requiredEnv("AWS_ACCESS_SECRET")
-const BUCKET_NAME = requiredEnv("AWS_BUCKET_NAME")
-const BUCKET_URL = requiredEnv("AWS_BUCKET_URL")
-const BUCKET_DIR = "poster"
+const ACCESS_KEY = env("AWS_ACCESS_KEY", "")
+const ACCESS_SECRET = env("AWS_ACCESS_SECRET", "")
+const BUCKET_NAME = env("AWS_BUCKET_NAME", "")
+const BUCKET_URL = env("AWS_BUCKET_URL")
+const BUCKET_PATH = env("AWS_BUCKET_PATH", "/poster/")
 
 const s3 = new AWS.S3({
   accessKeyId: ACCESS_KEY,
@@ -172,7 +173,7 @@ export async function uploadPoster(
     .toString(16)
     .toLowerCase()
   const userHash = auth.slice(-8).toLowerCase()
-  const filename = BUCKET_DIR + "/" + userHash + timeHash + ext
+  const filename = resolve(BUCKET_PATH, userHash + timeHash + ext).slice(1)
   await ensure()
 
   const params: AWS.S3.Types.PutObjectRequest = {
@@ -192,7 +193,7 @@ export async function uploadPoster(
   const time = ((Date.now() - initial) / 1000).toFixed(3)
   const result = {
     filename,
-    url: BUCKET_URL + "/" + filename,
+    url: new URL("/" + filename, BUCKET_URL).toString(),
     size,
     type,
   }
@@ -218,12 +219,12 @@ async function ensure() {
       await headBucket({ Bucket: BUCKET_NAME })
       const bucketExists = await headObject({
         Bucket: BUCKET_NAME,
-        Key: BUCKET_DIR,
+        Key: BUCKET_PATH,
       })
       if (!bucketExists) {
         await putObject({
           Bucket: BUCKET_NAME,
-          Key: BUCKET_DIR,
+          Key: BUCKET_PATH,
           ACL: "public-read",
         })
       }

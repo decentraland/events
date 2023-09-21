@@ -67,25 +67,25 @@ export default function ImageInput({
   return (
     <div
       className={TokenList.join([
-        "ImageInput",
-        error && "ImageInput--error",
-        loading && "ImageInput--loading",
-        value && "ImageInput--with-value",
+        "image-input",
+        error && "image-input--error",
+        loading && "image-input--loading",
+        value && "image-input--with-value",
         className,
       ])}
     >
-      <div className="ImageInput__Label">{label}</div>
-      <div className="ImageInput__Value">
+      <div className="image-input__label">{label}</div>
+      <div className="image-input__value">
         <ImgFixed dimension="wide" src={value} />
-        <div className="ImageInput__Background" />
+        <div className="image-input__background" />
         {loading && <Loader size="medium" active />}
         {!loading && (
-          <div className="ImageInput__Content" onClick={handleClick}>
+          <div className="image-input__content" onClick={handleClick}>
             {props.children}
           </div>
         )}
       </div>
-      <div className="ImageInput__Message">{message}</div>
+      <div className="image-input__message">{message}</div>
     </div>
   )
 }

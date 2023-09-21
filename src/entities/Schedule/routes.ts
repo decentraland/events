@@ -6,14 +6,22 @@ import {
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
+import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { Request } from "express"
 import omit from "lodash/omit"
+import pick from "lodash/pick"
 import { v4 as uuid } from "uuid"
 
 import { getAuthProfileSettings } from "../ProfileSettings/routes/getAuthProfileSettings"
 import { canEditAnySchedule } from "../ProfileSettings/utils"
 import ScheduleModel from "./model"
-import { ScheduleAttributes } from "./types"
+import { createScheduleSchema, updateScheduleSchema } from "./schema"
+import { NewScheduleAttributes, ScheduleAttributes } from "./types"
+
+const createScheduleValidator =
+  createValidator<NewScheduleAttributes>(createScheduleSchema)
+const updateScheduleValidator =
+  createValidator<NewScheduleAttributes>(updateScheduleSchema)
 
 export default routes((router) => {
   const withAuth = auth({ optional: false })
@@ -21,7 +29,6 @@ export default routes((router) => {
   router.get("/schedules/:schedule_id", handle(getScheduleById))
   router.post("/schedules", withAuth, handle(createSchedule))
   router.patch("/schedules/:schedule_id", withAuth, handle(updateSchedule))
-  router.delete("/schedules/:schedule_id", withAuth, handle(deleteSchedule))
 })
 
 export async function getScheduleList() {
@@ -40,16 +47,9 @@ export async function getScheduleById(req: Request<{ schedule_id: string }>) {
 
 export async function createSchedule(req: WithAuth) {
   const user = req.auth!
-  const data = req.body as ScheduleAttributes
+  // TODO: validate input data
+  const data = createScheduleValidator(req.body || {})
   const profile = await getAuthProfileSettings(req)
-
-  if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    throw new RequestError("Empty schedule data", RequestError.BadRequest, {
-      body: data,
-      headers: omit(req.headers, ["authorization"]),
-      user,
-    })
-  }
 
   if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
@@ -58,12 +58,13 @@ export async function createSchedule(req: WithAuth) {
   return await ScheduleModel.create<ScheduleAttributes>({
     id: uuid(),
     name: data.name,
-    description: data.description,
-    image: data.image,
-    background: data.background,
+    description: data.description || null,
+    image: data.image || null,
+    theme: null,
+    background: data.background || [],
     active_since: data.active_since,
     active_until: data.active_until,
-    active: true,
+    active: data.active ?? true,
     created_at: new Date(),
     updated_at: new Date(),
   })
@@ -71,17 +72,10 @@ export async function createSchedule(req: WithAuth) {
 
 export async function updateSchedule(req: WithAuth) {
   const id = req.params.schedule_id
-  const data = req.body as ScheduleAttributes
+  // TODO: validate input data
+  const data = updateScheduleValidator(req.body || {})
   const user = req.auth!
   const profile = await getAuthProfileSettings(req)
-
-  if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
-    throw new RequestError("Empty schedule data", RequestError.BadRequest, {
-      body: data,
-      headers: omit(req.headers, ["authorization"]),
-      user,
-    })
-  }
 
   if (!isAdmin(user) && !canEditAnySchedule(profile)) {
     throw new RequestError(`Forbidden`, RequestError.Forbidden)
@@ -92,42 +86,12 @@ export async function updateSchedule(req: WithAuth) {
   if (!schedule) {
     throw new RequestError(`Schedule "${id}" not found`, RequestError.NotFound)
   }
-  const updatedData = {
-    name: data.name || schedule.name,
-    description: data.description || schedule.description,
-    image: data.image || schedule.image,
-    background: data.background || schedule.background,
-    active_since: data.active_since || schedule.active_since,
-    active_until: data.active_until || schedule.active_until,
-  }
+
+  const updatedData = Object.assign(
+    pick(schedule, Object.keys(updateScheduleSchema.properties as {})),
+    pick(data, Object.keys(updateScheduleSchema.properties as {}))
+  )
+
   await ScheduleModel.update(updatedData, { id: id })
   return updatedData
-}
-
-export async function deleteSchedule(req: WithAuth) {
-  const id = req.params.schedule_id
-  const user = req.auth!
-  const profile = await getAuthProfileSettings(req)
-
-  if (!isAdmin(user) && !canEditAnySchedule(profile)) {
-    throw new RequestError(`Forbidden`, RequestError.Forbidden)
-  }
-
-  const schedule = await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
-
-  if (!schedule) {
-    throw new RequestError(`Schedule "${id}" not found`, RequestError.NotFound)
-  }
-
-  if (!schedule.active) {
-    throw new RequestError(
-      `Schedule "${id}" already deactivated`,
-      RequestError.NotFound
-    )
-  }
-  const updatedData = {
-    active: false,
-  }
-  await ScheduleModel.update(updatedData, { id: id })
-  return await ScheduleModel.findOne<ScheduleAttributes>({ id: id })
 }

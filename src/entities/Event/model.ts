@@ -191,7 +191,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       FROM ${table(EventModel)} e
       WHERE
         e.rejected IS FALSE
-        AND e.approved IS TRUE
         AND e.recurrent IS TRUE
         AND e.finish_at > now()
         AND (e.next_start_at + (e.duration * '1 millisecond'::interval)) < now()
@@ -255,6 +254,11 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !options.allow_pending && !options.user,
           SQL`AND e.approved IS TRUE`
         )}
+        ${conditional(!!options.world === true, SQL`AND e.world IS TRUE`)}
+        ${conditional(
+          options.world !== undefined && !!options.world === false,
+          SQL`AND e.world IS FALSE`
+        )}
         ${conditional(
           !options.allow_pending && !!options.user,
           SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
@@ -266,6 +270,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${conditional(
           !!options.estate_id,
           SQL`AND e.estate_id = ${options.estate_id}`
+        )}
+        ${conditional(
+          !!options.schedule,
+          SQL`AND ${options.schedule} = ANY(e.schedules)`
         )}
 
       ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}

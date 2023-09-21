@@ -45,6 +45,10 @@ export async function getEventList(req: WithAuth) {
     options.search = query.search
   }
 
+  if (query.schedule) {
+    options.schedule = query.schedule
+  }
+
   if (query.position) {
     const [x, y] = query.position.split(",").slice(0, 2).map(Number) as [
       number,
@@ -89,6 +93,8 @@ export async function getEventList(req: WithAuth) {
 
     options.only_attendee = bool(query.only_attendee) ?? true
   }
+
+  options.world = bool(query.world) ?? undefined
 
   const events = await EventModel.getEvents(options)
   return events.map((event) => EventModel.toPublic(event, profile))

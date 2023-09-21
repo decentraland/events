@@ -1,4 +1,4 @@
-.AttendingButtons {
+.attending-buttons {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -6,43 +6,47 @@
   margin: 0 auto;
 }
 
-.AttendingButtons .ui.button.attending-status,
-.ui.modal .AttendingButtons .ui.button.attending-status {
-  border-color: rgba(115, 110, 125, 0.32);
+.attending-buttons .ui.button.attending-status,
+.ui.modal .attending-buttons .ui.button.attending-status {
+  border-color: var(--text);
   background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.AttendingButtons .ui.button.attending-status.attending {
+.attending-buttons .ui.button.attending-status.attending {
   color: var(--primary);
+  border-color: var(--primary);
 }
 
-.ui.modal .AttendingButtons .ui.button.inverted,
-.AttendingButtons .ui.button.inverted {
+.ui.modal .attending-buttons .ui.button.inverted,
+.attending-buttons .ui.button.inverted {
   background-color: transparent;
 }
-.AttendingButtons .ui.button {
+.attending-buttons .ui.button {
   flex: 0 0 auto;
 }
 
-.AttendingButtons .ui.button + .ui.button {
+.attending-buttons .ui.button + .ui.button {
   margin-left: 8px;
 }
 
-.AttendingButtons .ui.button.fluid {
+.attending-buttons .ui.button.fluid {
   flex: 0 1 auto;
 }
 
-.AttendingButtons .ui.button.share {
+.attending-buttons .ui.button.share {
   min-width: 34px;
   height: 34px;
   padding: 5px 3px;
-  border-color: rgba(115, 110, 125, 0.32);
+  border-color: var(--text);
 }
 
-.AttendingButtons .ui.button.share img {
+.attending-buttons .ui.button.share img {
   vertical-align: text-bottom;
 }
 
-.AttendingButtons .ui.button.share.mobile img {
+.attending-buttons .ui.button.share.mobile img {
   margin-right: 0.5em;
 }

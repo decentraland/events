@@ -1,6 +1,7 @@
 import React, { useCallback } from "react"
 
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import { Link } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 
 import { EventAttributes } from "../../entities/Event/types"
@@ -29,6 +30,8 @@ export default function JumpInPosition({
 
   const handleClick = useCallback(
     function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+      e.stopPropagation()
+
       if (props.onClick) {
         props.onClick(e)
       }
@@ -38,6 +41,8 @@ export default function JumpInPosition({
           eventId: event?.id || null,
           trending: event?.trending || false,
           highlighted: event?.highlighted || false,
+          world: event?.world || false,
+          world_name: event?.world ? event.server : false,
         })
       }
     },
@@ -45,24 +50,24 @@ export default function JumpInPosition({
   )
 
   return (
-    <a
+    <Link
       {...props}
       target="_blank"
       onClick={handleClick}
       href={to}
       className={TokenList.join([
-        "JumpInPosition",
-        compact && "JumpInPosition--compact",
+        "jump-in-position",
+        compact && "jump-in-position--compact",
         props.className,
       ])}
     >
-      <span className="JumpInPosition__Position">
+      <span className="jump-in-position__position">
         {isPosition && <img src={secondaryPinIcon} width="16" height="16" />}
-        <span>{position}</span>
+        <span>{event?.world ? event.server : position}</span>
       </span>
-      <span className="JumpInPosition__Icon">
+      <span className="jump-in-position__icon">
         <img src={primaryJumpInIcon} width={16} height={16} />
       </span>
-    </a>
+    </Link>
   )
 }

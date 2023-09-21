@@ -8,7 +8,7 @@
     "message": "You need to {action} before to submit an event"
   },
   "navigation": {
-    "events": "World Events",
+    "events": "Events",
     "my_events": "My Events",
     "pending_events": "Pending Events",
     "submit_events": "Submit Event",
@@ -35,37 +35,10 @@
     "events": {
       "no_events": "No events planned yet.",
       "not_found": "No events found.",
-      "all_events": "All Events",
-      "categories": {
-        "art": "Art & Culture",
-        "causes": "Causes",
-        "competition": "Competition",
-        "education": "Education",
-        "gambling": "Gambling",
-        "gaming": "Gaming",
-        "giveaway": "Giveaway",
-        "health": "Health & Wellbeing",
-        "hobbies": "Hobbies & Passions",
-        "identity": "Identity & Language",
-        "live": "Live Performances",
-        "music": "Music",
-        "networking": "Networking",
-        "nft": "NFT",
-        "other": "Other",
-        "party": "Party",
-        "play": "Play to Earn",
-        "poap": "POAP",
-        "religion": "Religion & Spirituality",
-        "shopping": "Shopping",
-        "social": "Social Activities",
-        "sports": "Sports",
-        "talks": "Talks & Presentations",
-        "town": "Town Hall",
-        "tv": "TV & Movies"
-      }
+      "all_events": "All Events"
     },
     "me": {
-      "going": "GOING",
+      "going": "INTERESTED",
       "you_are_not_attending": "You are not attending to any event, find some",
       "amazing_event": "amazing event",
       "hosted_by_me": "HOSTED BY ME",
@@ -79,11 +52,15 @@
     },
     "submit": {
       "submit_event": "Submit event",
-      "be_sure_to_fill": "Be sure to fill in as many details as possible to generate interest in your event.",
+      "be_sure_to_fill": "Host your own event in Decentraland. Visit the {event} for answers to commonly asked questions.",
+      "event": "Events FAQ",
+      "events_faq_url": "https://docs.decentraland.org/player/events/faq/",
       "error_image_size": "This image is too heavy (more than 500Kb), try with",
       "optimizilla": "optimizilla",
       "error_image_format": "This file format is not supported, try with",
       "image_recommended_size": "(recommended size: 1340 x 670)",
+      "image_recommended_label": "Upload a PNG, JPG or GIF. Recommended size 1340x670px. Maximum file size 500kb",
+      "event_cover": "Event Cover",
       "browse": "Browse",
       "browse_line1_label": "your computer or",
       "browse_line2_label": "drag a picture to add a cover",
@@ -118,13 +95,18 @@
       "ends_label": "Ends",
       "occurrences": "Occurrences",
       "dates": "Dates",
-      "categories_label": "Categories",
+      "categories_label": "Category",
       "want_new_category_label": "Want a new category? Ask for it on the",
       "add_category_placeholder": "Add category",
       "latitude_label": "Latitude (X)",
       "longitude_label": "Longitude (Y)",
       "server_label": "Server",
       "server_placeholder": "any server",
+      "world_label": "World name",
+      "world_placeholder": "e.g. name.dcl.eth",
+      "world_help": "You can host events in Worlds belonging to LAND owners or renters",
+      "location_label": "Location",
+      "location_placeholder": "",
       "contact_label": "Email or Discord username",
       "contact_placeholder": "hello@decentraland.org",
       "details_label": "Additional info",
@@ -136,6 +118,13 @@
       "reject": "reject",
       "notify_me": "notify me",
       "event_submission_will_be_reviewed": "The event submission will be reviewed by our team, you’ll be notified by email",
+      "limit_attendees_label": "The limit of attendees is {limit}",
+      "limit_attendees": "100 people",
+      "worlds_policy": "The event must be hosted in a world that belongs to a LAND owner or renters. {dao_proposal}.",
+      "renters": "renters",
+      "worlds_proposal_url": "https://governance.decentraland.org/proposal/?id=e712bb50-e822-11ed-b8f1-75dbe089d333",
+      "dao_proposal": "View DAO proposal",
+      "timezone": "Timezone",
       "confirm_modal": {
         "title": "Are you absolutely sure?",
         "paragraph": "This action **cannot** be undone. This will permanently delete the **{name}** event",
@@ -174,15 +163,35 @@
         }
       }
     },
+    "schedules": {
+      "not_found": "No schedule found",
+      "name": "NAME",
+      "active_since": "ACTIVE SINCE",
+      "active_until": "ACTIVE UNTIL",
+      "active": "VISIBILITY",
+      "active_true": "Main Page + API",
+      "active_false": "API Only",
+      "actions": "ACTIONS",
+      "open": "VIEW",
+      "edit": "EDIT"
+    },
     "schedule_edit": {
       "title": "Submit schedule",
       "name_label": "Name",
-      "name_placeholder": "Name of Event Schedule",
+      "name_placeholder": "Name of the Schedule",
       "schedule_cover_label": "Schedule cover",
       "error_image_size": "This image is too heavy (more than 500Kb), try with",
+      "theme_label": "Schedule theme",
+      "theme_option_empty": "Custom",
+      "theme_option_mvmf_2022": "Metaverse Music Festival 2022",
+      "theme_option_mvfw_2023": "Metaverse Fashion Week 2023",
+      "theme_option_pride_2023": "Pride Week 2023",
       "description_label": "Description",
       "description_placeholder": "This description is important for SEO",
       "background_label": "Background color",
+      "active_label": "Visibility",
+      "active_option_true": "Main Page + API",
+      "active_option_false": "API Only",
       "active_since_date_label": "Active since date",
       "active_since_time_label": "Active since time",
       "active_until_date_label": "Active until date",
@@ -262,8 +271,8 @@
       },
       "attending_buttons": {
         "jump_in": "jump in",
-        "going": "going",
-        "want_to_go": "want to go",
+        "going": "interested",
+        "want_to_go": "interested",
         "share": "share"
       },
       "edit_buttons": {
@@ -296,8 +305,16 @@
         "event_status_banner": {
           "this_event_was_rejected": "This event was rejected",
           "this_event_was_rejected_by": "This event was rejected (by {user})",
-          "this_event_is_pending_approval": "This event is pending approval"
+          "this_event_is_pending_approval": "This event is pending approval",
+          "this_event_is_in_the_past": "This event has finished, can't be approve or rejected"
         }
+      },
+      "event_detail": {
+        "public_organized_by": "Public, Organized by {organizer}",
+        "no_description": "No description",
+        "nobody_confirmed_yet": "Nobody confirmed yet",
+        "no_contact": "No contact",
+        "no_details": "No details"
       }
     },
     "modal": {
@@ -316,5 +333,32 @@
   "validation": {
     "module_field_required": "{module} {field} is required",
     "module_field_invalid": "{module} {field} is invalid"
+  },
+  "categories": {
+    "art": "Art & Culture",
+    "causes": "Causes",
+    "competition": "Competition",
+    "education": "Education",
+    "gambling": "Gambling",
+    "gaming": "Gaming",
+    "giveaway": "Giveaway",
+    "health": "Health & Wellbeing",
+    "hobbies": "Hobbies & Passions",
+    "identity": "Identity & Language",
+    "live": "Live Performances",
+    "music": "Music",
+    "networking": "Networking",
+    "nft": "NFT",
+    "other": "Other",
+    "party": "Party",
+    "play": "Play to Earn",
+    "poap": "POAP",
+    "religion": "Religion & Spirituality",
+    "shopping": "Shopping",
+    "social": "Social Activities",
+    "sports": "Sports",
+    "talks": "Talks & Presentations",
+    "town": "Town Hall",
+    "tv": "TV & Movies"
   }
 }

@@ -12,11 +12,18 @@ import { Tabs } from "decentraland-ui/dist/components/Tabs/Tabs"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 
 import { useEventsContext } from "../../context/Event"
+import { useProfileSettingsContext } from "../../context/ProfileSetting"
+import {
+  canEditAnyProfile,
+  canEditAnySchedule,
+} from "../../entities/ProfileSettings/utils"
+import { ScheduleTheme } from "../../entities/Schedule/types"
 import { getCurrentSchedules } from "../../entities/Schedule/utils"
 import { getSchedules } from "../../modules/events"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import SearchInput from "../Form/SearchInput"
+import { Rabbit } from "../Icon/Rabbit"
 
 import "./Navigation.css"
 
@@ -25,6 +32,8 @@ export enum NavigationTab {
   MyEvents = "my_events",
   PendingEvents = "pending_events",
   Schedule = "schedule",
+  Users = "users",
+  ScheduleTab = "schedule_tab",
 }
 
 export enum NavigationAction {
@@ -61,8 +70,9 @@ export default function Navigation(props: NavigationProps) {
   }, [props.action])
   const [events] = useEventsContext()
   const [account] = useAuthContext()
+  const [settings] = useProfileSettingsContext()
   const [schedules] = useAsyncMemo(getSchedules)
-  const scheduleInfo = useMemo(
+  const currentSchedule = useMemo(
     () => getCurrentSchedules(schedules),
     [schedules]
   )
@@ -111,13 +121,6 @@ export default function Navigation(props: NavigationProps) {
               {l("navigation.events")}
             </Tabs.Tab>
           </Link>
-          {account && (
-            <Link href={locations.myEvents()}>
-              <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
-                {l("navigation.my_events")}
-              </Tabs.Tab>
-            </Link>
-          )}
           {hasPendingEvents && (
             <Link href={locations.pendingEvents()}>
               <Tabs.Tab
@@ -127,16 +130,39 @@ export default function Navigation(props: NavigationProps) {
               </Tabs.Tab>
             </Link>
           )}
-          {scheduleInfo && (
-            <Link href={locations.schedule(scheduleInfo.id)}>
+          {currentSchedule && (
+            <Link href={locations.schedule(currentSchedule.id)}>
               <Tabs.Tab active={props.activeTab === NavigationTab.Schedule}>
-                {scheduleInfo.name}
+                {currentSchedule.theme ===
+                  ScheduleTheme.MetaverseFestival2022 && <Rabbit />}
+                {currentSchedule.name}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {account && (
+            <Link href={locations.myEvents()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.MyEvents}>
+                {l("navigation.my_events")}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {canEditAnyProfile(settings) && (
+            <Link href={locations.users()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.Users}>
+                {l("user_menu.users")}
+              </Tabs.Tab>
+            </Link>
+          )}
+          {canEditAnySchedule(settings) && (
+            <Link href={locations.schedules()}>
+              <Tabs.Tab active={props.activeTab === NavigationTab.ScheduleTab}>
+                {l("user_menu.schedules")}
               </Tabs.Tab>
             </Link>
           )}
         </div>
         <div style={{ flex: 1 }} />
-        <div className={"tabs__wrapper"}>
+        <div className={"botom_tabs__wrapper"}>
           {props.search && (
             <SearchInput
               placeholder={l("navigation.search")}

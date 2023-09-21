@@ -9,6 +9,7 @@ import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
+import env from "decentraland-gatsby/dist/utils/env"
 import pick from "lodash/pick"
 
 import EventAttendeeModel from "../../EventAttendee/model"
@@ -44,6 +45,11 @@ import { DECENTRALAND_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
+)
+
+const EVENTS_BASE_URL = env(
+  "EVENTS_BASE_URL",
+  "https://events.decentraland.org"
 )
 
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
@@ -142,7 +148,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
-  const userProfiles = await Catalyst.get().getProfiles([event.user])
+  const userProfiles = await Catalyst.getInstance().getProfiles([event.user])
   if (
     userProfiles &&
     userProfiles[0] &&
@@ -178,11 +184,18 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     }
   }
 
-  const tile = await API.catch(Land.get().getTile([x, y]))
-  updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
-  updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
-  updatedAttributes.scene_name = updatedAttributes.estate_name
+  // Update data from worlds
+  const tile = await API.catch(Land.getInstance().getTile([x, y]))
   updatedAttributes.coordinates = [x, y]
+
+  if (!updatedAttributes.world) {
+    updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
+    updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
+    updatedAttributes.scene_name = updatedAttributes.estate_name
+  } else {
+    updatedAttributes.image =
+      updatedAttributes.image || `${EVENTS_BASE_URL}/images/event-default.jpg`
+  }
 
   Object.assign(
     updatedAttributes,

@@ -1,13 +1,16 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 
 import DateBox from "decentraland-gatsby/dist/components/Date/DateBox"
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
 import Italic from "decentraland-gatsby/dist/components/Text/Italic"
-import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
+import Link from "decentraland-gatsby/dist/plugins/intl/Link"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
@@ -15,12 +18,19 @@ import isEmail from "validator/lib/isEmail"
 
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import { SessionEventAttributes } from "../../../../entities/Event/types"
+import { profileSiteUrl } from "../../../../entities/Event/utils"
 import { canEditAnyEvent } from "../../../../entities/ProfileSettings/utils"
 import extraIcon from "../../../../images/info.svg"
 import friendsIcon from "../../../../images/secondary-friends.svg"
 import infoIcon from "../../../../images/secondary-info.svg"
 import pinIcon from "../../../../images/secondary-pin.svg"
+import WorldIcon from "../../../../images/worlds-icon.svg"
+import { Flags } from "../../../../modules/features"
 import locations from "../../../../modules/locations"
+import { places } from "../../../../modules/places"
+import placesLocations from "../../../../modules/placesLocations"
+import { worlds } from "../../../../modules/worlds"
+import AttendingButtons from "../../../Button/AttendingButtons"
 import JumpInButton from "../../../Button/JumpInPosition"
 import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
 import EventSection from "../../EventSection"
@@ -49,6 +59,7 @@ export type EventDetailProps = {
 }
 
 export default function EventDetail({ event, ...props }: EventDetailProps) {
+  const l = useFormatMessage()
   const now = Date.now()
   const { next_start_at } = event || { next_start_at: new Date(now) }
   const completed = event.finish_at.getTime() < now
@@ -61,6 +72,21 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const [settings] = useProfileSettingsContext()
   const advance = event.user === settings.user || canEditAnyEvent(settings)
   const utc = props.utc ?? !settings.use_local_time
+  const [ff] = useFeatureFlagContext()
+
+  const [place, placeStatus] = useAsyncMemo(
+    async () => {
+      if (!event.world) {
+        return places.load(`${event.x},${event.y}`)
+      } else {
+        return worlds.load(`${event.server}`)
+      }
+    },
+    [event],
+    {
+      callWithTruthyDeps: true,
+    }
+  )
 
   const handleAttendees = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -71,23 +97,43 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     [props.onClickAttendees]
   )
 
+  const placesUrl = useMemo(() => {
+    if (event.world) {
+      return placesLocations.world(event.server!)
+    } else {
+      return placesLocations.place(`${event.x},${event.y}`)
+    }
+  }, [event])
+
   return (
-    <div className={"EventDetail"}>
-      <div className="EventDetail__Header">
+    <div className="event-detail">
+      <div className="event-detail__header">
         <DateBox date={next_start_at} utc={utc} />
-        <div className="EventDetail__Header__Event">
+        <div className="event-detail__header-event">
           <SubTitle>{event.name}</SubTitle>
-          <Paragraph className="EventDetail__Header__Event__By" secondary>
-            Public, Organized by <Link>{event.user_name || "Guest"}</Link>
+          <Paragraph className="event-detail__header-event-by" secondary>
+            {l("components.event.event_detail.public_organized_by", {
+              organizer: (
+                <Link
+                  href={
+                    ff.flags[Flags.ProfileSite]
+                      ? profileSiteUrl(event.user)
+                      : undefined
+                  }
+                >
+                  {event.user_name || "Guest"}
+                </Link>
+              ),
+            })}
           </Paragraph>
         </div>
         {props.showEdit !== false && advance && (
-          <div className="EventDetail__Header__Actions">
+          <div className="event-detail__header-actions">
             <MenuIcon>
               <MenuIconItem>
                 <Button
                   basic
-                  className="edit-detail__menu-icon__button"
+                  className="edit-detail__menu-icon-button"
                   as="a"
                   href={locations.editEvent(event.id)}
                   onClick={prevent(() =>
@@ -100,7 +146,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
               <MenuIconItem>
                 <Button
                   basic
-                  className="edit-detail__menu-icon__button"
+                  className="edit-detail__menu-icon-button"
                   as="a"
                   href={locations.cloneEvent(event.id)}
                   onClick={prevent(() =>
@@ -115,6 +161,12 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         )}
       </div>
 
+      {event.approved && (
+        <EventSection>
+          <AttendingButtons event={event} />
+        </EventSection>
+      )}
+
       {/* DESCRIPTION */}
       {props.showDescription !== false && <EventSection.Divider />}
       {props.showDescription !== false && (
@@ -123,7 +175,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <EventSection.Detail>
             {!event.description && (
               <Paragraph secondary={!event.description}>
-                <Italic>No description</Italic>
+                <Italic>
+                  {l("components.event.event_detail.no_description")}
+                </Italic>
               </Paragraph>
             )}
             {event.description && <Markdown children={event.description} />}
@@ -161,10 +215,24 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
       {/* PLACE */}
       {props.showPlace !== false && <EventSection.Divider />}
       {props.showPlace !== false && (
-        <EventSection>
-          <EventSection.Icon src={pinIcon} width="16" height="16" />
+        <EventSection className="event-detail__place">
+          {!event.world && (
+            <EventSection.Icon src={pinIcon} width="16" height="16" />
+          )}
+          {event.world && (
+            <EventSection.Icon src={WorldIcon} width="20" height="20" />
+          )}
           <EventSection.Detail>
-            <Paragraph bold>{event.scene_name || "Decentraland"}</Paragraph>
+            {placeStatus.loaded && place && (
+              <Link href={placesUrl}>{place.title}</Link>
+            )}
+            {(!placeStatus.loaded || !place) && (
+              <Paragraph bold>
+                {event.scene_name ||
+                  (placeStatus.loaded && place && place.title) ||
+                  "Decentraland"}
+              </Paragraph>
+            )}
           </EventSection.Detail>
           <EventSection.Action>
             <JumpInButton event={event} />
@@ -195,14 +263,16 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
               ))}
             {event.total_attendees === 0 && (
               <Paragraph secondary>
-                <Italic>Nobody confirmed yet</Italic>
+                <Italic>
+                  {l("components.event.event_detail.nobody_confirmed_yet")}
+                </Italic>
               </Paragraph>
             )}
           </EventSection.Detail>
           <EventSection.Action>
             {attendeesDiff > 0 && (
               <div
-                className="EventDetail__Detail__ShowAttendees"
+                className="event-detail__show-attendees"
                 onClick={handleAttendees}
               >
                 {`+${attendeesDiff}`}
@@ -232,7 +302,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             )}
             {!event.contact && (
               <Paragraph secondary={!event.contact}>
-                <Italic>No contact</Italic>
+                <Italic>{l("components.event.event_detail.no_contact")}</Italic>
               </Paragraph>
             )}
           </EventSection.Detail>
@@ -251,7 +321,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             {event.details && <Paragraph>{event.details}</Paragraph>}
             {!event.details && (
               <Paragraph secondary={!event.details}>
-                <Italic>No details</Italic>
+                <Italic>{l("components.event.event_detail.no_details")}</Italic>
               </Paragraph>
             )}
           </EventSection.Detail>

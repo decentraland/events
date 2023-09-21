@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react"
 
+import { AjvStringSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -7,10 +8,9 @@ import omit from "lodash/omit"
 import isURL from "validator/lib/isURL"
 import isUUID from "validator/lib/isUUID"
 
-import Events, { EditEvent, EditSchedule } from "../api/Events"
+import Events, { EditSchedule } from "../api/Events"
 import { DEFAULT_EVENT_DURATION } from "../entities/Event/types"
-
-import { newScheduleSchema } from "../entities/Schedule/schema"
+import { createScheduleSchema } from "../entities/Schedule/schema"
 import { ScheduleAttributes } from "../entities/Schedule/types"
 
 type ScheduleEditorState = EditSchedule & {
@@ -21,7 +21,7 @@ function getName(
   schedule: React.ChangeEvent<any>,
   props?: { name: string; value: string; type: string; checked: boolean } | any
 ): string {
-  return (props && props.name) || schedule.target.name
+  return (props && props.name) || schedule?.target?.name
 }
 
 function getValue(
@@ -37,7 +37,7 @@ function getValue(
         return props.value || ""
     }
   } else {
-    return schedule.target.value
+    return schedule?.target?.value
   }
 }
 
@@ -52,8 +52,10 @@ export default function useScheduleEditor(
   const [schedule, setEvent] = useState<ScheduleEditorState>({
     name: defaultSchedule.name || "",
     description: defaultSchedule.description || "",
-    image: defaultSchedule.image || "",
+    image: defaultSchedule.image || null,
+    theme: defaultSchedule.theme || null,
     background: defaultSchedule.background || ["#f3f2f5"],
+    active: defaultSchedule.active ?? true,
     active_since: defaultSchedule.active_since || currentDate.toDate(),
     active_until:
       defaultSchedule.active_until ||
@@ -62,29 +64,33 @@ export default function useScheduleEditor(
   })
 
   const active_since = useMemo(
-    () => Time.from(schedule.active_since.getTime(), { utc }),
-    [schedule.active_since.getTime()]
+    () =>
+      schedule.active_since &&
+      Time.from(schedule.active_since.getTime(), { utc }),
+    [schedule.active_since]
   )
 
   const active_until = useMemo(
-    () => Time.from(schedule.active_until.getTime(), { utc }),
-    [schedule.active_until.getTime()]
+    () =>
+      schedule.active_until &&
+      Time.from(schedule.active_until.getTime(), { utc }),
+    [schedule.active_until]
   )
 
   function getActiveSinceDate() {
-    return active_since.format(Time.Formats.InputDate)
+    return active_since && active_since.format(Time.Formats.InputDate)
   }
 
   function getActiveSinceTime() {
-    return active_since.format(Time.Formats.InputTime)
+    return active_since && active_since.format(Time.Formats.InputTime)
   }
 
   function getActiveUntilDate() {
-    return active_until.format(Time.Formats.InputDate)
+    return active_until && active_until.format(Time.Formats.InputDate)
   }
 
   function getActiveUntilTime() {
-    return active_until.format(Time.Formats.InputTime)
+    return active_until && active_until.format(Time.Formats.InputTime)
   }
 
   function setError(key: string, description: string) {
@@ -108,7 +114,10 @@ export default function useScheduleEditor(
     })
   }
 
-  function setValue<K extends keyof EditEvent>(key: K, value: EditEvent[K]) {
+  function setValue<K extends keyof EditSchedule>(
+    key: K,
+    value: EditSchedule[K]
+  ) {
     setEvent((current) => {
       const errors = { ...current.errors }
       delete errors[key]
@@ -123,11 +132,7 @@ export default function useScheduleEditor(
 
   function setValues(schedule: Partial<EditSchedule>) {
     setEvent((current) => {
-      const errors = { ...current.errors }
-
-      for (const key of Object.keys(schedule)) {
-        delete errors[key]
-      }
+      const errors = omit(current.errors, Object.keys(schedule))
 
       return {
         ...current,
@@ -261,12 +266,17 @@ export default function useScheduleEditor(
           name,
           String(value || "").slice(
             0,
-            newScheduleSchema.properties[name].maxLength
+            (createScheduleSchema.properties![name] as AjvStringSchema)
+              .maxLength!
           )
         )
 
       case "image":
-        return setValue(name, value)
+      case "theme":
+        return setValue(name, value || null)
+
+      case "active":
+        return setValue(name, !!value)
 
       case "active_since_date":
         return handleChangeActiveSinceDate(value)

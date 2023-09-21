@@ -1,10 +1,11 @@
-import metricsDatabase from "decentraland-gatsby/dist/entities/Database/routes"
+import { resolve } from "path"
+
 import { databaseInitializer } from "decentraland-gatsby/dist/entities/Database/utils"
-import { Logger } from "decentraland-gatsby/dist/entities/Development/logger"
 import Manager from "decentraland-gatsby/dist/entities/Job/manager"
 import { jobInitializer } from "decentraland-gatsby/dist/entities/Job/utils"
 import profile from "decentraland-gatsby/dist/entities/Profile/routes"
-import metrics from "decentraland-gatsby/dist/entities/Prometheus/routes"
+import { gatsbyRegister } from "decentraland-gatsby/dist/entities/Prometheus/metrics"
+import metrics from "decentraland-gatsby/dist/entities/Prometheus/routes/utils"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import {
@@ -13,13 +14,12 @@ import {
   withDDosProtection,
   withLogs,
 } from "decentraland-gatsby/dist/entities/Route/middleware"
-import {
-  filesystem,
-  status,
-} from "decentraland-gatsby/dist/entities/Route/routes"
+import gatsby from "decentraland-gatsby/dist/entities/Route/routes/filesystem2/gatsby"
+import status from "decentraland-gatsby/dist/entities/Route/routes/status"
 import { initializeServices } from "decentraland-gatsby/dist/entities/Server/handler"
 import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/utils"
 import express from "express"
+import { register } from "prom-client"
 
 import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
 import events from "./entities/Event/routes"
@@ -48,10 +48,10 @@ const app = express()
 app.set("x-powered-by", false)
 app.use(withLogs())
 app.use("/api", [
-  status(),
   withCors(),
   withDDosProtection(),
   withBody(),
+  status(),
   categories,
   events,
   poster,
@@ -68,20 +68,48 @@ app.use("/api", [
 app.get(SUBSCRIPTION_PATH, verifySubscription)
 app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
-app.use(metrics)
-app.use(metricsDatabase)
-app.get(
-  "/metrics/*",
-  handle(async () => {
-    throw new RequestError("NotFound", RequestError.NotFound)
-  })
-)
+app.use(metrics([gatsbyRegister, register]))
 
 app.use(sitemap)
 app.use("/", social)
-app.use(filesystem("public", "404.html"))
 
-// Logger.subscribe('error', (message: string, data: Record<string, any>) => { /* .. */ })
+app.use(
+  gatsby(resolve(__filename, "../../public"), {
+    contentSecurityPolicy: {
+      scriptSrc: [
+        "https://decentraland.org",
+        "https://*.decentraland.org",
+        "https://connect.facebook.net",
+        "http://*.hotjar.com:*",
+        "https://*.hotjar.com:*",
+        "http://*.hotjar.io",
+        "https://*.hotjar.io",
+        "wss://*.hotjar.com",
+        "https://*.twitter.com",
+        "https://cdn.segment.com",
+        "https://ajax.cloudflare.com",
+        "https://googleads.g.doubleclick.net",
+        "https://ssl.google-analytics.com",
+        "https://tagmanager.google.com",
+        "https://www.google-analytics.com",
+        "https://www.google-analytics.com",
+        "https://www.google.com",
+        "https://www.googleadservices.com",
+        "https://www.googletagmanager.com",
+        "https://app.intercom.io",
+        "https://widget.intercom.io",
+        "https://js.intercomcdn.com",
+        "https://verify.walletconnect.com",
+        "https://js.sentry-cdn.com",
+        "https://browser.sentry-cdn.com",
+      ].join(" "),
+      connectSrc: ["https:", "*.sentry.io"].join(" "),
+      workerSrc: ["'self'", "blob:"].join(" "),
+    },
+  })
+)
+
+// Logger.subscribe("error", createSegmentSubscriber())
 
 initializeServices([
   databaseInitializer(),

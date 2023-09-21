@@ -1,11 +1,11 @@
 import { useMemo } from "react"
 
 import { SessionEventAttributes } from "../entities/Event/types"
-import { EventCategoryAttributes } from "../entities/EventCategory/types"
+import { EventCategoryAttributesWithI18N } from "../entities/EventCategory/types"
 
 export default function useListEventsCategories(
   events?: SessionEventAttributes[] | null,
-  categories?: EventCategoryAttributes[] | null
+  categories?: EventCategoryAttributesWithI18N[] | null
 ) {
   return useMemo(() => {
     if (events && categories) {

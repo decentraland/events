@@ -7,8 +7,9 @@
 // You can delete this file if you're not using it
 import React from "react"
 
-import Rollbar from "decentraland-gatsby/dist/components/Development/Rollbar"
+import Intercom from "decentraland-gatsby/dist/components/Development/Intercom"
 import Segment from "decentraland-gatsby/dist/components/Development/Segment"
+import Sentry from "decentraland-gatsby/dist/components/Development/Sentry"
 export { wrapPageElement, wrapRootElement } from "./gatsby-browser"
 
 /**
@@ -40,25 +41,19 @@ export function onPreRenderHTML(
     )
   })
 
+  headComponents.push(
+    <script
+      dangerouslySetInnerHTML={{
+        __html:
+          "if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {window.navigator.serviceWorker.getRegistrations().then(registrations => {registrations.forEach(r => r.unregister())})}",
+      }}
+    ></script>
+  )
+
   const postBodyComponents = [...getPostBodyComponents()]
-
-  if (process.env.GATSBY_SEGMENT_KEY) {
-    postBodyComponents.push(
-      <Segment
-        key="segment"
-        analyticsKey={process.env.GATSBY_SEGMENT_KEY}
-        trackPage={false}
-      />
-    )
-  } else {
-    console.warn("Missing GATSBY_SEGMENT_KEY environment")
-  }
-
-  if (process.env.GATSBY_ROLLBAR_TOKEN) {
-    postBodyComponents.push(<Rollbar key="rollbar" />)
-  } else {
-    console.warn("Missing GATSBY_ROLLBAR_TOKEN environment")
-  }
+  postBodyComponents.push(<Segment key="segment" trackPage={false} />)
+  postBodyComponents.push(<Intercom key="intercom" />)
+  postBodyComponents.push(<Sentry key="sentry" />)
 
   replaceHeadComponents(headComponents)
   replacePostBodyComponents(postBodyComponents)

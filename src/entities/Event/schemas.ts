@@ -1,6 +1,7 @@
 import {
   AjvArraySchema,
   AjvObjectSchema,
+  BooleanEnum,
   TruthyEnum,
   apiResultSchema,
 } from "decentraland-gatsby/dist/entities/Schema/types"
@@ -56,6 +57,11 @@ export const getEventListQuery: AjvObjectSchema = {
       description:
         "Filter events that contains a websearch expression, should have at least 3 characters otherwise the resultant list will be empty",
     },
+    schedule: {
+      type: "string",
+      format: "uuid",
+      description: "Filter events by specifyc schedule",
+    },
     list: {
       description: "Filter event using one of the following list",
       default: "active",
@@ -83,6 +89,11 @@ export const getEventListQuery: AjvObjectSchema = {
       default: "asc",
       enum: ["asc", "desc"],
     },
+    world: {
+      enum: BooleanEnum.filter((value) => typeof value === "string"),
+      description:
+        "True for events in Worlds, false for events not in Worlds, null for all events",
+    },
   },
 }
 
@@ -100,69 +111,16 @@ export const eventSchema = {
       maxLength: 150,
       description: "The event name",
     },
-    description: {
-      type: "string",
-      minLength: 0,
-      maxLength: 5000,
-      description: "The event description on markdown",
-    },
-    approved: {
-      type: "boolean",
-      description: "True if the event was approved by an admin",
-    },
-    rejected: {
-      type: "boolean",
-      description: "True if the event was rejected by an admin",
-    },
-    highlighted: {
-      type: "boolean",
-      description: "True if the event is highlighted",
-    },
-    trending: {
-      type: "boolean",
-      description: "True if the event is tending",
-    },
     image: {
       description: "Url to the event cover",
       type: "string",
       format: "uri",
     },
-    user: {
-      descrioption: "The user who created the event",
+    description: {
       type: "string",
-      format: "address",
-    },
-    user_name: {
-      descrioption: "The user name who created the event",
-      type: "string",
-      format: "address",
-    },
-
-    total_attendees: {
-      type: "number",
-      minimum: 0,
-      description:
-        "The number of users who specified that they will attend the event",
-    },
-
-    latest_attendees: {
-      type: "array",
-      description:
-        "A list of the latest users who specified that they will attend the event",
-      items: {
-        type: "string",
-        format: "address",
-      },
-    },
-
-    url: {
-      description: "The url where the event will take place",
-      type: "string",
-      format: "uri",
-    },
-    scene_name: {
-      description: "The scene name where the event will take place",
-      type: "string",
+      minLength: 0,
+      maxLength: 5000,
+      description: "The event description on markdown",
     },
     start_at: {
       description: "The initial date of the event",
@@ -174,15 +132,91 @@ export const eventSchema = {
       type: "string",
       format: "date-time",
     },
-    next_start_at: {
-      description: "The next start of the event",
+    coordinates: {
+      type: "array",
+      description: "The specific position",
+      items: {
+        type: "string",
+        pattern: "^-?\\d{1,3}$",
+      },
+    },
+    user: {
+      descrioption: "The user who created the event",
+      type: "string",
+    },
+    approved: {
+      type: "boolean",
+      description: "True if the event was approved by an admin",
+    },
+    created_at: {
+      description: "the time the event was created",
       type: "string",
       format: "date-time",
     },
-    next_finish_at: {
-      description: "The next finish of the event",
+    updated_at: {
+      description: "The time the event was last updated",
       type: "string",
       format: "date-time",
+    },
+    total_attendees: {
+      type: "number",
+      minimum: 0,
+      description:
+        "The number of users who specified that they will attend the event",
+    },
+    latest_attendees: {
+      type: "array",
+      description:
+        "A list of the latest users who specified that they will attend the event",
+      items: {
+        type: "string",
+        format: "address",
+      },
+    },
+    url: {
+      description: "The url where the event will take place",
+      type: "string",
+      format: "uri",
+    },
+    scene_name: {
+      description: "The scene name where the event will take place",
+      type: "string",
+    },
+    user_name: {
+      descrioption: "The user name who created the event",
+      type: "string",
+      format: "address",
+    },
+    rejected: {
+      type: "boolean",
+      description: "True if the event was rejected by an admin",
+    },
+    trending: {
+      type: "boolean",
+      description: "True if the event is tending",
+    },
+    server: {
+      description: "Realm name",
+      type: "string",
+    },
+    estate_id: {
+      type: "string",
+      format: "uudi",
+      description: "state id",
+    },
+    estate_name: {
+      type: "string",
+      description: "The state name",
+    },
+    x: {
+      type: "number",
+      maximum: 170,
+      minimum: -170,
+    },
+    y: {
+      type: "number",
+      maximum: 170,
+      minimum: -170,
     },
     all_day: {
       description: "True if the event is all day long",
@@ -196,17 +230,6 @@ export const eventSchema = {
       description:
         "Rrule FREQ configuration, see: https://datatracker.ietf.org/doc/html/rfc5545",
       enum: [...Frequencies, null],
-    },
-    recurrent_setpos: {
-      description:
-        "Rrule BYSETPOS configuration, see: https://datatracker.ietf.org/doc/html/rfc5545",
-      type: ["number", "null"],
-      minimum: 0,
-    },
-    recurrent_monthday: {
-      description:
-        "Rrule BYMONTHDAY configuration, see: https://datatracker.ietf.org/doc/html/rfc5545",
-      type: ["number", "null"],
     },
     recurrent_weekday_mask: {
       description:
@@ -237,15 +260,90 @@ export const eventSchema = {
       type: ["string", "null"],
       format: "date-time",
     },
-    created_at: {
-      description: "the time the event was created",
+    duration: {
+      type: "number",
+    },
+    recurrent_dates: {
+      type: "array",
+      description: "The specific position",
+      items: {
+        type: "string",
+        format: "date-time",
+      },
+    },
+    recurrent_setpos: {
+      description:
+        "Rrule BYSETPOS configuration, see: https://datatracker.ietf.org/doc/html/rfc5545",
+      type: ["number", "null"],
+      minimum: 0,
+    },
+    recurrent_monthday: {
+      description:
+        "Rrule BYMONTHDAY configuration, see: https://datatracker.ietf.org/doc/html/rfc5545",
+      type: ["number", "null"],
+    },
+    highlighted: {
+      type: "boolean",
+      description: "True if the event is highlighted",
+    },
+    next_start_at: {
+      description: "The next start of the event",
       type: "string",
       format: "date-time",
     },
-    updated_at: {
-      description: "The time the event was last updated",
+    next_finish_at: {
+      description: "The next finish of the event",
       type: "string",
       format: "date-time",
+    },
+    categories: {
+      type: "array",
+      description: "List of categories",
+      items: {
+        type: "string",
+      },
+    },
+    schedules: {
+      type: "array",
+      description: "List of schedule ids",
+      items: {
+        type: "string",
+        format: "uudi",
+      },
+    },
+    approved_by: {
+      descrioption: "The user who approved the event",
+      type: "string",
+      format: "address",
+    },
+    rejected_by: {
+      descrioption: "The user who rejected the event",
+      type: "string",
+      format: "address",
+    },
+    attending: {
+      type: "boolean",
+      description: "Show if user is attending when searching by user",
+    },
+    notify: {
+      type: "boolean",
+      description: "Show if user get notify when searching by user",
+    },
+    position: {
+      type: "array",
+      description: "The specific position",
+      items: {
+        type: "string",
+        pattern: "^-?\\d{1,3}$",
+      },
+    },
+    live: {
+      type: "boolean",
+      description: "If event is live",
+    },
+    world: {
+      type: "boolean",
+      description: "True if the event is in a World",
     },
   },
 }
@@ -370,6 +468,9 @@ export const newEventSchema = {
     schedules: {
       type: ["array", "null"],
       items: { type: "string", format: "uuid" },
+    },
+    world: {
+      type: "boolean",
     },
   },
 }

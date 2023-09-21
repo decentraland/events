@@ -4,7 +4,7 @@ import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 import EventAttendeeModel from "../EventAttendee/model"
 import { EventAttendeeAttributes } from "../EventAttendee/types"
 import push from "../Notification/push"
-import { sendEmailUpcomingEvent } from "../Notification/utils"
+// import { sendEmailUpcomingEvent } from "../Notification/utils"
 import ProfileSettingsModel from "../ProfileSettings/model"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 import ProfileSubscriptionModel from "../ProfileSubscription/model"
@@ -130,7 +130,8 @@ export async function notify(
     })
   })
 
-  proms.push(sendEmailUpcomingEvent(event, email))
+  // TODO: remove
+  // proms.push(sendEmailUpcomingEvent(event, email))
   const notifications = await Promise.all(proms)
 
   return {

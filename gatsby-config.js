@@ -12,7 +12,7 @@ module.exports = {
   developMiddleware: developMiddleware([
     {
       prefix: `/api`,
-      url: `http://localhost:4000`,
+      url: `http://127.0.0.1:4000`,
     },
     {
       prefix: `/poster`,
@@ -35,11 +35,11 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Decentraland`,
-        short_name: `starter`,
+        name: `Decentraland Events`,
+        short_name: `Events`,
         start_url: `/`,
-        background_color: `#663399`,
-        theme_color: `#663399`,
+        background_color: `#ff2d55`,
+        theme_color: `#ff2d55`,
         display: `minimal-ui`,
         icon: `node_modules/decentraland-gatsby/static/decentraland.svg`, // This path is relative to the root of the site.
       },

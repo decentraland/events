@@ -1,13 +1,13 @@
-.ImageInput {
+.image-input {
   position: relative;
   border-radius: 8px;
 }
 
-.ImageInput .ImgFixed {
+.image-input .ImgFixed {
   border-radius: 8px;
 }
 
-.ImageInput .ImageInput__Label {
+.image-input .image-input__label {
   text-transform: none;
   font-size: 15px;
   line-height: 18px;
@@ -17,17 +17,17 @@
   color: var(--secondary-text);
 }
 
-.ImageInput .ImageInput__Message {
+.image-input .image-input__message {
   margin-top: 8px;
   font-size: 15px;
   color: var(--secondary-text);
 }
 
-.ImageInput .ImageInput__Value {
+.image-input .image-input__value {
   position: relative;
 }
 
-.ImageInput .ImageInput__Content {
+.image-input .image-input__content {
   position: absolute;
   display: flex;
   justify-content: center;
@@ -41,7 +41,7 @@
   cursor: pointer;
 }
 
-.ImageInput .ImageInput__Background {
+.image-input .image-input__background {
   background: white;
   position: absolute;
   width: 100%;
@@ -52,25 +52,26 @@
   border-radius: 8px;
 }
 
-.ImageInput.ImageInput--with-value .ImageInput__Content,
-.ImageInput.ImageInput--with-value .ImageInput__Background {
+.image-input.image-input--with-value .image-input__content,
+.image-input.image-input--with-value .image-input__background {
   opacity: 0;
 }
 
-.ImageInput.ImageInput--with-value:hover .ImageInput__Content {
+.image-input.image-input--with-value:hover .image-input__content {
   opacity: 1;
 }
 
-.ImageInput.ImageInput--with-value.ImageInput--loading .ImageInput__Background,
-.ImageInput--with-value:hover .ImageInput__Background {
+.image-input.image-input--with-value.image-input--loading
+  .image-input__background,
+.image-input--with-value:hover .image-input__background {
   opacity: 0.7;
 }
 
-.ImageInput.ImageInput--error .ImageInput__Content {
+.image-input.image-input--error .image-input__content {
   border-color: var(--primary);
 }
 
-.ImageInput.ImageInput--error .ImageInput__Label,
-.ImageInput.ImageInput--error .ImageInput__Message {
+.image-input.image-input--error .image-input__label,
+.image-input.image-input--error .image-input__message {
   color: var(--primary);
 }

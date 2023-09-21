@@ -1,0 +1,20 @@
+.info-container {
+  color: var(--secondary-text);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.info-container img {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  margin-top: 2px;
+}
+
+.info-container > span {
+  font-size: 15px;
+}

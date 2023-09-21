@@ -26,6 +26,11 @@
   vertical-align: inherit;
 }
 
+.LayoutMainContainer > .dcl.tabs .dcl.tab svg {
+  height: 1em;
+  margin-right: 0.5em;
+}
+
 @media only screen and (max-width: 415px) {
   .LayoutMainContainer > .dcl.tabs .dcl.tab {
     margin-right: 0;
@@ -43,6 +48,7 @@
     height: auto;
     align-items: flex-start;
     flex-direction: column;
+    width: 100%;
   }
 
   .LayoutMainContainer > .dcl.tabs .ui.container {
@@ -50,23 +56,16 @@
     flex-direction: column;
   }
 
-  .LayoutMainContainer > .dcl.tabs .tabs__wrapper {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 16px;
-  }
-
-  .LayoutMainContainer > .dcl.tabs .tabs__wrapper:last-child {
-    margin-bottom: 8px;
-    width: 100%;
-  }
-
   .LayoutMainContainer > .dcl.tabs .SearchInput {
     min-width: 140px;
     flex: 1;
+    display: none;
   }
 
-  .LayoutMainContainer > .dcl.tabs .SubmitButton {
+  .LayoutMainContainer > .dcl.tabs .ui.button {
     margin-right: 1rem;
+    width: auto;
+    min-width: auto;
+    margin: 0 auto;
   }
 }

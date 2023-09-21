@@ -20,6 +20,40 @@ body {
   position: relative;
 }
 
+.ui.container.full,
+.dcl.hero .ui.container,
+.ui.container.footer.LayoutFooterContainer,
+.LayoutNavbarContainer > .ui.container,
+.LayoutMainContainer > .dcl.tabs .ui.container,
+.navigation-menu.fullscreen .dcl.tabs .ui.container {
+  width: calc(100% -48px);
+}
+
+.LayoutMainContainer > .dcl.tabs .ui.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.botom_tabs__wrapper,
+.tabs__wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.dcl.tabs {
+  height: unset !important;
+}
+
+@media only screen and (max-width: 1370px) {
+  .botom_tabs__wrapper {
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+}
+
 @keyframes loading {
   to {
     background-position-x: -200%;
@@ -44,6 +78,43 @@ body {
 }
 
 .ui.two.cards > .ui.card:nth-child(2n),
-.LayoutMainContainer .right.Column .ui.cards > .ui.card:nth-child(3n) {
+.ui.two.cards > .ui.card:nth-child(3n) {
   margin-right: 1em;
+}
+
+.LayoutMainContainer.layout__main .dcl.tabs .tabs__wrapper {
+  display: flex;
+  flex-direction: row;
+  overflow: scroll;
+  width: 100%;
+  /* hide scrollbar IE and Edge */
+  -ms-overflow-style: none;
+  /* hide scrollbar Firefox */
+  scrollbar-width: none;
+  text-wrap: nowrap;
+  padding-right: 20px;
+}
+
+.LayoutMainContainer.layout__main .dcl.tabs .tabs__wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .LayoutMainContainer.layout__main .dcl.tabs .tabs__wrapper {
+    width: unset;
+  }
+}
+
+@media (max-width: 769px) {
+  .LayoutMainContainer > .dcl.tabs .dcl.tab.active {
+    border-bottom: 3px solid var(--primary);
+    border-left: 0;
+  }
+
+  .LayoutMainContainer > .dcl.tabs .dcl.tab,
+  .LayoutMainContainer > .dcl.tabs .dcl.tab.active {
+    padding: 0;
+    margin-left: 16px;
+    text-wrap: nowrap;
+  }
 }

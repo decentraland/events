@@ -1,11 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react"
 
 import { useLocation } from "@gatsbyjs/reach-router"
-import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
-import useMobileDetector from "decentraland-gatsby/dist/hooks/useMobileDetector"
 import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
 import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
@@ -20,13 +18,12 @@ import {
 } from "../../entities/Event/utils"
 import facebookIcon from "../../images/icon-facebook.svg"
 import twitterIcon from "../../images/icon-twitter.svg"
-import notificationDisabledIcon from "../../images/notification-disabled.svg"
-import notificationEnabledIcon from "../../images/notification-enabled.svg"
 import closeIcon from "../../images/popup-close.svg"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import shareIcon from "../../images/share.svg"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
+import { Star } from "../Icon/Star"
 
 import "./AttendingButtons.css"
 
@@ -44,9 +41,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   )
   const isLive = useTimeout(nextStartAt)
   const [fallbackShare, setFallbackShare] = useState(false)
-  const [, actions] = useAuthContext()
   const location = useLocation()
-  const isMobile = useMobileDetector()
   const [, state] = useEventsContext()
   const track = useTrackContext()
   const l = useFormatMessage()
@@ -148,17 +143,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     [event, state]
   )
 
-  const handleNotify = useCallback(
-    (e: React.MouseEvent<any>) => {
-      e.preventDefault()
-      e.stopPropagation()
-      event && state.notify(event.id, !event.notify)
-    },
-    [event, state]
-  )
-
   return (
-    <div className="AttendingButtons">
+    <div className="attending-buttons">
       {fallbackShare && (
         <Button
           inverted
@@ -190,7 +176,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare && isLive && (actions.provider || !isMobile) && (
+      {!fallbackShare && isLive && (
         <Button
           primary
           size="small"
@@ -215,7 +201,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare && !isLive && (actions.provider || !isMobile) && (
+      {!fallbackShare && !isLive && (
         <Button
           inverted
           size="small"
@@ -228,6 +214,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
             event?.attending && "attending",
           ])}
         >
+          {event && <Star active={event.attending} />}
           {!event && " "}
           {event &&
             event.attending &&
@@ -238,30 +225,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         </Button>
       )}
 
-      {!fallbackShare &&
-        !isLive &&
-        event?.attending &&
-        (actions.provider || !isMobile) && (
-          <Button
-            inverted
-            primary
-            size="small"
-            className="share"
-            disabled={loading || sharing || !approved}
-            onClick={handleNotify}
-          >
-            <img
-              src={
-                (event?.notify && notificationEnabledIcon) ||
-                notificationDisabledIcon
-              }
-              width="22"
-              height="22"
-            />
-          </Button>
-        )}
-
-      {!fallbackShare && (actions.provider || !isMobile) && (
+      {!fallbackShare && (
         <Button
           inverted
           primary
@@ -271,20 +235,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           onClick={handleShare}
         >
           <img src={shareIcon} width="14" height="14" />
-        </Button>
-      )}
-
-      {!fallbackShare && !actions.provider && isMobile && (
-        <Button
-          inverted
-          primary
-          size="small"
-          className="share fluid"
-          disabled={loading || sharing || !approved}
-          onClick={handleShare}
-        >
-          <img src={shareIcon} width="14" height="14" />{" "}
-          {l("components.button.attending_buttons.share")}
         </Button>
       )}
     </div>
