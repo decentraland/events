@@ -1,4 +1,3 @@
-import fs from "fs"
 import { resolve } from "path"
 import { promisify } from "util"
 
@@ -12,21 +11,15 @@ import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middl
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import env, { requiredEnv } from "decentraland-gatsby/dist/utils/env"
+import env from "decentraland-gatsby/dist/utils/env"
 import fileUpload, { UploadedFile } from "express-fileupload"
-import fetch from "node-fetch"
 
-import { siteUrl } from "../Event/utils"
 import {
   POSTER_FILE_SIZE,
   POSTER_FILE_TYPES,
   PosterAttributes,
   extension,
 } from "./types"
-/* 
-
-
-var FormData = require("form-data") */
 
 let BUCKET_CHECKED = false
 let BUCKET_CHECKED_JOB: Promise<void> | null = null
@@ -34,7 +27,7 @@ const ACCESS_KEY = env("AWS_ACCESS_KEY", "")
 const ACCESS_SECRET = env("AWS_ACCESS_SECRET", "")
 const BUCKET_NAME = env("AWS_BUCKET_NAME", "")
 const BUCKET_URL = env("AWS_BUCKET_URL")
-const BUCKET_PATH = env("AWS_BUCKET_PATH", "/poster/")
+const BUCKET_PATH = env("AWS_BUCKET_PATH", "")
 
 const s3 = new AWS.S3({
   accessKeyId: ACCESS_KEY,
@@ -64,77 +57,43 @@ export default routes((router) => {
     "/posterSignedUrl",
     withAuth,
     withAuthProfile(),
-    withFile,
     handle(getPosterSignedUrl)
   )
 })
 
 export async function getPosterSignedUrl(
   req: WithAuth
-): Promise<Pick<PosterAttributes, "filename" | "signedUrl" | "url">> {
+): Promise<Pick<PosterAttributes, "filename" | "signedUrl">> {
   const initial = Date.now()
   const auth = req.auth as string
+  const mimetype = req.body.mimetype
 
-  const ext = extension(req.body.type)
+  const ext = extension(mimetype)
+
   const timeHash = Math.floor(initial / 1000)
     .toString(16)
     .toLowerCase()
   const userHash = auth.slice(-8).toLowerCase()
-  const filename = BUCKET_DIR + "/" + userHash + timeHash + ext
-  await ensure()
+  const filename = userHash + timeHash + ext
 
   const signedUrlExpireSeconds = 60 * 1000
 
-  const signedUrl = s3.getSignedUrl("putObject", {
+  const objectToSign = {
     Bucket: BUCKET_NAME,
-    Key: filename,
+    Key: `${filename}`,
     Expires: signedUrlExpireSeconds,
-    ContentType: req.body.type,
+    ContentType: mimetype,
     ACL: "public-read",
     CacheControl: "public, max-age=31536000, immutable",
-  })
+  }
 
-  const time = ((Date.now() - initial) / 1000).toFixed(3)
-  console.log(signedUrl)
-
-  const url = new URL(signedUrl)
-  url.host = "localhost" // siteUrl().host
+  const signedUrl = s3.getSignedUrl("putObject", objectToSign)
 
   const result = {
     filename,
-    url: BUCKET_URL + "/" + filename,
-    signedUrl: url.toString(),
+    signedUrl: signedUrl,
   }
 
-  /* const form = new FormData()
-  form.append(
-    "file",
-    fs.createReadStream("/Users/braianmellor/Downloads/15f70ddd62cdfe24.jpg")
-  ) */
-
-  //Send the file to File-system
-  console.log("Sending file to S3...")
-  const resp = await fetch(url.toString(), {
-    method: "PUT",
-    body: fs.readFileSync("/Users/braianmellor/Downloads/15f70ddd62cdfe24.jpg"),
-    headers: {
-      "Content-Type": req.body.type,
-      "Cache-Control": "public, max-age=31536000, immutable",
-    },
-  }).catch((err) => {
-    console.log("------------------------")
-    console.log(err)
-    return null
-  })
-
-  console.log("@@@@@@@@@@@@@@@")
-  console.log(resp)
-  console.log(resp?.body)
-
-  logger.log(`new poster created: ${JSON.stringify(result)} (time: ${time}s)`, {
-    poster: result,
-    time,
-  })
   return result
 }
 
@@ -216,7 +175,7 @@ async function ensure() {
 
   BUCKET_CHECKED_JOB = (async () => {
     try {
-      await headBucket({ Bucket: BUCKET_NAME })
+      // await headBucket({ Bucket: BUCKET_NAME })
       const bucketExists = await headObject({
         Bucket: BUCKET_NAME,
         Key: BUCKET_PATH,
