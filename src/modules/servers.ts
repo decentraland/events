@@ -4,9 +4,15 @@ import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
 import { memo } from "radash/dist/curry"
 
+const mainRealmUrl = "https://realm-provider.decentraland.org/main"
+
 export const getServers = memo(
   async () => {
-    const servers = cache.catalysts.mainnet
+    const servers: { address: string }[] = cache.catalysts.mainnet
+
+    // add main realm
+    servers.push({ address: mainRealmUrl })
+
     return Promise.all(
       servers.map((server) => {
         return API.catch(Catalyst.getInstanceFrom(server.address).getAbout())
