@@ -6,7 +6,7 @@ import { memo } from "radash/dist/curry"
 
 export const getServers = memo(
   async () => {
-    const servers = cache.catalysts.mainnet
+    const servers: { address: string }[] = cache.catalysts.mainnet
 
     // add main realm
     servers.push({ address: "https://realm-provider.decentraland.org/main" })
