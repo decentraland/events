@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto"
+
 import isAdmin from "decentraland-gatsby/dist/entities/Auth/isAdmin"
 import {
   WithAuth,
@@ -8,9 +10,7 @@ import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import { Request } from "express"
-import omit from "lodash/omit"
 import pick from "lodash/pick"
-import { v4 as uuid } from "uuid"
 
 import { getAuthProfileSettings } from "../ProfileSettings/routes/getAuthProfileSettings"
 import { canEditAnySchedule } from "../ProfileSettings/utils"
@@ -56,7 +56,7 @@ export async function createSchedule(req: WithAuth) {
   }
 
   return await ScheduleModel.create<ScheduleAttributes>({
-    id: uuid(),
+    id: randomUUID(),
     name: data.name,
     description: data.description || null,
     image: data.image || null,

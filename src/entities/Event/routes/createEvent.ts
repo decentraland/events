@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto"
+
 import { isInsideWorldLimits } from "@dcl/schemas/dist/dapps/world"
 import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
@@ -9,7 +11,6 @@ import Land from "decentraland-gatsby/dist/utils/api/Land"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import omit from "lodash/omit"
-import { v4 as uuid } from "uuid"
 
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
@@ -94,7 +95,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   const now = new Date()
-  const event_id = uuid()
+  const event_id = randomUUID()
   let estate_name: string | null = null
   let image = ""
   let estate_id = null
