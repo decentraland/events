@@ -57,7 +57,7 @@
     "@types/express-fileupload": "^1.1.7",
     "@types/html-escaper": "^3.0.0",
     "@types/jest": "^29.5.1",
-    "@types/node": "^13.9.1",
+    "@types/node": "^18.17.0",
     "@types/react": "^17.0.34",
     "@types/react-helmet": "^5.0.15",
     "@types/validator": "^13.6.3",
