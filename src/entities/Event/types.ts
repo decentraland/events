@@ -100,7 +100,7 @@ export type EventAttributes = {
   x: number
   y: number
   server: string | null
-  url: string | null
+  url: string
   user: string
   estate_id: string | null
   estate_name: string | null
