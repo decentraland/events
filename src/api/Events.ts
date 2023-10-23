@@ -161,6 +161,7 @@ export default class Events extends API {
     return (result || []).map(Events.parseEvent)
   }
 
+  /** @deprecated Notification no longer used */
   async createSubscription(subscription: {
     endpoint: string
     p256dh: string
@@ -175,6 +176,7 @@ export default class Events extends API {
     )
   }
 
+  /** @deprecated Notification no longer used */
   async removeSubscriptions() {
     return this.fetch<{}>(
       `/profiles/subscriptions`,

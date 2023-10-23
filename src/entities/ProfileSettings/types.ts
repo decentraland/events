@@ -1,5 +1,3 @@
-import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
-
 export type ProfileSettingsAttributes = {
   user: string
   email: string | null

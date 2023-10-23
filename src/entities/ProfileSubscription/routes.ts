@@ -33,6 +33,7 @@ export default routes((router) => {
   )
 })
 
+/** @deprecated Notification no longer used */
 export async function getProfileSubscription(req: WithAuth) {
   const user = req.auth!
   return ProfileSubscriptionModel.find({ user })
@@ -40,6 +41,7 @@ export async function getProfileSubscription(req: WithAuth) {
 
 const validateProfileSubscription =
   createValidator<ProfileSubscriptionAttributes>(profileSubscriptionSchema)
+/** @deprecated Notification no longer used */
 export async function createProfileSubscription(req: WithAuth) {
   const user = req.auth!
   const data = validateProfileSubscription(req.body)
@@ -59,6 +61,7 @@ export async function createProfileSubscription(req: WithAuth) {
   return true
 }
 
+/** @deprecated Notification no longer used */
 export async function removeProfileSubscription(req: WithAuth) {
   const user = req.auth!
   await ProfileSubscriptionModel.delete({ user })

@@ -28,6 +28,7 @@ export default React.memo(function EventCardBig(props: EventCardBigProps) {
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (event) {
+        e.preventDefault()
         if (onClick) {
           onClick(e, event)
         }

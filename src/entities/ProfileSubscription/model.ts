@@ -8,6 +8,7 @@ import isEthereumAddress from "validator/lib/isEthereumAddress"
 
 import { ProfileSubscriptionAttributes } from "./types"
 
+/** @deprecated Notification no longer used */
 export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionAttributes> {
   static tableName = "profile_subscriptions"
   static primaryKey = "endpoint"

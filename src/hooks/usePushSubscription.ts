@@ -12,6 +12,7 @@ export type PushSubscriptionState = {
 
 const applicationServerKey = fromWebPushKey(env("WEB_PUSH_KEY", ""))
 
+/** @deprecated Notification no longer used */
 export default function usePushSubscription(path = "/sw.js") {
   const registration = useServiceWorker(path)
   const [state, patchState] = usePatchState<PushSubscriptionState>({
@@ -30,6 +31,7 @@ export default function usePushSubscription(path = "/sw.js") {
     }
   }, [registration])
 
+  /** @deprecated Notification no longer used */
   async function subscribe() {
     if (state.subscription) {
       return state.subscription
@@ -49,6 +51,7 @@ export default function usePushSubscription(path = "/sw.js") {
     return subscription
   }
 
+  /** @deprecated Notification no longer used */
   async function unsubscribe() {
     if (!state.subscription) {
       return false
