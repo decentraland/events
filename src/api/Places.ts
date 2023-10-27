@@ -145,4 +145,9 @@ export default class Places extends API {
       this.options().authorization({ sign: true, optional: true })
     )
   }
+
+  async getWorldNames() {
+    const result: string[] = (await this.fetch(`/world_names`)) as any
+    return result || []
+  }
 }
