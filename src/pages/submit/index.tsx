@@ -1178,20 +1178,6 @@ export default function SubmitPage() {
                     onChange={editActions.handleChange}
                     border
                   />
-                  {editing.world && (
-                    <Info
-                      text={l("page.submit.worlds_policy", {
-                        dao_proposal: (
-                          <Link
-                            href={l("page.submit.worlds_proposal_url")}
-                            target="_blank"
-                          >
-                            {l("page.submit.dao_proposal")}
-                          </Link>
-                        ),
-                      })}
-                    />
-                  )}
                 </Grid.Column>
               </Grid.Row>
 
