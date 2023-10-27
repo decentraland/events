@@ -68,7 +68,11 @@ import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 import { getServerOptions, getServers } from "../../modules/servers"
-import { getWorlds, getWorldsOptions } from "../../modules/worlds"
+import {
+  getWorldNames,
+  getWorldNamesOptions,
+  getWorlds,
+} from "../../modules/worlds"
 
 import "./index.css"
 
@@ -185,7 +189,7 @@ export default function SubmitPage() {
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
   const [servers] = useAsyncMemo(getServers)
-  const [worlds] = useAsyncMemo(getWorlds)
+  const [worlds] = useAsyncMemo(getWorldNames)
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
 
@@ -198,7 +202,7 @@ export default function SubmitPage() {
 
   const serverOptions = useMemo(() => {
     if (editing.world) {
-      return getWorldsOptions(worlds)
+      return getWorldNamesOptions(worlds)
     } else {
       return getServerOptions(servers)
     }

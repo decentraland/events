@@ -146,6 +146,20 @@ export default class Places extends API {
     )
   }
 
+  async getWorldByName(names: string[]) {
+    const query = new URLSearchParams()
+
+    for (const name of names) {
+      query.append("name", name)
+    }
+    query.append("limit", "1")
+    query.append("offset", "0")
+    return this.fetchMany(
+      `/worlds?${query.toString()}`,
+      this.options().authorization({ sign: true, optional: true })
+    )
+  }
+
   async getWorldNames() {
     const result: string[] = (await this.fetch(`/world_names`)) as any
     return result || []
