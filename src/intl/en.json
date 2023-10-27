@@ -120,7 +120,6 @@
       "event_submission_will_be_reviewed": "The event submission will be reviewed by our team, you’ll be notified by email",
       "limit_attendees_label": "The limit of attendees is {limit}",
       "limit_attendees": "100 people",
-      "worlds_policy": "The event must be hosted in a world that belongs to a LAND owner or renters. {dao_proposal}.",
       "renters": "renters",
       "worlds_proposal_url": "https://governance.decentraland.org/proposal/?id=e712bb50-e822-11ed-b8f1-75dbe089d333",
       "dao_proposal": "View DAO proposal",
