@@ -326,6 +326,15 @@ export default class Events extends API {
     )
   }
 
+  async getPresignedUrl(type: string): Promise<PosterAttributes> {
+    return this.fetch(
+      `/posterSignedUrl`,
+      this.options({ method: "POST" })
+        .authorization({ sign: true })
+        .json({ type })
+    )
+  }
+
   async uploadPoster(file: File): Promise<PosterAttributes> {
     const body = new FormData()
     body.append("poster", file)

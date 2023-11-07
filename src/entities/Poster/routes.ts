@@ -11,7 +11,7 @@ import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middl
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import env, { requiredEnv } from "decentraland-gatsby/dist/utils/env"
+import env from "decentraland-gatsby/dist/utils/env"
 import fileUpload, { UploadedFile } from "express-fileupload"
 
 import {
@@ -27,7 +27,7 @@ const ACCESS_KEY = env("AWS_ACCESS_KEY", "")
 const ACCESS_SECRET = env("AWS_ACCESS_SECRET", "")
 const BUCKET_NAME = env("AWS_BUCKET_NAME", "")
 const BUCKET_URL = env("AWS_BUCKET_URL")
-const BUCKET_PATH = env("AWS_BUCKET_PATH", "/poster/")
+const BUCKET_PATH = env("AWS_BUCKET_PATH", "")
 
 const s3 = new AWS.S3({
   accessKeyId: ACCESS_KEY,
@@ -53,9 +53,53 @@ export default routes((router) => {
     withFile,
     handle(uploadPoster)
   )
+  router.post(
+    "/posterSignedUrl",
+    withAuth,
+    withAuthProfile(),
+    handle(getPosterSignedUrl)
+  )
 })
 
-export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
+export async function getPosterSignedUrl(
+  req: WithAuth
+): Promise<Pick<PosterAttributes, "filename" | "signedUrl">> {
+  const initial = Date.now()
+  const auth = req.auth as string
+  const mimetype = req.body.mimetype
+
+  const ext = extension(mimetype)
+
+  const timeHash = Math.floor(initial / 1000)
+    .toString(16)
+    .toLowerCase()
+  const userHash = auth.slice(-8).toLowerCase()
+  const filename = userHash + timeHash + ext
+
+  const signedUrlExpireSeconds = 60 * 1000
+
+  const objectToSign = {
+    Bucket: BUCKET_NAME,
+    Key: `${filename}`,
+    Expires: signedUrlExpireSeconds,
+    ContentType: mimetype,
+    ACL: "public-read",
+    CacheControl: "public, max-age=31536000, immutable",
+  }
+
+  const signedUrl = s3.getSignedUrl("putObject", objectToSign)
+
+  const result = {
+    filename,
+    signedUrl: signedUrl,
+  }
+
+  return result
+}
+
+export async function uploadPoster(
+  req: WithAuth
+): Promise<Pick<PosterAttributes, "filename" | "size" | "url" | "type">> {
   if (!req.files || !req.files.poster) {
     throw new RequestError(`Poster param is required`, RequestError.BadRequest)
   }
@@ -131,7 +175,7 @@ async function ensure() {
 
   BUCKET_CHECKED_JOB = (async () => {
     try {
-      await headBucket({ Bucket: BUCKET_NAME })
+      // await headBucket({ Bucket: BUCKET_NAME })
       const bucketExists = await headObject({
         Bucket: BUCKET_NAME,
         Key: BUCKET_PATH,
