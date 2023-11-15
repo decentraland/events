@@ -114,7 +114,9 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         <span>
           <strong>Decentraland Foundation</strong>
           <InfoTooltip
-            content={l("components.event.event_detail.decentraland_foundation_info")}
+            content={l(
+              "components.event.event_detail.decentraland_foundation_info"
+            )}
             position="right center"
             on="hover"
           />
