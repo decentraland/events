@@ -35,8 +35,8 @@ import AttendingButtons from "../../../Button/AttendingButtons"
 import JumpInButton from "../../../Button/JumpInPosition"
 import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
 import EventSection from "../../EventSection"
-import { useDecentralandFoundationAddresses } from "./utils"
 import EventDateDetail from "./EventDateDetail"
+import { useDecentralandFoundationAddresses } from "./utils"
 
 import "./EventDetail.css"
 
