@@ -313,7 +313,8 @@
         "no_description": "No description",
         "nobody_confirmed_yet": "Nobody confirmed yet",
         "no_contact": "No contact",
-        "no_details": "No details"
+        "no_details": "No details",
+        "decentraland_foundation_info": "This event is produced by The Decentraland Foundation."
       }
     },
     "modal": {
