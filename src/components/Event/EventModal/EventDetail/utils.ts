@@ -4,13 +4,12 @@ import { Flags } from "../../../../modules/features"
 
 export function useDecentralandFoundationAddresses() {
   const [ff] = useFeatureFlagContext()
-  if (
-    ff.flags[Flags.DCLFoundationAddresses] &&
-    ff.variants[Flags.DCLFoundationAddresses].payload
-  ) {
-    return JSON.parse(
-      ff.variants[Flags.DCLFoundationAddresses].payload.value
-    ).map((address: string) => address.toLowerCase())
+  const isFoundationAddressesEnabled = ff.flags[Flags.DCLFoundationAddresses]
+  const payload = ff.variants[Flags.DCLFoundationAddresses].payload
+  if (isFoundationAddressesEnabled && payload) {
+    return JSON.parse(payload.value).map((address: string) =>
+      address.toLowerCase()
+    )
   }
 
   return []
