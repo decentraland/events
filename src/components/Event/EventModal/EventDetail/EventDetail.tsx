@@ -13,6 +13,7 @@ import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import Link from "decentraland-gatsby/dist/plugins/intl/Link"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
+import { InfoTooltip } from "decentraland-ui/dist/components/InfoTooltip"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import isEmail from "validator/lib/isEmail"
 
@@ -20,6 +21,7 @@ import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import { SessionEventAttributes } from "../../../../entities/Event/types"
 import { profileSiteUrl } from "../../../../entities/Event/utils"
 import { canEditAnyEvent } from "../../../../entities/ProfileSettings/utils"
+import { useDecentralandFoundationAddresses } from "../../../../hooks/useDecentralandFoundationAddresses"
 import extraIcon from "../../../../images/info.svg"
 import friendsIcon from "../../../../images/secondary-friends.svg"
 import infoIcon from "../../../../images/secondary-info.svg"
@@ -73,6 +75,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
   const advance = event.user === settings.user || canEditAnyEvent(settings)
   const utc = props.utc ?? !settings.use_local_time
   const [ff] = useFeatureFlagContext()
+  const dclAddresses = useDecentralandFoundationAddresses()
 
   const [place, placeStatus] = useAsyncMemo(
     async () => {
@@ -105,6 +108,30 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
     }
   }, [event])
 
+  const organizer = useMemo(() => {
+    if (dclAddresses.includes(event.user.toLowerCase())) {
+      return (
+        <span>
+          <strong>Decentraland Foundation</strong>
+          <InfoTooltip
+            content="This event is produced by The Decentraland Foundation."
+            position="right center"
+            on="hover"
+          />
+        </span>
+      )
+    }
+    return (
+      <Link
+        href={
+          ff.flags[Flags.ProfileSite] ? profileSiteUrl(event.user) : undefined
+        }
+      >
+        {event.user_name || "Guest"}
+      </Link>
+    )
+  }, [])
+
   return (
     <div className="event-detail">
       <div className="event-detail__header">
@@ -113,17 +140,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
           <SubTitle>{event.name}</SubTitle>
           <Paragraph className="event-detail__header-event-by" secondary>
             {l("components.event.event_detail.public_organized_by", {
-              organizer: (
-                <Link
-                  href={
-                    ff.flags[Flags.ProfileSite]
-                      ? profileSiteUrl(event.user)
-                      : undefined
-                  }
-                >
-                  {event.user_name || "Guest"}
-                </Link>
-              ),
+              organizer,
             })}
           </Paragraph>
         </div>
