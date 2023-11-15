@@ -114,7 +114,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         <span>
           <strong>Decentraland Foundation</strong>
           <InfoTooltip
-            content="This event is produced by The Decentraland Foundation."
+            content={l("components.event.event_detail.decentraland_foundation_info")}
             position="right center"
             on="hover"
           />
@@ -130,7 +130,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
         {event.user_name || "Guest"}
       </Link>
     )
-  }, [])
+  }, [dclAddresses, event.user, event.user_name])
 
   return (
     <div className="event-detail">
