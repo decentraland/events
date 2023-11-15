@@ -1,6 +1,6 @@
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 
-import { Flags } from "../../../../modules/features"
+import { Flags } from "../modules/features"
 
 export function useDecentralandFoundationAddresses() {
   const [ff] = useFeatureFlagContext()
