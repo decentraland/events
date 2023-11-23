@@ -41,6 +41,8 @@ COPY ./gatsby-ssr.js        /app/gatsby-ssr.js
 COPY ./tsconfig.json        /app/tsconfig.json
 
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:server
+RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front -- --prefix-paths
+RUN mv public public-prefix
 RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front
 RUN npm prune --production
 
