@@ -45,7 +45,7 @@ export type AggregatePlaceAttributes = PlaceAttributes & {
 }
 
 export default class Places extends API {
-  static Url = env("PLACES_URL", `https://places.decentraland.org`)
+  static Url = env("PLACES_API_URL", `https://places.decentraland.org`)
 
   static Cache = new Map<string, Places>()
 
@@ -58,7 +58,7 @@ export default class Places extends API {
   }
 
   static get() {
-    return this.from(`${env("PLACES_URL", this.Url)}/api`)
+    return this.from(`${env("PLACES_API_URL", this.Url)}/api`)
   }
 
   static parsePlace(place: AggregatePlaceAttributes): AggregatePlaceAttributes {
