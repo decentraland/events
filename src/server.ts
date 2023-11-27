@@ -78,6 +78,7 @@ app.use(env("NEW_ROLLOUT") !== undefined ? "/events" : "/", [
   withCors({
     cors: "*",
     corsOrigin: "*",
+    allowedHeaders: "*",
   }),
   gatsby(
     resolve(
