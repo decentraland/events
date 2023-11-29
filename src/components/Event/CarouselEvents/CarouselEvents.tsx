@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from "react"
 
-import Carousel2, {
-  IndicatorType,
-} from "decentraland-gatsby/dist/components/Carousel2/Carousel2"
+import { withPrefix } from "gatsby"
+
+import Carousel2 from "decentraland-gatsby/dist/components/Carousel2/Carousel2"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
@@ -108,7 +108,7 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
             <Button
               primary
               as="a"
-              href={locations.schedule(schedule.id)}
+              href={withPrefix(locations.schedule(schedule.id))}
               onClick={handleClickFullSchedule}
             >
               Full Schedule
@@ -176,7 +176,7 @@ const CarouselThemeHeader = React.memo(function CarouselThemeHeader({
       <Button
         as="a"
         primary
-        href={locations.schedule(schedule.id)}
+        href={withPrefix(locations.schedule(schedule.id))}
         onClick={handleClickFullSchedule}
       >
         {CarouselThemeHeaderCTA[schedule.theme]}

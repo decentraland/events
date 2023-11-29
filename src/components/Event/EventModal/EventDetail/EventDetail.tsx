@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from "react"
 
+import { withPrefix } from "gatsby"
+
 import DateBox from "decentraland-gatsby/dist/components/Date/DateBox"
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
 import Italic from "decentraland-gatsby/dist/components/Text/Italic"
@@ -154,7 +156,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
                   basic
                   className="edit-detail__menu-icon-button"
                   as="a"
-                  href={locations.editEvent(event.id)}
+                  href={withPrefix(locations.editEvent(event.id))}
                   onClick={prevent(() =>
                     navigate(locations.editEvent(event.id))
                   )}
@@ -167,7 +169,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
                   basic
                   className="edit-detail__menu-icon-button"
                   as="a"
-                  href={locations.cloneEvent(event.id)}
+                  href={withPrefix(locations.cloneEvent(event.id))}
                   onClick={prevent(() =>
                     navigate(locations.cloneEvent(event.id))
                   )}

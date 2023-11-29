@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from "react"
 
+import { withPrefix } from "gatsby"
+
 import { useLocation } from "@gatsbyjs/reach-router"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
@@ -102,6 +104,9 @@ export default function Navigation(props: NavigationProps) {
 
       debounceTrack(e.target.value)
       let target = location.pathname
+      if (target.startsWith(withPrefix("/"))) {
+        target = target.slice(withPrefix("/").length)
+      }
       const search = newParams.toString()
       if (search) {
         target += "?" + search

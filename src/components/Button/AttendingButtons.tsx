@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react"
 
+import { withPrefix } from "gatsby"
+
 import { useLocation } from "@gatsbyjs/reach-router"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
@@ -58,7 +60,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         await (navigator as any).share({
           title: event.name,
           text: event.description,
-          url: location.origin + locations.event(event.id),
+          url: location.origin + withPrefix(locations.event(event.id)),
         })
       } catch (err) {
         console.error(err)
@@ -183,7 +185,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           disabled={loading || sharing || !approved}
           onClick={handleStopPropagation}
           className="fluid"
-          href={href}
+          href={href ? withPrefix(href) : href}
           target="_blank"
           style={{
             display: "flex",
