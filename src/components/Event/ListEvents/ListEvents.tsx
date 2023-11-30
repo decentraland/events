@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from "react"
 
+import { withPrefix } from "gatsby"
+
 import { useLocation } from "@gatsbyjs/reach-router"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -138,7 +140,10 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
         new URLSearchParams(location.search)
       )
       track(SegmentEvent.Filter, newFilters)
-      navigate(url(location.pathname, newParams))
+      const pathname = location.pathname.startsWith(withPrefix("/"))
+        ? location.pathname.slice(withPrefix("/").length)
+        : location.pathname
+      navigate(url(pathname, newParams))
     },
     [location.pathname, location.search, props.filters]
   )
@@ -152,7 +157,10 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
         new URLSearchParams(location.search)
       )
       track(SegmentEvent.Filter, newFilters)
-      navigate(url(location.pathname, newParams))
+      const pathname = location.pathname.startsWith(withPrefix(""))
+        ? location.pathname.slice(withPrefix("/").length)
+        : location.pathname
+      navigate(url(pathname, newParams))
     },
     [location.pathname, location.search, props.filters]
   )
@@ -172,7 +180,10 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
         new URLSearchParams(location.search)
       )
       track(SegmentEvent.Filter, newFilters)
-      navigate(url(location.pathname, newParams))
+      const pathname = location.pathname.startsWith(withPrefix("/"))
+        ? location.pathname.slice(withPrefix("/").length)
+        : location.pathname
+      navigate(url(pathname, newParams))
     },
     []
   )
@@ -192,7 +203,10 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
         new URLSearchParams(location.search)
       )
       track(SegmentEvent.Filter, newFilters)
-      navigate(url(location.pathname, newParams))
+      const pathname = location.pathname.startsWith(withPrefix("/"))
+        ? location.pathname.slice(withPrefix("/").length)
+        : location.pathname
+      navigate(url(pathname, newParams))
     },
     []
   )

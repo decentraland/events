@@ -1,5 +1,4 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
-import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventType } from "../entities/Event/types"
 import {
@@ -8,8 +7,6 @@ import {
   toEventTime,
 } from "../entities/Event/utils"
 import { ALL_EVENT_CATEGORY } from "../entities/EventCategory/types"
-
-const BASE_URL = env("BASE_URL", "/")
 
 export enum EventView {
   Attendees = "attendees",
@@ -90,7 +87,7 @@ export function url(
   path: string,
   query?: Record<string, string> | URLSearchParams
 ) {
-  return API.url(BASE_URL, path, query)
+  return API.url("", path, query)
 }
 
 export default {

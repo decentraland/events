@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from "react"
 
+import { withPrefix } from "gatsby"
+
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import Avatar from "decentraland-gatsby/dist/components/Profile/Avatar"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -7,13 +9,11 @@ import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { Card } from "decentraland-ui/dist/components/Card/Card"
 
 import { SessionEventAttributes } from "../../../entities/Event/types"
-import WorldIcon from "../../../images/worlds-icon.svg"
 import locations from "../../../modules/locations"
 import StartIn from "../../Badge/StartIn"
 import AttendingButtons from "../../Button/AttendingButtons"
 import JumpInPosition from "../../Button/JumpInPosition"
 import EventDate from "../EventDate/EventDate"
-import EventSection from "../EventSection"
 
 import "./EventCard.css"
 
@@ -64,7 +64,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
         props.loading && "loading",
         event && !event.approved && "pending",
       ])}
-      href={href}
+      href={href ? withPrefix(href) : href}
       onClick={handleClick}
     >
       {event && <StartIn date={nextStartAt} />}

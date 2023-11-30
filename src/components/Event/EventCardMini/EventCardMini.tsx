@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from "react"
 
+import { withPrefix } from "gatsby"
+
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
@@ -52,7 +54,7 @@ export default React.memo(function EventCardMini(props: EventCardMiniProps) {
         props.loading && "loading",
         event && !event.approved && "pending",
       ])}
-      href={href}
+      href={href ? withPrefix(href) : href}
       onClick={handleClick}
     >
       {event && !props.loading && (

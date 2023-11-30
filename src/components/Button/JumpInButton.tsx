@@ -1,5 +1,7 @@
 import React, { useMemo } from "react"
 
+import { withPrefix } from "gatsby"
+
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
   Button,
@@ -28,7 +30,7 @@ export default function JumpInButton(props: ButtonProps) {
     <Button
       primary
       className="fluid"
-      href={href}
+      href={withPrefix(href)}
       target="_blank"
       style={{
         display: "flex",

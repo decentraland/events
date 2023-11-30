@@ -2,7 +2,7 @@ import { cache } from "dcl-catalyst-client/dist/contracts-snapshots/data"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
-import { memo } from "radash/dist/curry"
+import { memo } from "radash"
 
 const mainRealmUrl = "https://realm-provider.decentraland.org/main"
 

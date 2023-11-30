@@ -58,7 +58,7 @@ export type EditSchedule = Pick<
 >
 
 export default class Events extends API {
-  static Url = env("EVENTS_URL", `https://events.decentraland.org/api`)
+  static Url = env("EVENTS_API_URL", `https://events.decentraland.org/api`)
 
   static Cache = new Map<string, Events>()
 
@@ -71,7 +71,7 @@ export default class Events extends API {
   }
 
   static get() {
-    return this.from(env("EVENTS_URL", this.Url))
+    return this.from(env("EVENTS_API_URL", this.Url))
   }
 
   static parseEvent(event: SessionEventAttributes): SessionEventAttributes {

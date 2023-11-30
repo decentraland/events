@@ -1,3 +1,5 @@
+import { withPrefix } from "gatsby"
+
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import padStart from "lodash/padStart"
@@ -20,7 +22,10 @@ const DECENTRALAND_URL = env(
   "DECENTRALAND_URL",
   "https://play.decentraland.org"
 )
-const EVENTS_URL = env("EVENTS_URL", "https://events.decentraland.org/api")
+const EVENTS_BASE_URL = env(
+  "EVENTS_BASE_URL",
+  "https://events.decentraland.org"
+)
 const PROFILE_SITE_URL = env(
   "PROFILE_SITE_URL",
   "https://profile.decentraland.org"
@@ -33,8 +38,8 @@ export function profileSiteUrl(address: string) {
 }
 
 export function siteUrl(pathname = "") {
-  const target = new URL(EVENTS_URL)
-  target.pathname = pathname
+  const target = new URL(EVENTS_BASE_URL)
+  target.pathname = withPrefix(pathname)
   return target
 }
 

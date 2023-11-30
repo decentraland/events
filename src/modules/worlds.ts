@@ -1,6 +1,6 @@
 import Dataloader from "dataloader"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
-import { memo } from "radash/dist/curry"
+import { memo } from "radash"
 
 import Places, { AggregatePlaceAttributes } from "../api/Places"
 

@@ -1,5 +1,7 @@
 import React, { useCallback } from "react"
 
+import { withPrefix } from "gatsby"
+
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -53,7 +55,7 @@ export default function AddToCalendarButton({
       target="_blank"
       {...props}
       onClick={handleClick}
-      href={to}
+      href={withPrefix(to)}
       basic
       className={TokenList.join(["AddToCalendarButton", props.className])}
     >
