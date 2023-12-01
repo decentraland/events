@@ -37,11 +37,10 @@ export function profileSiteUrl(address: string) {
 
 export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_BASE_URL)
-  target.pathname = target.pathname + pathname
+  target.pathname = (target.pathname + pathname).replace(/\/+/g, "/")
   return target
 }
 
-// TODO: This is used by the functions below in the UI and the backend
 export function eventUrl(event: Pick<EventAttributes, "id">): string {
   const target = siteUrl("/event/")
   target.searchParams.set("id", event.id)
@@ -68,7 +67,6 @@ export function eventTargetUrl(
   return target.toString()
 }
 
-// TODO: This is used in the UI and the backend as well.
 export function eventFacebookUrl(
   event: Pick<EventAttributes, "id" | "description">
 ): string {
