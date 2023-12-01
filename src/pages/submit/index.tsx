@@ -68,11 +68,7 @@ import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 import { getServerOptions, getServers } from "../../modules/servers"
-import {
-  getWorldNames,
-  getWorldNamesOptions,
-  getWorlds,
-} from "../../modules/worlds"
+import { getWorldNames, getWorldNamesOptions } from "../../modules/worlds"
 
 import "./index.css"
 

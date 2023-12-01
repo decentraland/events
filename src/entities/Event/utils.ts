@@ -1,5 +1,3 @@
-import { withPrefix } from "gatsby"
-
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import padStart from "lodash/padStart"
@@ -39,7 +37,7 @@ export function profileSiteUrl(address: string) {
 
 export function siteUrl(pathname = "") {
   const target = new URL(EVENTS_BASE_URL)
-  target.pathname = withPrefix(pathname)
+  target.pathname = (target.pathname + pathname).replace(/\/+/g, "/")
   return target
 }
 
@@ -82,6 +80,7 @@ export function eventFacebookUrl(
   return target.toString()
 }
 
+// TODO: This is used in the UI and the backend as well.
 export function eventTwitterUrl(
   event: Pick<EventAttributes, "id" | "description">
 ): string {
