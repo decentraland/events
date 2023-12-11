@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo, useState } from "react"
 
+import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Avatar from "decentraland-gatsby/dist/components/User/Avatar"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Link } from "decentraland-gatsby/dist/plugins/intl"
@@ -30,6 +32,7 @@ import {
   updateProfileSettingsSchema,
 } from "../entities/ProfileSettings/types"
 import { canEditAnyProfile } from "../entities/ProfileSettings/utils"
+import { Flags } from "../modules/features"
 import locations from "../modules/locations"
 
 import "./users.css"
@@ -41,6 +44,7 @@ export default function SettingsPage() {
   const l = useFormatMessage()
   const [account, accountState] = useAuthContext()
   const [settings, settingsState] = useProfileSettingsContext()
+  const [ff] = useFeatureFlagContext()
   const [filter, setFilter] = useState("")
   const handleChangeFilter = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -82,6 +86,10 @@ export default function SettingsPage() {
       ),
     [avatars]
   )
+
+  if (ff.flags[Flags.Maintenance]) {
+    return <MaintenancePage />
+  }
 
   if (
     !account ||

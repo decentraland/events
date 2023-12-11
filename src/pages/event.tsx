@@ -4,8 +4,10 @@ import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
+import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
@@ -22,6 +24,7 @@ import {
   canApproveAnyEvent,
   canApproveOwnEvent,
 } from "../entities/ProfileSettings/utils"
+import { Flags } from "../modules/features"
 
 import "./index.css"
 
@@ -31,6 +34,7 @@ export type EventPageState = {
 
 export default function EventPage() {
   const l = useFormatMessage()
+  const [ff] = useFeatureFlagContext()
   const [, accountState] = useAuthContext()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
@@ -45,6 +49,10 @@ export default function EventPage() {
     [settings, event]
   )
   const loading = accountState.loading || eventState.loading
+
+  if (ff.flags[Flags.Maintenance]) {
+    return <MaintenancePage />
+  }
 
   if (!loading && !event && eventState.version !== 0) {
     return (

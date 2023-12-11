@@ -3,11 +3,13 @@ import React, { useEffect, useMemo, useState } from "react"
 import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
+import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import prevent from "decentraland-gatsby/dist/utils/react/prevent"
@@ -26,6 +28,7 @@ import {
   useEventsContext,
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
+import { Flags } from "../modules/features"
 import locations from "../modules/locations"
 
 import "./index.css"
@@ -33,6 +36,7 @@ import "./index.css"
 export default function MyEventsPage() {
   const l = useFormatMessage()
   const location = useLocation()
+  const [ff] = useFeatureFlagContext()
   const params = new URLSearchParams(location.search)
   const [account, accountState] = useAuthContext()
   const [eventList, eventsState] = useEventsContext()
@@ -50,6 +54,10 @@ export default function MyEventsPage() {
       navigate(locations.event(event.id), { replace: true })
     }
   }, [event])
+
+  if (ff.flags[Flags.Maintenance]) {
+    return <MaintenancePage />
+  }
 
   if (accountState.loading || !account) {
     return (
