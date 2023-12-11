@@ -58,7 +58,6 @@ typings/
 .parcel-cache/
 .cache/
 public
-public-prefix
 
 # Mac files
 .DS_Store
