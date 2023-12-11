@@ -3,7 +3,9 @@ import React, { useEffect, useMemo, useState } from "react"
 import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
+import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -24,6 +26,7 @@ import { useProfileSettingsContext } from "../context/ProfileSetting"
 import { SessionEventAttributes } from "../entities/Event/types"
 import { getCurrentSchedules } from "../entities/Schedule/utils"
 import { getSchedules } from "../modules/events"
+import { Flags } from "../modules/features"
 import locations, { toEventFilters } from "../modules/locations"
 
 import "./index.css"
@@ -63,6 +66,12 @@ export default function IndexPage() {
       navigate(locations.event(event.id), { replace: true })
     }
   }, [event])
+
+  const [ff] = useFeatureFlagContext()
+
+  if (ff.flags[Flags.Maintenance]) {
+    return <MaintenancePage />
+  }
 
   return (
     <>

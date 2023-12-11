@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react"
 
 import { Helmet } from "react-helmet"
 
+import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -22,6 +24,7 @@ import isEmail from "validator/lib/isEmail"
 import Navigation from "../components/Layout/Navigation"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import check from "../images/check.svg"
+import { Flags } from "../modules/features"
 
 import "./settings.css"
 
@@ -29,10 +32,15 @@ export default function SettingsPage() {
   const l = useFormatMessage()
   const [account, accountState] = useAuthContext()
   const [settings, state] = useProfileSettingsContext()
+  const [ff] = useFeatureFlagContext()
   const [email, setEmail] = useState(settings.email)
   const currentEmailChanged = email !== settings.email
   const currentEmailIsValid = useMemo(() => isEmail(email || ""), [email])
   useEffect(() => setEmail(settings.email), [settings.email])
+
+  if (ff.flags[Flags.Maintenance]) {
+    return <MaintenancePage />
+  }
 
   // const emailNextVerificationDate = useMemo(() => {
   //   return settings.email_updated_at

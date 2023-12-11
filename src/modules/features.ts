@@ -3,4 +3,5 @@ export enum Flags {
   HideEventsInWorlds = "events-hide-events-in-worlds",
   NewNavbarDropdown = "dapps-new-navbar-dropdown",
   DCLFoundationAddresses = "events-decentraland-foundation-addresses",
+  Maintenance = "events-maintenance",
 }

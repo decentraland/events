@@ -3,9 +3,11 @@ import React, { useMemo, useState } from "react"
 import { Helmet } from "react-helmet"
 
 import { useLocation } from "@gatsbyjs/reach-router"
+import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
@@ -20,6 +22,7 @@ import mvfwLogo from "../images/mvfw.svg"
 import mvmfImage from "../images/mvmf.jpg"
 import pride2023Image from "../images/pride-2023.png"
 import { getSchedules } from "../modules/events"
+import { Flags } from "../modules/features"
 import { toEventFilters } from "../modules/locations"
 
 import "./schedule.css"
@@ -33,6 +36,7 @@ export default function IndexPage() {
   const l = useFormatMessage()
   const [, accountState] = useAuthContext()
   const location = useLocation()
+  const [ff] = useFeatureFlagContext()
   const params = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
@@ -49,6 +53,10 @@ export default function IndexPage() {
   const filters = useMemo(() => toEventFilters(params), [params])
   const loading = accountState.loading || state.loading
   const [enabledNotification, setEnabledNotification] = useState(false)
+
+  if (ff.flags[Flags.Maintenance]) {
+    return <MaintenancePage />
+  }
 
   return (
     <>
