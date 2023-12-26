@@ -2,5 +2,6 @@
 package.json
 package-lock.json
 public
+public-prefix
 node_modules
 lib
