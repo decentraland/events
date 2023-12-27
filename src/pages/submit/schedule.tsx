@@ -6,6 +6,8 @@ import { useLocation } from "@gatsbyjs/reach-router"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { DappsFeatureFlags } from "decentraland-gatsby/dist/context/FeatureFlag/types"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import usePatchState from "decentraland-gatsby/dist/hooks/usePatchState"
@@ -24,7 +26,6 @@ import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 import Events, { EditSchedule } from "../../api/Events"
 import AddCoverButton from "../../components/Button/AddCoverButton"
 import ImageInput from "../../components/Form/ImageInput"
-import Label from "../../components/Form/Label"
 import Textarea from "../../components/Form/Textarea"
 import ItemLayout from "../../components/Layout/ItemLayout"
 import {
@@ -56,7 +57,9 @@ export default function ScheduleEditPage() {
   const l = useFormatMessage()
   const [state, patchState] = usePatchState<ScheduleEditPageState>({})
   const [account, accountState] = useAuthContext()
+  const [ff] = useFeatureFlagContext()
   const location = useLocation()
+  const isAuthDappEnabled = ff.enabled(DappsFeatureFlags.AuthDappEnabled)
   const params = new URLSearchParams(location.search)
 
   const [editing, editActions] = useScheduleEditor()
@@ -230,7 +233,9 @@ export default function ScheduleEditPage() {
         {!loading && (!account || accountState.loading) && (
           <SignIn
             isConnecting={accountState.loading}
-            onConnect={() => accountState.select()}
+            onConnect={
+              isAuthDappEnabled ? accountState.authorize : accountState.select
+            }
           />
         )}
         {!loading && account && (

@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React from "react"
 
 import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 import Divider from "decentraland-gatsby/dist/components/Text/Divider"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
-import Avatar from "decentraland-gatsby/dist/components/User/Avatar"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { DappsFeatureFlags } from "decentraland-gatsby/dist/context/FeatureFlag/types"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -38,6 +38,7 @@ export default function SettingsPage() {
   const [account, accountState] = useAuthContext()
   const [settings, settingsState] = useProfileSettingsContext()
   const [ff] = useFeatureFlagContext()
+  const isAuthDappEnabled = ff.enabled(DappsFeatureFlags.AuthDappEnabled)
   const [schedules, schedulesState] = useAsyncMemo(
     async () => {
       const schedules = await Events.get().getSchedules()
@@ -71,7 +72,9 @@ export default function SettingsPage() {
         <Container>
           <SignIn
             isConnecting={accountState.loading || settingsState.loading}
-            onConnect={() => accountState.select()}
+            onConnect={
+              isAuthDappEnabled ? accountState.authorize : accountState.select
+            }
           />
         </Container>
       </>

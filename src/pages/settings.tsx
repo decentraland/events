@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet"
 import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { DappsFeatureFlags } from "decentraland-gatsby/dist/context/FeatureFlag/types"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useCountdown from "decentraland-gatsby/dist/hooks/useCountdown"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -33,6 +34,7 @@ export default function SettingsPage() {
   const [account, accountState] = useAuthContext()
   const [settings, state] = useProfileSettingsContext()
   const [ff] = useFeatureFlagContext()
+  const isAuthDappEnabled = ff.enabled(DappsFeatureFlags.AuthDappEnabled)
   const [email, setEmail] = useState(settings.email)
   const currentEmailChanged = email !== settings.email
   const currentEmailIsValid = useMemo(() => isEmail(email || ""), [email])
@@ -122,7 +124,9 @@ export default function SettingsPage() {
         <Container>
           <SignIn
             isConnecting={accountState.loading}
-            onConnect={() => accountState.select()}
+            onConnect={
+              isAuthDappEnabled ? accountState.authorize : accountState.select
+            }
           />
         </Container>
       </>
