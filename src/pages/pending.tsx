@@ -9,6 +9,7 @@ import Link from "decentraland-gatsby/dist/components/Text/Link"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import SubTitle from "decentraland-gatsby/dist/components/Text/SubTitle"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { DappsFeatureFlags } from "decentraland-gatsby/dist/context/FeatureFlag/types"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
@@ -19,7 +20,6 @@ import { Loader } from "decentraland-ui/dist/components/Loader/Loader"
 import { SignIn } from "decentraland-ui/dist/components/SignIn/SignIn"
 
 import EventCard from "../components/Event/EventCard/EventCard"
-import EventModal from "../components/Event/EventModal/EventModal"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import {
@@ -37,6 +37,7 @@ export default function MyEventsPage() {
   const l = useFormatMessage()
   const location = useLocation()
   const [ff] = useFeatureFlagContext()
+  const isAuthDappEnabled = ff.enabled(DappsFeatureFlags.AuthDappEnabled)
   const params = new URLSearchParams(location.search)
   const [account, accountState] = useAuthContext()
   const [eventList, eventsState] = useEventsContext()
@@ -99,7 +100,9 @@ export default function MyEventsPage() {
         <Container>
           <SignIn
             isConnecting={accountState.loading}
-            onConnect={() => accountState.select()}
+            onConnect={
+              isAuthDappEnabled ? accountState.authorize : accountState.select
+            }
           />
         </Container>
       </>

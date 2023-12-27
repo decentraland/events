@@ -6,6 +6,7 @@ import NotFound from "decentraland-gatsby/dist/components/Layout/NotFound"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Avatar from "decentraland-gatsby/dist/components/User/Avatar"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { DappsFeatureFlags } from "decentraland-gatsby/dist/context/FeatureFlag/types"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
@@ -43,6 +44,7 @@ export default function SettingsPage() {
   const [account, accountState] = useAuthContext()
   const [settings, settingsState] = useProfileSettingsContext()
   const [ff] = useFeatureFlagContext()
+  const isAuthDappEnabled = ff.enabled(DappsFeatureFlags.AuthDappEnabled)
   const [value, setValue] = useState("")
   const handleChangeValue = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value),
@@ -128,7 +130,9 @@ export default function SettingsPage() {
         <Container>
           <SignIn
             isConnecting={accountState.loading || settingsState.loading}
-            onConnect={() => accountState.select()}
+            onConnect={
+              isAuthDappEnabled ? accountState.authorize : accountState.select
+            }
           />
         </Container>
       </>
