@@ -9,6 +9,7 @@ import Markdown from "decentraland-gatsby/dist/components/Text/Markdown"
 import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
+import { DappsFeatureFlags } from "decentraland-gatsby/dist/context/FeatureFlag/types"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
@@ -195,6 +196,7 @@ export default function SubmitPage() {
   const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
   const [ff] = useFeatureFlagContext()
+  const isAuthDappEnabled = ff.enabled(DappsFeatureFlags.AuthDappEnabled)
 
   const serverOptions = useMemo(() => {
     if (editing.world) {
@@ -413,7 +415,9 @@ export default function SubmitPage() {
         <Container style={{ paddingTop: "75px" }}>
           <SignIn
             isConnecting={accountState.loading}
-            onConnect={() => accountState.select()}
+            onConnect={
+              isAuthDappEnabled ? accountState.authorize : accountState.select
+            }
           />
         </Container>
       </>
