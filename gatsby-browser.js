@@ -24,8 +24,10 @@ import "./src/theme.css"
 // import Helmet from 'react-helmet'
 // import { RawIntlProvider, createIntl } from 'react-intl'
 import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
+import Layout2 from "decentraland-gatsby/dist/components/Layout/Layout2"
 import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
+import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
 import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
 import env from "decentraland-gatsby/dist/utils/env"
@@ -52,16 +54,25 @@ export const wrapRootElement = ({ element }) => (
 )
 
 export const wrapPageElement = ({ element, props }) => {
+  const [ff] = useFeatureFlagContext()
+  const isNewMenu = ff.flags["dapps-navbar2_variant"]
   return (
     <IntlProvider {...props.pageContext.intl}>
-      <Layout
-        {...props}
-        rightMenu={<UserMenu />}
-        activePage="events"
-        isFullScreen={true}
-      >
-        {element}
-      </Layout>
+      {!isNewMenu && (
+        <Layout
+          {...props}
+          rightMenu={<UserMenu />}
+          activePage="events"
+          isFullScreen={true}
+        >
+          {element}
+        </Layout>
+      )}
+      {isNewMenu && (
+        <Layout2 {...props} activePage="explore">
+          {element}
+        </Layout2>
+      )}
     </IntlProvider>
   )
 }
