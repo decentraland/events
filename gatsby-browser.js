@@ -23,13 +23,13 @@ import "./src/theme.css"
 
 // import Helmet from 'react-helmet'
 // import { RawIntlProvider, createIntl } from 'react-intl'
+import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
 import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
 import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
 import env from "decentraland-gatsby/dist/utils/env"
 
-import Layout from "./src/components/Layout/Layout"
 import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
 import ProfileSettings from "./src/context/ProfileSetting"
@@ -53,7 +53,7 @@ export const wrapRootElement = ({ element }) => (
 export const wrapPageElement = ({ element, props }) => {
   return (
     <IntlProvider {...props.pageContext.intl}>
-      <Layout>{element}</Layout>
+      <Layout activePage="explore">{element}</Layout>
     </IntlProvider>
   )
 }
