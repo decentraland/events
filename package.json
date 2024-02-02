@@ -33,7 +33,7 @@
     "gatsby-transformer-sharp": "^4.25.0",
     "html-escaper": "^3.0.3",
     "node-pg-migrate": "^6.0.0",
-    "pg": "^8.7.1",
+    "pg": "^8.11.3",
     "postcss": "^8.3.11",
     "postcss-assets": "^6.0.0",
     "postcss-svg": "^3.0.0",
