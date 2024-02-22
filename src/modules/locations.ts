@@ -1,8 +1,9 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
 
-import { EventType } from "../entities/Event/types"
+import { EventTimeReference, EventType } from "../entities/Event/types"
 import {
   fromEventTime,
+  getEventTimeReference,
   getEventType,
   toEventTime,
 } from "../entities/Event/utils"
@@ -21,6 +22,7 @@ export type EventFilters = {
   search?: string | null
   category?: string | null
   type?: EventType
+  timeReference?: string | null
   timeFrom?: number
   timeTo?: number
 }
@@ -35,6 +37,7 @@ export function toEventFilters(params: URLSearchParams): EventFilters {
     search: params.get("search"),
     category: params.get("category"),
     type: getEventType(params.get("type")),
+    timeReference: getEventTimeReference(params.get("time-reference")),
     timeFrom,
     timeTo,
   }
@@ -60,6 +63,15 @@ export function fromEventFilters(
     params.set("type", filters.type)
   } else {
     params.delete("type")
+  }
+
+  if (
+    filters.timeReference &&
+    filters.timeReference !== EventTimeReference.ALL
+  ) {
+    params.set("time-reference", filters.timeReference)
+  } else {
+    params.delete("time-reference")
   }
 
   if (Number.isFinite(filters.timeFrom) && Number.isFinite(filters.timeTo)) {

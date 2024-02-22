@@ -6,6 +6,7 @@ import { RRule, Weekday } from "rrule"
 import { ScheduleAttributes } from "../Schedule/types"
 import {
   EventAttributes,
+  EventTimeReference,
   EventType,
   MAX_EVENT_RECURRENT,
   MonthMask,
@@ -331,6 +332,13 @@ export function getEventType(type: string | null) {
     default:
       return EventType.All
   }
+}
+
+export function getEventTimeReference(type: string | null) {
+  if (Object.values(EventTimeReference).includes(type as EventTimeReference)) {
+    return type as EventTimeReference
+  }
+  return EventTimeReference.ALL
 }
 
 export function validateTime(time: string, defaultTime: number): number {

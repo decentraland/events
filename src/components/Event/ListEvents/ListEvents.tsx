@@ -18,10 +18,14 @@ import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 import { useCategoriesContext } from "../../../context/Category"
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
 import {
+  EventTimeReference,
   EventType,
   SessionEventAttributes,
 } from "../../../entities/Event/types"
-import { getEventType } from "../../../entities/Event/utils"
+import {
+  getEventTimeReference,
+  getEventType,
+} from "../../../entities/Event/utils"
 import { ALL_EVENT_CATEGORY } from "../../../entities/EventCategory/types"
 import useListEventsByMonth from "../../../hooks/useListEventsByMonth"
 import useListEventsCategories from "../../../hooks/useListEventsCategories"
@@ -57,6 +61,34 @@ const typeItems = [
     title: "Recurring event",
     description: "Events which happen on more than one day",
     value: EventType.Recurrent,
+  },
+]
+
+const dateItems = [
+  {
+    title: EventTimeReference.ALL,
+    description: "",
+    value: EventTimeReference.ALL,
+  },
+  {
+    title: EventTimeReference.TODAY,
+    description: "",
+    value: EventTimeReference.TODAY,
+  },
+  {
+    title: EventTimeReference.TOMORROW,
+    description: "",
+    value: EventTimeReference.TOMORROW,
+  },
+  {
+    title: EventTimeReference.THIS_WEEK,
+    description: "",
+    value: EventTimeReference.THIS_WEEK,
+  },
+  {
+    title: EventTimeReference.THIS_MONTH,
+    description: "",
+    value: EventTimeReference.THIS_MONTH,
   },
 ]
 
@@ -148,6 +180,23 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
     [location.pathname, location.search, props.filters]
   )
 
+  const handleDateChange = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
+      const timeReference = getEventTimeReference(item.value as string)
+      const newFilters = { ...props.filters, timeReference }
+      const newParams = fromEventFilters(
+        newFilters,
+        new URLSearchParams(location.search)
+      )
+      track(SegmentEvent.Filter, newFilters)
+      const pathname = location.pathname.startsWith(withPrefix("/"))
+        ? location.pathname.slice(withPrefix("/").length)
+        : location.pathname
+      navigate(url(pathname, newParams))
+    },
+    [location.pathname, location.search, props.filters]
+  )
+
   const handleCategoryChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, item: ToggleBoxItem) => {
       const category = item.value as string
@@ -221,6 +270,14 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               onClick={handleTypeChange}
               items={typeItems}
               value={props.filters.type}
+            />
+
+            <ToggleBox
+              header="Date"
+              onClick={handleDateChange}
+              items={dateItems}
+              value={props.filters.timeReference || undefined}
+              borderless
             />
 
             {categoriesFiltered.length > 0 && (
