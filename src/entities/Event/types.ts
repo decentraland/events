@@ -248,6 +248,14 @@ export enum EventType {
   Recurrent = "recurrent",
 }
 
+export enum EventTimeReference {
+  ALL = "all",
+  TODAY = "today",
+  TOMORROW = "tomorrow",
+  THIS_WEEK = "this week",
+  THIS_MONTH = "this month",
+}
+
 export const MAX_CATAGORIES_ALLOWED = 1
 
 export enum eventLocations {
