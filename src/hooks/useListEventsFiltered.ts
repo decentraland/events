@@ -74,6 +74,7 @@ export default function useListEventsFiltered(
         } else if (timeReference === EventTimeReference.THIS_MONTH) {
           return eventDate.isSameOrBefore(eventCompareDate.add(1, "month"))
         }
+        return false
       })
     }
 

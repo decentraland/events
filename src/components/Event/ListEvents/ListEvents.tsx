@@ -188,7 +188,6 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
         newFilters,
         new URLSearchParams(location.search)
       )
-      console.log(newParams)
       track(SegmentEvent.Filter, newFilters)
       const pathname = location.pathname.startsWith(withPrefix("/"))
         ? location.pathname.slice(withPrefix("/").length)
