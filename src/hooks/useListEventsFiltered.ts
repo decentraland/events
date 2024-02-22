@@ -2,7 +2,11 @@ import { useMemo } from "react"
 
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 
-import { EventType, SessionEventAttributes } from "../entities/Event/types"
+import {
+  EventTimeReference,
+  EventType,
+  SessionEventAttributes,
+} from "../entities/Event/types"
 import {
   DEFAULT_PROFILE_SETTINGS,
   ProfileSettingsAttributes,
@@ -48,6 +52,27 @@ export default function useListEventsFiltered(
           return event.duration <= Time.Day
         } else {
           return event.duration > Time.Day || event.recurrent
+        }
+      })
+    }
+
+    if (
+      filter.timeReference &&
+      filter.timeReference !== EventTimeReference.ALL
+    ) {
+      const timeReference = filter.timeReference
+      events = events.filter((event) => {
+        const eventDate = Time.from(event.next_start_at)
+        const eventCompareDate = Time.from()
+
+        if (timeReference === EventTimeReference.TODAY) {
+          return eventDate.isToday()
+        } else if (timeReference === EventTimeReference.TOMORROW) {
+          return eventDate.isTomorrow()
+        } else if (timeReference === EventTimeReference.THIS_WEEK) {
+          return eventDate.isSameOrBefore(eventCompareDate.add(1, "week"))
+        } else if (timeReference === EventTimeReference.THIS_MONTH) {
+          return eventDate.isSameOrBefore(eventCompareDate.add(1, "month"))
         }
       })
     }
