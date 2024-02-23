@@ -69,9 +69,9 @@ export default function useListEventsFiltered(
           return eventDate.isToday()
         } else if (timeReference === EventTimeReference.TOMORROW) {
           return eventDate.isTomorrow()
-        } else if (timeReference === EventTimeReference.THIS_WEEK) {
+        } else if (timeReference === EventTimeReference.NEXT_WEEK) {
           return eventDate.isSameOrBefore(eventCompareDate.add(1, "week"))
-        } else if (timeReference === EventTimeReference.THIS_MONTH) {
+        } else if (timeReference === EventTimeReference.NEXT_MONTH) {
           return eventDate.isSameOrBefore(eventCompareDate.add(1, "month"))
         }
         return false

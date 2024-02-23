@@ -81,14 +81,14 @@ const dateItems = [
     value: EventTimeReference.TOMORROW,
   },
   {
-    title: EventTimeReference.THIS_WEEK,
+    title: EventTimeReference.NEXT_WEEK,
     description: "",
-    value: EventTimeReference.THIS_WEEK,
+    value: EventTimeReference.NEXT_WEEK,
   },
   {
-    title: EventTimeReference.THIS_MONTH,
+    title: EventTimeReference.NEXT_MONTH,
     description: "",
-    value: EventTimeReference.THIS_MONTH,
+    value: EventTimeReference.NEXT_MONTH,
   },
 ]
 
@@ -265,6 +265,16 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
       <Grid.Row>
         {showFilters && (
           <Grid.Column tablet={4}>
+            {categoriesFiltered.length > 0 && (
+              <ToggleBox
+                header="Category"
+                onClick={handleCategoryChange}
+                items={categoryItems}
+                value={props.filters.category || ALL_EVENT_CATEGORY}
+                borderless
+              />
+            )}
+
             <ToggleBox
               header="Type"
               onClick={handleTypeChange}
@@ -279,16 +289,6 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               value={props.filters.timeReference || undefined}
               borderless
             />
-
-            {categoriesFiltered.length > 0 && (
-              <ToggleBox
-                header="Category"
-                onClick={handleCategoryChange}
-                items={categoryItems}
-                value={props.filters.category || ALL_EVENT_CATEGORY}
-                borderless
-              />
-            )}
 
             <SliderField
               range={true}

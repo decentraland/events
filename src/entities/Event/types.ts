@@ -249,11 +249,11 @@ export enum EventType {
 }
 
 export enum EventTimeReference {
-  ALL = "all",
-  TODAY = "today",
-  TOMORROW = "tomorrow",
-  THIS_WEEK = "this week",
-  THIS_MONTH = "this month",
+  ALL = "All",
+  TODAY = "Today",
+  TOMORROW = "Tomorrow",
+  NEXT_WEEK = "Next 7 days",
+  NEXT_MONTH = "Next 30 days",
 }
 
 export const MAX_CATAGORIES_ALLOWED = 1
