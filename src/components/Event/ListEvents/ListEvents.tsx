@@ -275,6 +275,14 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               />
             )}
 
+            <ToggleBox
+              header="Date"
+              onClick={handleDateChange}
+              items={dateItems}
+              value={props.filters.timeReference || undefined}
+              borderless
+            />
+
             <SliderField
               range={true}
               header="Event Time"
@@ -294,14 +302,6 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               onClick={handleTypeChange}
               items={typeItems}
               value={props.filters.type}
-            />
-
-            <ToggleBox
-              header="Date"
-              onClick={handleDateChange}
-              items={dateItems}
-              value={props.filters.timeReference || undefined}
-              borderless
             />
           </Grid.Column>
         )}
