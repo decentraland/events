@@ -275,6 +275,20 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               />
             )}
 
+            <SliderField
+              range={true}
+              header="Event Time"
+              min={0}
+              max={48}
+              defaultValue={timeRangeValue}
+              onChange={handleRangeChange}
+              onMouseUp={handleRangeAfterChange}
+              label={timeRangeLabel}
+              labelFrom={labelFrom}
+              labelTo={LabelTo}
+              className="list-events__time-range-slider"
+            />
+
             <ToggleBox
               header="Type"
               onClick={handleTypeChange}
@@ -288,19 +302,6 @@ export const ListEvents = React.memo((props: ListEventsProps) => {
               items={dateItems}
               value={props.filters.timeReference || undefined}
               borderless
-            />
-
-            <SliderField
-              range={true}
-              header="Event Time"
-              min={0}
-              max={48}
-              defaultValue={timeRangeValue}
-              onChange={handleRangeChange}
-              onMouseUp={handleRangeAfterChange}
-              label={timeRangeLabel}
-              labelFrom={labelFrom}
-              labelTo={LabelTo}
             />
           </Grid.Column>
         )}
