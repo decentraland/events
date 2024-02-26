@@ -90,6 +90,16 @@ const dateItems = [
     description: "",
     value: EventTimeReference.NEXT_MONTH,
   },
+  {
+    title: EventTimeReference.NEXT_90_DAYS,
+    description: "",
+    value: EventTimeReference.NEXT_90_DAYS,
+  },
+  {
+    title: EventTimeReference.NEXT_120_DAYS,
+    description: "",
+    value: EventTimeReference.NEXT_120_DAYS,
+  },
 ]
 
 export const ListEvents = React.memo((props: ListEventsProps) => {
