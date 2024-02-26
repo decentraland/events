@@ -73,6 +73,10 @@ export default function useListEventsFiltered(
           return eventDate.isSameOrBefore(eventCompareDate.add(1, "week"))
         } else if (timeReference === EventTimeReference.NEXT_MONTH) {
           return eventDate.isSameOrBefore(eventCompareDate.add(1, "month"))
+        } else if (timeReference === EventTimeReference.NEXT_90_DAYS) {
+          return eventDate.isSameOrBefore(eventCompareDate.add(3, "month"))
+        } else if (timeReference === EventTimeReference.NEXT_120_DAYS) {
+          return eventDate.isSameOrBefore(eventCompareDate.add(4, "month"))
         }
         return false
       })

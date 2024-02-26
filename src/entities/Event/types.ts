@@ -254,6 +254,8 @@ export enum EventTimeReference {
   TOMORROW = "Tomorrow",
   NEXT_WEEK = "Next 7 days",
   NEXT_MONTH = "Next 30 days",
+  NEXT_90_DAYS = "Next 90 days",
+  NEXT_120_DAYS = "Next 120 days",
 }
 
 export const MAX_CATAGORIES_ALLOWED = 1
