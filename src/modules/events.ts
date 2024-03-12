@@ -4,7 +4,6 @@ import once from "decentraland-gatsby/dist/utils/function/once"
 
 import Events from "../api/Events"
 import { SessionEventAttributes } from "../entities/Event/types"
-import { EventCategoryAttributes } from "../entities/EventCategory/types"
 import { ScheduleAttributes } from "../entities/Schedule/types"
 import locations from "./locations"
 

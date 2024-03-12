@@ -6,7 +6,6 @@ import { useLocation } from "@gatsbyjs/reach-router"
 import MaintenancePage from "decentraland-gatsby/dist/components/Layout/MaintenancePage"
 import useAuthContext from "decentraland-gatsby/dist/context/Auth/useAuthContext"
 import useFeatureFlagContext from "decentraland-gatsby/dist/context/FeatureFlag/useFeatureFlagContext"
-import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { navigate } from "decentraland-gatsby/dist/plugins/intl"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
@@ -24,8 +23,6 @@ import {
 } from "../context/Event"
 import { useProfileSettingsContext } from "../context/ProfileSetting"
 import { SessionEventAttributes } from "../entities/Event/types"
-import { getCurrentSchedules } from "../entities/Schedule/utils"
-import { getSchedules } from "../modules/events"
 import { Flags } from "../modules/features"
 import locations, { toEventFilters } from "../modules/locations"
 
@@ -41,7 +38,6 @@ export default function IndexPage() {
   const l = useFormatMessage()
   const [, accountState] = useAuthContext()
   const location = useLocation()
-  const [schedules] = useAsyncMemo(getSchedules)
   const params = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
@@ -51,11 +47,6 @@ export default function IndexPage() {
   const [all, state] = useEventsContext()
   const events = useEventSorter(all, settings)
   const loading = accountState.loading || state.loading
-
-  const currentSchedule = useMemo(
-    () => getCurrentSchedules(schedules),
-    [schedules]
-  )
 
   const filters = useMemo(() => toEventFilters(params), [params])
   const [enabledNotification, setEnabledNotification] = useState(false)
@@ -106,7 +97,6 @@ export default function IndexPage() {
 
       <CarouselEvents
         events={filters.search ? empty : events}
-        schedule={currentSchedule}
         loading={loading}
       />
 

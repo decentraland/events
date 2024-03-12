@@ -29,6 +29,7 @@ import "./CarouselEvents.css"
 
 export type CarouselEventsProps = {
   loading?: boolean
+  hideGoToSchedule?: boolean
   events?: SessionEventAttributes[]
   schedule?: ScheduleAttributes
 }
@@ -103,18 +104,21 @@ export const CarouselEvents = React.memo((props: CarouselEventsProps) => {
           items={mainEvents}
           component={CarouselEventItem}
         />
-        {!props.loading && schedule && !schedule?.theme && (
-          <div className="carousel-events__action-wrapper">
-            <Button
-              primary
-              as="a"
-              href={withPrefix(locations.schedule(schedule.id))}
-              onClick={handleClickFullSchedule}
-            >
-              Full Schedule
-            </Button>
-          </div>
-        )}
+        {!props.loading &&
+          schedule &&
+          !schedule?.theme &&
+          !props.hideGoToSchedule && (
+            <div className="carousel-events__action-wrapper">
+              <Button
+                primary
+                as="a"
+                href={withPrefix(locations.schedule(schedule.id))}
+                onClick={handleClickFullSchedule}
+              >
+                Full Schedule
+              </Button>
+            </div>
+          )}
       </Container>
     </ContainerWrapper>
   )
