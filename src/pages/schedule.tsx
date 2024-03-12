@@ -13,10 +13,12 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { Container } from "decentraland-ui/dist/components/Container/Container"
 
+import { CarouselEvents } from "../components/Event/CarouselEvents/CarouselEvents"
 import { ListEvents } from "../components/Event/ListEvents/ListEvents"
 import Navigation, { NavigationTab } from "../components/Layout/Navigation"
 import EnabledNotificationModal from "../components/Modal/EnabledNotificationModal"
 import { useEventSchedule, useEventsContext } from "../context/Event"
+import { SessionEventAttributes } from "../entities/Event/types"
 import { ScheduleTheme } from "../entities/Schedule/types"
 import mvfwLogo from "../images/mvfw.svg"
 import mvmfImage from "../images/mvmf.jpg"
@@ -102,7 +104,12 @@ export default function IndexPage() {
         onClose={() => setEnabledNotification(false)}
       />
       <Navigation activeTab={schedule && NavigationTab.Schedule} search />
-
+      <CarouselEvents
+        events={events}
+        schedule={schedule}
+        loading={loading}
+        hideGoToSchedule
+      />
       <div
         className={TokenList.join([
           "scheduled-events",
