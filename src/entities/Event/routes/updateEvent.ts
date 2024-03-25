@@ -241,7 +241,6 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   })
 
   updatedEvent.attending = !!attendee
-  updatedEvent.notify = !!attendee?.notify
 
   if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)

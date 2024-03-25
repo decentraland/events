@@ -166,10 +166,9 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
 
 export async function notifyUpcomingEvent(
   event: DeprecatedEventAttributes,
-  emailNotifications: number,
-  pushNotifications: number
+  notificationsCount: number
 ) {
-  if (!emailNotifications && !pushNotifications) {
+  if (!notificationsCount) {
     return
   }
 
@@ -189,9 +188,8 @@ export async function notifyUpcomingEvent(
           type: "plain_text",
           text: [
             "Name: " + event.name,
-            emailNotifications && `Sent: ${emailNotifications} emails :email:`,
-            pushNotifications &&
-              `Sent: ${pushNotifications} push notifications :bell:`,
+            notificationsCount &&
+              `Sent: ${notificationsCount} push notifications :bell:`,
           ]
             .filter(Boolean)
             .join("\n"),

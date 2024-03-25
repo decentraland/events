@@ -31,13 +31,6 @@ export function canEditAnyEvent(settings: ProfileSettingsAttributes) {
   )
 }
 
-export function canTestAnyNotification(settings: ProfileSettingsAttributes) {
-  return (
-    // isAdmin(settings.user) ||
-    settings.permissions.includes(ProfilePermissions.EditAnyEvent)
-  )
-}
-
 export function canEditAnySchedule(settings: ProfileSettingsAttributes) {
   return settings.permissions.includes(ProfilePermissions.EditAnySchedule)
 }
