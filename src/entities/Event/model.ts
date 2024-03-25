@@ -17,7 +17,9 @@ import isEthereumAddress from "validator/lib/isEthereumAddress"
 
 import { utils } from "decentraland-commons"
 
+import { EventsNotifications } from "../../api/Notifications"
 import EventAttendee from "../EventAttendee/model"
+import EventNotificationsModel from "../EventNotifications/model"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 import {
   DeprecatedEventAttributes,
@@ -171,15 +173,41 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return await EventModel.query<{ id: string }>(query)
   }
 
+  static async getStartedEvents() {
+    const query = SQL`
+      SELECT *
+      FROM ${table(EventModel)} e
+      LEFT JOIN ${table(
+        EventNotificationsModel
+      )} en ON en.event_id = e.id AND en.notification_type = '${
+      EventsNotifications.EVENT_STARTED
+    }
+      WHERE
+        e.rejected IS FALSE
+        AND e.approved IS TRUE
+        AND e.next_start_at > (now() + interval '1 minutes')
+        AND e.next_start_at < (now() + interval '3 minutes')
+        AND en.event_id IS NULL
+    `
+
+    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+  }
+
   static async getUpcomingEvents() {
     const query = SQL`
       SELECT *
       FROM ${table(EventModel)} e
+      LEFT JOIN ${table(
+        EventNotificationsModel
+      )} en ON en.event_id = e.id AND en.notification_type = '${
+      EventsNotifications.EVENT_STARTS_SOON
+    }'
       WHERE
         e.rejected IS FALSE
         AND e.approved IS TRUE
         AND e.next_start_at > now()
-        AND e.next_start_at < (now() + interval '10 minutes')
+        AND e.next_start_at < (now() + interval '60 minutes')
+        AND en.event_id IS NULL
     `
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
@@ -216,7 +244,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       SELECT
         e.*
         ${conditional(!!options.user, SQL`, a.user is not null as attending`)}
-        ${conditional(!!options.user, SQL`, a.notify = TRUE as notify`)}
       FROM ${table(EventModel)} e
         ${conditional(
           !!options.user,
@@ -328,7 +355,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       ...event,
       estate_name: event.estate_name || event.scene_name,
       attending: !!event.attending,
-      notify: !!event.notify,
       next_start_at,
       position: [event.x, event.y],
       live,

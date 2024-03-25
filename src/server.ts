@@ -18,24 +18,19 @@ import gatsby from "decentraland-gatsby/dist/entities/Route/routes/filesystem2/g
 import status from "decentraland-gatsby/dist/entities/Route/routes/status"
 import { initializeServices } from "decentraland-gatsby/dist/entities/Server/handler"
 import { serverInitializer } from "decentraland-gatsby/dist/entities/Server/utils"
-import env from "decentraland-gatsby/dist/utils/env"
 import express from "express"
 import { register } from "prom-client"
 
-import { notifyUpcomingEvents, updateNextStartAt } from "./entities/Event/cron"
+import {
+  notifyStartedEvents,
+  notifyUpcomingEvents,
+  updateNextStartAt,
+} from "./entities/Event/cron"
 import events from "./entities/Event/routes"
 import attendees from "./entities/EventAttendee/routes"
 import categories from "./entities/EventCategory/routes"
 import poster from "./entities/Poster/routes"
 import profileSettings from "./entities/ProfileSettings/routes"
-import {
-  removeSubscription,
-  verifySubscription,
-} from "./entities/ProfileSettings/routes/subscriptions"
-import {
-  SUBSCRIPTION_PATH,
-  UNSUBSCRIBE_PATH,
-} from "./entities/ProfileSettings/types"
 import profileSubscription from "./entities/ProfileSubscription/routes"
 import schedules from "./entities/Schedule/routes"
 import sitemap from "./entities/Sitemap/routes"
@@ -43,6 +38,7 @@ import social from "./entities/Social/routes"
 
 const jobs = new Manager({ concurrency: 10 })
 jobs.cron("@eachMinute", notifyUpcomingEvents)
+jobs.cron("@eachMinute", notifyStartedEvents)
 jobs.cron("@eachMinute", updateNextStartAt)
 
 const app = express()
@@ -65,9 +61,6 @@ app.use("/api", [
     throw new RequestError("NotFound", RequestError.NotFound)
   }),
 ])
-
-app.get(SUBSCRIPTION_PATH, verifySubscription)
-app.get(UNSUBSCRIBE_PATH, removeSubscription)
 
 app.use(metrics([gatsbyRegister, register]))
 

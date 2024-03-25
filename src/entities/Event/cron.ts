@@ -1,21 +1,14 @@
-import logger from "decentraland-gatsby/dist/entities/Development/logger"
 import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 
+import Notifications, { EventsNotifications } from "../../api/Notifications"
 import EventAttendeeModel from "../EventAttendee/model"
-import { EventAttendeeAttributes } from "../EventAttendee/types"
-import push from "../Notification/push"
-// import { sendEmailUpcomingEvent } from "../Notification/utils"
-import ProfileSettingsModel from "../ProfileSettings/model"
-import { ProfileSettingsAttributes } from "../ProfileSettings/types"
-import ProfileSubscriptionModel from "../ProfileSubscription/model"
-import { ProfileSubscriptionAttributes } from "../ProfileSubscription/types"
+import EventNotificationsModel from "../EventNotifications/model"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 import EventModel from "./model"
 import { EventAttributes } from "./types"
 import {
   calculateNextRecurrentDates,
   calculateRecurrentProperties,
-  eventUrl,
 } from "./utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
@@ -34,111 +27,80 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
 
 export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   const events = await EventModel.getUpcomingEvents()
-  ctx.log(`[${new Date().toJSON()}] ${events.length} events to notify`)
+  ctx.log(`[${new Date().toJSON()}] ${events.length} upcoming events to notify`)
 
   if (events.length === 0) {
     return
   }
 
-  // const eventMap = new Map(events.map(event => [event.id, event] as const))
-  const attendees = await EventAttendeeModel.getPendingNotification(
-    events.map((event) => event.id)
-  )
-  ctx.log(`${attendees.length} attendees to notify`)
+  for (const event of events) {
+    const attendees = await EventAttendeeModel.listByEventId(event.id, {
+      limit: null,
+    })
+    ctx.log(`${attendees.length} attendees to notify for Event: ${event.id}`)
 
-  if (attendees.length === 0) {
+    if (attendees.length === 0) {
+      continue
+    }
+
+    for (const attendee of attendees) {
+      await Notifications.get().sendEventStartsSoon({
+        address: attendee.user,
+        id: event.id,
+        x: event.x,
+        y: event.y,
+        server: event.server,
+        name: event.name,
+        image: event.image || "",
+        startsAt: event.start_at.toISOString(),
+        endsAt: event.finish_at.toISOString(),
+      })
+    }
+
+    await EventNotificationsModel.notificationSent(
+      event.id,
+      EventsNotifications.EVENT_STARTS_SOON
+    )
+
+    await notifyBySlack(event, attendees.length)
+  }
+}
+
+export async function notifyStartedEvents(ctx: JobContext<{}>) {
+  const events = await EventModel.getStartedEvents()
+  ctx.log(
+    `[${new Date().toJSON()}] ${events.length} just started events to notify`
+  )
+
+  if (events.length === 0) {
     return
   }
 
-  const user = attendees.map((attendee) => attendee.user)
-  const [settings, subscriptions] = await Promise.all([
-    ProfileSettingsModel.findByUsers(user),
-    ProfileSubscriptionModel.findByUsers(user),
-  ])
-
-  const settingMap = Object.fromEntries(
-    settings.map((setting) => [setting.user, setting] as const)
-  )
-  const subscriptionMap = Object.fromEntries(
-    subscriptions.map(
-      (subscription) => [subscription.user, subscription] as const
-    )
-  )
-  const expiredSubscriptions: ProfileSubscriptionAttributes[] = []
-
   for (const event of events) {
-    const eventAttendees = attendees.filter(
-      (attendee) => attendee.event_id === event.id
-    )
-
-    const result = await notify(
-      event,
-      eventAttendees,
-      settingMap,
-      subscriptionMap
-    )
-    ctx.log(
-      `Notified event ${event.id} (email: ${result.email.length}, web: ${result.browser.length})`
-    )
-
-    if (result.email.length + result.browser.length) {
-      await notifyBySlack(event, result.email.length, result.browser.length)
-    }
-  }
-
-  await EventAttendeeModel.setNotified(attendees)
-  await ProfileSubscriptionModel.deleteAll(expiredSubscriptions)
-}
-
-export async function notify(
-  event: EventAttributes,
-  attendees: EventAttendeeAttributes[],
-  settings: Record<string, ProfileSettingsAttributes> = {},
-  subscriptions: Record<string, ProfileSubscriptionAttributes> = {}
-) {
-  const email: ProfileSettingsAttributes[] = []
-  const browser: ProfileSubscriptionAttributes[] = []
-  const expired: ProfileSubscriptionAttributes[] = []
-
-  for (const attendee of attendees) {
-    const setting = settings[attendee.user]
-    const subscription = subscriptions[attendee.user]
-
-    if (setting && setting.email_verified && setting.notify_by_email) {
-      email.push(setting)
-    }
-
-    if (setting && setting.notify_by_browser && subscription) {
-      browser.push(subscription)
-    }
-  }
-
-  const data = {
-    title: event.name,
-    href: eventUrl(event),
-    tag: event.id,
-    image: event.image!,
-  }
-
-  const proms: Promise<any>[] = browser.map(async (subscription) => {
-    return push(subscription, data).catch((error) => {
-      logger.error(
-        `Error sending push notification to user "${subscription.user}"`,
-        { subscription, data }
-      )
-      error.statusCode === 410 && expired.push(subscription)
+    const attendees = await EventAttendeeModel.listByEventId(event.id, {
+      limit: null,
     })
-  })
+    ctx.log(`${attendees.length} attendees to notify for Event: ${event.id}`)
 
-  // TODO: remove
-  // proms.push(sendEmailUpcomingEvent(event, email))
-  const notifications = await Promise.all(proms)
+    if (attendees.length === 0) {
+      continue
+    }
 
-  return {
-    data,
-    email,
-    browser,
-    expired,
-    notifications,
+    for (const attendee of attendees) {
+      await Notifications.get().sendEventStarted({
+        address: attendee.user,
+        id: event.id,
+        x: event.x,
+        y: event.y,
+        server: event.server,
+        name: event.name,
+        image: event.image || "",
+      })
+    }
+
+    await EventNotificationsModel.notificationSent(
+      event.id,
+      EventsNotifications.EVENT_STARTED
+    )
   }
 }
