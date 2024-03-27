@@ -1,6 +1,9 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
 import env from "decentraland-gatsby/dist/utils/env"
 
+import { EventAttributes } from "../entities/Event/types"
+import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
+
 type DCLNotification<T, M> = {
   eventKey: string
   type: T
@@ -55,7 +58,7 @@ export default class Notifications extends API {
     return this.from(this.Url)
   }
 
-  private async sendNotification<T>(notification: T) {
+  private async sendNotification<T>(notifications: T[]) {
     return this.fetch(
       "/notifications",
       this.options()
@@ -63,91 +66,79 @@ export default class Notifications extends API {
         .headers({
           Authorization: `Bearer ${env("NOTIFICATION_SERVICE_TOKEN", "")}`,
         })
-        .json([notification])
+        .json(notifications)
     )
   }
 
-  async sendEventStartsSoon({
-    address,
-    x,
-    y,
-    id,
-    name,
-    image,
-    startsAt,
-    endsAt,
-    server,
-  }: {
-    address: string
-    x: number
-    y: number
-    server: string | null
-    id: string
-    name: string
-    image: string
-    startsAt: string
-    endsAt: string
-  }) {
+  async sendEventStartsSoon(
+    event: EventAttributes,
+    attendees: EventAttendeeAttributes[]
+  ) {
     const link = new URL("https://play.decentraland.org/")
-    link.searchParams.append("position", `${x},${y}`)
+    link.searchParams.append("position", `${event.x},${event.y}`)
 
-    if (server) {
-      link.searchParams.append("realm", server)
+    if (event.server) {
+      link.searchParams.append("realm", event.server)
     }
 
-    return this.sendNotification<EventStartsSoonNotification>({
-      address,
-      eventKey: `${id}-${address}`,
-      metadata: {
-        name,
-        image,
-        startsAt,
-        endsAt,
-        link: link.toString(),
-        title: "Event starts in an hour",
-        description: `The event ${name} starts in an hour`,
-      },
+    const common = {
+      eventKey: event.id,
       type: EventsNotifications.EVENT_STARTS_SOON,
       timestamp: Date.now(),
-    })
+      metadata: {
+        title: "Event starts in an hour",
+        description: `The event ${event.name} starts in an hour.`,
+        link: link.toString(),
+        startsAt: event.start_at.toISOString(),
+        endsAt: event.finish_at.toISOString(),
+        image: event.image || "",
+        name: event.name,
+      },
+    } as const
+
+    const notifications: EventStartsSoonNotification[] = attendees.map(
+      (attendee) => ({
+        ...common,
+        metadata: common.metadata,
+        address: attendee.user,
+      })
+    )
+
+    return this.sendNotification<EventStartsSoonNotification>(notifications)
   }
 
-  async sendEventStarted({
-    address,
-    x,
-    y,
-    id,
-    name,
-    image,
-    server,
-  }: {
-    address: string
-    x: number
-    y: number
-    server: string | null
-    id: string
-    name: string
-    image: string
-  }) {
+  async sendEventStarted(
+    event: EventAttributes,
+    attendees: EventAttendeeAttributes[]
+  ) {
     const link = new URL("https://play.decentraland.org/")
-    link.searchParams.append("position", `${x},${y}`)
+    link.searchParams.append("position", `${event.x},${event.y}`)
 
-    if (server) {
-      link.searchParams.append("realm", server)
+    if (event.server) {
+      link.searchParams.append("realm", event.server)
     }
 
-    return this.sendNotification<EventStartedNotification>({
-      address,
-      eventKey: `${id}-${address}`,
-      metadata: {
-        name,
-        image,
-        link: link.toString(),
-        title: "Event started",
-        description: `The event ${name} has begun!`,
-      },
+    const common = {
+      eventKey: event.id,
       type: EventsNotifications.EVENT_STARTED,
       timestamp: Date.now(),
-    })
+      metadata: {
+        title: "Event started",
+        description: `The event ${event.name} has begun!`,
+        link: link.toString(),
+        name: event.name,
+        image: event.image || "",
+      },
+    } as const
+
+    const notifications: EventStartedNotification[] = attendees.map(
+      (attendee) => ({
+        ...common,
+        metadata: common.metadata,
+        address: attendee.user,
+      })
+    )
+
+    return this.sendNotification<EventStartedNotification>(notifications)
   }
 }
