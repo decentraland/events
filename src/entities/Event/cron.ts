@@ -2,7 +2,7 @@ import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 
 import Notifications, { EventsNotifications } from "../../api/Notifications"
 import EventAttendeeModel from "../EventAttendee/model"
-import EventNotificationsModel from "../EventNotifications/model"
+import NotificationCursorsModel from "../NotificationCursors/model"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 import EventModel from "./model"
 import { EventAttributes } from "./types"
@@ -26,12 +26,15 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
 }
 
 export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
-  const events = await EventModel.getUpcomingEvents()
-  ctx.log(`[${new Date().toJSON()}] ${events.length} upcoming events to notify`)
+  const lastRun =
+    await NotificationCursorsModel.getLastUpdateForNotificationType(
+      EventsNotifications.EVENT_STARTS_SOON
+    )
 
-  if (events.length === 0) {
-    return
-  }
+  console.log("date > ", new Date(lastRun).toISOString())
+
+  const events = await EventModel.getUpcomingEvents(lastRun)
+  ctx.log(`[${new Date().toJSON()}] ${events.length} upcoming events to notify`)
 
   for (const event of events) {
     const attendees = await EventAttendeeModel.listByEventId(event.id, {
@@ -43,39 +46,29 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
       continue
     }
 
-    for (const attendee of attendees) {
-      await Notifications.get().sendEventStartsSoon({
-        address: attendee.user,
-        id: event.id,
-        x: event.x,
-        y: event.y,
-        server: event.server,
-        name: event.name,
-        image: event.image || "",
-        startsAt: event.start_at.toISOString(),
-        endsAt: event.finish_at.toISOString(),
-      })
-    }
-
-    await EventNotificationsModel.notificationSent(
-      event.id,
-      EventsNotifications.EVENT_STARTS_SOON
-    )
-
+    await Notifications.get().sendEventStartsSoon(event, attendees)
     await notifyBySlack(event, attendees.length)
   }
+
+  await NotificationCursorsModel.updateLastUpdateForNotificationType(
+    EventsNotifications.EVENT_STARTS_SOON,
+    getNowPlusHour(lastRun)
+  )
 }
 
 export async function notifyStartedEvents(ctx: JobContext<{}>) {
-  const events = await EventModel.getStartedEvents()
+  const lastRun =
+    await NotificationCursorsModel.getLastUpdateForNotificationType(
+      EventsNotifications.EVENT_STARTED
+    )
+
+  console.log("date 2 > ", new Date(lastRun).toISOString())
+
+  const events = await EventModel.getStartedEvents(lastRun)
   ctx.log(
     `[${new Date().toJSON()}] ${events.length} just started events to notify`
   )
 
-  if (events.length === 0) {
-    return
-  }
-
   for (const event of events) {
     const attendees = await EventAttendeeModel.listByEventId(event.id, {
       limit: null,
@@ -86,21 +79,25 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
       continue
     }
 
-    for (const attendee of attendees) {
-      await Notifications.get().sendEventStarted({
-        address: attendee.user,
-        id: event.id,
-        x: event.x,
-        y: event.y,
-        server: event.server,
-        name: event.name,
-        image: event.image || "",
-      })
-    }
-
-    await EventNotificationsModel.notificationSent(
-      event.id,
-      EventsNotifications.EVENT_STARTED
-    )
+    await Notifications.get().sendEventStarted(event, attendees)
   }
+
+  await NotificationCursorsModel.updateLastUpdateForNotificationType(
+    EventsNotifications.EVENT_STARTED,
+    getNowPlusMins(lastRun)
+  )
+}
+
+function getNowPlusHour(ts: number) {
+  const hoursToAdd = 1 * 60 * 60 * 1000
+  const now = new Date(ts)
+  now.setTime(now.getTime() + hoursToAdd)
+  return now.getTime()
+}
+
+function getNowPlusMins(ts: number) {
+  const minsToAdd = 2 * 60000
+  const now = new Date(ts)
+  now.setTime(now.getTime() + minsToAdd)
+  return now.getTime()
 }

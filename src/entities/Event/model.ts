@@ -17,9 +17,7 @@ import isEthereumAddress from "validator/lib/isEthereumAddress"
 
 import { utils } from "decentraland-commons"
 
-import { EventsNotifications } from "../../api/Notifications"
 import EventAttendee from "../EventAttendee/model"
-import EventNotificationsModel from "../EventNotifications/model"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 import {
   DeprecatedEventAttributes,
@@ -173,41 +171,29 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return await EventModel.query<{ id: string }>(query)
   }
 
-  static async getStartedEvents() {
+  static async getStartedEvents(timestamp: number) {
     const query = SQL`
       SELECT *
       FROM ${table(EventModel)} e
-      LEFT JOIN ${table(
-        EventNotificationsModel
-      )} en ON en.event_id = e.id AND en.notification_type = '${
-      EventsNotifications.EVENT_STARTED
-    }
       WHERE
         e.rejected IS FALSE
         AND e.approved IS TRUE
-        AND e.next_start_at > (now() + interval '1 minutes')
+        AND e.next_start_at >= (to_timestamp(${timestamp} / 1000.0) + interval '1 minutes')
         AND e.next_start_at < (now() + interval '3 minutes')
-        AND en.event_id IS NULL
     `
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
-  static async getUpcomingEvents() {
+  static async getUpcomingEvents(timestamp: number) {
     const query = SQL`
       SELECT *
       FROM ${table(EventModel)} e
-      LEFT JOIN ${table(
-        EventNotificationsModel
-      )} en ON en.event_id = e.id AND en.notification_type = '${
-      EventsNotifications.EVENT_STARTS_SOON
-    }'
       WHERE
         e.rejected IS FALSE
         AND e.approved IS TRUE
-        AND e.next_start_at > now()
+        AND e.next_start_at >= to_timestamp(${timestamp} / 1000.0)
         AND e.next_start_at < (now() + interval '60 minutes')
-        AND en.event_id IS NULL
     `
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
