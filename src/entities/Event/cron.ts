@@ -31,10 +31,10 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
       EventsNotifications.EVENT_STARTS_SOON
     )
 
-  console.log("date > ", new Date(lastRun).toISOString())
-
   const events = await EventModel.getUpcomingEvents(lastRun)
   ctx.log(`[${new Date().toJSON()}] ${events.length} upcoming events to notify`)
+
+  const now = Date.now()
 
   for (const event of events) {
     const attendees = await EventAttendeeModel.listByEventId(event.id, {
@@ -52,7 +52,7 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
     EventsNotifications.EVENT_STARTS_SOON,
-    getNowPlusHour(lastRun)
+    getNowPlusHour(now)
   )
 }
 
@@ -62,12 +62,12 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
       EventsNotifications.EVENT_STARTED
     )
 
-  console.log("date 2 > ", new Date(lastRun).toISOString())
-
   const events = await EventModel.getStartedEvents(lastRun)
   ctx.log(
     `[${new Date().toJSON()}] ${events.length} just started events to notify`
   )
+
+  const now = Date.now()
 
   for (const event of events) {
     const attendees = await EventAttendeeModel.listByEventId(event.id, {
@@ -84,7 +84,7 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
     EventsNotifications.EVENT_STARTED,
-    getNowPlusMins(lastRun)
+    getNowPlusMins(now)
   )
 }
 
