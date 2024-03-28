@@ -43,6 +43,7 @@ export default class Notifications extends API {
     `https://notifications-processor.decentraland.io`
   )
   static Token = env("NOTIFICATION_SERVICE_TOKEN", "")
+  static ExplorerURL = env("EXPLORER_URL", "https://play.decentraland.org/")
 
   static Cache = new Map<string, Notifications>()
 
@@ -74,7 +75,7 @@ export default class Notifications extends API {
     event: EventAttributes,
     attendees: EventAttendeeAttributes[]
   ) {
-    const link = new URL("https://play.decentraland.org/")
+    const link = new URL(Notifications.ExplorerURL)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
