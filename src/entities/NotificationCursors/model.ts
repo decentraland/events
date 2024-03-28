@@ -20,7 +20,7 @@ export default class NotificationCursorsModel extends Model<{}> {
             updated_at             = ${Date.now()};
     `
 
-    return this.namedQuery("updateLastUpdateForNotificationType", query)
+    return this.namedQuery("update_last_update_for_notification_type", query)
   }
 
   static async getLastUpdateForNotificationType(
@@ -29,7 +29,7 @@ export default class NotificationCursorsModel extends Model<{}> {
     const result = await this.namedQuery<{
       last_successful_run_at: number
     }>(
-      "getLastUpdateForNotificationType",
+      "get_last_update_for_notification_type",
       SQL`
         SELECT *
         FROM ${table(this)}
