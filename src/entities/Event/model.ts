@@ -171,15 +171,18 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return await EventModel.query<{ id: string }>(query)
   }
 
-  static async getUpcomingEvents() {
+  static async getEventsStartingInRange(
+    starting_from: number,
+    starting_to: number
+  ) {
     const query = SQL`
       SELECT *
       FROM ${table(EventModel)} e
       WHERE
         e.rejected IS FALSE
         AND e.approved IS TRUE
-        AND e.next_start_at > now()
-        AND e.next_start_at < (now() + interval '10 minutes')
+        AND e.next_start_at >= (to_timestamp(${starting_from} / 1000.0))
+        AND e.next_start_at < (to_timestamp(${starting_to} / 1000.0))
     `
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
@@ -216,7 +219,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       SELECT
         e.*
         ${conditional(!!options.user, SQL`, a.user is not null as attending`)}
-        ${conditional(!!options.user, SQL`, a.notify = TRUE as notify`)}
       FROM ${table(EventModel)} e
         ${conditional(
           !!options.user,
@@ -328,7 +330,6 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       ...event,
       estate_name: event.estate_name || event.scene_name,
       attending: !!event.attending,
-      notify: !!event.notify,
       next_start_at,
       position: [event.x, event.y],
       live,

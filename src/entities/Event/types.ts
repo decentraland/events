@@ -144,7 +144,6 @@ export type DeprecatedEventAttributes = EventAttributes & {
 
 export type SessionEventAttributes = DeprecatedEventAttributes & {
   attending: boolean
-  notify: boolean
   live: boolean
   position: [number, number]
 }

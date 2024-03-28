@@ -12,7 +12,6 @@ import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import EventModel from "../Event/model"
 import { getEvent } from "../Event/routes/getEvent"
 import EventAttendeeModel from "../EventAttendee/model"
-import ProfileSettingsModel from "../ProfileSettings/model"
 import { EventAttendeeAttributes } from "./types"
 
 export default routes((router) => {
@@ -25,11 +24,6 @@ export default routes((router) => {
     withAuth,
     withUserProfile,
     handle(createEventAttendee)
-  )
-  router.patch(
-    "/events/:event_id/attendees",
-    withAuth,
-    handle(updateEventAttendee)
   )
   router.delete(
     "/events/:event_id/attendees",
@@ -68,26 +62,14 @@ export async function createEventAttendee(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const user_name = req.authProfile?.name || null
   const event = await getEvent(req)
-  const settings = await ProfileSettingsModel.findOrGetDefault(user)
   await EventAttendeeModel.create<EventAttendeeAttributes>({
     event_id: event.id,
     user,
     user_name,
-    notify: settings.notify_by_email,
-    notified: false,
     created_at: new Date(),
   })
 
   await updateEventAttendeesById(event.id)
-  return getEventAttendeeList(event.id)
-}
-
-export async function updateEventAttendee(req: WithAuth) {
-  const user = req.auth!
-  const event = await getEvent(req)
-  const identify = { event_id: event.id, user }
-  const notify = Boolean(req.body && req.body.notify)
-  await EventAttendeeModel.update({ notify }, identify)
   return getEventAttendeeList(event.id)
 }
 

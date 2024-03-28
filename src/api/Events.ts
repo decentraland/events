@@ -104,7 +104,6 @@ export default class Events extends API {
       duration,
       recurrent: Boolean(event.recurrent),
       attending: Boolean(event.attending),
-      notify: Boolean(event.notify),
       live: Boolean(event.live),
     } as SessionEventAttributes
   }
@@ -271,13 +270,6 @@ export default class Events extends API {
     )
   }
 
-  async deleteEvent(eventId: string) {
-    return this.fetch<{}>(
-      `/events/${eventId}`,
-      this.options({ method: "DELETE" }).authorization({ sign: true })
-    )
-  }
-
   async notifyEvent(eventId: string) {
     return this.fetch<{}>(
       `/events/${eventId}/notifications`,
@@ -297,18 +289,6 @@ export default class Events extends API {
     return this.fetch<EventAttendeeAttributes[]>(
       `/events/${eventId}/attendees`,
       this.options({ method: "POST" }).authorization({ sign: true })
-    )
-  }
-
-  async updateEventAttendee(
-    eventId: string,
-    attendee: Partial<Pick<EventAttendeeAttributes, "notify">> = {}
-  ) {
-    return this.fetch<EventAttendeeAttributes[]>(
-      `/events/${eventId}/attendees`,
-      this.options({ method: "PATCH" })
-        .json(attendee)
-        .authorization({ sign: true })
     )
   }
 

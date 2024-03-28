@@ -61,7 +61,6 @@ import {
 import {
   canApproveAnyEvent,
   canEditAnyEvent,
-  canTestAnyNotification,
 } from "../../entities/ProfileSettings/utils"
 import useEventEditor from "../../hooks/useEventEditor"
 import WorldIcon from "../../images/worlds-icon.svg"
@@ -348,12 +347,6 @@ export default function SubmitPage() {
       })
       eventsState.add(event)
       navigate(locations.events())
-    }
-  }, [original])
-
-  const [notifying, notify] = useAsyncTask(async () => {
-    if (original) {
-      await Events.get().notifyEvent(original.id)
     }
   }, [original])
 
@@ -1260,7 +1253,7 @@ export default function SubmitPage() {
                 <Grid.Column mobile="6">
                   <Button
                     primary
-                    loading={submitting || removing || notifying}
+                    loading={submitting || removing}
                     disabled={
                       Boolean(
                         original &&
@@ -1268,8 +1261,7 @@ export default function SubmitPage() {
                           !canEditAnyEvent(settings)
                       ) ||
                       submitting ||
-                      removing ||
-                      notifying
+                      removing
                     }
                     style={{ width: "100%" }}
                     onClick={submit}
@@ -1283,8 +1275,8 @@ export default function SubmitPage() {
                       canApproveAnyEvent(settings)) && (
                       <Button
                         basic
-                        loading={submitting || removing || notifying}
-                        disabled={submitting || removing || notifying}
+                        loading={submitting || removing}
+                        disabled={submitting || removing}
                         style={{ width: "100%" }}
                         onClick={handleReject}
                       >
@@ -1293,19 +1285,6 @@ export default function SubmitPage() {
                           l("page.submit.reject")}
                       </Button>
                     )}
-                </Grid.Column>
-                <Grid.Column mobile="5">
-                  {original && canTestAnyNotification(settings) && (
-                    <Button
-                      basic
-                      loading={submitting || removing || notifying}
-                      disabled={submitting || removing || notifying}
-                      style={{ width: "100%" }}
-                      onClick={prevent(() => notify())}
-                    >
-                      {l("page.submit.notify_me")}
-                    </Button>
-                  )}
                 </Grid.Column>
               </Grid.Row>
               {state.error && (

@@ -25,7 +25,6 @@ const defaultProfileSettings = [
     rejecting: [] as string[],
     restoring: [] as string[],
     attending: [] as string[],
-    notifying: [] as string[],
     modifying: new Set<string>(),
     reload: (() => null) as () => void,
     add: (() => null) as (newEvent: SessionEventAttributes) => void,
@@ -33,7 +32,6 @@ const defaultProfileSettings = [
     reject: (() => null) as (id: string) => void,
     restore: (() => null) as (id: string) => void,
     attend: (() => null) as (id: string, attending: boolean) => void,
-    notify: (() => null) as (id: string, attending: boolean) => void,
   },
 ] as const
 
@@ -128,7 +126,6 @@ export function useEvents() {
         const newEvent = {
           ...event,
           attending: !!newAttendee,
-          notify: !!(newAttendee && newAttendee.notify),
           total_attendees: newAttendees.length,
           latest_attendees: newAttendees
             .slice(0, 10)
@@ -165,25 +162,9 @@ export function useEvents() {
     [updateAttendee]
   )
 
-  const [notifying, notify] = useAsyncTasks(
-    async (id, notify: boolean) => {
-      await updateAttendee(id, () =>
-        Events.get().updateEventAttendee(id, { notify })
-      )
-    },
-    [updateAttendee]
-  )
-
   const modifying = useMemo(
-    () =>
-      new Set([
-        ...approving,
-        ...rejecting,
-        ...restoring,
-        ...attending,
-        ...notifying,
-      ]),
-    [approving, rejecting, restoring, attending, notifying]
+    () => new Set([...approving, ...rejecting, ...restoring, ...attending]),
+    [approving, rejecting, restoring, attending]
   )
 
   return [
@@ -195,14 +176,12 @@ export function useEvents() {
       rejecting,
       restoring,
       attending,
-      notifying,
       modifying,
       reload: eventsState.reload,
       add,
       approve,
       reject,
       restore,
-      notify,
       attend,
     },
   ] as const
