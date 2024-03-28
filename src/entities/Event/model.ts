@@ -185,15 +185,18 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
-  static async getUpcomingEvents(timestamp: number) {
+  static async getEventsStartingInRange(
+    starting_from: number,
+    starting_to: number
+  ) {
     const query = SQL`
       SELECT *
       FROM ${table(EventModel)} e
       WHERE
         e.rejected IS FALSE
         AND e.approved IS TRUE
-        AND e.next_start_at >= to_timestamp(${timestamp} / 1000.0)
-        AND e.next_start_at < (now() + interval '60 minutes')
+        AND e.next_start_at >= (to_timestamp(${starting_from} / 1000.0))
+        AND e.next_start_at < (to_timestamp(${starting_to} / 1000.0))
     `
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))

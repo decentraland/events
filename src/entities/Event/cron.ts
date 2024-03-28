@@ -30,11 +30,14 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
     await NotificationCursorsModel.getLastUpdateForNotificationType(
       EventsNotifications.EVENT_STARTS_SOON
     )
-
-  const events = await EventModel.getUpcomingEvents(lastRun)
-  ctx.log(`[${new Date().toJSON()}] ${events.length} upcoming events to notify`)
-
   const now = Date.now()
+
+  const ahead = 60 * 60 * 1000 // 1 hour in the future
+  const events = await EventModel.getEventsStartingInRange(
+    lastRun + ahead,
+    now + ahead
+  )
+  ctx.log(`[${new Date().toJSON()}] ${events.length} upcoming events to notify`)
 
   for (const event of events) {
     const attendees = await EventAttendeeModel.listByEventId(event.id, {
@@ -52,7 +55,7 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
     EventsNotifications.EVENT_STARTS_SOON,
-    getNowPlusHour(now)
+    now
   )
 }
 
@@ -61,13 +64,12 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
     await NotificationCursorsModel.getLastUpdateForNotificationType(
       EventsNotifications.EVENT_STARTED
     )
+  const now = Date.now()
 
-  const events = await EventModel.getStartedEvents(lastRun)
+  const events = await EventModel.getEventsStartingInRange(lastRun, now)
   ctx.log(
     `[${new Date().toJSON()}] ${events.length} just started events to notify`
   )
-
-  const now = Date.now()
 
   for (const event of events) {
     const attendees = await EventAttendeeModel.listByEventId(event.id, {
@@ -84,20 +86,6 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
     EventsNotifications.EVENT_STARTED,
-    getNowPlusMins(now)
+    now
   )
-}
-
-function getNowPlusHour(ts: number) {
-  const hoursToAdd = 1 * 60 * 60 * 1000
-  const now = new Date(ts)
-  now.setTime(now.getTime() + hoursToAdd)
-  return now.getTime()
-}
-
-function getNowPlusMins(ts: number) {
-  const minsToAdd = 2 * 60000
-  const now = new Date(ts)
-  now.setTime(now.getTime() + minsToAdd)
-  return now.getTime()
 }
