@@ -45,7 +45,15 @@ const app = express()
 app.set("x-powered-by", false)
 app.use(withLogs())
 app.use("/api", [
-  withCors(),
+  withCors({
+    corsOrigin: [
+      /^http:\/\/localhost:[0-9]{1,10}$/,
+      /^https:\/\/(.{1,50}\.)?decentraland\.(zone|today|org)$/,
+      "https://mvfw.org",
+      "https://dcl-metrics.com",
+    ],
+    allowedHeaders: "*",
+  }),
   withDDosProtection(),
   withBody(),
   status(),
@@ -69,8 +77,12 @@ app.use("/events", social)
 
 app.use("/events", [
   withCors({
-    cors: "*",
-    corsOrigin: "*",
+    corsOrigin: [
+      /^http:\/\/localhost:[0-9]{1,10}$/,
+      /^https:\/\/(.{1,50}\.)?decentraland\.(zone|today|org)$/,
+      "https://mvfw.org",
+      "https://dcl-metrics.com",
+    ],
     allowedHeaders: "*",
   }),
   gatsby(resolve(__filename, "../../public"), {
