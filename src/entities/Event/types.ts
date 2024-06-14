@@ -199,6 +199,7 @@ export type EventListOptions = {
   limit?: number
   offset?: number
   order?: "asc" | "desc"
+  date?: string
 }
 
 export const editEventAttributes = [
