@@ -59,7 +59,7 @@
       "optimizilla": "optimizilla",
       "error_image_format": "This file format is not supported, try with",
       "image_recommended_size": "(recommended size: 1340 x 670)",
-      "image_recommended_label": "Upload a PNG, JPG or GIF. Recommended size 1340x670px. Maximum file size 500kb",
+      "image_recommended_label": "Upload a PNG, JPG, or GIF (1340x670px, max 500kb). Center visuals and text to fit all screen resolutions.",
       "event_cover": "Event Cover",
       "browse": "Browse",
       "browse_line1_label": "your computer or",
