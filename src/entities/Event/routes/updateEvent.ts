@@ -12,6 +12,7 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import pick from "lodash/pick"
 
+import { getEvent } from "./getEvent"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
@@ -39,7 +40,6 @@ import {
   editOwnEventAttributes,
 } from "../types"
 import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
-import { getEvent } from "./getEvent"
 
 import { DECENTRALAND_URL } from "./index"
 
