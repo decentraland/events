@@ -75,23 +75,30 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       throw new Error(`Missing update conditions`)
     }
 
-    const sql = SQL`
-      UPDATE ${table(this)}
-      SET
-        ${join(
-          changesKeys.map((key) => SQL`"${SQL.raw(key)}" = ${changes[key]}`),
-          SQL`,`
-        )}
-      WHERE
-        ${join(
-          conditionsKeys.map(
-            (key) => SQL`"${SQL.raw(key)}" = ${conditions[key]}`
-          ),
-          SQL`,`
-        )}
-    `
+  
+  const updatedChanges = {
+    ...changes,
+    updated_at: new Date(),
+  };
 
-    return this.query(sql) as any
+  const sql = SQL`
+    UPDATE ${table(this)}
+    SET
+      ${join(
+        Object.keys(updatedChanges).map((key) => SQL`"${SQL.raw(key)}" = ${updatedChanges[key]}`),
+        SQL`,`
+      )}
+    WHERE
+      ${join(
+        conditionsKeys.map(
+          (key) => SQL`"${SQL.raw(key)}" = ${conditions[key]}`
+        ),
+        SQL`,`
+      )}
+  `;
+
+  return this.query(sql) as any;
+
   }
 
   static selectNextStartAt(
