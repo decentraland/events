@@ -7,6 +7,8 @@
   Community Events
 </h1>
 
+[![Coverage Status](https://coveralls.io/repos/github/decentraland/events/badge.svg)](https://coveralls.io/github/decentraland/events)
+
 This website hosts a dApp used to upload and see what others are organizing inside the Decentraland virtual world.
 
 ![events home page](./static/events.jpg)
