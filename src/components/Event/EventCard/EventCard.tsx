@@ -38,7 +38,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
     [event?.next_start_at]
   )
   const handleJumpIn = useCallback(
-    (e: React.MouseEvent<any>) => e.preventDefault(),
+    (e: React.MouseEvent<any>) => e.stopPropagation(),
     []
   )
   const handleClick = useCallback(
