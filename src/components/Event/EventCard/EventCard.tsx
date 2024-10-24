@@ -37,10 +37,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
       new Date(event ? Date.parse(event.next_start_at.toString()) : Date.now()),
     [event?.next_start_at]
   )
-  const handleJumpIn = useCallback(
-    (e: React.MouseEvent<any>) => e.stopPropagation(),
-    []
-  )
+
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (event) {
@@ -88,7 +85,7 @@ export default React.memo(function EventCard(props: EventCardProps) {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <EventDate event={event} />
             <div>
-              <JumpInPosition event={event} onClick={handleJumpIn} />
+              <JumpInPosition event={event} />
             </div>
           </div>
         )}
