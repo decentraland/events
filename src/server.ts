@@ -173,6 +173,7 @@ app.use("/events", [
         // "http://192.168.1.5:*",
       ].join(" "),
       workerSrc: ["'self'", "blob:"].join(" "),
+      frameSrc: ["https:", "dcl:", "decentraland:"].join(" "),
     },
   }),
 ])
