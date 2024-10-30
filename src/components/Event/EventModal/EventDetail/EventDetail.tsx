@@ -19,6 +19,7 @@ import { InfoTooltip } from "decentraland-ui/dist/components/InfoTooltip"
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon"
 import isEmail from "validator/lib/isEmail"
 
+import EventDateDetail from "./EventDateDetail"
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import { SessionEventAttributes } from "../../../../entities/Event/types"
 import { profileSiteUrl } from "../../../../entities/Event/utils"
@@ -38,7 +39,6 @@ import AttendingButtons from "../../../Button/AttendingButtons"
 import JumpInButton from "../../../Button/JumpInPosition"
 import MenuIcon, { MenuIconItem } from "../../../MenuIcon/MenuIcon"
 import EventSection from "../../EventSection"
-import EventDateDetail from "./EventDateDetail"
 
 import "./EventDetail.css"
 
