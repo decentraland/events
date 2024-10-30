@@ -67,7 +67,7 @@ import WorldIcon from "../../images/worlds-icon.svg"
 import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
-import { getServerOptions, getServers } from "../../modules/servers"
+import { getReamls, getServerOptions } from "../../modules/servers"
 import { getWorldNames, getWorldNamesOptions } from "../../modules/worlds"
 
 import "./index.css"
@@ -184,7 +184,7 @@ export default function SubmitPage() {
 
   const [state, patchState] = usePatchState<SubmitPageState>({})
   const [account, accountState] = useAuthContext()
-  const [servers] = useAsyncMemo(getServers)
+  const [servers] = useAsyncMemo(getReamls)
   const [worlds] = useAsyncMemo(getWorldNames)
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)

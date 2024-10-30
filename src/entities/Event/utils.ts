@@ -1,9 +1,9 @@
+import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import padStart from "lodash/padStart"
 import { RRule, Weekday } from "rrule"
 
-import { ScheduleAttributes } from "../Schedule/types"
 import {
   EventAttributes,
   EventTimeReference,
@@ -16,6 +16,7 @@ import {
   WeekdayMask,
   Weekdays,
 } from "./types"
+import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL = env(
   "DECENTRALAND_URL",
@@ -54,6 +55,7 @@ export function scheduleUrl(schedule: Pick<ScheduleAttributes, "id">): string {
   return target.toString()
 }
 
+/** deprecated user eventClientOptions, redirecto to play wont work in the future */
 export function eventTargetUrl(
   event: Pick<EventAttributes, "x" | "y" | "server">
 ): string {
@@ -66,6 +68,39 @@ export function eventTargetUrl(
   }
 
   return target.toString()
+}
+
+export function eventClientOptions(
+  event: Pick<EventAttributes, "x" | "y" | "server">,
+  servers?: (CatalystAbout | null)[] | null
+): {
+  position: string
+  realm?: string
+} {
+  const options: {
+    position: string
+    realm?: string
+  } = {
+    position: [event.x || 0, event.y || 0].join(","),
+  }
+
+  let realmURL
+  if (event.server && servers) {
+    realmURL = servers
+      .map((server) => {
+        if (server?.configurations?.realmName === event.server) {
+          const url = new URL(server.content.publicUrl)
+          return url.origin.toString()
+        }
+      })
+      .filter(Boolean)[0]
+  }
+
+  if (realmURL) {
+    options.realm = realmURL
+  }
+
+  return options
 }
 
 export function eventFacebookUrl(

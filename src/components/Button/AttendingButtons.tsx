@@ -4,6 +4,7 @@ import { withPrefix } from "gatsby"
 
 import { useLocation } from "@gatsbyjs/reach-router"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
@@ -14,8 +15,8 @@ import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { useEventsContext } from "../../context/Event"
 import { SessionEventAttributes } from "../../entities/Event/types"
 import {
+  eventClientOptions,
   eventFacebookUrl,
-  eventTargetUrl,
   eventTwitterUrl,
 } from "../../entities/Event/utils"
 import facebookIcon from "../../images/icon-facebook.svg"
@@ -23,8 +24,10 @@ import twitterIcon from "../../images/icon-twitter.svg"
 import closeIcon from "../../images/popup-close.svg"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import shareIcon from "../../images/share.svg"
+import { launchDesktopApp } from "../../modules/desktop"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
+import { getReamls } from "../../modules/servers"
 import { Star } from "../Icon/Star"
 
 import "./AttendingButtons.css"
@@ -52,7 +55,6 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     () => props.loading ?? state.modifying.has(event?.id || ""),
     [props.loading, state.modifying]
   )
-  const href = useMemo(() => event && eventTargetUrl(event), [event])
 
   const [sharing, share] = useAsyncTask(async () => {
     if (event) {
@@ -132,9 +134,31 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     [setFallbackShare]
   )
 
-  const handleStopPropagation = useCallback((e: React.MouseEvent<any>) => {
-    e.stopPropagation()
-  }, [])
+  const [servers] = useAsyncMemo(getReamls)
+
+  const handleJumpIn = useCallback(
+    async function (e: React.MouseEvent<HTMLButtonElement>) {
+      e.stopPropagation()
+      e.preventDefault()
+      let hasDecentralandLauncher: null | boolean = null
+      if (!event) {
+        return
+      }
+      hasDecentralandLauncher = await launchDesktopApp(
+        eventClientOptions(event, servers)
+      )
+
+      track(SegmentEvent.JumpIn, {
+        eventId: event?.id || null,
+        trending: event?.trending || false,
+        highlighted: event?.highlighted || false,
+        world: event?.world || false,
+        world_name: event?.world ? event.server : false,
+        has_laucher: !!hasDecentralandLauncher,
+      })
+    },
+    [event, track, servers]
+  )
 
   const handleAttend = useCallback(
     (e: React.MouseEvent<any>) => {
@@ -183,10 +207,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           primary
           size="small"
           disabled={loading || sharing || !approved}
-          onClick={handleStopPropagation}
+          onClick={handleJumpIn}
           className="fluid"
-          href={href ? withPrefix(href) : href}
-          target="_blank"
           style={{
             display: "flex",
             justifyContent: "center",
