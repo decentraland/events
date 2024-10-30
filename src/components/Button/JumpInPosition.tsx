@@ -142,7 +142,7 @@ export default function JumpInPosition({
         <Button
           primary
           onClick={handleModalClick}
-          style={{ marginTop: "28px" }}
+          className="jump-in-position__modal-button"
         >
           {modalText && modalText.buttonLabel}
         </Button>
