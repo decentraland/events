@@ -55,7 +55,7 @@ export const launchDesktopApp = async (options: {
     customProtocolParams.push(`realm=${options.realm}`)
   }
 
-  const customProtocolTarget = `decentraland://${customProtocolParams.join(
+  const customProtocolTarget = `decentraland://?${customProtocolParams.join(
     "&"
   )}`
 
