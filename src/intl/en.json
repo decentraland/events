@@ -327,17 +327,10 @@
         "paragraph": "A crypto wallet helps you manage your transactions: earn rewards, purchase items, claim your name, and more!",
         "paragraph_secondary": "Once you've installed your wallet, you will need to refresh this page to continue"
       },
-      "join_in_modal": {
-        "relunch": {
-          "title": "Open Decentraland to jump right into the event.",
-          "description": "If Decentraland didn't open automatically, click relaunch.",
-          "button_label": "Relaunch"
-        },
-        "download": {
-          "title": "Download Decentraland to Jump in.",
-          "description": "Download the all-new Decentraland and come back to this page to jump straight into this event.",
-          "button_label": "Download"
-        }
+      "download": {
+        "title": "Download Decentraland to Jump in.",
+        "description": "Download the all-new Decentraland and come back to this page to jump straight into this event.",
+        "button_label": "Download"
       }
     }
   },
