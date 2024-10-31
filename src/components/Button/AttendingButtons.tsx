@@ -10,6 +10,7 @@ import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import useTimeout from "decentraland-gatsby/dist/hooks/useTimeout"
 import newPopupWindow from "decentraland-gatsby/dist/utils/dom/newPopupWindow"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import env from "decentraland-gatsby/dist/utils/env"
 import { Button } from "decentraland-ui/dist/components/Button/Button"
 
 import { useEventsContext } from "../../context/Event"
@@ -29,6 +30,7 @@ import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getReamls } from "../../modules/servers"
 import { Star } from "../Icon/Star"
+import DownloadModal from "../Modal/DownloadModal"
 
 import "./AttendingButtons.css"
 
@@ -38,7 +40,8 @@ export type AttendingButtonsProps = {
 }
 
 export default function AttendingButtons(props: AttendingButtonsProps) {
-  const event = props.event
+  const { event } = props
+  const [showModal, setShowModal] = useState(false)
   const nextStartAt = useMemo(
     () =>
       new Date(event ? Date.parse(event.next_start_at.toString()) : Date.now()),
@@ -136,17 +139,21 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
 
   const [servers] = useAsyncMemo(getReamls)
 
+  let hasDecentralandLauncher: null | boolean = null
+
   const handleJumpIn = useCallback(
     async function (e: React.MouseEvent<HTMLButtonElement>) {
       e.stopPropagation()
       e.preventDefault()
-      let hasDecentralandLauncher: null | boolean = null
+
       if (!event) {
         return
       }
       hasDecentralandLauncher = await launchDesktopApp(
         eventClientOptions(event, servers)
       )
+
+      !hasDecentralandLauncher && setShowModal(true)
 
       track(SegmentEvent.JumpIn, {
         eventId: event?.id || null,
@@ -157,7 +164,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
         has_laucher: !!hasDecentralandLauncher,
       })
     },
-    [event, track, servers]
+    [event, track, servers, hasDecentralandLauncher]
   )
 
   const handleAttend = useCallback(
@@ -167,6 +174,20 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       event && state.attend(event.id, !event.attending)
     },
     [event, state]
+  )
+
+  const handleModalClick = useCallback(
+    async function (e: React.MouseEvent<HTMLButtonElement>) {
+      e.stopPropagation()
+      e.preventDefault()
+      if (event) {
+        window.open(
+          env("DECENTRALAND_DOWNLOAD_URL", "https://decentraland.org/download"),
+          "_blank"
+        )
+      }
+    },
+    [event, track, servers, hasDecentralandLauncher]
   )
 
   return (
@@ -261,6 +282,11 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           <img src={shareIcon} width="14" height="14" />
         </Button>
       )}
+      <DownloadModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onModalClick={handleModalClick}
+      />
     </div>
   )
 }
