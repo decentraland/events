@@ -222,6 +222,18 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       orderDirection = options.order === "asc" ? "ASC" : "DESC"
     }
 
+    let coordinatesFilter = ""
+    if (
+      !Number.isFinite(options.x) &&
+      !Number.isFinite(options.y) &&
+      options.positions &&
+      options.positions.length > 0
+    ) {
+      coordinatesFilter = options.positions
+        .map((position) => `ARRAY[${position.join(",")}]`)
+        .join(",")
+    }
+
     const query = SQL`
       SELECT
         e.*
@@ -275,6 +287,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${conditional(
           Number.isFinite(options.x) && Number.isFinite(options.y),
           SQL`AND e.x = ${options.x} AND e.y = ${options.y}`
+        )}
+        ${conditional(
+          !!coordinatesFilter,
+          SQL`AND e.coordinates IN (${SQL.raw(coordinatesFilter)})`
         )}
         ${conditional(
           !!options.estate_id,
