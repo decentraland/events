@@ -222,6 +222,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       orderDirection = options.order === "asc" ? "ASC" : "DESC"
     }
 
+    // Prioritizes "x" && "y" options params over positions
     let coordinatesFilter = ""
     if (
       !Number.isFinite(options.x) &&
