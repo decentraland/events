@@ -64,6 +64,27 @@ export async function getEventList(req: WithAuth) {
     }
   }
 
+  if (!!query.positions && query.positions.length > 0) {
+    options.positions = []
+
+    for (const position of query.positions) {
+      const [x, y] = position.split(",").slice(0, 2).map(Number) as [
+        number,
+        number
+      ]
+
+      if (
+        !Number.isFinite(x) ||
+        !Number.isFinite(y) ||
+        !isInsideWorldLimits(x, y)
+      ) {
+        return []
+      }
+
+      options.positions.push([x, y])
+    }
+  }
+
   if (query.estate_id) {
     const estateId = Number(query.estate_id)
     if (estateId !== null && Number.isFinite(estateId)) {

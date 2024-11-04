@@ -222,6 +222,19 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       orderDirection = options.order === "asc" ? "ASC" : "DESC"
     }
 
+    // Prioritizes "x" && "y" options params over positions
+    let positionsFilter = ""
+    if (
+      !Number.isFinite(options.x) &&
+      !Number.isFinite(options.y) &&
+      options.positions &&
+      options.positions.length > 0
+    ) {
+      positionsFilter = options.positions
+        .map((position) => `(${position.join(",")})`)
+        .join(",")
+    }
+
     const query = SQL`
       SELECT
         e.*
@@ -275,6 +288,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${conditional(
           Number.isFinite(options.x) && Number.isFinite(options.y),
           SQL`AND e.x = ${options.x} AND e.y = ${options.y}`
+        )}
+        ${conditional(
+          !!positionsFilter,
+          SQL`AND (e.x, e.y) = ANY(Array[${SQL.raw(positionsFilter)}])`
         )}
         ${conditional(
           !!options.estate_id,
