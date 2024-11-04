@@ -223,15 +223,15 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     // Prioritizes "x" && "y" options params over positions
-    let coordinatesFilter = ""
+    let positionsFilter = ""
     if (
       !Number.isFinite(options.x) &&
       !Number.isFinite(options.y) &&
       options.positions &&
       options.positions.length > 0
     ) {
-      coordinatesFilter = options.positions
-        .map((position) => `ARRAY[${position.join(",")}]`)
+      positionsFilter = options.positions
+        .map((position) => `(${position.join(",")})`)
         .join(",")
     }
 
@@ -290,8 +290,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           SQL`AND e.x = ${options.x} AND e.y = ${options.y}`
         )}
         ${conditional(
-          !!coordinatesFilter,
-          SQL`AND e.coordinates IN (${SQL.raw(coordinatesFilter)})`
+          !!positionsFilter,
+          SQL`AND (e.x, e.y) = ANY(Array[${SQL.raw(positionsFilter)}])`
         )}
         ${conditional(
           !!options.estate_id,
