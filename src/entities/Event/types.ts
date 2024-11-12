@@ -174,6 +174,7 @@ export type EventListParams = {
   list?: EventListType
   creator?: string
   position?: string
+  positions?: string[]
   estate_id?: string
   only_attendee?: boolean
   search?: string
@@ -191,6 +192,7 @@ export type EventListOptions = {
   creator?: string
   x?: number
   y?: number
+  positions?: number[][]
   estate_id?: string
   only_attendee?: boolean
   search?: string

@@ -38,6 +38,12 @@ export const getEventListQuery: AjvObjectSchema = {
       pattern: "^-?\\d{1,3},-?\\d{1,3}$",
       description: "Filter events that will happend in a specific position",
     },
+    positions: {
+      type: "array",
+      maxItems: 1000,
+      items: { type: "string", pattern: "^-?\\d{1,3},-?\\d{1,3}$" },
+      description: "Filter places in specific positions",
+    },
     estate_id: {
       type: "string",
       format: "int",

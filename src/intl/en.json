@@ -54,7 +54,7 @@
       "submit_event": "Submit event",
       "be_sure_to_fill": "Host your own event in Decentraland. Visit the {event} for answers to commonly asked questions.",
       "event": "Events FAQ",
-      "events_faq_url": "https://docs.decentraland.org/player/events/faq/",
+      "events_faq_url": "https://docs.decentraland.org/player/general/faq/#creating-an-event",
       "error_image_size": "This image is too heavy (more than 500Kb), try with",
       "optimizilla": "optimizilla",
       "error_image_format": "This file format is not supported, try with",
@@ -326,6 +326,11 @@
         "sub_title": "Get a wallet to continue",
         "paragraph": "A crypto wallet helps you manage your transactions: earn rewards, purchase items, claim your name, and more!",
         "paragraph_secondary": "Once you've installed your wallet, you will need to refresh this page to continue"
+      },
+      "download": {
+        "title": "Download Decentraland to Jump in.",
+        "description": "Download the all-new Decentraland and come back to this page to jump straight into this event.",
+        "button_label": "Download"
       }
     }
   },

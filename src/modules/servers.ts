@@ -6,6 +6,7 @@ import { memo } from "radash"
 
 const mainRealmUrl = "https://realm-provider.decentraland.org/main"
 
+/** @deprecated use getReamls */
 export const getServers = memo(
   async () => {
     const servers: { address: string }[] = cache.catalysts.mainnet
@@ -18,6 +19,23 @@ export const getServers = memo(
         return API.catch(Catalyst.getInstanceFrom(server.address).getAbout())
       })
     )
+  },
+  { ttl: Infinity }
+)
+
+export const getReamls = memo(
+  async () => {
+    const servers: { address: string }[] = cache.catalysts.mainnet
+    // add main realm
+    servers.push({ address: mainRealmUrl })
+
+    const serverWithAbout = await Promise.all(
+      servers.map((server) => {
+        return API.catch(Catalyst.getInstanceFrom(server.address).getAbout())
+      })
+    )
+
+    return serverWithAbout.filter((server) => !!server?.comms)
   },
   { ttl: Infinity }
 )

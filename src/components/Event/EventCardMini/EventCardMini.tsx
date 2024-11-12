@@ -42,11 +42,6 @@ export default React.memo(function EventCardMini(props: EventCardMiniProps) {
     [event, onClick]
   )
 
-  const handleJumpIn = useCallback(
-    (e: React.MouseEvent<any>) => e.stopPropagation(),
-    []
-  )
-
   return (
     <Card
       className={TokenList.join([
@@ -57,9 +52,7 @@ export default React.memo(function EventCardMini(props: EventCardMiniProps) {
       href={href ? withPrefix(href) : href}
       onClick={handleClick}
     >
-      {event && !props.loading && (
-        <JumpInPosition event={event} compact onClick={handleJumpIn} />
-      )}
+      {event && !props.loading && <JumpInPosition event={event} compact />}
       <div style={{ display: "flex" }}>
         <div className="event-card-mini__cover">
           <ImgFixed src={event?.image || ""} dimension="square" />

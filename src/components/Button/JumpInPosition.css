@@ -68,3 +68,7 @@
 .ui.cards > .card .jump-in-position .jump-in-position__position img {
   vertical-align: super;
 }
+
+.jump-in-position__modal-button {
+  margin-top: "28px";
+}

@@ -92,6 +92,11 @@ p.FieldNote {
   line-height: 18px;
 }
 
+.submit__row-description .ui.form textarea,
+.submit__row-description .dcl.text-area > textarea {
+  resize: vertical;
+}
+
 .submit__location-select,
 .submit__server-select {
   margin-bottom: 8px;

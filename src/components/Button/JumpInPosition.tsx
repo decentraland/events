@@ -1,14 +1,19 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { Link } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
+import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventAttributes } from "../../entities/Event/types"
-import { eventTargetUrl } from "../../entities/Event/utils"
+import { eventClientOptions } from "../../entities/Event/utils"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import secondaryPinIcon from "../../images/secondary-pin-small.svg"
+import { launchDesktopApp } from "../../modules/desktop"
 import { SegmentEvent } from "../../modules/segment"
+import { getReamls } from "../../modules/servers"
+import DownloadModal from "../Modal/DownloadModal"
 
 import "./JumpInPosition.css"
 
@@ -19,55 +24,81 @@ export type JumpInPositionProps = React.HTMLProps<HTMLAnchorElement> & {
 
 export default function JumpInPosition({
   event,
-  href,
   compact,
   ...props
 }: JumpInPositionProps) {
   const track = useTrackContext()
-  const to = href || (event && eventTargetUrl(event)) || "#"
-  const isPosition = !href && !!event
+  const [showModal, setShowModal] = useState(false)
+  const [servers] = useAsyncMemo(getReamls)
+
+  const isPosition = !!event
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"
 
-  const handleClick = useCallback(
-    function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-      e.stopPropagation()
+  let hasDecentralandLauncher: null | boolean = null
 
-      if (props.onClick) {
-        props.onClick(e)
+  const handleClick = useCallback(
+    async function (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+      e.stopPropagation()
+      e.preventDefault()
+      if (event) {
+        hasDecentralandLauncher = await launchDesktopApp(
+          eventClientOptions(event, servers)
+        )
+
+        !hasDecentralandLauncher && setShowModal(true)
       }
 
-      if (!e.defaultPrevented) {
-        track(SegmentEvent.JumpIn, {
-          eventId: event?.id || null,
-          trending: event?.trending || false,
-          highlighted: event?.highlighted || false,
-          world: event?.world || false,
-          world_name: event?.world ? event.server : false,
-        })
+      track(SegmentEvent.JumpIn, {
+        eventId: event?.id || null,
+        trending: event?.trending || false,
+        highlighted: event?.highlighted || false,
+        world: event?.world || false,
+        world_name: event?.world ? event.server : false,
+        has_laucher: !!hasDecentralandLauncher,
+      })
+    },
+    [event, track, servers]
+  )
+
+  const handleModalClick = useCallback(
+    async function (e: React.MouseEvent<HTMLButtonElement>) {
+      e.stopPropagation()
+      e.preventDefault()
+      if (event) {
+        window.open(
+          env("DECENTRALAND_DOWNLOAD_URL", "https://decentraland.org/download"),
+          "_blank"
+        )
       }
     },
-    [event, track]
+    [event, track, servers, hasDecentralandLauncher]
   )
 
   return (
-    <Link
-      {...props}
-      target="_blank"
-      onClick={handleClick}
-      href={to}
-      className={TokenList.join([
-        "jump-in-position",
-        compact && "jump-in-position--compact",
-        props.className,
-      ])}
-    >
-      <span className="jump-in-position__position">
-        {isPosition && <img src={secondaryPinIcon} width="16" height="16" />}
-        <span>{event?.world ? event.server : position}</span>
-      </span>
-      <span className="jump-in-position__icon">
-        <img src={primaryJumpInIcon} width={16} height={16} />
-      </span>
-    </Link>
+    <>
+      <Link
+        {...props}
+        target="_blank"
+        onClick={handleClick}
+        className={TokenList.join([
+          "jump-in-position",
+          compact && "jump-in-position--compact",
+          props.className,
+        ])}
+      >
+        <span className="jump-in-position__position">
+          {isPosition && <img src={secondaryPinIcon} width="16" height="16" />}
+          <span>{event?.world ? event.server : position}</span>
+        </span>
+        <span className="jump-in-position__icon">
+          <img src={primaryJumpInIcon} width={16} height={16} />
+        </span>
+      </Link>
+      <DownloadModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onModalClick={handleModalClick}
+      />
+    </>
   )
 }
