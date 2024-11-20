@@ -11,6 +11,7 @@ import { eventClientOptions } from "../../entities/Event/utils"
 import primaryJumpInIcon from "../../images/primary-jump-in.svg"
 import secondaryPinIcon from "../../images/secondary-pin-small.svg"
 import { launchDesktopApp } from "../../modules/desktop"
+import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getReamls } from "../../modules/servers"
 import DownloadModal from "../Modal/DownloadModal"
@@ -65,13 +66,7 @@ export default function JumpInPosition({
       e.stopPropagation()
       e.preventDefault()
       if (event) {
-        window.open(
-          `${env(
-            "DECENTRALAND_DOWNLOAD_URL",
-            "https://decentraland.org/download"
-          )}/?event=${event.id}`,
-          "_blank"
-        )
+        window.open(locations.download(event.id), "_blank")
       }
     },
     [event, track, servers, hasDecentralandLauncher]
