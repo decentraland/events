@@ -1,4 +1,5 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
+import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventTimeReference, EventType } from "../entities/Event/types"
 import {
@@ -126,4 +127,12 @@ export default {
   settings: () => url("/settings/"),
 
   docs: () => url("/docs/"),
+
+  download: (id: string) => {
+    const url = new URL(
+      env("DECENTRALAND_DOWNLOAD_URL", "https://decentraland.org/download")
+    )
+    url.searchParams.set("event", id)
+    return url.toString()
+  },
 }

@@ -181,10 +181,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       e.stopPropagation()
       e.preventDefault()
       if (event) {
-        window.open(
-          env("DECENTRALAND_DOWNLOAD_URL", "https://decentraland.org/download"),
-          "_blank"
-        )
+        window.open(locations.download(event.id), "_blank")
       }
     },
     [event, track, servers, hasDecentralandLauncher]
