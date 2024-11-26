@@ -54,7 +54,7 @@
       "submit_event": "Submit event",
       "be_sure_to_fill": "Host your own event in Decentraland. Visit the {event} for answers to commonly asked questions.",
       "event": "Events FAQ",
-      "events_faq_url": "https://docs.decentraland.org/player/general/faq/#creating-an-event",
+      "events_faq_url": "https://docs.decentraland.org/player/FAQs/places/",
       "error_image_size": "This image is too heavy (more than 500Kb), try with",
       "optimizilla": "optimizilla",
       "error_image_format": "This file format is not supported, try with",
