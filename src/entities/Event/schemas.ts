@@ -281,7 +281,7 @@ export const eventSchema = {
       description:
         "Rrule BYSETPOS configuration, see: https://datatracker.ietf.org/doc/html/rfc5545",
       type: ["number", "null"],
-      minimum: 0,
+      minimum: -1,
     },
     recurrent_monthday: {
       description:
@@ -416,7 +416,7 @@ export const newEventSchema = {
     },
     recurrent_setpos: {
       type: ["number", "null"],
-      minimum: 0,
+      minimum: -1,
     },
     recurrent_monthday: {
       type: ["number", "null"],
