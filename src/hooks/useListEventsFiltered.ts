@@ -49,7 +49,7 @@ export default function useListEventsFiltered(
 
       events = events.filter((event) => {
         if (type === EventType.One) {
-          return event.duration <= Time.Day
+          return event.duration <= Time.Day && !event.recurrent
         } else {
           return event.duration > Time.Day || event.recurrent
         }
