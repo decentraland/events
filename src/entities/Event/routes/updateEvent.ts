@@ -39,7 +39,11 @@ import {
   editEventAttributes,
   editOwnEventAttributes,
 } from "../types"
-import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
+import {
+  calculateRecurrentProperties,
+  eventTargetUrl,
+  validateImageUrl,
+} from "../utils"
 
 import { DECENTRALAND_URL } from "./index"
 
@@ -110,6 +114,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
+
+  if (updatedAttributes.image) {
+    await validateImageUrl(updatedAttributes.image)
+  }
 
   // make schedules unique
   if (updatedAttributes.schedules) {

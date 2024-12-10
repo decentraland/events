@@ -1,3 +1,5 @@
+import logger from "decentraland-gatsby/dist/entities/Development/logger"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
@@ -16,6 +18,7 @@ import {
   WeekdayMask,
   Weekdays,
 } from "./types"
+import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../Poster/types"
 import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL = env(
@@ -30,6 +33,8 @@ const PROFILE_SITE_URL = env(
   "PROFILE_SITE_URL",
   "https://profile.decentraland.org"
 )
+
+const BUCKET_URL = env("AWS_BUCKET_URL")
 
 export function profileSiteUrl(address: string) {
   const target = new URL(PROFILE_SITE_URL)
@@ -448,4 +453,20 @@ export function isPastEvent(event: EventAttributes) {
   const now = Date.now()
   const finish_at = Time.date(event.finish_at)
   return finish_at.getTime() < now
+}
+
+export async function validateImageUrl(imageUrl: string) {
+  const url = new URL(imageUrl)
+  const whitelistedDomains = [BUCKET_URL].filter(
+    (domain): domain is string => !!domain
+  )
+
+  if (!whitelistedDomains.some((domain) => domain.endsWith(url.host))) {
+    throw new RequestError(
+      `Invalid image url ${imageUrl}, please upload the image through the upload poster endpoint (POST /poster)`,
+      RequestError.BadRequest
+    )
+  }
+
+  return imageUrl
 }
