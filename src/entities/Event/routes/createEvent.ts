@@ -22,7 +22,11 @@ import {
   EventAttributes,
   MAX_EVENT_DURATION,
 } from "../types"
-import { calculateRecurrentProperties, eventTargetUrl } from "../utils"
+import {
+  calculateRecurrentProperties,
+  eventTargetUrl,
+  validateImageUrl,
+} from "../utils"
 
 const validateNewEvent = createValidator<EventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -60,6 +64,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   validateNewEvent(data)
+
+  if (data.image) {
+    await validateImageUrl(data.image)
+  }
 
   const x = data.x
   const y = data.y
