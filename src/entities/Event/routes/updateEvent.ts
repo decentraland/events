@@ -115,8 +115,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
 
-  if (updatedAttributes.image) {
-    await validateImageUrl(updatedAttributes.image)
+  if (req.body.image && req.body.image !== event.image) {
+    await validateImageUrl(req.body.image)
   }
 
   // make schedules unique
