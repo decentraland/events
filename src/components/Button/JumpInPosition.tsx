@@ -13,7 +13,7 @@ import secondaryPinIcon from "../../images/secondary-pin-small.svg"
 import { launchDesktopApp } from "../../modules/desktop"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
-import { getReamls } from "../../modules/servers"
+import { getRealms } from "../../modules/servers"
 import DownloadModal from "../Modal/DownloadModal"
 
 import "./JumpInPosition.css"
@@ -30,7 +30,7 @@ export default function JumpInPosition({
 }: JumpInPositionProps) {
   const track = useTrackContext()
   const [showModal, setShowModal] = useState(false)
-  const [servers] = useAsyncMemo(getReamls)
+  const [servers] = useAsyncMemo(getRealms)
 
   const isPosition = !!event
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"

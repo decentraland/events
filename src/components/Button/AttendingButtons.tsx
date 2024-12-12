@@ -28,7 +28,7 @@ import shareIcon from "../../images/share.svg"
 import { launchDesktopApp } from "../../modules/desktop"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
-import { getReamls } from "../../modules/servers"
+import { getRealms } from "../../modules/servers"
 import { Star } from "../Icon/Star"
 import DownloadModal from "../Modal/DownloadModal"
 
@@ -137,7 +137,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     [setFallbackShare]
   )
 
-  const [servers] = useAsyncMemo(getReamls)
+  const [servers] = useAsyncMemo(getRealms)
 
   let hasDecentralandLauncher: null | boolean = null
 

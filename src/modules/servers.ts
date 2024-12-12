@@ -23,7 +23,7 @@ export const getServers = memo(
   { ttl: Infinity }
 )
 
-export const getReamls = memo(
+export const getRealms = memo(
   async () => {
     const servers: { address: string }[] = cache.catalysts.mainnet
     // add main realm
