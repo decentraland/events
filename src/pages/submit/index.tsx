@@ -1064,6 +1064,11 @@ export default function SubmitPage() {
                     <Label>
                       {l("page.submit.dates")} ({recurrent_date.length}):{" "}
                     </Label>
+                    <Info
+                      text={l("page.submit.recurrent_dates_warning", {
+                        limit: MAX_EVENT_RECURRENT,
+                      })}
+                    />
                   </Grid.Column>
                 )}
                 {editing.recurrent &&
