@@ -76,7 +76,7 @@ export function eventTargetUrl(
 }
 
 export function eventClientOptions(
-  event: Pick<EventAttributes, "x" | "y" | "server">,
+  event: Pick<EventAttributes, "x" | "y" | "server" | "world">,
   servers?: (CatalystAbout | null)[] | null
 ): {
   position: string
@@ -90,7 +90,12 @@ export function eventClientOptions(
   }
 
   let realmURL
-  if (event.server && servers) {
+
+  if (event.world) {
+    realmURL = event.server
+  }
+
+  if (!realmURL && event.server && servers) {
     realmURL = servers
       .map((server) => {
         if (server?.configurations?.realmName === event.server) {
