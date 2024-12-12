@@ -127,7 +127,8 @@
         "title": "Are you absolutely sure?",
         "paragraph": "This action **cannot** be undone. This will permanently delete the **{name}** event",
         "submit": "yes, delete this event"
-      }
+      },
+      "recurrent_dates_warning": "The following {limit} occurrences of the event will start on the next available date if the start date is in the past"
     },
     "users": {
       "not_found": "No user found",

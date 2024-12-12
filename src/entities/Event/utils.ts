@@ -169,11 +169,33 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
   })
 }
 
+export function futureRecurrentDates(
+  options: RecurrentEventAttributes
+): Date[] {
+  const now = Date.now()
+  let recurrentCount = 0
+
+  return toRRuleDates(options, (date) => {
+    if (date.getTime() >= now) {
+      recurrentCount++
+    }
+
+    if (recurrentCount > MAX_EVENT_RECURRENT) {
+      return false
+    }
+
+    return true
+  }).filter(
+    (date) => date.getTime() >= Math.max(now, options.start_at.getTime())
+  )
+}
+
 export function toRRuleDates(
   options: RecurrentEventAttributes,
   iterator?: (d: Date, len: number) => boolean
 ): Date[] {
   const rrule = toRRule(options)
+
   if (rrule) {
     return rrule.all(iterator).map((date) => {
       date.setUTCHours(options.start_at.getUTCHours())
@@ -316,10 +338,7 @@ export function calculateRecurrentProperties(
       event.recurrent_count || recurrent.recurrent_count
     recurrent.recurrent_until = recurrent_until || recurrent.recurrent_until
 
-    const recurrent_dates = toRRuleDates(
-      recurrent,
-      (_, i) => i < MAX_EVENT_RECURRENT
-    ).filter((date) => date.getTime() + duration > now)
+    const recurrent_dates = futureRecurrentDates(recurrent)
 
     if (recurrent_dates.length) {
       const last_date = new Date(recurrent_dates[recurrent_dates.length - 1])

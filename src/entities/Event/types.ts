@@ -151,6 +151,7 @@ export type SessionEventAttributes = DeprecatedEventAttributes & {
 export type RecurrentEventAttributes = Pick<
   DeprecatedEventAttributes,
   | "start_at"
+  | "duration"
   | "recurrent"
   | "recurrent_interval"
   | "recurrent_frequency"
