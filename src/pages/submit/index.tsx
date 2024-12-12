@@ -50,6 +50,7 @@ import {
   eventLocations,
 } from "../../entities/Event/types"
 import {
+  futureRecurrentDates,
   isLatestRecurrentSetpos,
   toRRuleDates,
   toRecurrentSetposName,
@@ -221,8 +222,9 @@ export default function SubmitPage() {
   const loading = accountState.loading && eventState.loading
 
   const recurrent_date = useMemo(
-    () => toRRuleDates(editing, (_, i) => i < MAX_EVENT_RECURRENT),
+    () => futureRecurrentDates(editing),
     [
+      editing.duration,
       editing.start_at,
       editing.recurrent,
       editing.recurrent_count,
