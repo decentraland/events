@@ -1,4 +1,5 @@
 .LayoutMainContainer > .dcl.tabs {
+  margin-top: 66px;
   background: var(--background);
 }
 
