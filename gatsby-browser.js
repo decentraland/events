@@ -30,6 +30,12 @@ import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
 import env from "decentraland-gatsby/dist/utils/env"
 
+import {
+  CssBaseline,
+  Experimental_CssVarsProvider as CssVarsProvider,
+  lightTheme,
+} from "decentraland-ui2"
+
 import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
 import ProfileSettings from "./src/context/ProfileSetting"
@@ -43,7 +49,12 @@ export const wrapRootElement = ({ element }) => (
     <FeatureFlagProvider applicationName={["events", "dapps"]}>
       <ProfileSettings>
         <Events>
-          <Categories>{element}</Categories>
+          <Categories>
+            <CssVarsProvider theme={lightTheme}>
+              <CssBaseline />
+              {element}
+            </CssVarsProvider>
+          </Categories>
         </Events>
       </ProfileSettings>
     </FeatureFlagProvider>
