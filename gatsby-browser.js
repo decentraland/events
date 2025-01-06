@@ -30,11 +30,7 @@ import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
 import env from "decentraland-gatsby/dist/utils/env"
 
-import {
-  CssBaseline,
-  Experimental_CssVarsProvider as CssVarsProvider,
-  lightTheme,
-} from "decentraland-ui2"
+import { DclThemeProvider, lightTheme } from "decentraland-ui2"
 
 import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
@@ -50,10 +46,7 @@ export const wrapRootElement = ({ element }) => (
       <ProfileSettings>
         <Events>
           <Categories>
-            <CssVarsProvider theme={lightTheme}>
-              <CssBaseline />
-              {element}
-            </CssVarsProvider>
+            <DclThemeProvider theme={lightTheme}>{element}</DclThemeProvider>
           </Categories>
         </Events>
       </ProfileSettings>
