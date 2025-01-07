@@ -24,12 +24,14 @@ import "./src/theme.css"
 // import Helmet from 'react-helmet'
 // import { RawIntlProvider, createIntl } from 'react-intl'
 import EnhancedIntercom from "decentraland-gatsby/dist/components/Development/EnhancedIntercom"
-import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
+import Layout2 from "decentraland-gatsby/dist/components/Layout/Layout2"
 import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
 import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
 import env from "decentraland-gatsby/dist/utils/env"
+
+import { DclThemeProvider, lightTheme } from "decentraland-ui2"
 
 import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
@@ -44,7 +46,9 @@ export const wrapRootElement = ({ element }) => (
     <FeatureFlagProvider applicationName={["events", "dapps"]}>
       <ProfileSettings>
         <Events>
-          <Categories>{element}</Categories>
+          <Categories>
+            <DclThemeProvider theme={lightTheme}>{element}</DclThemeProvider>
+          </Categories>
         </Events>
       </ProfileSettings>
     </FeatureFlagProvider>
@@ -55,7 +59,7 @@ export const wrapRootElement = ({ element }) => (
 export const wrapPageElement = ({ element, props }) => {
   return (
     <IntlProvider {...props.pageContext.intl}>
-      <Layout activePage="explore">{element}</Layout>
+      <Layout2 activePage="explore">{element}</Layout2>
     </IntlProvider>
   )
 }

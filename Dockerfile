@@ -40,8 +40,8 @@ COPY ./gatsby-node.js       /app/gatsby-node.js
 COPY ./gatsby-ssr.js        /app/gatsby-ssr.js
 COPY ./tsconfig.json        /app/tsconfig.json
 
-RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:server
-RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build:front -- --prefix-paths
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build:server
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build:front -- --prefix-paths
 RUN npm prune --production
 
 FROM node:18.8-alpine
