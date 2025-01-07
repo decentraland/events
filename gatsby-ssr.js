@@ -27,28 +27,29 @@ export function onPreRenderHTML(
   },
   pluginOptions
 ) {
-  const headComponents = getHeadComponents().map((component) => {
-    if (component.type !== "style" || !component.props["data-href"]) {
-      return component
-    }
+  const headComponents = getHeadComponents()
+    .concat([
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {window.navigator.serviceWorker.getRegistrations().then(registrations => {registrations.forEach(r => r.unregister())})}",
+        }}
+      ></script>,
+    ])
+    .map((component, i) => {
+      if (component.type !== "style" || !component.props["data-href"]) {
+        return component
+      }
 
-    return (
-      <link
-        rel="stylesheet"
-        id={component.props.id}
-        href={component.props["data-href"]}
-      />
-    )
-  })
-
-  headComponents.push(
-    <script
-      dangerouslySetInnerHTML={{
-        __html:
-          "if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {window.navigator.serviceWorker.getRegistrations().then(registrations => {registrations.forEach(r => r.unregister())})}",
-      }}
-    ></script>
-  )
+      return (
+        <link
+          key={i}
+          rel="stylesheet"
+          id={component.props.id}
+          href={component.props["data-href"]}
+        />
+      )
+    })
 
   const postBodyComponents = [...getPostBodyComponents()]
   postBodyComponents.push(<Segment key="segment" trackPage={false} />)

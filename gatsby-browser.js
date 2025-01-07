@@ -23,6 +23,7 @@ import "./src/theme.css"
 
 // import Helmet from 'react-helmet'
 // import { RawIntlProvider, createIntl } from 'react-intl'
+import EnhancedIntercom from "decentraland-gatsby/dist/components/Development/EnhancedIntercom"
 import Layout from "decentraland-gatsby/dist/components/Layout/Layout"
 import AuthProvider from "decentraland-gatsby/dist/context/Auth/AuthProvider"
 import FeatureFlagProvider from "decentraland-gatsby/dist/context/FeatureFlag/FeatureFlagProvider"
@@ -47,6 +48,7 @@ export const wrapRootElement = ({ element }) => (
         </Events>
       </ProfileSettings>
     </FeatureFlagProvider>
+    <EnhancedIntercom />
   </AuthProvider>
 )
 
