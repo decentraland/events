@@ -179,9 +179,9 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   /**
    * Verify categories actually exist
    */
-  if (event.categories.length) {
+  if (updatedAttributes.categories.length) {
     const validation = await EventCategoryModel.validateCategories(
-      event.categories
+      updatedAttributes.categories
     )
     if (!validation) {
       throw new RequestError(
