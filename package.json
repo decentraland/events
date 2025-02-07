@@ -55,7 +55,7 @@
   "devDependencies": {
     "@dcl/eslint-config": "^1.0.6",
     "@types/apicache": "^1.6.0",
-    "@types/express": "^4.17.3",
+    "@types/express": "^5.0.0",
     "@types/express-fileupload": "^1.1.7",
     "@types/html-escaper": "^3.0.0",
     "@types/jest": "^29.5.1",
