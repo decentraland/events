@@ -12,7 +12,7 @@
     "@sentry/browser": "^7.66.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
-    "autoprefixer": "^10.4.0",
+    "autoprefixer": "^10.4.20",
     "aws-sdk": "^2.1002.0",
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
