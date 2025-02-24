@@ -86,6 +86,7 @@ app.use("/events", [
     allowedHeaders: "*",
   }),
   gatsby(resolve(__filename, "../../public"), {
+    crossOriginOpenerPolicy: "same-origin",
     contentSecurityPolicy: {
       fontSrc: [
         "https://decentraland.org",
