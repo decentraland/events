@@ -4,8 +4,8 @@ import Paragraph from "decentraland-gatsby/dist/components/Text/Paragraph"
 import Title from "decentraland-gatsby/dist/components/Text/Title"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import { Button } from "decentraland-ui/dist/components/Button/Button"
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal"
+import { DownloadButton } from "decentraland-ui2/dist/components/DownloadButton/DownloadButton"
 
 import ExplorerJumpinImage from "../../images/explorer-jumpin-modal.svg"
 import closeIcon from "../../images/popup-close.svg"
@@ -13,7 +13,7 @@ import closeIcon from "../../images/popup-close.svg"
 import "./DownloadModal.css"
 
 export default function DownloadModal(props: ModalProps) {
-  const { onModalClick, onClose } = props
+  const { onClose } = props
   const l = useFormatMessage()
 
   const handleClose = useCallback(
@@ -39,13 +39,7 @@ export default function DownloadModal(props: ModalProps) {
       </div>
       <Title>{l(`components.modal.download.title`)}</Title>
       <Paragraph>{l(`components.modal.download.description`)}</Paragraph>
-      <Button
-        primary
-        onClick={onModalClick}
-        className="jump-in-position__modal-button"
-      >
-        {l(`components.modal.download.button_label`)}
-      </Button>
+      <DownloadButton label={l(`components.modal.download.button_label`)} />
     </Modal>
   )
 }

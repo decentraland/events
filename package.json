@@ -19,6 +19,7 @@
     "dcl-catalyst-client": "^21.5.0",
     "decentraland-gatsby": "^6.39.0",
     "decentraland-ui": "^6.12.1",
+    "decentraland-ui2": "file:../ui2/decentraland-ui2-0.0.0-development.tgz",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.23.0",
