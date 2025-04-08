@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from "react"
 import { withPrefix } from "gatsby"
 
 import { useLocation } from "@gatsbyjs/reach-router"
+import DownloadModal from "decentraland-gatsby/dist/components/Modal/DownloadModal"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
@@ -30,7 +31,6 @@ import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getRealms } from "../../modules/servers"
 import { Star } from "../Icon/Star"
-import DownloadModal from "../Modal/DownloadModal"
 
 import "./AttendingButtons.css"
 

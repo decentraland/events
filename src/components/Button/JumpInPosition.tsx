@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from "react"
 
+import DownloadModal from "decentraland-gatsby/dist/components/Modal/DownloadModal"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import { Link } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventAttributes } from "../../entities/Event/types"
 import { eventClientOptions } from "../../entities/Event/utils"
@@ -14,7 +14,6 @@ import { launchDesktopApp } from "../../modules/desktop"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getRealms } from "../../modules/servers"
-import DownloadModal from "../Modal/DownloadModal"
 
 import "./JumpInPosition.css"
 
