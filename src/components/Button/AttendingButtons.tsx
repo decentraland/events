@@ -282,7 +282,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
       <DownloadModal
         open={showModal}
         onClose={() => setShowModal(false)}
-        onModalClick={handleModalClick}
+        onDownloadClick={handleModalClick}
       />
     </div>
   )

@@ -94,7 +94,7 @@ export default function JumpInPosition({
       <DownloadModal
         open={showModal}
         onClose={() => setShowModal(false)}
-        onModalClick={handleModalClick}
+        onDownloadClick={handleModalClick}
       />
     </>
   )
