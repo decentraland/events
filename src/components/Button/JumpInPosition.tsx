@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from "react"
 
+import DownloadModal from "decentraland-gatsby/dist/components/Modal/DownloadModal"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
+import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import { Link } from "decentraland-gatsby/dist/plugins/intl"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
-import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventAttributes } from "../../entities/Event/types"
 import { eventClientOptions } from "../../entities/Event/utils"
@@ -14,7 +15,6 @@ import { launchDesktopApp } from "../../modules/desktop"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getRealms } from "../../modules/servers"
-import DownloadModal from "../Modal/DownloadModal"
 
 import "./JumpInPosition.css"
 
@@ -29,6 +29,7 @@ export default function JumpInPosition({
   ...props
 }: JumpInPositionProps) {
   const track = useTrackContext()
+  const l = useFormatMessage()
   const [showModal, setShowModal] = useState(false)
   const [servers] = useAsyncMemo(getRealms)
 
@@ -94,8 +95,11 @@ export default function JumpInPosition({
       </Link>
       <DownloadModal
         open={showModal}
+        title={l("components.modal.download.title")}
+        description={l("components.modal.download.description")}
+        buttonLabel={l("components.modal.download.button_label")}
         onClose={() => setShowModal(false)}
-        onModalClick={handleModalClick}
+        onDownloadClick={handleModalClick}
       />
     </>
   )
