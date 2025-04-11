@@ -69,7 +69,9 @@
   display: none;
 }
 
-.ui.card.event-card-mini .MuiLink-root.MuiTypography-root:hover p:first-of-type {
+.ui.card.event-card-mini
+  .MuiLink-root.MuiTypography-root:hover
+  p:first-of-type {
   display: flex;
   position: absolute;
   right: 100%;
