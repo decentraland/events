@@ -50,7 +50,7 @@
   border-radius: 8px 0 0 8px;
 }
 
-.ui.card.event-card-mini .jump-in-position {
+.ui.card.event-card-mini .MuiLink-root.MuiTypography-root {
   position: absolute;
   background: white !important;
   border: 1px solid white;
@@ -58,10 +58,26 @@
   border-radius: 100%;
   top: 15px;
   right: 15px;
+  z-index: 1;
 }
 
-.ui.card.event-card-mini .jump-in-position img {
+.ui.card.event-card-mini .MuiLink-root.MuiTypography-root img {
   margin: 0;
+}
+
+.ui.card.event-card-mini .MuiLink-root.MuiTypography-root p:first-of-type {
+  display: none;
+}
+
+.ui.card.event-card-mini .MuiLink-root.MuiTypography-root:hover p:first-of-type {
+  display: flex;
+  position: absolute;
+  right: 100%;
+  top: 0;
+  background: var(--secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 .ui.card.event-card-mini .event-card-mini__attendees {
