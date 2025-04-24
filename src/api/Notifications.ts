@@ -40,7 +40,7 @@ export type EventStartedNotification = DCLNotification<
 export default class Notifications extends API {
   static Url = env(
     "NOTIFICATION_SERVICE_URL",
-    `https://notifications-processor.decentraland.io`
+    `https://notifications-processor.decentraland.zone`
   )
   static Token = env("NOTIFICATION_SERVICE_TOKEN", "")
   static ExplorerURL = env("EXPLORER_URL", "https://play.decentraland.org/")
