@@ -49,7 +49,7 @@ app.use("/api", [
     corsOrigin: [
       /^http:\/\/localhost:[0-9]{1,10}$/,
       /^https:\/\/(.{1,50}\.)?decentraland\.(zone|today|org)$/,
-      /https:\/\/([a-zA-Z0-9\-_]+\.)*-decentraland1\.vercel\.app/,
+      /https:\/\/([a-zA-Z0-9\-_])+-decentraland1\.vercel\.app/,
       "https://mvfw.org",
       "https://dcl-metrics.com",
     ],
@@ -81,7 +81,7 @@ app.use("/events", [
     corsOrigin: [
       /^http:\/\/localhost:[0-9]{1,10}$/,
       /^https:\/\/(.{1,50}\.)?decentraland\.(zone|today|org)$/,
-      /https:\/\/([a-zA-Z0-9\-_]+\.)*-decentraland1\.vercel\.app/,
+      /https:\/\/([a-zA-Z0-9\-_])+-decentraland1\.vercel\.app/,
       "https://mvfw.org",
       "https://dcl-metrics.com",
     ],
