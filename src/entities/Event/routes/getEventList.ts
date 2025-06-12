@@ -117,6 +117,10 @@ export async function getEventList(req: WithAuth) {
 
   options.world = bool(query.world) ?? undefined
 
+  if (query.world_names) {
+    options.world_names = query.world_names
+  }
+
   const events = await EventModel.getEvents(options)
   return events.map((event) => EventModel.toPublic(event, profile))
 }

@@ -100,6 +100,15 @@ export const getEventListQuery: AjvObjectSchema = {
       description:
         "True for events in Worlds, false for events not in Worlds, null for all events",
     },
+    world_names: {
+      type: "array",
+      description: "Filter events by world names",
+      minItems: 1,
+      items: {
+        type: "string",
+        pattern: "^.*\\.dcl\\.eth$",
+      },
+    },
   },
 }
 
