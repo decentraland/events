@@ -267,6 +267,13 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           options.list === EventListType.Upcoming,
           SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
         )}
+        ${conditional(
+          !!options.date,
+          SQL`
+            AND e.start_at >= '${date}T00:00:00.000Z
+            AND e.start_at < '${date}T23:59:59.000Z'
+          `
+        )}
         ${conditional(!!options.search, SQL`AND "rank" > 0`)}
         ${conditional(
           !!options.creator,
