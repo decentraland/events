@@ -181,6 +181,7 @@ export type EventListParams = {
   search?: string
   schedule?: string
   world?: boolean
+  world_names?: string[]
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -199,6 +200,7 @@ export type EventListOptions = {
   search?: string
   schedule?: string
   world?: boolean
+  world_names?: string[]
   limit?: number
   offset?: number
   order?: "asc" | "desc"

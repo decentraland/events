@@ -301,7 +301,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           !!options.schedule,
           SQL`AND ${options.schedule} = ANY(e.schedules)`
         )}
-
+        ${conditional(
+          !!options.world_names,
+          SQL`AND e.server = ANY(ARRAY[${options.world_names?.join(",")}])`
+        )}
       ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}
       ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
