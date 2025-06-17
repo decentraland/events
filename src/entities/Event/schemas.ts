@@ -109,6 +109,15 @@ export const getEventListQuery: AjvObjectSchema = {
         pattern: "^.*\\.dcl\\.eth$",
       },
     },
+    places_ids: {
+      type: "array",
+      description: "Filter events by places ids",
+      maxItems: 100,
+      items: {
+        type: "string",
+        format: "uuid",
+      },
+    },
   },
 }
 

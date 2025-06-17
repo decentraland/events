@@ -27,6 +27,12 @@ export default routes((router) => {
     handle(getEventList as any)
   )
   router.post("/events", withAuth, withAuthProfile(), handle(createEvent))
+  router.post(
+    "/events/by-places",
+    withPublicAccess,
+    withOptionalAuth,
+    handle(getEventList as any)
+  )
   router.get(
     "/events/attending",
     withPublicAccess,
