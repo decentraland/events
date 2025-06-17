@@ -303,7 +303,11 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         )}
         ${conditional(
           !!options.world_names,
-          SQL`AND e.server = ANY(ARRAY[${options.world_names?.join(",")}])`
+          SQL`AND e.server = ANY(${options.world_names})`
+        )}
+        ${conditional(
+          !!options.places_ids,
+          SQL`AND e.place_id = ANY(${options.places_ids})`
         )}
       ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}
       ${limit(options.limit, { max: 500 })}

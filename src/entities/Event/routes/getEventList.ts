@@ -18,7 +18,12 @@ import { EventListOptions, EventListParams, EventListType } from "../types"
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth) {
   const profile = await getAuthProfileSettings(req)
-  const query = validate(req.query)
+  const placesIds =
+    req.method === "POST" && req.body && Array.isArray(req.body) ? req.body : []
+  const query = validate({
+    ...req.query,
+    places_ids: placesIds,
+  })
   const options: EventListOptions = {
     user: profile.user,
     allow_pending:
@@ -119,6 +124,10 @@ export async function getEventList(req: WithAuth) {
 
   if (query.world_names) {
     options.world_names = query.world_names
+  }
+
+  if (query.places_ids) {
+    options.places_ids = query.places_ids
   }
 
   const events = await EventModel.getEvents(options)
