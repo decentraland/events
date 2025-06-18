@@ -41,6 +41,16 @@ export default function DocsPage() {
         </ApiCard>
 
         <ApiCard
+          id="get-events-by-places"
+          method="POST"
+          path="/api/events/by-places"
+          description="Returns the list of the upcoming events by places"
+        >
+          <ApiDetails title="Request" cors="*" query={getEventListQuery} />
+          <ApiDetails title="Response" body={eventListResponseSchema} />
+        </ApiCard>
+
+        <ApiCard
           id="get-event"
           method="GET"
           path="/api/events/{event_id}"
