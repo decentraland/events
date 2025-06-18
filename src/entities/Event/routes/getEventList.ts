@@ -54,6 +54,15 @@ export async function getEventList(req: WithAuth) {
     options.schedule = query.schedule
   }
 
+  if (query.date) {
+    if (isNaN(new Date(query.date))) {
+      //out of bound
+      return []
+    } else {
+      options.date = query.date
+    }
+  }
+
   if (query.position) {
     const [x, y] = query.position.split(",").slice(0, 2).map(Number) as [
       number,
