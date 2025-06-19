@@ -380,7 +380,6 @@ export const eventListResponseSchema = apiResultSchema({
   description: "Event list",
   items: eventSchema,
 } as AjvArraySchema)
-
 export const eventListByPlacesResponseSchema = apiResultSchema({
   type: "object",
   description: "Event list",

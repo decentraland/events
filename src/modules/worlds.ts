@@ -13,7 +13,7 @@ export const worlds = new Dataloader(async (worlds_name: readonly string[]) => {
 export const getWorlds = memo(
   async (worlds_name: readonly string[]) => {
     try {
-      const missingWorlds = await Places.get().getWorldByName(
+      const missingWorlds = await Places.get().getWorldByNames(
         worlds_name.filter((name) => !CACHE.has(name))
       )
 

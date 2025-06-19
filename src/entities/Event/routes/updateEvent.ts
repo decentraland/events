@@ -13,6 +13,7 @@ import env from "decentraland-gatsby/dist/utils/env"
 import pick from "lodash/pick"
 
 import { getEvent } from "./getEvent"
+import Places from "../../../api/Places"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
@@ -197,12 +198,16 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   updatedAttributes.coordinates = [x, y]
 
   if (!updatedAttributes.world) {
+    const place = await Places.get().getPlaceByPosition(`${x},${y}`)
     updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
     updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
     updatedAttributes.scene_name = updatedAttributes.estate_name
+    updatedAttributes.place_id = place?.id || updatedAttributes.place_id
   } else {
+    const world = await Places.get().getWorldByName(updatedAttributes.server!)
     updatedAttributes.image =
       updatedAttributes.image || `${EVENTS_BASE_URL}/images/event-default.jpg`
+    updatedAttributes.place_id = world?.id || updatedAttributes.place_id
   }
 
   Object.assign(

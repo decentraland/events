@@ -12,6 +12,7 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import omit from "lodash/omit"
 
+import Places from "../../../api/Places"
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import { notifyNewEvent } from "../../Slack/utils"
@@ -108,8 +109,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   let estate_name: string | null = null
   let image = ""
   let estate_id = null
+  let place_id = null
   if (!data.world) {
     const tiles = await API.catch(Land.getInstance().getTiles([x, y], [x, y]))
+    const place = await Places.get().getPlaceByPosition(`${x},${y}`)
     const tile = tiles && tiles[[x, y].join(",")]
     estate_id = tile?.estateId || null
     estate_name = tile?.name || null
@@ -118,8 +121,11 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
       (estate_id
         ? Land.getInstance().getEstateImage(estate_id)
         : Land.getInstance().getParcelImage([x, y]))
+    place_id = place?.id || null
   } else {
+    const world = await Places.get().getWorldByName(data.server!)
     image = data.image || `${EVENTS_BASE_URL}/images/event-default.jpg`
+    place_id = world?.id || null
   }
 
   const user_name = userProfile.name || null
@@ -152,6 +158,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     schedules: [],
     created_at: now,
     textsearch: null,
+    place_id,
   }
 
   event.textsearch = EventModel.textsearch(event)
