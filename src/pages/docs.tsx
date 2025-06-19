@@ -6,6 +6,7 @@ import { Container } from "decentraland-ui/dist/components/Container/Container"
 
 import Navigation from "../components/Layout/Navigation"
 import {
+  eventListByPlacesResponseSchema,
   eventListResponseSchema,
   eventResponseSchema,
   getEventListQuery,
@@ -47,7 +48,7 @@ export default function DocsPage() {
           description="Returns the list of the upcoming events by places"
         >
           <ApiDetails title="Request" cors="*" query={getEventListQuery} />
-          <ApiDetails title="Response" body={eventListResponseSchema} />
+          <ApiDetails title="Response" body={eventListByPlacesResponseSchema} />
         </ApiCard>
 
         <ApiCard

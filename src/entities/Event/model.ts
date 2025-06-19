@@ -161,6 +161,82 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     )
   }
 
+  private static buildEventFilterConditions(
+    options: Partial<EventListOptions> = {}
+  ) {
+    // Prioritizes "x" && "y" options params over positions
+    let positionsFilter = ""
+    if (
+      !Number.isFinite(options.x) &&
+      !Number.isFinite(options.y) &&
+      options.positions &&
+      options.positions.length > 0
+    ) {
+      positionsFilter = options.positions
+        .map((position) => `(${position.join(",")})`)
+        .join(",")
+    }
+
+    return [
+      SQL`e.rejected IS FALSE`,
+      conditional(options.list === EventListType.All, SQL``),
+      conditional(
+        options.list === EventListType.Active,
+        SQL`AND e.next_finish_at > now()`
+      ),
+      conditional(
+        options.list === EventListType.Live,
+        SQL`AND e.next_finish_at > now() AND e.next_start_at < now()`
+      ),
+      conditional(
+        options.list === EventListType.Upcoming,
+        SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
+      ),
+      conditional(!!options.search, SQL`AND "rank" > 0`),
+      conditional(
+        !!options.creator,
+        SQL`AND lower(e.user) = ${options.creator}`
+      ),
+      conditional(
+        !options.allow_pending && !options.user,
+        SQL`AND e.approved IS TRUE`
+      ),
+      conditional(!!options.world === true, SQL`AND e.world IS TRUE`),
+      conditional(
+        options.world !== undefined && !!options.world === false,
+        SQL`AND e.world IS FALSE`
+      ),
+      conditional(
+        !options.allow_pending && !!options.user,
+        SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
+      ),
+      conditional(
+        Number.isFinite(options.x) && Number.isFinite(options.y),
+        SQL`AND e.x = ${options.x} AND e.y = ${options.y}`
+      ),
+      conditional(
+        !!positionsFilter,
+        SQL`AND (e.x, e.y) = ANY(Array[${SQL.raw(positionsFilter)}])`
+      ),
+      conditional(
+        !!options.estate_id,
+        SQL`AND e.estate_id = ${options.estate_id}`
+      ),
+      conditional(
+        !!options.schedule,
+        SQL`AND ${options.schedule} = ANY(e.schedules)`
+      ),
+      conditional(
+        !!options.world_names,
+        SQL`AND e.server = ANY(${options.world_names})`
+      ),
+      conditional(
+        !!options.places_ids,
+        SQL`AND e.place_id = ANY(${options.places_ids})`
+      ),
+    ].filter((condition) => !!condition.text)
+  }
+
   static async countEvents() {
     return this.count<EventAttributes>({ approved: true })
   }
@@ -222,18 +298,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       orderDirection = options.order === "asc" ? "ASC" : "DESC"
     }
 
-    // Prioritizes "x" && "y" options params over positions
-    let positionsFilter = ""
-    if (
-      !Number.isFinite(options.x) &&
-      !Number.isFinite(options.y) &&
-      options.positions &&
-      options.positions.length > 0
-    ) {
-      positionsFilter = options.positions
-        .map((position) => `(${position.join(",")})`)
-        .join(",")
-    }
+    const conditions = this.buildEventFilterConditions(options)
 
     const query = SQL`
       SELECT
@@ -253,68 +318,39 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
             )})) AS "rank"`
           )}
       WHERE
-        e.rejected IS FALSE
-        ${conditional(options.list === EventListType.All, SQL``)}
-        ${conditional(
-          options.list === EventListType.Active,
-          SQL`AND e.next_finish_at > now()`
-        )}
-        ${conditional(
-          options.list === EventListType.Live,
-          SQL`AND e.next_finish_at > now() AND e.next_start_at < now()`
-        )}
-        ${conditional(
-          options.list === EventListType.Upcoming,
-          SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
-        )}
-        ${conditional(!!options.search, SQL`AND "rank" > 0`)}
-        ${conditional(
-          !!options.creator,
-          SQL`AND lower(e.user) = ${options.creator}`
-        )}
-        ${conditional(
-          !options.allow_pending && !options.user,
-          SQL`AND e.approved IS TRUE`
-        )}
-        ${conditional(!!options.world === true, SQL`AND e.world IS TRUE`)}
-        ${conditional(
-          options.world !== undefined && !!options.world === false,
-          SQL`AND e.world IS FALSE`
-        )}
-        ${conditional(
-          !options.allow_pending && !!options.user,
-          SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
-        )}
-        ${conditional(
-          Number.isFinite(options.x) && Number.isFinite(options.y),
-          SQL`AND e.x = ${options.x} AND e.y = ${options.y}`
-        )}
-        ${conditional(
-          !!positionsFilter,
-          SQL`AND (e.x, e.y) = ANY(Array[${SQL.raw(positionsFilter)}])`
-        )}
-        ${conditional(
-          !!options.estate_id,
-          SQL`AND e.estate_id = ${options.estate_id}`
-        )}
-        ${conditional(
-          !!options.schedule,
-          SQL`AND ${options.schedule} = ANY(e.schedules)`
-        )}
-        ${conditional(
-          !!options.world_names,
-          SQL`AND e.server = ANY(${options.world_names})`
-        )}
-        ${conditional(
-          !!options.places_ids,
-          SQL`AND e.place_id = ANY(${options.places_ids})`
-        )}
+        ${join(conditions, SQL` `)}
       ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}
       ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
     `
 
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+  }
+
+  static async countEventsWithFilter(options: Partial<EventListOptions> = {}) {
+    const conditions = this.buildEventFilterConditions(options)
+
+    const query = SQL`
+      SELECT COUNT(*) as count
+      FROM ${table(EventModel)} e
+        ${conditional(
+          !!options.user,
+          SQL`LEFT JOIN ${table(
+            EventAttendee
+          )} a on e.id = a.event_id AND lower(a.user) = ${options.user}`
+        )}
+          ${conditional(
+            !!options.search,
+            SQL`, ts_rank_cd(e.textsearch, to_tsquery(${tsquery(
+              options.search || ""
+            )})) AS "rank"`
+          )}
+      WHERE
+        ${join(conditions, SQL` `)}
+    `
+
+    const result = await EventModel.query<{ count: string }>(query)
+    return parseInt(result[0]?.count || "0", 10)
   }
 
   static async getAttending(user?: string | null) {

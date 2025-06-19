@@ -126,10 +126,24 @@ export async function getEventList(req: WithAuth) {
     options.world_names = query.world_names
   }
 
-  if (query.places_ids) {
+  if (query.places_ids && query.places_ids.length > 0) {
     options.places_ids = query.places_ids
   }
 
   const events = await EventModel.getEvents(options)
-  return events.map((event) => EventModel.toPublic(event, profile))
+
+  const publicEvents = events.map((event) =>
+    EventModel.toPublic(event, profile)
+  )
+
+  if (options.places_ids && options.places_ids.length > 0) {
+    const total = await EventModel.countEventsWithFilter(options)
+
+    return {
+      events: publicEvents,
+      total,
+    }
+  }
+
+  return publicEvents
 }

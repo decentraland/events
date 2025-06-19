@@ -23,6 +23,7 @@ export const getEvent = oncePerRequest(async (req: WithAuth) => {
   const user = req.auth
   const profile = await getAuthProfileSettings(req)
   const params = validateGetEventParams(req.params)
+
   if (!isUUID(params.event_id)) {
     throw new RequestError(
       `Not found event "${params.event_id}"`,
