@@ -38,6 +38,7 @@ const EVENTS_BASE_URL = env(
   "https://events.decentraland.org"
 )
 
+// TODO: associate event to a place id
 export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const userProfile = req.authProfile!
