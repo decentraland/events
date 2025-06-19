@@ -131,6 +131,7 @@ export type EventAttributes = {
   approved_by: string | null
   rejected_by: string | null
   world: boolean
+  place_id: string | null
 }
 
 export type GetEventParams = {
