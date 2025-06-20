@@ -116,10 +116,7 @@ export default class Places extends API {
   }
 
   async getPlaceByPosition(position: string) {
-    const places = await this.fetchMany(
-      `/places/?positions=${position}`,
-      this.options().authorization({ sign: true, optional: true })
-    )
+    const places = await this.getPlaceByPositions([position])
     return places.length > 0 ? places[0] : null
   }
 
@@ -155,7 +152,7 @@ export default class Places extends API {
     const query = new URLSearchParams()
 
     for (const name of names) {
-      query.append("name", name)
+      query.append("names", name)
     }
 
     query.append("limit", "1")
