@@ -159,6 +159,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     created_at: now,
     textsearch: null,
     place_id,
+    community: data.community || null,
   }
 
   event.textsearch = EventModel.textsearch(event)

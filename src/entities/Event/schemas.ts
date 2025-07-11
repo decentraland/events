@@ -511,5 +511,8 @@ export const newEventSchema = {
     world: {
       type: "boolean",
     },
+    community: {
+      type: ["string", "null"],
+    },
   },
 }

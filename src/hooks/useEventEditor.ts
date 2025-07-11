@@ -70,6 +70,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     trending: false,
     categories: [],
     schedules: [],
+    community: defaultEvent.community || "",
 
     // recurrent
     recurrent: false,
@@ -607,6 +608,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
       case "categories":
         return setValue(name, [value])
+      case "community":
+        return setValue(name, value)
       case "schedules":
         return handleChangeList(name, value)
 

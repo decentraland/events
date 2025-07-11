@@ -33,6 +33,7 @@ import SelectionLabel from "semantic-ui-react/dist/commonjs/elements/Label"
 
 import Events, { EditEvent } from "../../api/Events"
 import AddCoverButton from "../../components/Button/AddCoverButton"
+import CommunityDropdown from "../../components/Form/CommunityDropdown"
 import ImageInput from "../../components/Form/ImageInput"
 import Label from "../../components/Form/Label"
 import RadioGroup from "../../components/Form/RadioGroup"
@@ -70,6 +71,7 @@ import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
 import { getRealms, getServerOptions } from "../../modules/servers"
 import { getWorldNames, getWorldNamesOptions } from "../../modules/worlds"
+import { getCommunityOptions } from "../../modules/communities"
 
 import "./index.css"
 
@@ -192,6 +194,18 @@ export default function SubmitPage() {
 
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
+  const communityOptions = useMemo(() => getCommunityOptions(), [])
+  
+  // Handle community query parameter
+  const communityFromQuery = params.get("community")
+  useEffect(() => {
+    if (communityFromQuery) {
+      const communityExists = communityOptions.some(option => option.value === communityFromQuery)
+      if (communityExists) {
+        editActions.setValue("community", communityFromQuery)
+      }
+    }
+  }, [communityFromQuery, communityOptions, editActions])
   const [, eventsState] = useEventsContext()
   const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
@@ -1123,6 +1137,19 @@ export default function SubmitPage() {
                       editing.categories.length > 0 ? editing.categories[0] : ""
                     }
                     disabled={categoryOptions.length === 0}
+                    border
+                  />
+                </Grid.Column>
+                <Grid.Column mobile="8">
+                  <Label>{l("navigation.community")}</Label>
+                  <Paragraph tiny secondary>
+                    Link the Event to a Community
+                  </Paragraph>
+                  <CommunityDropdown
+                    placeholder={l("navigation.community_placeholder")}
+                    options={communityOptions}
+                    onChange={editActions.handleChange}
+                    value={editing.community || ""}
                     border
                   />
                 </Grid.Column>

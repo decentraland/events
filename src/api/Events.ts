@@ -43,7 +43,9 @@ export type EditEvent = Pick<
   | "categories"
   | "schedules"
   | "world"
->
+> & {
+  community?: string
+}
 
 export type EditSchedule = Pick<
   ScheduleAttributes,

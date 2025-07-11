@@ -14,7 +14,9 @@
     "submit_events": "Submit Event",
     "submit_users": "Add User",
     "submit_schedules": "Add Schedule",
-    "search": "Search..."
+    "search": "Search...",
+    "community": "Community",
+    "community_placeholder": "Select community..."
   },
   "user_menu": {
     "api": "API",

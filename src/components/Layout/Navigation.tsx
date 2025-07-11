@@ -79,6 +79,8 @@ export default function Navigation(props: NavigationProps) {
     [schedules]
   )
 
+
+
   const hasPendingEvents = useMemo(
     () => events.some((event) => !event.approved && !event.rejected),
     [events]
@@ -116,6 +118,8 @@ export default function Navigation(props: NavigationProps) {
     },
     [location.pathname, params, debounceTrack]
   )
+
+
 
   return (
     <>

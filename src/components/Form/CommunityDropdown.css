@@ -1,0 +1,12 @@
+.dcl.select-field.CommunityDropdown {
+  min-width: auto;
+}
+
+.dcl.select-field.CommunityDropdown .ui.selection.dropdown {
+  min-width: auto;
+}
+
+.dcl.select-field.CommunityDropdown .ui.sub.header {
+  text-transform: none;
+  font-size: 15px;
+}
