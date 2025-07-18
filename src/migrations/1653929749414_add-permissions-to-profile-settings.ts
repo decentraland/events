@@ -35,13 +35,16 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     ProfilePermissions.EditAnyProfile,
   ]
 
-  pgm.sql(`
-    UPDATE ${ProfileSettings.tableName}
-    SET "permissions" = ARRAY[${permissions
-      .map((permission) => `'${permission}'`)
-      .join(", ")}]
-    WHERE "user" in (${admins.map((admin) => `'${admin}'`).join(", ")})
-  `)
+  // Only update if there are admin users
+  if (admins.length > 0) {
+    pgm.sql(`
+      UPDATE ${ProfileSettings.tableName}
+      SET "permissions" = ARRAY[${permissions
+        .map((permission) => `'${permission}'`)
+        .join(", ")}]
+      WHERE "user" in (${admins.map((admin) => `'${admin}'`).join(", ")})
+    `)
+  }
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
