@@ -301,6 +301,10 @@ export default function SubmitPage() {
         categories: original.categories,
         schedules: original.schedules,
         world: original.world,
+        community_id:
+          communityOptions.find(
+            (option) => option.value === original.community_id
+          )?.value || undefined,
       })
     }
   }, [original])

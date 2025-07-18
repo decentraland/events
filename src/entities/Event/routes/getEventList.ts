@@ -130,6 +130,10 @@ export async function getEventList(req: WithAuth) {
     options.places_ids = query.places_ids
   }
 
+  if (query.community_id) {
+    options.community_id = query.community_id
+  }
+
   const events = await EventModel.getEvents(options)
 
   const publicEvents = events.map((event) =>

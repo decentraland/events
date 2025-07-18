@@ -610,6 +610,8 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
       case "categories":
         return setValue(name, [value])
+      case "community_id":
+        return setValue(name, value || null)
       case "schedules":
         return handleChangeList(name, value)
 
