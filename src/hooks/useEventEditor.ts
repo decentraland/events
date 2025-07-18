@@ -81,7 +81,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     recurrent_month_mask: 0,
     recurrent_until: null,
     recurrent_count: null,
+
+    // links
     world: false,
+    community_id: null,
 
     errors: {},
   })

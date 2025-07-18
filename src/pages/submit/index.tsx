@@ -65,6 +65,11 @@ import {
 } from "../../entities/ProfileSettings/utils"
 import useEventEditor from "../../hooks/useEventEditor"
 import WorldIcon from "../../images/worlds-icon.svg"
+import {
+  getCommunitiesByOwner,
+  getCommunitiesOptions,
+  markUserOwnedCommunities,
+} from "../../modules/communities"
 import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
@@ -189,6 +194,10 @@ export default function SubmitPage() {
   const [worlds] = useAsyncMemo(getWorldNames)
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
+  const [userCommunities] = useAsyncMemo(
+    () => (account ? getCommunitiesByOwner(account) : Promise.resolve([])),
+    [account]
+  )
 
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
@@ -218,6 +227,14 @@ export default function SubmitPage() {
       text: l(`categories.${category.name}`),
     }))
   }, [categories])
+
+  const communityOptions = useMemo(() => {
+    const markedCommunities =
+      account && userCommunities
+        ? markUserOwnedCommunities(userCommunities, account)
+        : userCommunities || []
+    return getCommunitiesOptions(markedCommunities)
+  }, [userCommunities, account])
 
   const loading = accountState.loading && eventState.loading
 
@@ -1127,12 +1144,27 @@ export default function SubmitPage() {
                   />
                 </Grid.Column>
               </Grid.Row>
-
-              <Grid.Row>
-                <Grid.Column mobile="16">
-                  <Divider size="tiny" />
-                </Grid.Column>
-              </Grid.Row>
+              {communityOptions.length > 0 && (
+                <Grid.Row>
+                  <Grid.Column mobile="16">
+                    <SelectField
+                      label={l("page.submit.community_label")}
+                      placeholder={l("page.submit.community_placeholder")}
+                      name="community_id"
+                      error={!!errors["community_id"]}
+                      message={errors["community_id"]}
+                      options={communityOptions}
+                      onChange={editActions.handleChange}
+                      value={
+                        editing.community_id !== null
+                          ? editing.community_id
+                          : ""
+                      }
+                      border
+                    />
+                  </Grid.Column>
+                </Grid.Row>
+              )}
               {!ff.flags[Flags.HideEventsInWorlds] && (
                 <Grid.Row>
                   <Grid.Column mobile="16">
@@ -1160,6 +1192,11 @@ export default function SubmitPage() {
                   </Grid.Column>
                 </Grid.Row>
               )}
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <Divider size="tiny" />
+                </Grid.Column>
+              </Grid.Row>
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <SelectField

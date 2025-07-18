@@ -13,5 +13,7 @@
   "GATSBY_PLACES_URL": "https://decentraland.zone/places",
   "GATSBY_PLACES_API_URL": "https://places.decentraland.zone/api",
   "GATSBY_PROFILE_SITE_URL": "https://decentraland.zone/profile",
-  "GATSBY_SSO_URL": "https://id.decentraland.zone"
+  "GATSBY_SSO_URL": "https://id.decentraland.zone",
+  "SLACK_WEBHOOK": "test",
+  "PROMETHEUS_BEARER_TOKEN": "test"
 }

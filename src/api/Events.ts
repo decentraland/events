@@ -43,6 +43,7 @@ export type EditEvent = Pick<
   | "categories"
   | "schedules"
   | "world"
+  | "community_id"
 >
 
 export type EditSchedule = Pick<
