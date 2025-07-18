@@ -201,6 +201,23 @@ export default function SubmitPage() {
 
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
+
+  const communityIdFromUrl = params.get("community_id")
+
+  // check if the community from URL is owned by the current user
+  const [communityFromUrl] = useAsyncMemo(async () => {
+    if (!communityIdFromUrl || !account) return null
+
+    try {
+      const allCommunities = await getCommunitiesByOwner(account)
+      const community = allCommunities.find((c) => c.id === communityIdFromUrl)
+      return community || null
+    } catch (error) {
+      console.error("Error fetching community:", error)
+      return null
+    }
+  }, [communityIdFromUrl, account])
+
   const [, eventsState] = useEventsContext()
   const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
@@ -1162,7 +1179,9 @@ export default function SubmitPage() {
                       value={
                         editing.community_id !== null
                           ? editing.community_id
-                          : ""
+                          : communityFromUrl && !original
+                          ? communityFromUrl.id
+                          : undefined
                       }
                       border
                     />
