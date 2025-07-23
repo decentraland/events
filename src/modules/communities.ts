@@ -23,13 +23,3 @@ export const getCommunitiesOptions = (
     value: community.id,
   }))
 }
-
-export const markUserOwnedCommunities = (
-  communities: AggregateCommunityAttributes[],
-  userAddress: string
-) => {
-  return communities.map((community) => ({
-    ...community,
-    user_owned: community.ownerAddress === userAddress,
-  }))
-}

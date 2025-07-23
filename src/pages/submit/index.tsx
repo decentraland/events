@@ -68,7 +68,6 @@ import WorldIcon from "../../images/worlds-icon.svg"
 import {
   getCommunitiesByOwner,
   getCommunitiesOptions,
-  markUserOwnedCommunities,
 } from "../../modules/communities"
 import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
@@ -246,12 +245,8 @@ export default function SubmitPage() {
   }, [categories])
 
   const communityOptions = useMemo(() => {
-    const markedCommunities =
-      account && userCommunities
-        ? markUserOwnedCommunities(userCommunities, account)
-        : userCommunities || []
-    return getCommunitiesOptions(markedCommunities)
-  }, [userCommunities, account])
+    return getCommunitiesOptions(userCommunities || [])
+  }, [userCommunities])
 
   const loading = accountState.loading && eventState.loading
 
@@ -319,12 +314,14 @@ export default function SubmitPage() {
         schedules: original.schedules,
         world: original.world,
         community_id:
-          communityOptions.find(
-            (option) => option.value === original.community_id
-          )?.value || undefined,
+          userCommunities && userCommunities.length > 0
+            ? communityOptions.find(
+                (option) => option.value === original.community_id
+              )?.value || null
+            : original.community_id,
       })
     }
-  }, [original])
+  }, [original, communityOptions])
 
   const [uploadingPoster, uploadPoster] = useAsyncTask(
     async (file: File) => {
