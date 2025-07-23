@@ -65,6 +65,10 @@ import {
 } from "../../entities/ProfileSettings/utils"
 import useEventEditor from "../../hooks/useEventEditor"
 import WorldIcon from "../../images/worlds-icon.svg"
+import {
+  getCommunitiesByOwner,
+  getCommunitiesOptions,
+} from "../../modules/communities"
 import { getSchedules, getSchedulesOptions } from "../../modules/events"
 import { Flags } from "../../modules/features"
 import locations from "../../modules/locations"
@@ -189,9 +193,24 @@ export default function SubmitPage() {
   const [worlds] = useAsyncMemo(getWorldNames)
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
+  const [userCommunities, userCommunitiesState] = useAsyncMemo(
+    () => (account ? getCommunitiesByOwner(account) : Promise.resolve([])),
+    [account]
+  )
 
   const [editing, editActions] = useEventEditor()
   const params = new URLSearchParams(location.search)
+
+  const communityIdFromUrl = params.get("community_id")
+
+  // check if the community from URL is owned by the current user
+  const communityFromUrl = useMemo(() => {
+    if (!communityIdFromUrl || !userCommunities) return null
+
+    const community = userCommunities.find((c) => c.id === communityIdFromUrl)
+    return community || null
+  }, [communityIdFromUrl, userCommunities])
+
   const [, eventsState] = useEventsContext()
   const [settings] = useProfileSettingsContext()
   const [original, eventState] = useEventIdContext(params.get("event"))
@@ -219,7 +238,12 @@ export default function SubmitPage() {
     }))
   }, [categories])
 
-  const loading = accountState.loading && eventState.loading
+  const communityOptions = useMemo(() => {
+    return getCommunitiesOptions(userCommunities || [])
+  }, [userCommunities])
+
+  const loading =
+    accountState.loading || eventState.loading || userCommunitiesState.loading
 
   const recurrent_date = useMemo(
     () => futureRecurrentDates(editing),
@@ -284,9 +308,15 @@ export default function SubmitPage() {
         categories: original.categories,
         schedules: original.schedules,
         world: original.world,
+        community_id:
+          userCommunities && userCommunities.length > 0
+            ? communityOptions.find(
+                (option) => option.value === original.community_id
+              )?.value || null
+            : original.community_id,
       })
     }
-  }, [original])
+  }, [original, communityOptions])
 
   const [uploadingPoster, uploadPoster] = useAsyncTask(
     async (file: File) => {
@@ -1127,12 +1157,29 @@ export default function SubmitPage() {
                   />
                 </Grid.Column>
               </Grid.Row>
-
-              <Grid.Row>
-                <Grid.Column mobile="16">
-                  <Divider size="tiny" />
-                </Grid.Column>
-              </Grid.Row>
+              {communityOptions.length > 0 && (
+                <Grid.Row>
+                  <Grid.Column mobile="16">
+                    <SelectField
+                      label={l("page.submit.community_label")}
+                      placeholder={l("page.submit.community_placeholder")}
+                      name="community_id"
+                      error={!!errors["community_id"]}
+                      message={errors["community_id"]}
+                      options={communityOptions}
+                      onChange={editActions.handleChange}
+                      value={
+                        editing.community_id !== null
+                          ? editing.community_id
+                          : communityFromUrl && !original
+                          ? communityFromUrl.id
+                          : undefined
+                      }
+                      border
+                    />
+                  </Grid.Column>
+                </Grid.Row>
+              )}
               {!ff.flags[Flags.HideEventsInWorlds] && (
                 <Grid.Row>
                   <Grid.Column mobile="16">
@@ -1160,6 +1207,11 @@ export default function SubmitPage() {
                   </Grid.Column>
                 </Grid.Row>
               )}
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <Divider size="tiny" />
+                </Grid.Column>
+              </Grid.Row>
               <Grid.Row>
                 <Grid.Column mobile="16">
                   <SelectField

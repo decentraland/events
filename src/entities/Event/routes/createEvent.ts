@@ -12,6 +12,7 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 import omit from "lodash/omit"
 
+import Communities from "../../../api/Communities"
 import Places from "../../../api/Places"
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
@@ -98,6 +99,30 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     if (!validation) {
       throw new RequestError(
         `Invalid category tag supplied`,
+        RequestError.BadRequest,
+        { body: data }
+      )
+    }
+  }
+
+  // Verify community ownership if community_id is provided
+  if (data.community_id) {
+    try {
+      const userCommunities = await Communities.get().getCommunities()
+      const community = userCommunities.find((c) => c.id === data.community_id)
+
+      if (!community) {
+        throw new RequestError(
+          `Community "${data.community_id}" not found or you don't have access to it`,
+          RequestError.BadRequest,
+          { body: data }
+        )
+      }
+    } catch (error) {
+      throw new RequestError(
+        `Failed to validate community ownership: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
         RequestError.BadRequest,
         { body: data }
       )

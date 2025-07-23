@@ -14,7 +14,9 @@
     "submit_events": "Submit Event",
     "submit_users": "Add User",
     "submit_schedules": "Add Schedule",
-    "search": "Search..."
+    "search": "Search...",
+    "community": "Community",
+    "community_placeholder": "Select community..."
   },
   "user_menu": {
     "api": "API",
@@ -96,6 +98,8 @@
       "occurrences": "Occurrences",
       "dates": "Dates",
       "categories_label": "Category",
+      "community_label": "Community",
+      "community_placeholder": "Select any of your Communities",
       "want_new_category_label": "Want a new category? Ask for it on the",
       "add_category_placeholder": "Add category",
       "latitude_label": "Latitude (X)",

@@ -132,6 +132,7 @@ export type EventAttributes = {
   rejected_by: string | null
   world: boolean
   place_id: string | null
+  community_id: string | null
 }
 
 export type GetEventParams = {
@@ -184,6 +185,7 @@ export type EventListParams = {
   world?: boolean
   world_names?: string[]
   places_ids?: string[]
+  community_id?: string
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -204,6 +206,7 @@ export type EventListOptions = {
   world?: boolean
   world_names?: string[]
   places_ids?: string[]
+  community_id?: string
   limit?: number
   offset?: number
   order?: "asc" | "desc"
@@ -231,6 +234,7 @@ export const editEventAttributes = [
   "recurrent_until",
   "categories",
   "world",
+  "community_id",
 ] as const
 
 export const editOwnEventAttributes = ["contact", "details"] as const

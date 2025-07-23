@@ -234,6 +234,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         !!options.places_ids,
         SQL`AND e.place_id = ANY(${options.places_ids})`
       ),
+      conditional(
+        !!options.community_id,
+        SQL`AND e.community_id = ${options.community_id}`
+      ),
     ].filter((condition) => !!condition.text)
   }
 

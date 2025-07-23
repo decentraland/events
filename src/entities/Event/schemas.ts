@@ -118,6 +118,11 @@ export const getEventListQuery: AjvObjectSchema = {
         format: "uuid",
       },
     },
+    community_id: {
+      type: "string",
+      format: "uuid",
+      description: "Filter events by community ID",
+    },
   },
 }
 
@@ -510,6 +515,11 @@ export const newEventSchema = {
     },
     world: {
       type: "boolean",
+    },
+    community_id: {
+      type: ["string", "null"],
+      format: "uuid",
+      description: "Community ID associated with the event",
     },
   },
 }
