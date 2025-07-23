@@ -204,18 +204,12 @@ export default function SubmitPage() {
   const communityIdFromUrl = params.get("community_id")
 
   // check if the community from URL is owned by the current user
-  const [communityFromUrl] = useAsyncMemo(async () => {
-    if (!communityIdFromUrl || !account) return null
+  const communityFromUrl = useMemo(() => {
+    if (!communityIdFromUrl || !userCommunities) return null
 
-    try {
-      const allCommunities = await getCommunitiesByOwner(account)
-      const community = allCommunities.find((c) => c.id === communityIdFromUrl)
-      return community || null
-    } catch (error) {
-      console.error("Error fetching community:", error)
-      return null
-    }
-  }, [communityIdFromUrl, account])
+    const community = userCommunities.find((c) => c.id === communityIdFromUrl)
+    return community || null
+  }, [communityIdFromUrl, userCommunities])
 
   const [, eventsState] = useEventsContext()
   const [settings] = useProfileSettingsContext()
