@@ -34,7 +34,7 @@ export type CommunitiesResponse = {
 export default class Communities extends API {
   static Url = env(
     "GATSBY_COMMUNITIES_API_URL",
-    `https://social-api.decentraland.zone/v1`
+    `https://social-api.decentraland.zone`
   )
 
   static Cache = new Map<string, Communities>()
