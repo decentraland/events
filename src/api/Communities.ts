@@ -33,7 +33,7 @@ export type CommunitiesResponse = {
 
 export default class Communities extends API {
   static Url = env(
-    "COMMUNITIES_API_URL",
+    "GATSBY_COMMUNITIES_API_URL",
     `https://social-api.decentraland.zone/v1`
   )
 
@@ -88,7 +88,7 @@ export default class Communities extends API {
 
   async getCommunities() {
     return this.fetchMany(
-      `/communities`,
+      `/v1/communities`,
       this.options().authorization({ sign: true, optional: true })
     )
   }
@@ -98,14 +98,14 @@ export default class Communities extends API {
     query.append("owner", owner)
 
     return this.fetchMany(
-      `/communities/?${query.toString()}`,
+      `/v1/communities/?${query.toString()}`,
       this.options().authorization({ sign: true, optional: true })
     )
   }
 
   async getCommunityById(id: string) {
     return this.fetchOne(
-      `/communities/${id}`,
+      `/v1/communities/${id}`,
       this.options().authorization({ sign: true, optional: true })
     )
   }

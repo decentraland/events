@@ -13,5 +13,6 @@
   "GATSBY_PLACES_URL": "https://places.decentraland.org",
   "GATSBY_PLACES_API_URL": "https://places.decentraland.org/api",
   "GATSBY_PROFILE_SITE_URL": "https://profile.decentraland.org",
+  "GATSBY_COMMUNITIES_API_URL": "https://social-api.decentraland.org",
   "GATSBY_SSO_URL": "https://id.decentraland.org"
 }
