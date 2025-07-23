@@ -66,8 +66,8 @@ export default class Communities extends API {
 
   async getCommunities() {
     return this.fetchMany(
-      `/v1/communities`,
-      this.options().authorization({ sign: true, optional: true })
+      `/v1/communities?onlyMemberOf=true`, // TODO: retrieve only communities you own or manage
+      this.options().authorization({ sign: true })
     )
   }
 }
