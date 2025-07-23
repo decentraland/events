@@ -193,7 +193,7 @@ export default function SubmitPage() {
   const [worlds] = useAsyncMemo(getWorldNames)
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
-  const [userCommunities] = useAsyncMemo(
+  const [userCommunities, userCommunitiesState] = useAsyncMemo(
     () => (account ? getCommunitiesByOwner(account) : Promise.resolve([])),
     [account]
   )
@@ -242,7 +242,8 @@ export default function SubmitPage() {
     return getCommunitiesOptions(userCommunities || [])
   }, [userCommunities])
 
-  const loading = accountState.loading && eventState.loading
+  const loading =
+    accountState.loading || eventState.loading || userCommunitiesState.loading
 
   const recurrent_date = useMemo(
     () => futureRecurrentDates(editing),
