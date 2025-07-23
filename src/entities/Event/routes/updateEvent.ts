@@ -13,6 +13,7 @@ import env from "decentraland-gatsby/dist/utils/env"
 import pick from "lodash/pick"
 
 import { getEvent } from "./getEvent"
+import Communities from "../../../api/Communities"
 import Places from "../../../api/Places"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
@@ -189,6 +190,32 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
         `Invalid category tag supplied`,
         RequestError.BadRequest,
         { body: event }
+      )
+    }
+  }
+
+  // Verify community ownership if community_id is provided
+  if (updatedAttributes.community_id) {
+    try {
+      const userCommunities = await Communities.get().getCommunities()
+      const community = userCommunities.find(
+        (c) => c.id === updatedAttributes.community_id
+      )
+
+      if (!community) {
+        throw new RequestError(
+          `Community "${updatedAttributes.community_id}" not found or you don't have access to it`,
+          RequestError.BadRequest,
+          { body: updatedAttributes }
+        )
+      }
+    } catch (error) {
+      throw new RequestError(
+        `Failed to validate community ownership: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        RequestError.BadRequest,
+        { body: updatedAttributes }
       )
     }
   }
