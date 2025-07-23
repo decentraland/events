@@ -1,6 +1,5 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
 import Options from "decentraland-gatsby/dist/utils/api/Options"
-import Time from "decentraland-gatsby/dist/utils/date/Time"
 import env from "decentraland-gatsby/dist/utils/env"
 
 export type CommunityAttributes = {
@@ -17,19 +16,7 @@ export type CommunityAttributes = {
   }
 }
 
-export type AggregateCommunityAttributes = CommunityAttributes & {
-  user_owned?: boolean
-}
-
-export type CommunitiesResponse = {
-  data: {
-    results: CommunityAttributes[]
-    total: number
-    page: number
-    pages: number
-    limit: number
-  }
-}
+export type AggregateCommunityAttributes = CommunityAttributes
 
 export default class Communities extends API {
   static Url = env(
@@ -58,7 +45,6 @@ export default class Communities extends API {
       ...community,
       active: Boolean(community.active),
       isLive: Boolean(community.isLive),
-      user_owned: false, // This will be set based on the current user
     } as AggregateCommunityAttributes
   }
 
@@ -70,42 +56,17 @@ export default class Communities extends API {
     return result
   }
 
-  async fetchOne(
-    url: string,
-    options: Options = new Options({})
-  ): Promise<AggregateCommunityAttributes> {
-    const result = (await this.fetch<CommunitiesResponse>(url, options)) as any
-    return Communities.parseCommunity(result.data.results[0])
-  }
-
   async fetchMany(
     url: string,
     options: Options = new Options({})
   ): Promise<AggregateCommunityAttributes[]> {
-    const result = (await this.fetch<CommunitiesResponse>(url, options)) as any
+    const result = (await this.fetch<any>(url, options)) as any
     return (result.data.results || []).map(Communities.parseCommunity)
   }
 
   async getCommunities() {
     return this.fetchMany(
       `/v1/communities`,
-      this.options().authorization({ sign: true, optional: true })
-    )
-  }
-
-  async getCommunitiesByOwner(owner: string) {
-    const query = new URLSearchParams()
-    query.append("owner", owner)
-
-    return this.fetchMany(
-      `/v1/communities/?${query.toString()}`,
-      this.options().authorization({ sign: true, optional: true })
-    )
-  }
-
-  async getCommunityById(id: string) {
-    return this.fetchOne(
-      `/v1/communities/${id}`,
       this.options().authorization({ sign: true, optional: true })
     )
   }
