@@ -43,9 +43,9 @@ export default function DocsPage() {
         </ApiCard>
 
         <ApiCard
-          id="get-events-by-places"
+          id="get-events-search"
           method="POST"
-          path="/api/events/by-places"
+          path="/api/events/search"
           description="Returns the list of events filtered by place IDs and/or community ID"
         >
           <ApiDetails
