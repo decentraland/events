@@ -9,6 +9,7 @@ import {
   eventListByPlacesResponseSchema,
   eventListResponseSchema,
   eventResponseSchema,
+  getEventListByPlacesBodySchema,
   getEventListQuery,
   getEventParamsSchema,
 } from "../entities/Event/schemas"
@@ -42,12 +43,17 @@ export default function DocsPage() {
         </ApiCard>
 
         <ApiCard
-          id="get-events-by-places"
+          id="get-events-search"
           method="POST"
-          path="/api/events/by-places"
-          description="Returns the list of the upcoming events by places"
+          path="/api/events/search"
+          description="Returns the list of events filtered by place IDs and/or community ID"
         >
-          <ApiDetails title="Request" cors="*" query={getEventListQuery} />
+          <ApiDetails
+            title="Request"
+            cors="*"
+            query={getEventListQuery}
+            body={getEventListByPlacesBodySchema}
+          />
           <ApiDetails title="Response" body={eventListByPlacesResponseSchema} />
         </ApiCard>
 

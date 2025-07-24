@@ -401,6 +401,28 @@ export const eventListByPlacesResponseSchema = apiResultSchema({
   },
 } as AjvObjectSchema)
 
+export const getEventListByPlacesBodySchema = {
+  type: "object",
+  description: "Request body for filtering events by places and/or community",
+  additionalProperties: false,
+  properties: {
+    placeIds: {
+      type: "array",
+      description: "Array of place IDs to filter events by",
+      items: {
+        type: "string",
+        format: "uuid",
+      },
+      maxItems: 100,
+    },
+    communityId: {
+      type: "string",
+      format: "uuid",
+      description: "Community ID to filter events by (optional)",
+    },
+  },
+} as AjvObjectSchema
+
 export const newEventSchema = {
   type: "object",
   additionalProperties: false,
