@@ -18,8 +18,16 @@ import { EventListOptions, EventListParams, EventListType } from "../types"
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth) {
   const profile = await getAuthProfileSettings(req)
-  const placesIds =
-    req.method === "POST" && req.body && Array.isArray(req.body) ? req.body : []
+
+  // Handle body format: { placeIds: [...], communityId?: string }
+  let placesIds: string[] = []
+  let communityId: string | undefined
+
+  if (req.method === "POST" && req.body && typeof req.body === "object") {
+    placesIds = req.body.placeIds || []
+    communityId = req.body.communityId
+  }
+
   const query = validate({
     ...req.query,
     places_ids: placesIds,
@@ -126,12 +134,16 @@ export async function getEventList(req: WithAuth) {
     options.world_names = query.world_names
   }
 
+  // Handle places_ids from query or body
   if (query.places_ids && query.places_ids.length > 0) {
     options.places_ids = query.places_ids
   }
 
+  // Handle community_id from query or body
   if (query.community_id) {
     options.community_id = query.community_id
+  } else if (communityId) {
+    options.community_id = communityId
   }
 
   const events = await EventModel.getEvents(options)
@@ -140,7 +152,11 @@ export async function getEventList(req: WithAuth) {
     EventModel.toPublic(event, profile)
   )
 
-  if (options.places_ids && options.places_ids.length > 0) {
+  // Return total count when filtering by places_ids or community_id from body
+  if (
+    (options.places_ids && options.places_ids.length > 0) ||
+    options.community_id
+  ) {
     const total = await EventModel.countEventsWithFilter(options)
 
     return {

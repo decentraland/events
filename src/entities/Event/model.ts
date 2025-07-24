@@ -230,12 +230,19 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         !!options.world_names,
         SQL`AND e.server = ANY(${options.world_names})`
       ),
+      // Handle places_ids and community_id with OR logic when both are present
       conditional(
-        !!options.places_ids,
+        !!options.places_ids && !!options.community_id,
+        SQL`AND (e.place_id = ANY(${options.places_ids}) OR e.community_id = ${options.community_id})`
+      ),
+      // Handle places_ids only when community_id is not present
+      conditional(
+        !!options.places_ids && !options.community_id,
         SQL`AND e.place_id = ANY(${options.places_ids})`
       ),
+      // Handle community_id only when places_ids is not present
       conditional(
-        !!options.community_id,
+        !options.places_ids && !!options.community_id,
         SQL`AND e.community_id = ${options.community_id}`
       ),
     ].filter((condition) => !!condition.text)
