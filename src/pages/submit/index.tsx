@@ -315,8 +315,10 @@ export default function SubmitPage() {
               )?.value || null
             : original.community_id,
       })
+    } else if (communityFromUrl && editing.community_id === null) {
+      editActions.setValue("community_id", communityFromUrl.id)
     }
-  }, [original, communityOptions])
+  }, [original, communityOptions, communityFromUrl])
 
   const [uploadingPoster, uploadPoster] = useAsyncTask(
     async (file: File) => {
@@ -1168,13 +1170,7 @@ export default function SubmitPage() {
                       message={errors["community_id"]}
                       options={communityOptions}
                       onChange={editActions.handleChange}
-                      value={
-                        editing.community_id !== null
-                          ? editing.community_id
-                          : communityFromUrl && !original
-                          ? communityFromUrl.id
-                          : undefined
-                      }
+                      value={editing.community_id || undefined}
                       border
                     />
                   </Grid.Column>
