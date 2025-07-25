@@ -45,7 +45,10 @@ export type AggregatePlaceAttributes = PlaceAttributes & {
 }
 
 export default class Places extends API {
-  static Url = env("PLACES_API_URL", `https://places.decentraland.org/api`)
+  static Url = env(
+    "GATSBY_PLACES_API_URL",
+    `https://places.decentraland.org/api`
+  )
 
   static Cache = new Map<string, Places>()
 
