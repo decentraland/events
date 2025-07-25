@@ -312,7 +312,7 @@ export default function SubmitPage() {
           userCommunities && userCommunities.length > 0
             ? communityOptions.find(
                 (option) => option.value === original.community_id
-              )?.value || null
+              )?.value || undefined
             : original.community_id,
       })
     } else if (communityFromUrl && editing.community_id === null) {
@@ -1159,7 +1159,8 @@ export default function SubmitPage() {
                   />
                 </Grid.Column>
               </Grid.Row>
-              {communityOptions.length > 0 && (
+              {/* Community's None option will always be available */}
+              {communityOptions.length > 1 && (
                 <Grid.Row>
                   <Grid.Column mobile="16">
                     <SelectField
