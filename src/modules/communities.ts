@@ -17,9 +17,19 @@ export const getCommunitiesByOwner = async (
 export const getCommunitiesOptions = (
   communities: AggregateCommunityAttributes[]
 ) => {
-  return communities.map((community) => ({
+  const communityOptions = communities.map((community) => ({
     key: community.id,
     text: community.name,
     value: community.id,
   }))
+
+  // Add "None" option at the beginning to unselect the community
+  return [
+    {
+      key: "none",
+      text: "None",
+      value: undefined,
+    },
+    ...communityOptions,
+  ]
 }
