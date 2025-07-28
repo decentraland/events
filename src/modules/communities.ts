@@ -1,22 +1,13 @@
-import Communities, { AggregateCommunityAttributes } from "../api/Communities"
+import Communities, { CommunityAttributes } from "../api/Communities"
 
-export const getCommunitiesByOwner = async (
-  ownerAddress?: string
-): Promise<AggregateCommunityAttributes[]> => {
+export const getCommunitiesByOwner = async (): Promise<
+  CommunityAttributes[]
+> => {
   const allCommunities = await Communities.get().getCommunities()
-
-  if (ownerAddress) {
-    return allCommunities.filter(
-      (community) => community.ownerAddress === ownerAddress
-    )
-  }
-
-  return allCommunities
+  return allCommunities.filter((community) => community.active)
 }
 
-export const getCommunitiesOptions = (
-  communities: AggregateCommunityAttributes[]
-) => {
+export const getCommunitiesOptions = (communities: CommunityAttributes[]) => {
   const communityOptions = communities.map((community) => ({
     key: community.id,
     text: community.name,
