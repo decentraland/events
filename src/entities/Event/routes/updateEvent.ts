@@ -58,8 +58,6 @@ const EVENTS_BASE_URL = env(
   "https://events.decentraland.org"
 )
 
-const COMMUNITIES_API_ADMIN_TOKEN = env("COMMUNITIES_API_ADMIN_TOKEN", "")
-
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
@@ -200,8 +198,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   if (updatedAttributes.community_id) {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
-        user,
-        COMMUNITIES_API_ADMIN_TOKEN
+        user
       )
       const community = userCommunities.find(
         (c) => c.id === updatedAttributes.community_id

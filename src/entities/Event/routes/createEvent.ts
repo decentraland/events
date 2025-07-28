@@ -39,8 +39,6 @@ const EVENTS_BASE_URL = env(
   "https://events.decentraland.org"
 )
 
-const COMMUNITIES_API_ADMIN_TOKEN = env("COMMUNITIES_API_ADMIN_TOKEN", "")
-
 // TODO: associate event to a place id
 export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
@@ -111,8 +109,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   if (data.community_id) {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
-        user,
-        COMMUNITIES_API_ADMIN_TOKEN
+        user
       )
       const community = userCommunities.find((c) => c.id === data.community_id)
 

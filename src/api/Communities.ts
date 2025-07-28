@@ -15,6 +15,8 @@ export default class Communities extends API {
     `https://social-api.decentraland.zone`
   )
 
+  static Token = env("COMMUNITIES_API_ADMIN_TOKEN", "")
+
   static Cache = new Map<string, Communities>()
 
   static from(url: string) {
@@ -54,15 +56,15 @@ export default class Communities extends API {
 
   async getCommunities() {
     return this.fetchMany(
-      `/v1/communities?role=owner&role=moderator`,
+      `/v1/communities?roles=owner&roles=moderator`,
       this.options().authorization({ sign: true, optional: true })
     )
   }
 
-  async getCommunitiesWithToken(address: string, token: string) {
+  async getCommunitiesWithToken(address: string) {
     return this.fetchMany(
       `/v1/communities/${address}/managed`,
-      this.options().headers({ Authorization: `Bearer ${token}` })
+      this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
     )
   }
 }
