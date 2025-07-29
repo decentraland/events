@@ -5,24 +5,17 @@ import env from "decentraland-gatsby/dist/utils/env"
 export type CommunityAttributes = {
   id: string
   name: string
-  description: string | null
   ownerAddress: string
-  privacy: string
   active: boolean
-  membersCount: number
-  isLive: boolean
-  thumbnails?: {
-    raw: string
-  }
 }
-
-export type AggregateCommunityAttributes = CommunityAttributes
 
 export default class Communities extends API {
   static Url = env(
     "GATSBY_COMMUNITIES_API_URL",
     `https://social-api.decentraland.zone`
   )
+
+  static Token = env("COMMUNITIES_API_ADMIN_TOKEN", "")
 
   static Cache = new Map<string, Communities>()
 
@@ -38,14 +31,11 @@ export default class Communities extends API {
     return this.from(env("COMMUNITIES_API_URL", this.Url))
   }
 
-  static parseCommunity(
-    community: CommunityAttributes
-  ): AggregateCommunityAttributes {
+  static parseCommunity(community: CommunityAttributes): CommunityAttributes {
     return {
       ...community,
       active: Boolean(community.active),
-      isLive: Boolean(community.isLive),
-    } as AggregateCommunityAttributes
+    }
   }
 
   async fetch<T extends Record<string, any>>(
@@ -59,15 +49,34 @@ export default class Communities extends API {
   async fetchMany(
     url: string,
     options: Options = new Options({})
-  ): Promise<AggregateCommunityAttributes[]> {
+  ): Promise<CommunityAttributes[]> {
     const result = (await this.fetch<any>(url, options)) as any
     return (result.data.results || []).map(Communities.parseCommunity)
   }
 
   async getCommunities() {
-    return this.fetchMany(
-      `/v1/communities?onlyMemberOf=true`, // TODO: retrieve only communities you own or manage
-      this.options().authorization({ sign: true, optional: true })
+    return this.safeApiCall(() =>
+      this.fetchMany(
+        `/v1/communities?roles=owner&roles=moderator`,
+        this.options().authorization({ sign: true, optional: true })
+      )
     )
+  }
+
+  async getCommunitiesWithToken(address: string) {
+    return this.safeApiCall(() =>
+      this.fetchMany(
+        `/v1/communities/${address}/managed`,
+        this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
+      )
+    )
+  }
+
+  private async safeApiCall<T>(apiCall: () => Promise<T>): Promise<T> {
+    try {
+      return await apiCall()
+    } catch (error) {
+      return [] as T
+    }
   }
 }

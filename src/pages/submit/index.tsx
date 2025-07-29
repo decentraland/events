@@ -52,7 +52,6 @@ import {
 import {
   futureRecurrentDates,
   isLatestRecurrentSetpos,
-  toRRuleDates,
   toRecurrentSetposName,
 } from "../../entities/Event/utils"
 import {
@@ -194,7 +193,7 @@ export default function SubmitPage() {
   const [categories] = useCategoriesContext()
   const [schedules] = useAsyncMemo(getSchedules)
   const [userCommunities, userCommunitiesState] = useAsyncMemo(
-    () => (account ? getCommunitiesByOwner(account) : Promise.resolve([])),
+    () => (account ? getCommunitiesByOwner() : Promise.resolve([])),
     [account]
   )
 

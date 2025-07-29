@@ -197,7 +197,9 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   // Verify community ownership if community_id is provided
   if (updatedAttributes.community_id) {
     try {
-      const userCommunities = await Communities.get().getCommunities()
+      const userCommunities = await Communities.get().getCommunitiesWithToken(
+        user
+      )
       const community = userCommunities.find(
         (c) => c.id === updatedAttributes.community_id
       )
