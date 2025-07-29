@@ -55,16 +55,28 @@ export default class Communities extends API {
   }
 
   async getCommunities() {
-    return this.fetchMany(
-      `/v1/communities?roles=owner&roles=moderator`,
-      this.options().authorization({ sign: true, optional: true })
+    return this.safeApiCall(() =>
+      this.fetchMany(
+        `/v1/communities?roles=owner&roles=moderator`,
+        this.options().authorization({ sign: true, optional: true })
+      )
     )
   }
 
   async getCommunitiesWithToken(address: string) {
-    return this.fetchMany(
-      `/v1/communities/${address}/managed`,
-      this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
+    return this.safeApiCall(() =>
+      this.fetchMany(
+        `/v1/communities/${address}/managed`,
+        this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
+      )
     )
+  }
+
+  private async safeApiCall<T>(apiCall: () => Promise<T>): Promise<T> {
+    try {
+      return await apiCall()
+    } catch (error) {
+      return [] as T
+    }
   }
 }
