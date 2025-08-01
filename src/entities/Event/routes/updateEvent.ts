@@ -14,6 +14,7 @@ import pick from "lodash/pick"
 
 import { getEvent } from "./getEvent"
 import Communities from "../../../api/Communities"
+import Notifications from "../../../api/Notifications"
 import Places from "../../../api/Places"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
@@ -283,6 +284,42 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   })
 
   updatedEvent.attending = !!attendee
+
+  // Send notification to community members if community_id was newly assigned
+  if (
+    updatedEvent.community_id &&
+    updatedEvent.community_id !== event.community_id
+  ) {
+    try {
+      const community = await Communities.get().getCommunity(
+        updatedEvent.community_id
+      )
+      if (community) {
+        const communityMembers = await Communities.get().getCommunityMembers(
+          updatedEvent.community_id
+        )
+
+        const communityMembersAttendees = communityMembers.map((member) => ({
+          event_id: event.id,
+          user: member.ownerAddress,
+          user_name: member.name,
+          created_at: new Date(),
+        }))
+
+        await Notifications.get().sendEventCreated(
+          updatedEvent,
+          communityMembersAttendees,
+          {
+            communityId: updatedEvent.community_id,
+            communityName: community.name,
+          }
+        )
+      }
+    } catch (error) {
+      // Log error but don't fail the event update
+      console.error("Failed to send community notification:", error)
+    }
+  }
 
   if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)

@@ -72,7 +72,33 @@ export default class Communities extends API {
     )
   }
 
-  private async safeApiCall<T>(apiCall: () => Promise<T>): Promise<T> {
+  async getCommunity(communityId: string) {
+    return this.safeApiCall(
+      () =>
+        this.fetch(
+          `/v1/communities/${communityId}`,
+          this.options().headers({
+            Authorization: `Bearer ${Communities.Token}`,
+          })
+        ),
+      undefined
+    )
+  }
+
+  async getCommunityMembers(communityId: string) {
+    return this.safeApiCall(() =>
+      this.fetchMany(
+        `/v1/communities/${communityId}/members`,
+        // auth is required to get members from private communities
+        this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
+      )
+    )
+  }
+
+  private async safeApiCall<T>(
+    apiCall: () => Promise<T>,
+    defaultResult: T = [] as T
+  ): Promise<T> {
     try {
       return await apiCall()
     } catch (error) {
