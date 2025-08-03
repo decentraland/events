@@ -88,8 +88,8 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
 
         const communityMembersAttendees = communityMembers.map((member) => ({
           event_id: event.id,
-          user: member.ownerAddress,
-          user_name: member.name,
+          user: member.memberAddress,
+          user_name: member.name || "",
           created_at: new Date(),
         }))
 
@@ -99,6 +99,7 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
           {
             isLinkedToCommunity: true,
             communityName: community.name,
+            communityThumbnail: community.thumbnails?.raw,
           }
         )
       }

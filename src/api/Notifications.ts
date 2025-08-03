@@ -15,7 +15,7 @@ type DCLNotification<T, M> = {
 export enum EventsNotifications {
   EVENT_STARTS_SOON = "events_starts_soon",
   EVENT_STARTED = "events_started",
-  EVENT_CREATED = "events_created",
+  EVENT_CREATED = "event_created",
 }
 
 export type EventStartsSoonNotification = DCLNotification<
@@ -124,6 +124,7 @@ export default class Notifications extends API {
     options: {
       isLinkedToCommunity: boolean
       communityName?: string
+      communityThumbnail?: string
     } = {
       isLinkedToCommunity: false,
     }
@@ -150,6 +151,7 @@ export default class Notifications extends API {
         link: link.toString(),
         name: event.name,
         image: event.image || "",
+        communityThumbnail: options.communityThumbnail,
       },
     } as const
 
@@ -171,6 +173,7 @@ export default class Notifications extends API {
     options: {
       communityId: string
       communityName: string
+      communityThumbnail?: string
     }
   ) {
     const link = new URL("https://play.decentraland.org/")
@@ -179,6 +182,9 @@ export default class Notifications extends API {
     if (event.server) {
       link.searchParams.append("realm", event.server)
     }
+
+    console.log("options", options)
+    console.log("attendees", JSON.stringify(attendees, null, 2))
 
     const common = {
       eventKey: event.id,
@@ -190,6 +196,7 @@ export default class Notifications extends API {
         name: event.name,
         communityId: options.communityId,
         image: event.image || "",
+        communityThumbnail: options.communityThumbnail,
       },
     } as const
 

@@ -1,11 +1,25 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
-import Options from "decentraland-gatsby/dist/utils/api/Options"
 import env from "decentraland-gatsby/dist/utils/env"
 
 export type CommunityAttributes = {
   id: string
   name: string
   ownerAddress: string
+  active: boolean
+  thumbnails: {
+    raw: string
+  }
+}
+
+export type CommunityMemberAttributes = {
+  communityId: string
+  memberAddress: string
+  role: string
+  joinedAt: string
+  profilePictureUrl?: string
+  hasClaimedName: boolean
+  name?: string
+  friendshipStatus: number
   active: boolean
 }
 
@@ -38,43 +52,43 @@ export default class Communities extends API {
     }
   }
 
-  async fetch<T extends Record<string, any>>(
-    url: string,
-    options: Options = new Options({})
-  ) {
-    const result = await super.fetch<T>(url, options)
-    return result
+  static parseCommunityMember(
+    member: CommunityMemberAttributes
+  ): CommunityMemberAttributes {
+    return {
+      ...member,
+      active: Boolean(member.active),
+      hasClaimedName: Boolean(member.hasClaimedName),
+    }
   }
 
-  async fetchMany(
-    url: string,
-    options: Options = new Options({})
-  ): Promise<CommunityAttributes[]> {
-    const result = (await this.fetch<any>(url, options)) as any
-    return (result.data.results || []).map(Communities.parseCommunity)
-  }
-
-  async getCommunities() {
-    return this.safeApiCall(() =>
-      this.fetchMany(
+  async getCommunities(): Promise<CommunityAttributes[]> {
+    return this.safeApiCall(async () => {
+      const result = await this.fetch<any>(
         `/v1/communities?roles=owner&roles=moderator`,
         this.options().authorization({ sign: true, optional: true })
       )
-    )
+      const items = result.data?.results || []
+      return items.map(Communities.parseCommunity)
+    })
   }
 
-  async getCommunitiesWithToken(address: string) {
-    return this.safeApiCall(() =>
-      this.fetchMany(
+  async getCommunitiesWithToken(
+    address: string
+  ): Promise<CommunityAttributes[]> {
+    return this.safeApiCall(async () => {
+      const result = await this.fetch<any>(
         `/v1/communities/${address}/managed`,
         this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
       )
-    )
+      const items = result.data?.results || []
+      return items.map(Communities.parseCommunity)
+    })
   }
 
-  async getCommunity(communityId: string) {
+  async getCommunity(communityId: string): Promise<CommunityAttributes> {
     return this.safeApiCall(
-      () =>
+      async () =>
         this.fetch(
           `/v1/communities/${communityId}`,
           this.options().headers({
@@ -85,14 +99,19 @@ export default class Communities extends API {
     )
   }
 
-  async getCommunityMembers(communityId: string) {
-    return this.safeApiCall(() =>
-      this.fetchMany(
+  async getCommunityMembers(
+    communityId: string
+  ): Promise<CommunityMemberAttributes[]> {
+    return this.safeApiCall(async () => {
+      const result = await this.fetch<any>(
         `/v1/communities/${communityId}/members`,
-        // auth is required to get members from private communities
-        this.options().headers({ Authorization: `Bearer ${Communities.Token}` })
+        this.options().headers({
+          Authorization: `Bearer ${Communities.Token}`,
+        })
       )
-    )
+      const items = result.data?.results || result || []
+      return items.map(Communities.parseCommunityMember)
+    })
   }
 
   private async safeApiCall<T>(
@@ -102,7 +121,7 @@ export default class Communities extends API {
     try {
       return await apiCall()
     } catch (error) {
-      return [] as T
+      return defaultResult as T
     }
   }
 }

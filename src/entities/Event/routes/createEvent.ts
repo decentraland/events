@@ -13,7 +13,6 @@ import env from "decentraland-gatsby/dist/utils/env"
 import omit from "lodash/omit"
 
 import Communities from "../../../api/Communities"
-import Notifications from "../../../api/Notifications"
 import Places from "../../../api/Places"
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
@@ -192,37 +191,6 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   event.textsearch = EventModel.textsearch(event)
   await EventModel.create(event)
   await notifyNewEvent(event)
-
-  // Send notification to community members if event is linked to a community
-  if (event.community_id) {
-    try {
-      const community = await Communities.get().getCommunity(event.community_id)
-      if (community) {
-        const communityMembers = await Communities.get().getCommunityMembers(
-          event.community_id
-        )
-
-        const communityMembersAttendees = communityMembers.map((member) => ({
-          event_id: event.id,
-          user: member.ownerAddress,
-          user_name: member.name,
-          created_at: new Date(),
-        }))
-
-        await Notifications.get().sendEventCreated(
-          event,
-          communityMembersAttendees,
-          {
-            communityId: event.community_id,
-            communityName: community.name,
-          }
-        )
-      }
-    } catch (error) {
-      // Log error but don't fail the event creation
-      console.error("Failed to send community notification:", error)
-    }
-  }
 
   return EventModel.toPublic(event, profile)
 }
