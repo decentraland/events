@@ -73,7 +73,7 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
   )
 
   for (const event of events) {
-    const attendees = await EventAttendeeModel.listByEventId(event.id, {
+    let attendees = await EventAttendeeModel.listByEventId(event.id, {
       limit: null,
     })
     ctx.log(`${attendees.length} attendees to notify for Event: ${event.id}`)
@@ -93,25 +93,32 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
           created_at: new Date(),
         }))
 
-        await Notifications.get().sendEventStarted(
-          event,
-          communityMembersAttendees,
-          {
-            isLinkedToCommunity: true,
-            communityName: community.name,
-            communityThumbnail: community.thumbnails?.raw,
-          }
-        )
+        if (communityMembersAttendees.length > 0) {
+          // prevent duplications of notifications
+          attendees = attendees.filter(
+            (attendee) =>
+              !communityMembersAttendees.some(
+                (member) =>
+                  member.user.toLowerCase() === attendee.user.toLowerCase()
+              )
+          )
+
+          await Notifications.get().sendEventStarted(
+            event,
+            communityMembersAttendees,
+            {
+              isLinkedToCommunity: true,
+              communityName: community.name,
+              communityThumbnail: community.thumbnails?.raw,
+            }
+          )
+        }
       }
     }
 
     if (attendees.length === 0) {
       continue
     }
-
-    // we do not filter already notified attendees (community members if applies).
-    // whenever the event key is the same, notification services only notifies once.
-    // that's why it is important to send notifications related to community members first.
     await Notifications.get().sendEventStarted(event, attendees)
   }
 
