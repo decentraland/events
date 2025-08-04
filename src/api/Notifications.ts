@@ -183,9 +183,6 @@ export default class Notifications extends API {
       link.searchParams.append("realm", event.server)
     }
 
-    console.log("options", options)
-    console.log("attendees", JSON.stringify(attendees, null, 2))
-
     const common = {
       eventKey: event.id,
       type: EventsNotifications.EVENT_CREATED,

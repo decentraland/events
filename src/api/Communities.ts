@@ -6,7 +6,7 @@ export type CommunityAttributes = {
   name: string
   ownerAddress: string
   active: boolean
-  thumbnails: {
+  thumbnails?: {
     raw: string
   }
 }
@@ -86,17 +86,20 @@ export default class Communities extends API {
     })
   }
 
-  async getCommunity(communityId: string): Promise<CommunityAttributes> {
-    return this.safeApiCall(
+  async getCommunity(communityId: string): Promise<CommunityAttributes | null> {
+    const result = await this.safeApiCall(
       async () =>
-        this.fetch(
+        this.fetch<{ data: CommunityAttributes }>(
           `/v1/communities/${communityId}`,
           this.options().headers({
             Authorization: `Bearer ${Communities.Token}`,
           })
         ),
-      undefined
+      null
     )
+    return result?.data
+      ? Communities.parseCommunity(result.data as CommunityAttributes)
+      : null
   }
 
   async getCommunityMembers(
