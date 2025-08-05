@@ -13,7 +13,8 @@ import env from "decentraland-gatsby/dist/utils/env"
 import pick from "lodash/pick"
 
 import { getEvent } from "./getEvent"
-import Communities from "../../../api/Communities"
+import Communities, { CommunityAttributes } from "../../../api/Communities"
+import Notifications from "../../../api/Notifications"
 import Places from "../../../api/Places"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
@@ -35,6 +36,7 @@ import EventModel from "../model"
 import { newEventSchema } from "../schemas"
 import {
   DeprecatedEventAttributes,
+  EventAttributes,
   MAX_EVENT_DURATION,
   approveEventAttributes,
   editAnyEventAttributes,
@@ -57,6 +59,28 @@ const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
   "https://events.decentraland.org"
 )
+
+async function notifyCommunityMembers(
+  event: EventAttributes,
+  community: CommunityAttributes
+) {
+  const communityMembers = await Communities.get().getCommunityMembers(
+    community.id
+  )
+
+  const communityMembersAttendees = communityMembers.map((member) => ({
+    event_id: event.id,
+    user: member.memberAddress,
+    user_name: member.name || "",
+    created_at: new Date(),
+  }))
+
+  await Notifications.get().sendEventCreated(event, communityMembersAttendees, {
+    communityId: community.id,
+    communityName: community.name,
+    communityThumbnail: community.thumbnails?.raw,
+  })
+}
 
 export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
@@ -194,34 +218,6 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     }
   }
 
-  // Verify community ownership if community_id is provided
-  if (updatedAttributes.community_id) {
-    try {
-      const userCommunities = await Communities.get().getCommunitiesWithToken(
-        user
-      )
-      const community = userCommunities.find(
-        (c) => c.id === updatedAttributes.community_id
-      )
-
-      if (!community) {
-        throw new RequestError(
-          `Community "${updatedAttributes.community_id}" not found or you don't have access to it`,
-          RequestError.BadRequest,
-          { body: updatedAttributes }
-        )
-      }
-    } catch (error) {
-      throw new RequestError(
-        `Failed to validate community ownership: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-        RequestError.BadRequest,
-        { body: updatedAttributes }
-      )
-    }
-  }
-
   // Update data from worlds
   const tile = await API.catch(Land.getInstance().getTile([x, y]))
   updatedAttributes.coordinates = [x, y]
@@ -273,6 +269,46 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   } else if (!event.rejected && updatedEvent.rejected) {
     updatedEvent.rejected_by = user
     updatedAttributes.rejected_by = user
+  }
+
+  // verify community ownership and notify community members if valid
+  if (updatedEvent.community_id) {
+    try {
+      const userCommunities = await Communities.get().getCommunitiesWithToken(
+        user
+      )
+      const community = userCommunities.find(
+        (c) => c.id === updatedEvent.community_id
+      )
+
+      if (!community) {
+        throw new RequestError(
+          `Community "${updatedEvent.community_id}" not found or you don't have access to it`,
+          RequestError.BadRequest,
+          { body: updatedEvent }
+        )
+      }
+
+      const shouldNotify =
+        updatedEvent.approved &&
+        updatedEvent.community_id &&
+        (!event.approved || updatedEvent.community_id !== event.community_id)
+
+      if (shouldNotify) {
+        // do not fail the event update if the notification fails
+        await notifyCommunityMembers(updatedEvent, community).catch((error) => {
+          console.error("Failed to send community notification:", error)
+        })
+      }
+    } catch (error) {
+      throw new RequestError(
+        `Failed to validate community ownership: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        RequestError.BadRequest,
+        { body: updatedEvent }
+      )
+    }
   }
 
   await EventModel.update(updatedAttributes, { id: event.id })

@@ -15,6 +15,7 @@ type DCLNotification<T, M> = {
 export enum EventsNotifications {
   EVENT_STARTS_SOON = "events_starts_soon",
   EVENT_STARTED = "events_started",
+  EVENT_CREATED = "event_created",
 }
 
 export type EventStartsSoonNotification = DCLNotification<
@@ -34,6 +35,17 @@ export type EventStartedNotification = DCLNotification<
     name: string
     image: string
     link: string
+  }
+>
+
+export type EventCreatedNotification = DCLNotification<
+  EventsNotifications.EVENT_CREATED,
+  {
+    name: string
+    image: string
+    communityId?: string
+    communityName?: string
+    communityThumbnail?: string
   }
 >
 
@@ -110,7 +122,14 @@ export default class Notifications extends API {
 
   async sendEventStarted(
     event: EventAttributes,
-    attendees: EventAttendeeAttributes[]
+    attendees: EventAttendeeAttributes[],
+    options: {
+      isLinkedToCommunity: boolean
+      communityName?: string
+      communityThumbnail?: string
+    } = {
+      isLinkedToCommunity: false,
+    }
   ) {
     const link = new URL("https://play.decentraland.org/")
     link.searchParams.append("position", `${event.x},${event.y}`)
@@ -124,11 +143,17 @@ export default class Notifications extends API {
       type: EventsNotifications.EVENT_STARTED,
       timestamp: Date.now(),
       metadata: {
-        title: "Event started",
-        description: `The event ${event.name} has begun!`,
+        title: options.isLinkedToCommunity
+          ? "Community Event starting"
+          : "Event started",
+        description:
+          options.isLinkedToCommunity && options.communityName
+            ? `A ${options.communityName} event is about to start.`
+            : `The event ${event.name} has begun!`,
         link: link.toString(),
         name: event.name,
         image: event.image || "",
+        communityThumbnail: options.communityThumbnail,
       },
     } as const
 
@@ -141,5 +166,48 @@ export default class Notifications extends API {
     )
 
     return this.sendNotification<EventStartedNotification>(notifications)
+  }
+
+  // this notification is only sent to community members
+  async sendEventCreated(
+    event: EventAttributes,
+    attendees: EventAttendeeAttributes[],
+    options: {
+      communityId: string
+      communityName: string
+      communityThumbnail?: string
+    }
+  ) {
+    const link = new URL("https://play.decentraland.org/")
+    link.searchParams.append("position", `${event.x},${event.y}`)
+
+    if (event.server) {
+      link.searchParams.append("realm", event.server)
+    }
+
+    const common = {
+      eventKey: event.id,
+      type: EventsNotifications.EVENT_CREATED,
+      timestamp: Date.now(),
+      metadata: {
+        title: "Community Event Added",
+        description: `The ${options.communityName} Community has added a new event.`,
+        name: event.name,
+        image: event.image || "",
+        communityId: options.communityId,
+        communityName: options.communityName,
+        communityThumbnail: options.communityThumbnail,
+      },
+    } as const
+
+    const notifications: EventCreatedNotification[] = attendees.map(
+      (attendee) => ({
+        ...common,
+        metadata: common.metadata,
+        address: attendee.user,
+      })
+    )
+
+    return this.sendNotification<EventCreatedNotification>(notifications)
   }
 }

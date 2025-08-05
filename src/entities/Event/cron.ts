@@ -1,15 +1,16 @@
 import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 
-import Notifications, { EventsNotifications } from "../../api/Notifications"
-import EventAttendeeModel from "../EventAttendee/model"
-import NotificationCursorsModel from "../NotificationCursors/model"
-import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 import EventModel from "./model"
 import { EventAttributes } from "./types"
 import {
   calculateNextRecurrentDates,
   calculateRecurrentProperties,
 } from "./utils"
+import Communities from "../../api/Communities"
+import Notifications, { EventsNotifications } from "../../api/Notifications"
+import EventAttendeeModel from "../EventAttendee/model"
+import NotificationCursorsModel from "../NotificationCursors/model"
+import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()
@@ -72,15 +73,52 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
   )
 
   for (const event of events) {
-    const attendees = await EventAttendeeModel.listByEventId(event.id, {
+    let attendees = await EventAttendeeModel.listByEventId(event.id, {
       limit: null,
     })
     ctx.log(`${attendees.length} attendees to notify for Event: ${event.id}`)
 
+    if (event.community_id) {
+      const community = await Communities.get().getCommunity(event.community_id)
+
+      if (community) {
+        const communityMembers = await Communities.get().getCommunityMembers(
+          event.community_id
+        )
+
+        const communityMembersAttendees = communityMembers.map((member) => ({
+          event_id: event.id,
+          user: member.memberAddress,
+          user_name: member.name || "",
+          created_at: new Date(),
+        }))
+
+        if (communityMembersAttendees.length > 0) {
+          // prevent duplications of notifications
+          attendees = attendees.filter(
+            (attendee) =>
+              !communityMembersAttendees.some(
+                (member) =>
+                  member.user.toLowerCase() === attendee.user.toLowerCase()
+              )
+          )
+
+          await Notifications.get().sendEventStarted(
+            event,
+            communityMembersAttendees,
+            {
+              isLinkedToCommunity: true,
+              communityName: community.name,
+              communityThumbnail: community.thumbnails?.raw,
+            }
+          )
+        }
+      }
+    }
+
     if (attendees.length === 0) {
       continue
     }
-
     await Notifications.get().sendEventStarted(event, attendees)
   }
 
