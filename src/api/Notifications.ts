@@ -44,6 +44,8 @@ export type EventCreatedNotification = DCLNotification<
     name: string
     image: string
     communityId?: string
+    communityName?: string
+    communityThumbnail?: string
   }
 >
 
@@ -191,8 +193,9 @@ export default class Notifications extends API {
         title: "Community Event Added",
         description: `The ${options.communityName} Community has added a new event.`,
         name: event.name,
-        communityId: options.communityId,
         image: event.image || "",
+        communityId: options.communityId,
+        communityName: options.communityName,
         communityThumbnail: options.communityThumbnail,
       },
     } as const
