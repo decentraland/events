@@ -272,10 +272,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   // verify community ownership and notify community members if community id changed
-  if (
-    req.body.community_id &&
-    updatedAttributes.community_id !== event.community_id
-  ) {
+  if (typeof req.body.community_id !== "undefined") {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
         user
