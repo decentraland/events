@@ -272,27 +272,28 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   // verify community ownership and notify community members if valid
-  if (updatedEvent.community_id) {
+  if (updatedAttributes.community_id) {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
         user
       )
       const community = userCommunities.find(
-        (c) => c.id === updatedEvent.community_id
+        (c) => c.id === updatedAttributes.community_id
       )
 
       if (!community) {
         throw new RequestError(
-          `Community "${updatedEvent.community_id}" not found or you don't have access to it`,
+          `Community "${updatedAttributes.community_id}" not found or you don't have access to it`,
           RequestError.BadRequest,
-          { body: updatedEvent }
+          { body: updatedAttributes }
         )
       }
 
       const shouldNotify =
-        updatedEvent.approved &&
-        updatedEvent.community_id &&
-        (!event.approved || updatedEvent.community_id !== event.community_id)
+        updatedAttributes.approved &&
+        updatedAttributes.community_id &&
+        (!event.approved ||
+          updatedAttributes.community_id !== event.community_id)
 
       if (shouldNotify) {
         // do not fail the event update if the notification fails
