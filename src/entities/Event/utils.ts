@@ -1,4 +1,3 @@
-import logger from "decentraland-gatsby/dist/entities/Development/logger"
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
 import Time from "decentraland-gatsby/dist/utils/date/Time"
@@ -18,7 +17,7 @@ import {
   WeekdayMask,
   Weekdays,
 } from "./types"
-import { POSTER_FILE_SIZE, POSTER_FILE_TYPES } from "../Poster/types"
+import { mainRealmUrl } from "../../modules/servers"
 import { ScheduleAttributes } from "../Schedule/types"
 
 const DECENTRALAND_URL = env(
@@ -77,7 +76,8 @@ export function eventTargetUrl(
 
 export function eventClientOptions(
   event: Pick<EventAttributes, "x" | "y" | "server" | "world">,
-  servers?: (CatalystAbout | null)[] | null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _servers?: (CatalystAbout | null)[] | null
 ): {
   position: string
   realm?: string
@@ -93,18 +93,12 @@ export function eventClientOptions(
 
   if (event.world) {
     realmURL = event.server
-  } 
+  }
 
-  // if (!realmURL && event.server && servers) {
-  //   realmURL = servers
-  //     .map((server) => {
-  //       if (server?.configurations?.realmName === event.server) {
-  //         const url = new URL(server.content.publicUrl)
-  //         return url.origin.toString()
-  //       }
-  //     })
-  //     .filter(Boolean)[0]
-  // }
+  // @TODO: refactor to default to main only if it is present in tbe server list
+  if (!realmURL) {
+    realmURL = mainRealmUrl
+  }
 
   if (realmURL) {
     options.realm = realmURL
