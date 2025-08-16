@@ -93,18 +93,18 @@ export function eventClientOptions(
 
   if (event.world) {
     realmURL = event.server
-  }
+  } 
 
-  if (!realmURL && event.server && servers) {
-    realmURL = servers
-      .map((server) => {
-        if (server?.configurations?.realmName === event.server) {
-          const url = new URL(server.content.publicUrl)
-          return url.origin.toString()
-        }
-      })
-      .filter(Boolean)[0]
-  }
+  // if (!realmURL && event.server && servers) {
+  //   realmURL = servers
+  //     .map((server) => {
+  //       if (server?.configurations?.realmName === event.server) {
+  //         const url = new URL(server.content.publicUrl)
+  //         return url.origin.toString()
+  //       }
+  //     })
+  //     .filter(Boolean)[0]
+  // }
 
   if (realmURL) {
     options.realm = realmURL
