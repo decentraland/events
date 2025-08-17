@@ -95,11 +95,6 @@ export function eventClientOptions(
     realmURL = event.server
   }
 
-  // @TODO: refactor to default to main only if it is present in tbe server list
-  if (!realmURL) {
-    realmURL = mainRealmUrl
-  }
-
   if (realmURL) {
     options.realm = realmURL
   }
