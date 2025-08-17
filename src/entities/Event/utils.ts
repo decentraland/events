@@ -89,14 +89,8 @@ export function eventClientOptions(
     position: [event.x || 0, event.y || 0].join(","),
   }
 
-  let realmURL
-
   if (event.world) {
-    realmURL = event.server
-  }
-
-  if (realmURL) {
-    options.realm = realmURL
+    options.realm = event.server || undefined
   }
 
   return options
