@@ -89,19 +89,8 @@ export function eventClientOptions(
     position: [event.x || 0, event.y || 0].join(","),
   }
 
-  let realmURL
-
   if (event.world) {
-    realmURL = event.server
-  }
-
-  // @TODO: refactor to default to main only if it is present in tbe server list
-  if (!realmURL) {
-    realmURL = mainRealmUrl
-  }
-
-  if (realmURL) {
-    options.realm = realmURL
+    options.realm = event.server || undefined
   }
 
   return options
