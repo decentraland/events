@@ -4,7 +4,7 @@ import Catalyst from "decentraland-gatsby/dist/utils/api/Catalyst"
 import { CatalystAbout } from "decentraland-gatsby/dist/utils/api/Catalyst.types"
 import { memo } from "radash"
 
-const mainRealmUrl = "https://realm-provider.decentraland.org/main"
+export const mainRealmUrl = "https://realm-provider.decentraland.org/main"
 
 /** @deprecated use getReamls */
 export const getServers = memo(
