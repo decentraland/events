@@ -273,7 +273,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
 
   // verify community ownership and notify community members if community id changed
   // req.body.community_id = null means that the community id is being removed
-  if (req.body.community_id !== undefined) {
+  if (req.body.community_id !== undefined && req.body.community_id !== null) {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
         user
