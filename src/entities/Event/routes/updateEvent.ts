@@ -91,6 +91,17 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     ...pick(req.body, editEventAttributes),
   } as DeprecatedEventAttributes
 
+  const approvalOnlyFields = [
+    "approved",
+    "rejected",
+    "approved_by",
+    "rejected_by",
+  ]
+  const modifiedFields = Object.keys(req.body)
+  const isApprovalOnlyUpdate =
+    modifiedFields.length > 0 &&
+    modifiedFields.every((field) => approvalOnlyFields.includes(field))
+
   if (event.user === user) {
     Object.assign(
       updatedAttributes,
@@ -271,36 +282,63 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.rejected_by = user
   }
 
-  // verify community ownership and notify community members if community id changed
-  // req.body.community_id = null means that the community id is being removed
-  if (req.body.community_id !== undefined) {
+  // Determine if we need to validate community ownership
+  // Skip validation for approval-only updates since those are administrative actions
+  // that shouldn't require community management permissions
+  const needsCommunityValidation =
+    !isApprovalOnlyUpdate &&
+    // Case 1: Community ID is being set to a specific community (not null/detachment)
+    ((req.body.community_id !== undefined && req.body.community_id !== null) ||
+      // Case 2: Event has existing community, not being detached, and non-approval fields are being modified
+      (event.community_id &&
+        req.body.community_id !== null &&
+        modifiedFields.some((field) => !approvalOnlyFields.includes(field))))
+
+  if (needsCommunityValidation) {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
         user
       )
-      const community = userCommunities.find(
-        (c) => c.id === updatedAttributes.community_id
-      )
 
-      if (!community) {
-        throw new RequestError(
-          `Community "${updatedAttributes.community_id}" not found or you don't have access to it`,
-          RequestError.BadRequest,
-          { body: updatedAttributes }
+      // Determine which community to validate against
+      const communityToValidate =
+        req.body.community_id !== undefined
+          ? req.body.community_id === null
+            ? event.community_id
+            : req.body.community_id
+          : event.community_id
+
+      if (communityToValidate) {
+        const community = userCommunities.find(
+          (c) => c.id === communityToValidate
         )
-      }
 
-      const shouldNotify =
-        updatedAttributes.approved &&
-        updatedAttributes.community_id &&
-        (!event.approved ||
-          updatedAttributes.community_id !== event.community_id)
+        if (!community) {
+          const action =
+            req.body.community_id === null ? "detach this event from" : "access"
+          throw new RequestError(
+            `Community "${communityToValidate}" not found or you don't have permission to ${action} it`,
+            RequestError.BadRequest,
+            { body: updatedAttributes }
+          )
+        }
 
-      if (shouldNotify) {
-        // do not fail the event update if the notification fails
-        await notifyCommunityMembers(updatedEvent, community).catch((error) => {
-          console.error("Failed to send community notification:", error)
-        })
+        // Only notify if community is being set (not null) and event is being approved
+        const shouldNotify =
+          req.body.community_id !== null &&
+          updatedAttributes.approved &&
+          updatedAttributes.community_id &&
+          (!event.approved ||
+            updatedAttributes.community_id !== event.community_id)
+
+        if (shouldNotify) {
+          // do not fail the event update if the notification fails
+          await notifyCommunityMembers(updatedEvent, community).catch(
+            (error) => {
+              console.error("Failed to send community notification:", error)
+            }
+          )
+        }
       }
     } catch (error) {
       throw new RequestError(
