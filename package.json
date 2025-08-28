@@ -9,6 +9,7 @@
     "npm": "8.* || 9.*"
   },
   "dependencies": {
+    "@dcl/schemas": "^18.1.0",
     "@sentry/browser": "^7.66.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
@@ -17,7 +18,7 @@
     "core-js": "^3.22.2",
     "cssnano": "^5.0.10",
     "dcl-catalyst-client": "^21.5.0",
-    "decentraland-gatsby": "^6.54.0",
+    "decentraland-gatsby": "^7.1.0",
     "es6-shim": "^0.35.6",
     "express-fileupload": "^1.2.1",
     "gatsby": "^4.23.0",
