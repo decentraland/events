@@ -11,8 +11,8 @@ sharp.cache(false)
 sharp.simd(false)
 
 // You can delete this file if you're not using it
-exports.onCreateWebpackConfig = ({ actions }) => {
-  actions.setWebpackConfig({
+exports.onCreateWebpackConfig = ({ actions, stage }) => {
+  const config = {
     plugins: [
       new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
         resource.request = resource.request.replace(/^node:/, "")
@@ -27,7 +27,20 @@ exports.onCreateWebpackConfig = ({ actions }) => {
         os: false,
         stream: false,
         util: false,
+        url: false,
       },
     },
-  })
+  }
+
+  // During SSR, replace WearablePreview with a dummy module to avoid window access
+  if (stage === "build-html" || stage === "develop-html") {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /decentraland-ui2\/dist\/components\/WearablePreview\/WearablePreview/,
+        require.resolve("./src/utils/wearable-preview-ssr-stub.js")
+      )
+    )
+  }
+
+  actions.setWebpackConfig(config)
 }
