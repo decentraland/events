@@ -11,7 +11,7 @@ sharp.cache(false)
 sharp.simd(false)
 
 // You can delete this file if you're not using it
-exports.onCreateWebpackConfig = ({ actions }) => {
+exports.onCreateWebpackConfig = ({ actions, stage }) => {
   actions.setWebpackConfig({
     plugins: [
       new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
@@ -30,4 +30,13 @@ exports.onCreateWebpackConfig = ({ actions }) => {
       },
     },
   })
+
+  // Fix for SSR issues with decentraland-ui2 components
+  if (stage === "build-html" || stage === "develop-html") {
+    actions.setWebpackConfig({
+      externals: {
+        "decentraland-ui2": "commonjs decentraland-ui2",
+      },
+    })
+  }
 }
