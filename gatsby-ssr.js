@@ -30,9 +30,10 @@ export function onPreRenderHTML(
   const headComponents = getHeadComponents()
     .concat([
       <script
+        key="service-worker-unregister"
         dangerouslySetInnerHTML={{
           __html:
-            "if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {window.navigator.serviceWorker.getRegistrations().then(registrations => {registrations.forEach(r => r.unregister())})}",
+            "if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {window.navigator.serviceWorker.getRegistrations().then(registrations => {registrations.forEach(r => r.unregister())})}",
         }}
       ></script>,
     ])

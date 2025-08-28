@@ -180,7 +180,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
     async function (e: React.MouseEvent<HTMLButtonElement>) {
       e.stopPropagation()
       e.preventDefault()
-      if (event) {
+      if (event && typeof window !== "undefined") {
         window.open(locations.download(event.id), "_blank")
       }
     },
