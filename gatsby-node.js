@@ -27,6 +27,17 @@ exports.onCreateWebpackConfig = ({ actions, stage }) => {
         os: false,
         stream: false,
         util: false,
+        // Add fallbacks for SSR issues
+        zlib: false,
+        net: false,
+        tls: false,
+        tty: false,
+        path: false,
+        fs: false,
+        child_process: false,
+        worker_threads: false,
+        module: false,
+        url: false,
       },
     },
   })
