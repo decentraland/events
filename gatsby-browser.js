@@ -17,7 +17,7 @@ import "balloon-css/balloon.min.css"
 // eslint-disable-next-line css-import-order/css-import-order
 import "decentraland-ui/dist/themes/base-theme.css"
 // eslint-disable-next-line css-import-order/css-import-order
-import "decentraland-ui/dist/themes/alternative/light-theme.css"
+import "decentraland-ui/dist/themes/alternative/dark-theme.css"
 // eslint-disable-next-line css-import-order/css-import-order
 import "./src/theme.css"
 
@@ -31,7 +31,7 @@ import { IntlProvider } from "decentraland-gatsby/dist/plugins/intl"
 import segment from "decentraland-gatsby/dist/utils/development/segment"
 import env from "decentraland-gatsby/dist/utils/env"
 
-import { DclThemeProvider, lightTheme } from "decentraland-ui2"
+import { DclThemeProvider, darkTheme } from "decentraland-ui2"
 
 import Categories from "./src/context/Category"
 import Events from "./src/context/Event"
@@ -47,7 +47,7 @@ export const wrapRootElement = ({ element }) => (
       <ProfileSettings>
         <Events>
           <Categories>
-            <DclThemeProvider theme={lightTheme}>{element}</DclThemeProvider>
+            <DclThemeProvider theme={darkTheme}>{element}</DclThemeProvider>
           </Categories>
         </Events>
       </ProfileSettings>
