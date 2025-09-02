@@ -359,9 +359,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
           community.name
         )
         // do not fail the event update if the notification fails
-        await notifyCommunityMembers(updatedEvent, community).catch((error) => {
-          console.error("Failed to send community notification:", error)
-        })
+        await notifyCommunityMembers(updatedEvent, community)
       } else {
         console.log(
           "Community not found for notification:",
