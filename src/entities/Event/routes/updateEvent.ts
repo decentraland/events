@@ -322,23 +322,6 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
             { body: updatedAttributes }
           )
         }
-
-        // Only notify if community is being set (not null) and event is being approved
-        const shouldNotify =
-          req.body.community_id !== null &&
-          updatedAttributes.approved &&
-          updatedAttributes.community_id &&
-          (!event.approved ||
-            updatedAttributes.community_id !== event.community_id)
-
-        if (shouldNotify) {
-          // do not fail the event update if the notification fails
-          await notifyCommunityMembers(updatedEvent, community).catch(
-            (error) => {
-              console.error("Failed to send community notification:", error)
-            }
-          )
-        }
       }
     } catch (error) {
       throw new RequestError(
@@ -352,6 +335,41 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   await EventModel.update(updatedAttributes, { id: event.id })
+
+  // Notify community members when:
+  // 1. Event is approved AND has a community
+  // 2. Event is being approved for the first time OR community is changing to a new one
+  // 3. Community is not being explicitly removed (req.body.community_id !== null)
+  const shouldNotify =
+    updatedAttributes.approved && // Event is approved
+    updatedAttributes.community_id && // Event has a community
+    req.body.community_id !== null && // Community is not being explicitly removed
+    (!event.approved || // Event is being approved for the first time
+      (event.approved && updatedAttributes.community_id !== event.community_id)) // OR event was already approved but community changed
+
+  if (shouldNotify) {
+    try {
+      const community = await Communities.get().getCommunity(
+        updatedAttributes.community_id!
+      )
+
+      if (community) {
+        console.log(
+          "Sending community notification for community:",
+          community.name
+        )
+        // do not fail the event update if the notification fails
+        await notifyCommunityMembers(updatedEvent, community)
+      } else {
+        console.log(
+          "Community not found for notification:",
+          updatedAttributes.community_id
+        )
+      }
+    } catch (error) {
+      console.error("Error while sending community notification:", error)
+    }
+  }
 
   const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({
     event_id: event.id,
