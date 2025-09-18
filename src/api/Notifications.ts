@@ -91,7 +91,7 @@ export default class Notifications extends API {
     event: EventAttributes,
     attendees: EventAttendeeAttributes[]
   ) {
-    const link = new URL(Notifications.JumpInSiteURL)
+    const link = new URL(`${Notifications.JumpInSiteURL}/events`)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
@@ -135,7 +135,7 @@ export default class Notifications extends API {
       isLinkedToCommunity: false,
     }
   ) {
-    const link = new URL(Notifications.JumpInSiteURL)
+    const link = new URL(`${Notifications.JumpInSiteURL}/events`)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
@@ -182,7 +182,7 @@ export default class Notifications extends API {
       communityThumbnail?: string
     }
   ) {
-    const link = new URL(Notifications.JumpInSiteURL)
+    const link = new URL(`${Notifications.JumpInSiteURL}/events`)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
