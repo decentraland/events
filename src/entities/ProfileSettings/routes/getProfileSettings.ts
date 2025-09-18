@@ -4,10 +4,10 @@ import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { oncePerRequest } from "decentraland-gatsby/dist/entities/Route/utils"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
+import { getAuthProfileSettings } from "./getAuthProfileSettings"
 import ProfileSettingsModel from "../model"
 import { ProfileSettingsAttributes } from "../types"
 import { canEditAnyProfile } from "../utils"
-import { getAuthProfileSettings } from "./getAuthProfileSettings"
 
 export const getProfileSettings = oncePerRequest(async (req: WithAuth) => {
   const currentUserProfile = await getAuthProfileSettings(req)

@@ -1,5 +1,7 @@
 import Land from "decentraland-gatsby/dist/utils/api/Land"
 
+import sender from "./sender"
+import { TemplateOptions } from "./types"
 import { EventAttributes } from "../Event/types"
 import {
   eventFacebookUrl,
@@ -8,8 +10,6 @@ import {
   eventUrl,
 } from "../Event/utils"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
-import sender from "./sender"
-import { TemplateOptions } from "./types"
 
 export async function sendEmailVerification(email: string, verify_url: string) {
   const data: TemplateOptions<"validate_email_v3"> = {

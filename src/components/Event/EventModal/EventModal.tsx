@@ -4,6 +4,9 @@ import ImgFixed from "decentraland-gatsby/dist/components/Image/ImgFixed"
 import TokenList from "decentraland-gatsby/dist/utils/dom/TokenList"
 import { Modal, ModalProps } from "decentraland-ui/dist/components/Modal/Modal"
 
+import EventAttendeeList from "./EventAttendeeList/EventAttendeeList"
+import EventDetail from "./EventDetail/EventDetail"
+import EventStatusBanner from "./EventStatusBanner/EventStatusBanner"
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
 import { SessionEventAttributes } from "../../../entities/Event/types"
 import {
@@ -14,9 +17,6 @@ import closeIcon from "../../../images/remove.svg"
 import AttendingButtons from "../../Button/AttendingButtons"
 import EditButtons from "../../Button/EditButtons"
 import EventSection from "../EventSection"
-import EventAttendeeList from "./EventAttendeeList/EventAttendeeList"
-import EventDetail from "./EventDetail/EventDetail"
-import EventStatusBanner from "./EventStatusBanner/EventStatusBanner"
 
 import "./EventModal.css"
 

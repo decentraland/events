@@ -12,11 +12,11 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { Request } from "express"
 import pick from "lodash/pick"
 
-import { getAuthProfileSettings } from "../ProfileSettings/routes/getAuthProfileSettings"
-import { canEditAnySchedule } from "../ProfileSettings/utils"
 import ScheduleModel from "./model"
 import { createScheduleSchema, updateScheduleSchema } from "./schema"
 import { NewScheduleAttributes, ScheduleAttributes } from "./types"
+import { getAuthProfileSettings } from "../ProfileSettings/routes/getAuthProfileSettings"
+import { canEditAnySchedule } from "../ProfileSettings/utils"
 
 const createScheduleValidator =
   createValidator<NewScheduleAttributes>(createScheduleSchema)

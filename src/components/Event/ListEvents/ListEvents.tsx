@@ -15,6 +15,7 @@ import {
 } from "decentraland-ui/dist/components/ToggleBox/ToggleBox"
 import Grid from "semantic-ui-react/dist/commonjs/collections/Grid"
 
+import { ListMonthEvents } from "./ListMonthEvents"
 import { useCategoriesContext } from "../../../context/Category"
 import { useProfileSettingsContext } from "../../../context/ProfileSetting"
 import {
@@ -34,7 +35,6 @@ import { showTimezoneLabel } from "../../../modules/date"
 import { EventFilters, fromEventFilters, url } from "../../../modules/locations"
 import { SegmentEvent } from "../../../modules/segment"
 import { NoEvents } from "../NoEvents/NoEvents"
-import { ListMonthEvents } from "./ListMonthEvents"
 
 import "./ListEvents.css"
 

@@ -3,13 +3,13 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import difference from "lodash/difference"
 
+import { getProfileSettings } from "./getProfileSettings"
 import { notifyProfileSettingUpdate } from "../../Slack/utils"
 import ProfileSettingsModel from "../model"
 import {
   ProfileSettingsAttributes,
   updateProfileSettingsSchema,
 } from "../types"
-import { getProfileSettings } from "./getProfileSettings"
 
 export const validateProfileSettings =
   createValidator<ProfileSettingsAttributes>(
