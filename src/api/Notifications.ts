@@ -1,6 +1,7 @@
+import { NotificationType } from "@dcl/schemas"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import env from "decentraland-gatsby/dist/utils/env"
-import { NotificationType } from "@dcl/schemas"
+
 import { EventAttributes } from "../entities/Event/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 
@@ -122,8 +123,8 @@ export default class Notifications extends API {
       communityName?: string
       communityThumbnail?: string
     } = {
-        isLinkedToCommunity: false,
-      }
+      isLinkedToCommunity: false,
+    }
   ) {
     const link = new URL(Notifications.ExplorerURL)
     link.searchParams.append("position", `${event.x},${event.y}`)

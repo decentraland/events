@@ -9,10 +9,10 @@ import {
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 
+import { EventAttendeeAttributes } from "./types"
 import EventModel from "../Event/model"
 import { getEvent } from "../Event/routes/getEvent"
 import EventAttendeeModel from "../EventAttendee/model"
-import { EventAttendeeAttributes } from "./types"
 
 export default routes((router) => {
   const withAuth = auth({ optional: true })
