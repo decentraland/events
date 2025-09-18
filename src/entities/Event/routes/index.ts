@@ -13,7 +13,7 @@ import { updateEvent } from "./updateEvent"
 
 export const DECENTRALAND_URL = env(
   "DECENTRALAND_URL",
-  "https://play.decentraland.org"
+  "https://decentraland.org/jump/"
 )
 
 export default routes((router) => {

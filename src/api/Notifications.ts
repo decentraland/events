@@ -1,6 +1,6 @@
 import API from "decentraland-gatsby/dist/utils/api/API"
 import env from "decentraland-gatsby/dist/utils/env"
-
+import { NotificationType } from "@dcl/schemas"
 import { EventAttributes } from "../entities/Event/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
 
@@ -12,14 +12,8 @@ type DCLNotification<T, M> = {
   timestamp: number
 }
 
-export enum EventsNotifications {
-  EVENT_STARTS_SOON = "events_starts_soon",
-  EVENT_STARTED = "events_started",
-  EVENT_CREATED = "event_created",
-}
-
 export type EventStartsSoonNotification = DCLNotification<
-  EventsNotifications.EVENT_STARTS_SOON,
+  NotificationType.EVENTS_STARTS_SOON,
   {
     name: string
     image: string
@@ -30,7 +24,7 @@ export type EventStartsSoonNotification = DCLNotification<
 >
 
 export type EventStartedNotification = DCLNotification<
-  EventsNotifications.EVENT_STARTED,
+  NotificationType.EVENTS_STARTED,
   {
     name: string
     image: string
@@ -39,7 +33,7 @@ export type EventStartedNotification = DCLNotification<
 >
 
 export type EventCreatedNotification = DCLNotification<
-  EventsNotifications.EVENT_CREATED,
+  NotificationType.EVENT_CREATED,
   {
     name: string
     image: string
@@ -55,7 +49,7 @@ export default class Notifications extends API {
     `https://notifications-processor.decentraland.zone`
   )
   static Token = env("NOTIFICATION_SERVICE_TOKEN", "")
-  static ExplorerURL = env("EXPLORER_URL", "https://play.decentraland.org/")
+  static ExplorerURL = env("DECENTRALAND_URL", "https://decentraland.org/jump/")
 
   static Cache = new Map<string, Notifications>()
 
@@ -96,7 +90,7 @@ export default class Notifications extends API {
 
     const common = {
       eventKey: event.id,
-      type: EventsNotifications.EVENT_STARTS_SOON,
+      type: NotificationType.EVENTS_STARTS_SOON,
       timestamp: Date.now(),
       metadata: {
         title: "Event starts in an hour",
@@ -128,10 +122,10 @@ export default class Notifications extends API {
       communityName?: string
       communityThumbnail?: string
     } = {
-      isLinkedToCommunity: false,
-    }
+        isLinkedToCommunity: false,
+      }
   ) {
-    const link = new URL("https://play.decentraland.org/")
+    const link = new URL(Notifications.ExplorerURL)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
@@ -140,7 +134,7 @@ export default class Notifications extends API {
 
     const common = {
       eventKey: event.id,
-      type: EventsNotifications.EVENT_STARTED,
+      type: NotificationType.EVENTS_STARTED,
       timestamp: Date.now(),
       metadata: {
         title: options.isLinkedToCommunity
@@ -178,7 +172,7 @@ export default class Notifications extends API {
       communityThumbnail?: string
     }
   ) {
-    const link = new URL("https://play.decentraland.org/")
+    const link = new URL(Notifications.ExplorerURL)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
@@ -187,7 +181,7 @@ export default class Notifications extends API {
 
     const common = {
       eventKey: event.id,
-      type: EventsNotifications.EVENT_CREATED,
+      type: NotificationType.EVENT_CREATED,
       timestamp: Date.now(),
       metadata: {
         title: "Community Event Added",

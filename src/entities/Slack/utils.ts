@@ -13,7 +13,7 @@ import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 const SLACK_WEBHOOK = env("SLACK_WEBHOOK", "")
 const DECENTRALAND_URL = env(
   "DECENTRALAND_URL",
-  "https://play.decentraland.org"
+  "https://decentraland.org/jump/"
 )
 
 if (!isURL(SLACK_WEBHOOK)) {
