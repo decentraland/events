@@ -49,7 +49,7 @@ import {
   validateImageUrl,
 } from "../utils"
 
-import { DECENTRALAND_URL } from "./index"
+import { JUMP_IN_SITE_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -136,7 +136,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
 
   if (
     !updatedAttributes.url ||
-    updatedAttributes.url.startsWith(DECENTRALAND_URL)
+    updatedAttributes.url.startsWith(JUMP_IN_SITE_URL)
   ) {
     updatedAttributes.url = eventTargetUrl(updatedAttributes)
   }

@@ -20,8 +20,8 @@ import {
 import { mainRealmUrl } from "../../modules/servers"
 import { ScheduleAttributes } from "../Schedule/types"
 
-const DECENTRALAND_URL = env(
-  "DECENTRALAND_URL",
+const JUMP_IN_SITE_URL = env(
+  "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump/"
 )
 const EVENTS_BASE_URL = env(
@@ -63,7 +63,7 @@ export function scheduleUrl(schedule: Pick<ScheduleAttributes, "id">): string {
 export function eventTargetUrl(
   event: Pick<EventAttributes, "x" | "y" | "server">
 ): string {
-  const target = new URL(DECENTRALAND_URL)
+  const target = new URL(JUMP_IN_SITE_URL)
   target.pathname = ""
   target.searchParams.set("position", [event.x || 0, event.y || 0].join(","))
 

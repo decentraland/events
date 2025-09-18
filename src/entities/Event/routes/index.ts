@@ -11,8 +11,8 @@ import { getEvent } from "./getEvent"
 import { getEventList } from "./getEventList"
 import { updateEvent } from "./updateEvent"
 
-export const DECENTRALAND_URL = env(
-  "DECENTRALAND_URL",
+export const JUMP_IN_SITE_URL = env(
+  "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump/"
 )
 

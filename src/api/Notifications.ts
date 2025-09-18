@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { NotificationType } from "@dcl/schemas"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import env from "decentraland-gatsby/dist/utils/env"
@@ -12,6 +13,11 @@ type DCLNotification<T, M> = {
   metadata: M & { title: string; description: string }
   timestamp: number
 }
+
+export type EventsNotifications =
+  | NotificationType.EVENTS_STARTED
+  | NotificationType.EVENT_CREATED
+  | NotificationType.EVENTS_STARTS_SOON
 
 export type EventStartsSoonNotification = DCLNotification<
   NotificationType.EVENTS_STARTS_SOON,
@@ -50,7 +56,10 @@ export default class Notifications extends API {
     `https://notifications-processor.decentraland.zone`
   )
   static Token = env("NOTIFICATION_SERVICE_TOKEN", "")
-  static ExplorerURL = env("DECENTRALAND_URL", "https://decentraland.org/jump/")
+  static JumpInSiteURL = env(
+    "JUMP_IN_SITE_URL",
+    "https://decentraland.org/jump/"
+  )
 
   static Cache = new Map<string, Notifications>()
 
@@ -82,7 +91,7 @@ export default class Notifications extends API {
     event: EventAttributes,
     attendees: EventAttendeeAttributes[]
   ) {
-    const link = new URL(Notifications.ExplorerURL)
+    const link = new URL(Notifications.JumpInSiteURL)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
@@ -126,7 +135,7 @@ export default class Notifications extends API {
       isLinkedToCommunity: false,
     }
   ) {
-    const link = new URL(Notifications.ExplorerURL)
+    const link = new URL(Notifications.JumpInSiteURL)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {
@@ -173,7 +182,7 @@ export default class Notifications extends API {
       communityThumbnail?: string
     }
   ) {
-    const link = new URL(Notifications.ExplorerURL)
+    const link = new URL(Notifications.JumpInSiteURL)
     link.searchParams.append("position", `${event.x},${event.y}`)
 
     if (event.server) {

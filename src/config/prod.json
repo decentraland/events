@@ -1,6 +1,6 @@
 {
   "GATSBY_CHAIN_ID": "1,137",
-  "GATSBY_DECENTRALAND_URL": "https://decentraland.org/jump/",
+  "GATSBY_JUMP_IN_SITE_URL": "https://decentraland.org/jump/",
   "GATSBY_DECENTRALAND_DOWNLOAD_URL": "https://decentraland.org/download/",
   "GATSBY_EVENTS_API_URL": "https://events.decentraland.org/api",
   "GATSBY_EVENTS_BASE_URL": "https://events.decentraland.org",

@@ -11,8 +11,8 @@ import { eventUrl } from "../Event/utils"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 
 const SLACK_WEBHOOK = env("SLACK_WEBHOOK", "")
-const DECENTRALAND_URL = env(
-  "DECENTRALAND_URL",
+const JUMP_IN_SITE_URL = env(
+  "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump/"
 )
 
@@ -53,11 +53,11 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
           text: [
             `at <${eventUrl(event)}|Events page>`,
             event.url &&
-              event.url.startsWith(DECENTRALAND_URL) &&
+              event.url.startsWith(JUMP_IN_SITE_URL) &&
               `at <${event.url}|${
                 event.estate_name || event.scene_name || "Decentraland"
               } (${event.coordinates.join(",")})>`,
-            (!event.url || !event.url.startsWith(DECENTRALAND_URL)) &&
+            (!event.url || !event.url.startsWith(JUMP_IN_SITE_URL)) &&
               `at ${event.url}`,
           ]
             .filter(Boolean)

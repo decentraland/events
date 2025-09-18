@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+import { NotificationType } from "@dcl/schemas"
 import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 
 import EventModel from "./model"
@@ -7,7 +9,7 @@ import {
   calculateRecurrentProperties,
 } from "./utils"
 import Communities from "../../api/Communities"
-import Notifications, { EventsNotifications } from "../../api/Notifications"
+import Notifications from "../../api/Notifications"
 import EventAttendeeModel from "../EventAttendee/model"
 import NotificationCursorsModel from "../NotificationCursors/model"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
@@ -29,7 +31,7 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
 export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   const lastRun =
     await NotificationCursorsModel.getLastUpdateForNotificationType(
-      EventsNotifications.EVENT_STARTS_SOON
+      NotificationType.EVENTS_STARTS_SOON
     )
   const now = Date.now()
 
@@ -55,7 +57,7 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
   }
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
-    EventsNotifications.EVENT_STARTS_SOON,
+    NotificationType.EVENTS_STARTS_SOON,
     now
   )
 }
@@ -63,7 +65,7 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
 export async function notifyStartedEvents(ctx: JobContext<{}>) {
   const lastRun =
     await NotificationCursorsModel.getLastUpdateForNotificationType(
-      EventsNotifications.EVENT_STARTED
+      NotificationType.EVENTS_STARTED
     )
   const now = Date.now()
 
@@ -123,7 +125,7 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
   }
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
-    EventsNotifications.EVENT_STARTED,
+    NotificationType.EVENTS_STARTED,
     now
   )
 }
