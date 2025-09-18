@@ -22,7 +22,7 @@ import { ScheduleAttributes } from "../Schedule/types"
 
 const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
-  "https://decentraland.org/jump/"
+  "https://decentraland.org/jump"
 )
 const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",

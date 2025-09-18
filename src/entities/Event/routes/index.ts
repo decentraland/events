@@ -13,7 +13,7 @@ import { updateEvent } from "./updateEvent"
 
 export const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
-  "https://decentraland.org/jump/"
+  "https://decentraland.org/jump"
 )
 
 export default routes((router) => {
