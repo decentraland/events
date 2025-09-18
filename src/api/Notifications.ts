@@ -92,7 +92,7 @@ export default class Notifications extends API {
     attendees: EventAttendeeAttributes[]
   ) {
     const link = new URL(`${Notifications.JumpInSiteURL}/events`)
-    link.searchParams.append("position", `${event.x},${event.y}`)
+    link.searchParams.append("id", event.id)
 
     if (event.server) {
       link.searchParams.append("realm", event.server)
@@ -136,7 +136,7 @@ export default class Notifications extends API {
     }
   ) {
     const link = new URL(`${Notifications.JumpInSiteURL}/events`)
-    link.searchParams.append("position", `${event.x},${event.y}`)
+    link.searchParams.append("id", event.id)
 
     if (event.server) {
       link.searchParams.append("realm", event.server)
@@ -183,7 +183,7 @@ export default class Notifications extends API {
     }
   ) {
     const link = new URL(`${Notifications.JumpInSiteURL}/events`)
-    link.searchParams.append("position", `${event.x},${event.y}`)
+    link.searchParams.append("id", event.id)
 
     if (event.server) {
       link.searchParams.append("realm", event.server)
