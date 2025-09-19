@@ -58,7 +58,7 @@ export default class Notifications extends API {
   static Token = env("NOTIFICATION_SERVICE_TOKEN", "")
   static JumpInSiteURL = env(
     "JUMP_IN_SITE_URL",
-    "https://decentraland.org/jump/"
+    "https://decentraland.org/jump"
   )
 
   static Cache = new Map<string, Notifications>()

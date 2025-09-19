@@ -13,7 +13,7 @@ import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 const SLACK_WEBHOOK = env("SLACK_WEBHOOK", "")
 const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
-  "https://decentraland.org/jump/"
+  "https://decentraland.org/jump"
 )
 
 if (!isURL(SLACK_WEBHOOK)) {

@@ -22,7 +22,7 @@ import { ScheduleAttributes } from "../Schedule/types"
 
 const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
-  "https://decentraland.org/jump/"
+  "https://decentraland.org/jump"
 )
 const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
@@ -64,7 +64,6 @@ export function eventTargetUrl(
   event: Pick<EventAttributes, "x" | "y" | "server">
 ): string {
   const target = new URL(`${JUMP_IN_SITE_URL}/events`)
-  target.pathname = ""
   target.searchParams.set("position", [event.x || 0, event.y || 0].join(","))
 
   if (event.server) {
