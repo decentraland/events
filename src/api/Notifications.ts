@@ -1,10 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { NotificationType } from "@dcl/schemas"
+import {
+  EventCreatedEvent,
+  EventStartedEvent,
+  EventStartsSoonEvent,
+  Events,
+  NotificationType,
+} from "@dcl/schemas"
 import API from "decentraland-gatsby/dist/utils/api/API"
 import env from "decentraland-gatsby/dist/utils/env"
 
 import { EventAttributes } from "../entities/Event/types"
 import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
+import { createSnsPublisher } from "../utils/sns"
 
 type DCLNotification<T, M> = {
   eventKey: string
@@ -49,7 +56,6 @@ export type EventCreatedNotification = DCLNotification<
     communityThumbnail?: string
   }
 >
-
 export default class Notifications extends API {
   static Url = env(
     "NOTIFICATION_SERVICE_URL",
@@ -76,15 +82,10 @@ export default class Notifications extends API {
   }
 
   private async sendNotification<T>(notifications: T[]) {
-    return this.fetch(
-      "/notifications",
-      this.options()
-        .method("POST")
-        .headers({
-          Authorization: `Bearer ${env("NOTIFICATION_SERVICE_TOKEN", "")}`,
-        })
-        .json(notifications)
-    )
+    const { publishMessages } = createSnsPublisher()
+    // Cast to any because SNS publisher accepts schema event union and our
+    // notifications here match the expected shape (type + payload)
+    return publishMessages(notifications as unknown as any[])
   }
 
   async sendEventStartsSoon(
@@ -98,9 +99,10 @@ export default class Notifications extends API {
       link.searchParams.append("realm", event.server)
     }
 
-    const common = {
-      eventKey: event.id,
-      type: NotificationType.EVENTS_STARTS_SOON,
+    const notifications: EventStartsSoonEvent[] = attendees.map((attendee) => ({
+      type: Events.Type.EVENT,
+      subType: Events.SubType.Event.EVENT_STARTS_SOON,
+      key: event.id,
       timestamp: Date.now(),
       metadata: {
         title: "Event starts in an hour",
@@ -110,18 +112,11 @@ export default class Notifications extends API {
         endsAt: event.finish_at.toISOString(),
         image: event.image || "",
         name: event.name,
+        attendee: attendee.user,
       },
-    } as const
+    }))
 
-    const notifications: EventStartsSoonNotification[] = attendees.map(
-      (attendee) => ({
-        ...common,
-        metadata: common.metadata,
-        address: attendee.user,
-      })
-    )
-
-    return this.sendNotification<EventStartsSoonNotification>(notifications)
+    return this.sendNotification<EventStartsSoonEvent>(notifications)
   }
 
   async sendEventStarted(
@@ -142,9 +137,10 @@ export default class Notifications extends API {
       link.searchParams.append("realm", event.server)
     }
 
-    const common = {
-      eventKey: event.id,
-      type: NotificationType.EVENTS_STARTED,
+    const notifications: EventStartedEvent[] = attendees.map((attendee) => ({
+      type: Events.Type.EVENT,
+      subType: Events.SubType.Event.EVENT_STARTED,
+      key: event.id,
       timestamp: Date.now(),
       metadata: {
         title: options.isLinkedToCommunity
@@ -158,18 +154,11 @@ export default class Notifications extends API {
         name: event.name,
         image: event.image || "",
         communityThumbnail: options.communityThumbnail,
+        attendee: attendee.user,
       },
-    } as const
+    }))
 
-    const notifications: EventStartedNotification[] = attendees.map(
-      (attendee) => ({
-        ...common,
-        metadata: common.metadata,
-        address: attendee.user,
-      })
-    )
-
-    return this.sendNotification<EventStartedNotification>(notifications)
+    return this.sendNotification<EventStartedEvent>(notifications)
   }
 
   // this notification is only sent to community members
@@ -189,9 +178,10 @@ export default class Notifications extends API {
       link.searchParams.append("realm", event.server)
     }
 
-    const common = {
-      eventKey: event.id,
-      type: NotificationType.EVENT_CREATED,
+    const notifications: EventCreatedEvent[] = attendees.map((attendee) => ({
+      type: Events.Type.EVENT,
+      subType: Events.SubType.Event.EVENT_CREATED,
+      key: event.id,
       timestamp: Date.now(),
       metadata: {
         title: "Community Event Added",
@@ -201,17 +191,10 @@ export default class Notifications extends API {
         communityId: options.communityId,
         communityName: options.communityName,
         communityThumbnail: options.communityThumbnail,
+        attendee: attendee.user,
       },
-    } as const
+    }))
 
-    const notifications: EventCreatedNotification[] = attendees.map(
-      (attendee) => ({
-        ...common,
-        metadata: common.metadata,
-        address: attendee.user,
-      })
-    )
-
-    return this.sendNotification<EventCreatedNotification>(notifications)
+    return this.sendNotification<EventCreatedEvent>(notifications)
   }
 }
