@@ -285,8 +285,10 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   // Determine if we need to validate community ownership
   // Skip validation for approval-only updates since those are administrative actions
   // that shouldn't require community management permissions
+  // Also skip validation for admins unless they're actually modifying the community_id
   const needsCommunityValidation =
     !isApprovalOnlyUpdate &&
+    !(isAdmin(user) && req.body.community_id === undefined) && // Skip for admins not modifying community_id
     // Case 1: Community ID is being set to a specific community (not null/detachment)
     ((req.body.community_id !== undefined && req.body.community_id !== null) ||
       // Case 2: Event has existing community, not being detached, and non-approval fields are being modified
