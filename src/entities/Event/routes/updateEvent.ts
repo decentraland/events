@@ -289,7 +289,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const needsCommunityValidation =
     !isApprovalOnlyUpdate &&
     !(
-      (isAdmin(user) || canEditAnyEvent(profile)) &&
+      (isAdmin(user) || canEditAnyEvent(user)) &&
       req.body.community_id === undefined
     ) && // Skip for admins not modifying community_id
     // Case 1: Community ID is being set to a specific community (not null/detachment)
