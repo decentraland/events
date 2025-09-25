@@ -16,6 +16,8 @@
   "GATSBY_COMMUNITIES_API_URL": "https://social-api.decentraland.zone",
   "GATSBY_SSO_URL": "https://id.decentraland.zone",
   "GATSBY_ADMIN_ADDRESSES": "0xd9B96B5dC720fC52BedE1EC3B40A930e15F70Ddd",
+  "GATSBY_AWS_SNS_ARN": "",
+  "GATSBY_AWS_SNS_ENDPOINT": "",
   "SLACK_WEBHOOK": "test",
   "PROMETHEUS_BEARER_TOKEN": "test"
 }
