@@ -234,10 +234,13 @@ export const editEventAttributes = [
   "recurrent_until",
   "categories",
   "world",
-  "community_id",
 ] as const
 
-export const editOwnEventAttributes = ["contact", "details"] as const
+export const editOwnEventAttributes = [
+  "contact",
+  "details",
+  "community_id",
+] as const
 
 export const editAnyEventAttributes = [
   "highlighted",
