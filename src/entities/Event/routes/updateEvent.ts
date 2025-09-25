@@ -272,7 +272,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   // Community validation is only needed if the event is being updated by the owner
-  const needsCommunityValidation = req.body.community_id !== undefined
+  const needsCommunityValidation = updatedAttributes !== undefined
 
   if (needsCommunityValidation) {
     try {
