@@ -14,8 +14,8 @@ import pick from "lodash/pick"
 
 import { getEvent } from "./getEvent"
 import Communities, { CommunityAttributes } from "../../../api/Communities"
-import Notifications from "../../../api/Notifications"
 import Places from "../../../api/Places"
+import { sendEventCreated } from "../../../Notifications"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
@@ -75,7 +75,7 @@ async function notifyCommunityMembers(
     created_at: new Date(),
   }))
 
-  await Notifications.get().sendEventCreated(event, communityMembersAttendees, {
+  await sendEventCreated(event, communityMembersAttendees, {
     communityId: community.id,
     communityName: community.name,
     communityThumbnail: community.thumbnails?.raw,
