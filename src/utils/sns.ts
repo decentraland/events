@@ -21,13 +21,13 @@ function chunk<T>(theArray: T[], size: number): T[][] {
   }, [])
 }
 
-export function createSnsPublisher() {
-  const MAX_BATCH_SIZE = 10
-  const snsArn = env("AWS_SNS_ARN")
-  const optionalEndpoint = env("AWS_SNS_ENDPOINT", "")
-  const MAX_RETRIES = 3
-  const RETRY_DELAY_MS = 500
+const MAX_BATCH_SIZE = 10
+const snsArn = env("AWS_SNS_ARN")
+const optionalEndpoint = env("AWS_SNS_ENDPOINT", "")
+const MAX_RETRIES = 3
+const RETRY_DELAY_MS = 500
 
+export function createSnsPublisher() {
   if (!snsArn) {
     throw new Error("Missing required env var AWS_SNS_ARN")
   }
@@ -38,6 +38,53 @@ export function createSnsPublisher() {
 
   function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
+  async function publishBatch(
+    batch: PublishableEvent[],
+    batchIndex: number,
+    attempt: number
+  ): Promise<{
+    successfulMessageIds: string[]
+    failedEvents: PublishableEvent[]
+  }> {
+    const entries = batch.map((event, index) => {
+      return {
+        Id: `msg_${attempt}_${batchIndex * MAX_BATCH_SIZE + index}`,
+        Message: JSON.stringify(event),
+        MessageAttributes: {
+          type: {
+            DataType: "String",
+            StringValue: (event as any).type || "unknown",
+          },
+          subType: {
+            DataType: "String",
+            StringValue: (event as any).subType || "unknown",
+          },
+        },
+      }
+    })
+
+    const command = new PublishBatchCommand({
+      TopicArn: snsArn,
+      PublishBatchRequestEntries: entries,
+    })
+
+    const { Successful, Failed } = await client.send(command)
+
+    const successfulMessageIds: string[] =
+      Successful?.map((result) => result.MessageId).filter(
+        (messageId): messageId is string => typeof messageId === "string"
+      ) || []
+
+    const failedEventsForBatch =
+      Failed?.map((failure) => {
+        const failedEntry = entries.find((entry) => entry.Id === failure.Id)
+        const failedIndex = failedEntry ? entries.indexOf(failedEntry) : -1
+        return failedIndex >= 0 ? batch[failedIndex] : undefined
+      }).filter((x): x is PublishableEvent => Boolean(x)) || []
+
+    return { successfulMessageIds, failedEvents: failedEventsForBatch }
   }
 
   async function publishMessages(events: Array<PublishableEvent>): Promise<{
@@ -55,54 +102,17 @@ export function createSnsPublisher() {
 
       const batches = chunk(pendingEvents, MAX_BATCH_SIZE)
 
-      const publishBatchPromises = batches.map(async (batch, batchIndex) => {
-        const entries = batch.map((event, index) => {
-          return {
-            Id: `msg_${attempt}_${batchIndex * MAX_BATCH_SIZE + index}`,
-            Message: JSON.stringify(event),
-            MessageAttributes: {
-              type: {
-                DataType: "String",
-                StringValue: (event as any).type || "unknown",
-              },
-              subType: {
-                DataType: "String",
-                StringValue: (event as any).subType || "unknown",
-              },
-            },
-          }
-        })
+      const results = await Promise.all(
+        batches.map((batch, batchIndex) =>
+          publishBatch(batch, batchIndex, attempt)
+        )
+      )
 
-        const command = new PublishBatchCommand({
-          TopicArn: snsArn,
-          PublishBatchRequestEntries: entries,
-        })
-
-        const { Successful, Failed } = await client.send(command)
-
-        const successfulMessageIds: string[] =
-          Successful?.map((result) => result.MessageId).filter(
-            (messageId): messageId is string => typeof messageId === "string"
-          ) || []
-
-        const failedEventsForBatch =
-          Failed?.map((failure) => {
-            const failedEntry = entries.find((entry) => entry.Id === failure.Id)
-            const failedIndex = failedEntry ? entries.indexOf(failedEntry) : -1
-            return failedIndex >= 0 ? batch[failedIndex] : undefined
-          }).filter((x): x is PublishableEvent => Boolean(x)) || []
-
-        return { successfulMessageIds, failedEventsForBatch }
-      })
-
-      const results = await Promise.all(publishBatchPromises)
-
-      for (const r of results) {
-        allSuccessfulIds.push(...r.successfulMessageIds)
-      }
+      // Collect all successful IDs
+      allSuccessfulIds.push(...results.flatMap((r) => r.successfulMessageIds))
 
       // Prepare next retry set from failures
-      pendingEvents = results.flatMap((r) => r.failedEventsForBatch)
+      pendingEvents = results.flatMap((r) => r.failedEvents)
       attempt++
     }
 
