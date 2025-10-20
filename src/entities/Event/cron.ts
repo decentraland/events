@@ -9,9 +9,9 @@ import {
   calculateRecurrentProperties,
 } from "./utils"
 import Communities from "../../api/Communities"
-import { sendEventStarted, sendEventStartsSoon } from "../../Notifications"
 import EventAttendeeModel from "../EventAttendee/model"
 import NotificationCursorsModel from "../NotificationCursors/model"
+import { sendEventStarted, sendEventStartsSoon } from "../Notifications"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {

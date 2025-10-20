@@ -15,10 +15,10 @@ import pick from "lodash/pick"
 import { getEvent } from "./getEvent"
 import Communities, { CommunityAttributes } from "../../../api/Communities"
 import Places from "../../../api/Places"
-import { sendEventCreated } from "../../../Notifications"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
+import { sendEventCreated } from "../../Notifications"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import {
   canApproveAnyEvent,

@@ -1,7 +1,7 @@
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import { SQL, table } from "decentraland-gatsby/dist/entities/Database/utils"
 
-import { EventsNotifications } from "../../Notifications/types"
+import { EventsNotifications } from "../Notifications/types"
 
 export default class NotificationCursorsModel extends Model<{}> {
   static tableName = "notification_cursors"

@@ -7,9 +7,9 @@ import {
 } from "@dcl/schemas"
 import env from "decentraland-gatsby/dist/utils/env"
 
-import { EventAttributes } from "../entities/Event/types"
-import { EventAttendeeAttributes } from "../entities/EventAttendee/types"
-import { createSnsPublisher } from "../utils/sns"
+import { EventAttributes } from "../Event/types"
+import { EventAttendeeAttributes } from "../EventAttendee/types"
+import { createSnsPublisher } from "./sns"
 
 const JumpInSiteURL = env("JUMP_IN_SITE_URL", "https://decentraland.org/jump")
 
