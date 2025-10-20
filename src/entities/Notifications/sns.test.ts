@@ -152,4 +152,3 @@ describe("when publishing messages with SNS", () => {
     })
   })
 })
-
