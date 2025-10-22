@@ -9,9 +9,9 @@ import {
   calculateRecurrentProperties,
 } from "./utils"
 import Communities from "../../api/Communities"
-import Notifications from "../../api/Notifications"
 import EventAttendeeModel from "../EventAttendee/model"
 import NotificationCursorsModel from "../NotificationCursors/model"
+import { sendEventStarted, sendEventStartsSoon } from "../Notifications"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
@@ -52,7 +52,7 @@ export async function notifyUpcomingEvents(ctx: JobContext<{}>) {
       continue
     }
 
-    await Notifications.get().sendEventStartsSoon(event, attendees)
+    await sendEventStartsSoon(event, attendees)
     await notifyBySlack(event, attendees.length)
   }
 
@@ -105,15 +105,11 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
               )
           )
 
-          await Notifications.get().sendEventStarted(
-            event,
-            communityMembersAttendees,
-            {
-              isLinkedToCommunity: true,
-              communityName: community.name,
-              communityThumbnail: community.thumbnails?.raw,
-            }
-          )
+          await sendEventStarted(event, communityMembersAttendees, {
+            isLinkedToCommunity: true,
+            communityName: community.name,
+            communityThumbnail: community.thumbnails?.raw,
+          })
         }
       }
     }
@@ -121,7 +117,7 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
     if (attendees.length === 0) {
       continue
     }
-    await Notifications.get().sendEventStarted(event, attendees)
+    await sendEventStarted(event, attendees)
   }
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
