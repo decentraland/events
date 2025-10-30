@@ -1,0 +1,1964 @@
+openapi: 3.0.3
+info:
+  title: Decentraland Events API
+  description: |
+    # Overview
+
+    This API manages community events in the Decentraland virtual world. Users can create, update, and discover events happening in Decentraland locations (Genesis City parcels) or Worlds (custom deployments).
+
+    ### Features
+
+    - **Event Management**: Create, update, and list events with rich metadata
+    - **Recurrent Events**: Support for recurring events using iCalendar RRule standard
+    - **Attendee Tracking**: Users can mark attendance and view attendee lists
+    - **Schedules**: Group events into themed schedules for special occasions
+    - **Categories**: Organize events by categories (music, art, gaming, etc.)
+    - **Profile Settings**: Manage user notification preferences and permissions
+    - **Community Integration**: Link events to Decentraland communities
+    - **Location Support**: Events can be in Genesis City parcels or Worlds
+
+    ### Authentication
+
+    This API uses Ethereum-based authentication with signed messages. Most endpoints require authentication via the `Authorization` header containing a signed message from the user's wallet.
+
+    Authentication is handled by the `decentraland-gatsby` framework which validates Ethereum signatures.
+
+    ### Base URL
+
+    Production: `https://events.decentraland.org/api`
+
+    ### Rate Limiting
+
+    The API includes DDoS protection middleware. Excessive requests may be rate-limited.
+
+  version: 1.0.0
+  contact:
+    name: Decentraland Foundation
+    url: https://decentraland.org
+  license:
+    name: MIT
+    url: https://github.com/decentraland/events/blob/master/LICENSE
+
+servers:
+  - url: https://events.decentraland.org/api
+    description: Production server
+  - url: https://events.decentraland.zone/api
+    description: Development server
+  - url: http://localhost:4000/api
+    description: Local development server
+
+tags:
+  - name: Events
+    description: |
+      Event management endpoints for creating, updating, and querying events.
+      Events can be one-time or recurring, and can take place in Genesis City or Worlds.
+  - name: Event Attendees
+    description: |
+      Manage event attendance. Users can mark themselves as attending an event
+      and view the list of attendees for any event.
+  - name: Event Categories
+    description: |
+      Event categories help organize and filter events by type (music, art, gaming, etc.).
+      Categories are managed by administrators.
+  - name: Schedules
+    description: |
+      Schedules are themed collections of events for special occasions like festivals.
+      They can have custom themes, backgrounds, and time-based activation.
+  - name: Profile Settings
+    description: |
+      User profile settings including email preferences, notification settings,
+      and administrative permissions.
+  - name: Profile Subscriptions
+    description: |
+      Browser push notification subscriptions (deprecated - no longer in active use).
+  - name: Poster
+    description: |
+      Upload event poster images to AWS S3. Returns a public URL for the uploaded image.
+
+paths:
+  /events:
+    get:
+      tags:
+        - Events
+      summary: List events
+      description: |
+        Retrieves a list of events based on various filters. By default returns active events
+        (current and future) sorted by start date ascending. Supports filtering by location,
+        creator, categories, schedules, and more.
+      operationId: getEvents
+      security: []
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of events to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+        - name: offset
+          in: query
+          description: Number of events to skip (for pagination)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: list
+          in: query
+          description: Filter events by time range
+          schema:
+            type: string
+            enum: [all, active, live, upcoming]
+            default: active
+        - name: position
+          in: query
+          description: Filter events at a specific Genesis City position (format "x,y")
+          schema:
+            type: string
+            pattern: '^-?\d{1,3},-?\d{1,3}$'
+            example: "20,30"
+        - name: positions
+          in: query
+          description: Filter events at multiple positions
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^-?\d{1,3},-?\d{1,3}$'
+            maxItems: 1000
+          style: form
+          explode: true
+        - name: estate_id
+          in: query
+          description: Filter events by Genesis City estate ID
+          schema:
+            type: string
+        - name: creator
+          in: query
+          description: Filter events by creator's Ethereum address
+          schema:
+            type: string
+            pattern: '^0x[a-fA-F0-9]{40}$'
+            example: "0x1234567890123456789012345678901234567890"
+        - name: only_attendee
+          in: query
+          description: Show only events the authenticated user is attending (requires authentication)
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          description: Full-text search in event name and description (minimum 3 characters)
+          schema:
+            type: string
+            minLength: 3
+        - name: schedule
+          in: query
+          description: Filter events by schedule ID
+          schema:
+            type: string
+            format: uuid
+        - name: world
+          in: query
+          description: Filter events by location type (true=Worlds, false=Genesis City, null=all)
+          schema:
+            type: boolean
+        - name: world_names
+          in: query
+          description: Filter events by World names (format "name.dcl.eth")
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^.*\.dcl\.eth$'
+            minItems: 1
+          style: form
+          explode: true
+        - name: places_ids
+          in: query
+          description: Filter events by place IDs
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+            maxItems: 100
+          style: form
+          explode: true
+        - name: community_id
+          in: query
+          description: Filter events by community ID
+          schema:
+            type: string
+            format: uuid
+        - name: order
+          in: query
+          description: Sort order by start date
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Events
+      summary: Create a new event
+      description: |
+        Creates a new event. Requires authentication. Events are created in pending status
+        and require approval unless the user has special permissions.
+      operationId: createEvent
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEvent'
+      responses:
+        '200':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/search:
+    post:
+      tags:
+        - Events
+      summary: Search events
+      description: |
+        Alternative endpoint for searching events using POST method.
+        Accepts the same parameters as GET /events but via request body.
+      operationId: searchEvents
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                  type: integer
+                  minimum: 1
+                offset:
+                  type: integer
+                  minimum: 0
+                list:
+                  type: string
+                  enum: [all, active, live, upcoming]
+                position:
+                  type: string
+                positions:
+                  type: array
+                  items:
+                    type: string
+                creator:
+                  type: string
+                only_attendee:
+                  type: boolean
+                search:
+                  type: string
+                schedule:
+                  type: string
+                world:
+                  type: boolean
+                world_names:
+                  type: array
+                  items:
+                    type: string
+                places_ids:
+                  type: array
+                  items:
+                    type: string
+                community_id:
+                  type: string
+                order:
+                  type: string
+                  enum: [asc, desc]
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/attending:
+    get:
+      tags:
+        - Events
+      summary: Get events the user is attending
+      description: |
+        Returns all events that the authenticated user has marked as attending.
+      operationId: getAttendingEvents
+      security: []
+      responses:
+        '200':
+          description: List of events user is attending
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/{event_id}:
+    get:
+      tags:
+        - Events
+      summary: Get event by ID
+      description: |
+        Retrieves detailed information about a specific event.
+        If authenticated, includes whether the user is attending.
+      operationId: getEventById
+      security: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Events
+      summary: Update an event
+      description: |
+        Updates an existing event. Users can only update their own events unless they
+        have special permissions. Some fields require admin permissions.
+      operationId: updateEvent
+      security: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdate'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/{event_id}/attendees:
+    get:
+      tags:
+        - Event Attendees
+      summary: Get event attendees
+      description: |
+        Retrieves the list of users who have marked themselves as attending this event.
+      operationId: getEventAttendees
+      security: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of attendees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventAttendee'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Event Attendees
+      summary: Attend an event
+      description: |
+        Marks the authenticated user as attending this event.
+      operationId: attendEvent
+      security: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully marked as attending
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventAttendee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Event Attendees
+      summary: Unattend an event
+      description: |
+        Removes the authenticated user from the event's attendee list.
+      operationId: unattendEvent
+      security: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully removed from attendees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventAttendee'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/categories:
+    get:
+      tags:
+        - Event Categories
+      summary: List event categories
+      description: |
+        Returns all active event categories with internationalized labels.
+      operationId: getEventCategories
+      security: []
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventCategory'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /schedules:
+    get:
+      tags:
+        - Schedules
+      summary: List schedules
+      description: |
+        Returns all schedules, including their activation periods and themes.
+      operationId: getSchedules
+      security: []
+      responses:
+        '200':
+          description: List of schedules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Schedule'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Schedules
+      summary: Create a schedule
+      description: |
+        Creates a new schedule. Requires authentication and special permissions.
+      operationId: createSchedule
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSchedule'
+      responses:
+        '200':
+          description: Schedule created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Schedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /schedules/{schedule_id}:
+    get:
+      tags:
+        - Schedules
+      summary: Get schedule by ID
+      description: |
+        Retrieves detailed information about a specific schedule.
+      operationId: getScheduleById
+      security: []
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          description: Schedule UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Schedule details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Schedule'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Schedules
+      summary: Update a schedule
+      description: |
+        Updates an existing schedule. Requires authentication and special permissions.
+      operationId: updateSchedule
+      security: []
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          description: Schedule UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleUpdate'
+      responses:
+        '200':
+          description: Schedule updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Schedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /profiles/settings:
+    get:
+      tags:
+        - Profile Settings
+      summary: List profile settings
+      description: |
+        Returns profile settings for all users (admin only endpoint).
+        Requires authentication and edit_any_profile permission.
+      operationId: listProfileSettings
+      security: []
+      responses:
+        '200':
+          description: List of profile settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProfileSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /profiles/me/settings:
+    get:
+      tags:
+        - Profile Settings
+      summary: Get my profile settings
+      description: |
+        Returns the profile settings for the authenticated user.
+      operationId: getMyProfileSettings
+      security: []
+      responses:
+        '200':
+          description: Profile settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ProfileSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Profile Settings
+      summary: Update my profile settings
+      description: |
+        Updates the authenticated user's profile settings (email, notifications, etc.).
+      operationId: updateMyProfileSettings
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyProfileSettingsUpdate'
+      responses:
+        '200':
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ProfileSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /profiles/{profile_id}/settings:
+    get:
+      tags:
+        - Profile Settings
+      summary: Get profile settings by address
+      description: |
+        Returns profile settings for a specific user (admin only).
+        Requires authentication and edit_any_profile permission.
+      operationId: getProfileSettings
+      security: []
+      parameters:
+        - name: profile_id
+          in: path
+          required: true
+          description: Ethereum address of the user
+          schema:
+            type: string
+            pattern: '^0x[a-fA-F0-9]{40}$'
+            example: "0x1234567890123456789012345678901234567890"
+      responses:
+        '200':
+          description: Profile settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ProfileSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Profile Settings
+      summary: Update profile settings
+      description: |
+        Updates permissions for a specific user (admin only).
+        Requires authentication and edit_any_profile permission.
+      operationId: updateProfileSettings
+      security: []
+      parameters:
+        - name: profile_id
+          in: path
+          required: true
+          description: Ethereum address of the user
+          schema:
+            type: string
+            pattern: '^0x[a-fA-F0-9]{40}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileSettingsUpdate'
+      responses:
+        '200':
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ProfileSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /profiles/subscriptions:
+    get:
+      tags:
+        - Profile Subscriptions
+      summary: Get push subscriptions (deprecated)
+      description: |
+        Returns browser push notification subscriptions for the authenticated user.
+        **This endpoint is deprecated and no longer actively used.**
+      operationId: getProfileSubscriptions
+      deprecated: true
+      security: []
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProfileSubscription'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Profile Subscriptions
+      summary: Create push subscription (deprecated)
+      description: |
+        Creates a browser push notification subscription.
+        **This endpoint is deprecated and no longer actively used.**
+      operationId: createProfileSubscription
+      deprecated: true
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProfileSubscription'
+      responses:
+        '200':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: boolean
+                    example: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Profile Subscriptions
+      summary: Delete push subscriptions (deprecated)
+      description: |
+        Removes all browser push notification subscriptions for the authenticated user.
+        **This endpoint is deprecated and no longer actively used.**
+      operationId: deleteProfileSubscriptions
+      deprecated: true
+      security: []
+      responses:
+        '200':
+          description: Subscriptions deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: boolean
+                    example: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /poster:
+    post:
+      tags:
+        - Poster
+      summary: Upload event poster image
+      description: |
+        Uploads an event poster image to AWS S3 and returns the public URL.
+        Maximum file size: 500KB. Supported formats: JPEG, PNG, GIF.
+      operationId: uploadPoster
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - poster
+              properties:
+                poster:
+                  type: string
+                  format: binary
+                  description: Image file (JPEG, PNG, or GIF, max 500KB)
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Poster'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          description: Payload too large (file size exceeds 500KB)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          description: Service unavailable (AWS S3 issue)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Event:
+      type: object
+      description: |
+        An event in Decentraland. Events can be one-time or recurring, and can take place
+        in Genesis City (at specific coordinates) or in Worlds (custom deployments).
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique event identifier
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+          description: Event name
+          example: "Metaverse Music Festival"
+        description:
+          type: string
+          maxLength: 5000
+          description: Event description in Markdown format
+          example: "Join us for an amazing music festival in the metaverse!"
+        image:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to event poster image
+          example: "https://events-cdn.decentraland.org/poster/abc123.jpg"
+        start_at:
+          type: string
+          format: date-time
+          description: Event start date and time
+          example: "2024-12-25T18:00:00.000Z"
+        finish_at:
+          type: string
+          format: date-time
+          description: Event end date and time
+          example: "2024-12-25T20:00:00.000Z"
+        next_start_at:
+          type: string
+          format: date-time
+          description: Next occurrence start time (for recurring events)
+          example: "2024-12-25T18:00:00.000Z"
+        next_finish_at:
+          type: string
+          format: date-time
+          description: Next occurrence end time (for recurring events)
+          example: "2024-12-25T20:00:00.000Z"
+        duration:
+          type: integer
+          description: Event duration in milliseconds
+          example: 7200000
+        all_day:
+          type: boolean
+          description: Whether this is an all-day event
+          default: false
+        x:
+          type: integer
+          minimum: -170
+          maximum: 170
+          description: X coordinate in Genesis City (not used for World events)
+          example: 20
+        y:
+          type: integer
+          minimum: -170
+          maximum: 170
+          description: Y coordinate in Genesis City (not used for World events)
+          example: 30
+        coordinates:
+          type: array
+          description: Deprecated - use x and y instead
+          items:
+            type: integer
+          minItems: 2
+          maxItems: 2
+          example: [20, 30]
+        position:
+          type: array
+          description: Alias for coordinates
+          items:
+            type: integer
+          minItems: 2
+          maxItems: 2
+        server:
+          type: string
+          nullable: true
+          description: Realm/server name
+          example: "fenrir-amber"
+        url:
+          type: string
+          format: uri
+          description: Jump-in URL to the event location
+          example: "https://play.decentraland.org/?position=20,30"
+        user:
+          type: string
+          pattern: '^0x[a-fA-F0-9]{40}$'
+          description: Ethereum address of event creator
+          example: "0x1234567890123456789012345678901234567890"
+        user_name:
+          type: string
+          nullable: true
+          description: Display name of event creator
+          example: "Alice"
+        estate_id:
+          type: string
+          nullable: true
+          description: Genesis City estate ID (if applicable)
+        estate_name:
+          type: string
+          nullable: true
+          description: Genesis City estate name (if applicable)
+          example: "Dragon City"
+        scene_name:
+          type: string
+          nullable: true
+          description: Deprecated - scene name
+        approved:
+          type: boolean
+          description: Whether the event has been approved by a moderator
+          default: false
+        rejected:
+          type: boolean
+          description: Whether the event has been rejected by a moderator
+          default: false
+        approved_by:
+          type: string
+          nullable: true
+          pattern: '^0x[a-fA-F0-9]{40}$'
+          description: Ethereum address of approver
+        rejected_by:
+          type: string
+          nullable: true
+          pattern: '^0x[a-fA-F0-9]{40}$'
+          description: Ethereum address of rejector
+        highlighted:
+          type: boolean
+          description: Whether the event is highlighted in the UI
+          default: false
+        trending:
+          type: boolean
+          description: Whether the event is marked as trending
+          default: false
+        recurrent:
+          type: boolean
+          description: Whether this is a recurring event
+          default: false
+        recurrent_frequency:
+          type: string
+          nullable: true
+          enum: [YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY, MINUTELY, SECONDLY]
+          description: Recurrence frequency (RRule FREQ)
+        recurrent_interval:
+          type: integer
+          minimum: 0
+          description: Recurrence interval (RRule INTERVAL)
+          example: 1
+        recurrent_count:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: Number of recurrences (RRule COUNT)
+        recurrent_until:
+          type: string
+          format: date-time
+          nullable: true
+          description: Recurrence end date (RRule UNTIL)
+        recurrent_weekday_mask:
+          type: integer
+          minimum: 0
+          maximum: 127
+          description: Weekday mask for recurrence (bit flags for days of week)
+          example: 62
+        recurrent_month_mask:
+          type: integer
+          minimum: 0
+          maximum: 4095
+          description: Month mask for recurrence (bit flags for months)
+          example: 4095
+        recurrent_setpos:
+          type: integer
+          nullable: true
+          minimum: -1
+          maximum: 5
+          description: Position in recurrence set (RRule BYSETPOS)
+        recurrent_monthday:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 31
+          description: Day of month for recurrence (RRule BYMONTHDAY)
+        recurrent_dates:
+          type: array
+          description: Calculated recurrence dates
+          items:
+            type: string
+            format: date-time
+        contact:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: Contact information for event organizer
+          example: "alice@example.com"
+        details:
+          type: string
+          nullable: true
+          maxLength: 5000
+          description: Additional event details
+        categories:
+          type: array
+          description: Event category names
+          items:
+            type: string
+          example: ["music", "art"]
+        schedules:
+          type: array
+          description: Schedule IDs this event belongs to
+          items:
+            type: string
+            format: uuid
+        world:
+          type: boolean
+          description: Whether this event is in a World (true) or Genesis City (false)
+          default: false
+        place_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Place ID (from Places API)
+        community_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Community ID this event is associated with
+        total_attendees:
+          type: integer
+          minimum: 0
+          description: Total number of users attending
+          example: 42
+        latest_attendees:
+          type: array
+          description: Ethereum addresses of latest attendees
+          items:
+            type: string
+            pattern: '^0x[a-fA-F0-9]{40}$'
+          maxItems: 10
+        attending:
+          type: boolean
+          description: Whether the authenticated user is attending (only when authenticated)
+        live:
+          type: boolean
+          description: Whether the event is currently happening
+        created_at:
+          type: string
+          format: date-time
+          description: Event creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Event last update timestamp
+      required:
+        - id
+        - name
+        - start_at
+        - duration
+        - x
+        - y
+        - user
+
+    NewEvent:
+      type: object
+      description: Schema for creating a new event
+      required:
+        - name
+        - start_at
+        - duration
+        - x
+        - y
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+          description: Event name
+        description:
+          type: string
+          nullable: true
+          maxLength: 5000
+          description: Event description in Markdown
+        image:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to event poster
+        start_at:
+          type: string
+          format: date-time
+          description: Event start date and time
+        duration:
+          type: integer
+          minimum: 0
+          maximum: 86400000
+          description: Event duration in milliseconds (max 24 hours)
+        all_day:
+          type: boolean
+          default: false
+        x:
+          type: integer
+          minimum: -170
+          maximum: 170
+          description: X coordinate in Genesis City
+        y:
+          type: integer
+          minimum: -170
+          maximum: 170
+          description: Y coordinate in Genesis City
+        server:
+          type: string
+          nullable: true
+          description: Preferred realm/server
+        url:
+          type: string
+          format: uri
+          description: Custom jump-in URL
+        contact:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: Contact information
+        details:
+          type: string
+          nullable: true
+          maxLength: 5000
+          description: Additional details
+        categories:
+          type: array
+          nullable: true
+          items:
+            type: string
+          maxItems: 1
+          description: Event categories (max 1)
+        schedules:
+          type: array
+          nullable: true
+          items:
+            type: string
+            format: uuid
+          description: Schedule IDs (admin only)
+        world:
+          type: boolean
+          default: false
+          description: Whether event is in a World
+        community_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Associated community ID
+        recurrent:
+          type: boolean
+          default: false
+        recurrent_frequency:
+          type: string
+          nullable: true
+          enum: [YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY, MINUTELY, SECONDLY]
+        recurrent_interval:
+          type: integer
+          minimum: 0
+        recurrent_count:
+          type: integer
+          nullable: true
+        recurrent_until:
+          type: string
+          format: date-time
+          nullable: true
+        recurrent_weekday_mask:
+          type: integer
+          minimum: 0
+        recurrent_month_mask:
+          type: integer
+          minimum: 0
+        recurrent_setpos:
+          type: integer
+          nullable: true
+          minimum: -1
+        recurrent_monthday:
+          type: integer
+          nullable: true
+        approved:
+          type: boolean
+          description: Self-approve (requires permission)
+        rejected:
+          type: boolean
+        highlighted:
+          type: boolean
+          description: Highlight event (admin only)
+        trending:
+          type: boolean
+          description: Mark as trending (admin only)
+
+    EventUpdate:
+      type: object
+      description: Schema for updating an event (all fields optional)
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+          maxLength: 5000
+        image:
+          type: string
+          format: uri
+          nullable: true
+        start_at:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          minimum: 0
+        all_day:
+          type: boolean
+        x:
+          type: integer
+          minimum: -170
+          maximum: 170
+        y:
+          type: integer
+          minimum: -170
+          maximum: 170
+        server:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+        contact:
+          type: string
+          nullable: true
+          maxLength: 100
+        details:
+          type: string
+          nullable: true
+          maxLength: 5000
+        categories:
+          type: array
+          nullable: true
+          items:
+            type: string
+        schedules:
+          type: array
+          nullable: true
+          items:
+            type: string
+            format: uuid
+        world:
+          type: boolean
+        community_id:
+          type: string
+          format: uuid
+          nullable: true
+        recurrent:
+          type: boolean
+        recurrent_frequency:
+          type: string
+          nullable: true
+          enum: [YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY, MINUTELY, SECONDLY]
+        recurrent_interval:
+          type: integer
+        recurrent_count:
+          type: integer
+          nullable: true
+        recurrent_until:
+          type: string
+          format: date-time
+          nullable: true
+        recurrent_weekday_mask:
+          type: integer
+        recurrent_month_mask:
+          type: integer
+        recurrent_setpos:
+          type: integer
+          nullable: true
+        recurrent_monthday:
+          type: integer
+          nullable: true
+        approved:
+          type: boolean
+        rejected:
+          type: boolean
+        highlighted:
+          type: boolean
+        trending:
+          type: boolean
+
+    EventAttendee:
+      type: object
+      description: An attendee of an event
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          description: Event UUID
+        user:
+          type: string
+          pattern: '^0x[a-fA-F0-9]{40}$'
+          description: Attendee's Ethereum address
+        user_name:
+          type: string
+          nullable: true
+          description: Attendee's display name
+        created_at:
+          type: string
+          format: date-time
+          description: When the user marked attendance
+      required:
+        - event_id
+        - user
+        - created_at
+
+    EventCategory:
+      type: object
+      description: An event category
+      properties:
+        name:
+          type: string
+          description: Category identifier (internal name)
+          example: "music"
+        active:
+          type: boolean
+          description: Whether this category is active
+        i18n:
+          type: object
+          description: Internationalized labels
+          properties:
+            en:
+              type: string
+              description: English label
+              example: "Music"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - name
+        - active
+
+    Schedule:
+      type: object
+      description: |
+        A themed schedule grouping multiple events, typically used for festivals or special occasions
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Schedule UUID
+        name:
+          type: string
+          maxLength: 50
+          description: Schedule name
+          example: "Metaverse Music Festival 2024"
+        description:
+          type: string
+          nullable: true
+          maxLength: 255
+          description: Schedule description
+        image:
+          type: string
+          format: uri
+          nullable: true
+          description: Schedule banner image URL
+        theme:
+          type: string
+          nullable: true
+          enum: [mvmf_2022, mvfw_2023, pride_2023]
+          description: Pre-built theme identifier
+        background:
+          type: array
+          description: Background colors (CSS color values)
+          items:
+            type: string
+          example: ["#FF0000", "#00FF00"]
+        active:
+          type: boolean
+          description: Whether the schedule is active
+        active_since:
+          type: string
+          format: date-time
+          description: When the schedule becomes active
+        active_until:
+          type: string
+          format: date-time
+          description: When the schedule expires
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - active_since
+        - active_until
+
+    NewSchedule:
+      type: object
+      description: Schema for creating a new schedule
+      required:
+        - name
+        - active_since
+        - active_until
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          nullable: true
+          maxLength: 255
+        image:
+          type: string
+          format: uri
+          nullable: true
+        theme:
+          type: string
+          nullable: true
+          enum: [mvmf_2022, mvfw_2023, pride_2023]
+        background:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+          default: true
+        active_since:
+          type: string
+          format: date-time
+        active_until:
+          type: string
+          format: date-time
+
+    ScheduleUpdate:
+      type: object
+      description: Schema for updating a schedule (all fields optional)
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          nullable: true
+          maxLength: 255
+        image:
+          type: string
+          format: uri
+          nullable: true
+        theme:
+          type: string
+          nullable: true
+          enum: [mvmf_2022, mvfw_2023, pride_2023]
+        background:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+        active_since:
+          type: string
+          format: date-time
+        active_until:
+          type: string
+          format: date-time
+
+    ProfileSettings:
+      type: object
+      description: User profile settings and preferences
+      properties:
+        user:
+          type: string
+          pattern: '^0x[a-fA-F0-9]{40}$'
+          description: User's Ethereum address
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: User's email address
+        email_verified:
+          type: boolean
+          description: Whether the email has been verified
+        email_verified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the email was verified
+        email_updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the email was last updated
+        use_local_time:
+          type: boolean
+          description: Whether to display times in local timezone
+          default: true
+        notify_by_email:
+          type: boolean
+          description: Whether to send email notifications
+          default: false
+        notify_by_browser:
+          type: boolean
+          description: Whether to send browser push notifications (deprecated)
+          default: false
+        permissions:
+          type: array
+          description: User's special permissions
+          items:
+            type: string
+            enum:
+              - approve_own_event
+              - approve_any_event
+              - edit_any_event
+              - edit_any_schedule
+              - edit_any_profile
+              - test_any_notification
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - user
+
+    MyProfileSettingsUpdate:
+      type: object
+      description: Schema for updating own profile settings
+      properties:
+        email:
+          type: string
+          format: email
+          description: Update email address
+        email_verified:
+          type: boolean
+          description: Mark email as verified (admin only)
+        use_local_time:
+          type: boolean
+        notify_by_email:
+          type: boolean
+        notify_by_browser:
+          type: boolean
+
+    ProfileSettingsUpdate:
+      type: object
+      description: Schema for updating another user's profile settings (admin only)
+      properties:
+        permissions:
+          type: array
+          description: Update user permissions
+          items:
+            type: string
+            enum:
+              - approve_own_event
+              - approve_any_event
+              - edit_any_event
+              - edit_any_schedule
+              - edit_any_profile
+
+    ProfileSubscription:
+      type: object
+      description: Browser push notification subscription (deprecated)
+      deprecated: true
+      properties:
+        user:
+          type: string
+          pattern: '^0x[a-fA-F0-9]{40}$'
+        endpoint:
+          type: string
+          format: uri
+          description: Push notification endpoint URL
+        p256dh:
+          type: string
+          description: P-256 ECDH public key
+        auth:
+          type: string
+          description: Authentication secret
+      required:
+        - user
+        - endpoint
+        - p256dh
+        - auth
+
+    NewProfileSubscription:
+      type: object
+      description: Schema for creating a push subscription (deprecated)
+      deprecated: true
+      required:
+        - endpoint
+        - p256dh
+        - auth
+      properties:
+        endpoint:
+          type: string
+          format: uri
+        p256dh:
+          type: string
+        auth:
+          type: string
+
+    Poster:
+      type: object
+      description: Uploaded poster image information
+      properties:
+        filename:
+          type: string
+          description: File path in S3 bucket
+          example: "poster/abc123def456.jpg"
+        url:
+          type: string
+          format: uri
+          description: Public URL to access the image
+          example: "https://events-cdn.decentraland.org/poster/abc123def456.jpg"
+        size:
+          type: integer
+          description: File size in bytes
+          example: 245760
+        type:
+          type: string
+          description: MIME type
+          enum: [image/jpeg, image/png, image/gif]
+          example: "image/jpeg"
+      required:
+        - filename
+        - url
+        - size
+        - type
+
+    Error:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error message
+          example: "Event not found"
+      required:
+        - ok
+        - error
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters or body
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "Invalid request parameters"
+
+    Unauthorized:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "Unauthorized"
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "Forbidden"
+
+    NotFound:
+      description: Not found - resource doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "Resource not found"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "Internal server error"
+
