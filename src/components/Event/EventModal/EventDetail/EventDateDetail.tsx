@@ -13,6 +13,7 @@ import { showTimezoneLabel } from "../../../../modules/date"
 import Live from "../../../Badge/Live"
 import AddToCalendarButton from "../../../Button/AddToCalendarButton"
 import EventSection from "../../EventSection"
+import useFormattedCountdown from "../../../../hooks/useFormattedCountdown"
 
 import "./EventDateDetail.css"
 
@@ -51,6 +52,7 @@ export default React.memo(function EventDateDetail({
     [start_at, !settings.use_local_time]
   )
   const isLive = now.isBetween(start_at, finish_at)
+  const { countdownMessage } = useFormattedCountdown(start_at)
 
   return (
     <EventSection {...props}>
@@ -73,7 +75,7 @@ export default React.memo(function EventDateDetail({
             {l(
               "components.event.event_modal.event_detail.event_date_detail.starts_in"
             )}{" "}
-            {start_at.fromNow(true)}
+            {countdownMessage}
           </Paragraph>
         )}
         {!isLive && !countdown && duration < Time.Day && (
