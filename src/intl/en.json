@@ -299,7 +299,7 @@
         "event_detail": {
           "event_date_detail": {
             "started": "Started",
-            "starts_in": "Starts in",
+            "starts_in": "Starts",
             "from": "from",
             "to": "to",
             "at": "at"
