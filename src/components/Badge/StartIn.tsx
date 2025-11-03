@@ -20,9 +20,5 @@ export default function StartIn(props: StartInProps) {
     return <Live primary />
   }
 
-  return (
-    <div className={TokenList.join(["StartIn"])}>
-      {countdownMessage}
-    </div>
-  )
+  return <div className={TokenList.join(["StartIn"])}>{countdownMessage}</div>
 }

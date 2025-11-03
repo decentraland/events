@@ -8,12 +8,12 @@ import Time from "decentraland-gatsby/dist/utils/date/Time"
 
 import { useProfileSettingsContext } from "../../../../context/ProfileSetting"
 import { SessionEventAttributes } from "../../../../entities/Event/types"
+import useFormattedCountdown from "../../../../hooks/useFormattedCountdown"
 import clockIcon from "../../../../images/secondary-clock.svg"
 import { showTimezoneLabel } from "../../../../modules/date"
 import Live from "../../../Badge/Live"
 import AddToCalendarButton from "../../../Button/AddToCalendarButton"
 import EventSection from "../../EventSection"
-import useFormattedCountdown from "../../../../hooks/useFormattedCountdown"
 
 import "./EventDateDetail.css"
 
