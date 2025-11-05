@@ -28,6 +28,8 @@ exports.onCreateWebpackConfig = ({ actions, stage }) => {
         stream: false,
         util: false,
         url: false,
+        path: false,
+        diagnostics_channel: false,
       },
     },
   }
