@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
   EventCreatedEvent,
+  EventEndedEvent,
   EventStartedEvent,
   EventStartsSoonEvent,
   Events,
@@ -140,4 +141,26 @@ export async function sendEventCreated(
   }))
 
   return sendNotification<EventCreatedEvent>(notifications)
+}
+
+/**
+ * Creates event ended notification
+ * This is a single system event notification (not per attendee)
+ */
+export async function sendEventEnded(
+  event: EventAttributes,
+  attendeeCount: number
+) {
+  const notification: EventEndedEvent = {
+    type: Events.Type.EVENT,
+    subType: Events.SubType.Event.EVENT_ENDED,
+    key: event.id,
+    timestamp: Date.now(),
+    metadata: {
+      totalAttendees: attendeeCount,
+      ...(event.community_id && { communityId: event.community_id }),
+    },
+  }
+
+  return sendNotification<EventEndedEvent>([notification])
 }

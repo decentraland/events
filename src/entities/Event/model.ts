@@ -282,6 +282,20 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
+  static async getEventsEndingInRange(ending_from: number, ending_to: number) {
+    const query = SQL`
+      SELECT *
+      FROM ${table(EventModel)} e
+      WHERE
+        e.rejected IS FALSE
+        AND e.approved IS TRUE
+        AND e.next_finish_at >= (to_timestamp(${ending_from} / 1000.0))
+        AND e.next_finish_at < (to_timestamp(${ending_to} / 1000.0))
+    `
+
+    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+  }
+
   static async getRecurrentFinishedEvents() {
     const query = SQL`
       SELECT *

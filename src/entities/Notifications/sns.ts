@@ -2,6 +2,7 @@ import { PublishBatchCommand, SNSClient } from "@aws-sdk/client-sns"
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
   EventCreatedEvent,
+  EventEndedEvent,
   EventStartedEvent,
   EventStartsSoonEvent,
 } from "@dcl/schemas"
@@ -9,6 +10,7 @@ import env from "decentraland-gatsby/dist/utils/env"
 
 type PublishableEvent =
   | EventCreatedEvent
+  | EventEndedEvent
   | EventStartedEvent
   | EventStartsSoonEvent
 
