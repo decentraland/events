@@ -144,14 +144,14 @@ export async function sendEventCreated(
 }
 
 /**
- * Creates event ended notification
+ * Creates event ended notification object
  * This is a single system event notification (not per attendee)
  */
-export async function sendEventEnded(
-  event: EventAttributes,
+function createEventEndedNotification(
+  event: Pick<EventAttributes, "id" | "community_id">,
   attendeeCount: number
-) {
-  const notification: EventEndedEvent = {
+): EventEndedEvent {
+  return {
     type: Events.Type.EVENT,
     subType: Events.SubType.Event.EVENT_ENDED,
     key: event.id,
@@ -161,6 +161,30 @@ export async function sendEventEnded(
       ...(event.community_id && { communityId: event.community_id }),
     },
   }
+}
 
+/**
+ * Sends event ended notifications in batch
+ */
+export async function sendEventEnded(
+  event: Pick<EventAttributes, "id" | "community_id">,
+  attendeeCount: number
+) {
+  const notification = createEventEndedNotification(event, attendeeCount)
   return sendNotification<EventEndedEvent>([notification])
+}
+
+/**
+ * Sends multiple event ended notifications in batch
+ */
+export async function sendEventsEnded(
+  events: Array<{
+    event: Pick<EventAttributes, "id" | "community_id">
+    attendeeCount: number
+  }>
+) {
+  const notifications = events.map(({ event, attendeeCount }) =>
+    createEventEndedNotification(event, attendeeCount)
+  )
+  return sendNotification<EventEndedEvent>(notifications)
 }
