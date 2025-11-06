@@ -22,6 +22,7 @@ import express from "express"
 import { register } from "prom-client"
 
 import {
+  notifyEndedEvents,
   notifyStartedEvents,
   notifyUpcomingEvents,
   updateNextStartAt,
@@ -39,6 +40,7 @@ import social from "./entities/Social/routes"
 const jobs = new Manager({ concurrency: 10 })
 jobs.cron("@eachMinute", notifyUpcomingEvents)
 jobs.cron("@eachMinute", notifyStartedEvents)
+jobs.cron("@eachMinute", notifyEndedEvents)
 jobs.cron("@eachMinute", updateNextStartAt)
 
 const app = express()
