@@ -282,6 +282,40 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
   }
 
+  static async getEventsEndingInRangeWithAttendeeCount(
+    ending_from: number,
+    ending_to: number
+  ) {
+    const query = SQL`
+      SELECT 
+        e.id,
+        e.community_id,
+        COALESCE(COUNT(a.event_id), 0)::int as attendee_count
+      FROM ${table(EventModel)} e
+      LEFT JOIN ${table(EventAttendee)} a ON e.id = a.event_id
+      WHERE
+        e.rejected IS FALSE
+        AND e.approved IS TRUE
+        AND e.next_finish_at >= (to_timestamp(${ending_from} / 1000.0))
+        AND e.next_finish_at < (to_timestamp(${ending_to} / 1000.0))
+      GROUP BY e.id, e.community_id
+    `
+
+    const results = await EventModel.query<{
+      id: string
+      community_id: string | null
+      attendee_count: number
+    }>(query)
+
+    return results.map((result) => ({
+      event: {
+        id: result.id,
+        community_id: result.community_id,
+      } as Pick<EventAttributes, "id" | "community_id">,
+      attendeeCount: result.attendee_count,
+    }))
+  }
+
   static async getRecurrentFinishedEvents() {
     const query = SQL`
       SELECT *

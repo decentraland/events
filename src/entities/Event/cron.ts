@@ -11,7 +11,12 @@ import {
 import Communities from "../../api/Communities"
 import EventAttendeeModel from "../EventAttendee/model"
 import NotificationCursorsModel from "../NotificationCursors/model"
-import { sendEventStarted, sendEventStartsSoon } from "../Notifications"
+import {
+  sendEventStarted,
+  sendEventStartsSoon,
+  sendEventsEnded,
+} from "../Notifications"
+import { EVENTS_ENDED } from "../Notifications/types"
 import { notifyUpcomingEvent as notifyBySlack } from "../Slack/utils"
 
 export async function updateNextStartAt(ctx: JobContext<{}>) {
@@ -122,6 +127,50 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
 
   await NotificationCursorsModel.updateLastUpdateForNotificationType(
     NotificationType.EVENTS_STARTED,
+    now
+  )
+}
+
+export async function notifyEndedEvents(ctx: JobContext<{}>) {
+  // Track last run time using a custom cursor key (not a NotificationType)
+  // This is just for SNS message publishing, not user notifications
+  const lastRun =
+    await NotificationCursorsModel.getLastUpdateForNotificationType(
+      EVENTS_ENDED
+    )
+  const now = Date.now()
+
+  const eventsWithCounts =
+    await EventModel.getEventsEndingInRangeWithAttendeeCount(lastRun, now)
+  ctx.log(
+    `[${new Date().toJSON()}] ${
+      eventsWithCounts.length
+    } ended events to publish`
+  )
+
+  if (eventsWithCounts.length === 0) {
+    await NotificationCursorsModel.updateLastUpdateForNotificationType(
+      EVENTS_ENDED,
+      now
+    )
+    return
+  }
+
+  // Log details for each event
+  for (const { event, attendeeCount } of eventsWithCounts) {
+    ctx.log(
+      `Event ${event.id} ended with ${attendeeCount} attendees${
+        event.community_id ? ` (community: ${event.community_id})` : ""
+      }`
+    )
+  }
+
+  // Send all notifications in one batch
+  await sendEventsEnded(eventsWithCounts)
+
+  // Update cursor to track last successful run
+  await NotificationCursorsModel.updateLastUpdateForNotificationType(
+    EVENTS_ENDED,
     now
   )
 }
