@@ -24,6 +24,17 @@ async function sendNotification<T>(notifications: T[]) {
   return publishMessages(notifications as unknown as any[])
 }
 
+function buildEventLink(event: EventAttributes) {
+  const link = new URL(`${JumpInSiteURL}/events`)
+  link.searchParams.append("id", event.id)
+  link.searchParams.append("position", `${event.x},${event.y}`)
+
+  if (event.server) {
+    link.searchParams.append("realm", event.server)
+  }
+  return link.toString()
+}
+
 /**
  * Creates event starts soon notifications for attendees
  */
@@ -31,12 +42,7 @@ export async function sendEventStartsSoon(
   event: EventAttributes,
   attendees: EventAttendeeAttributes[]
 ) {
-  const link = new URL(`${JumpInSiteURL}/events`)
-  link.searchParams.append("id", event.id)
-
-  if (event.server) {
-    link.searchParams.append("realm", event.server)
-  }
+  const link = buildEventLink(event)
 
   const notifications: EventStartsSoonEvent[] = attendees.map((attendee) => ({
     type: Events.Type.EVENT,
@@ -72,12 +78,7 @@ export async function sendEventStarted(
     isLinkedToCommunity: false,
   }
 ) {
-  const link = new URL(`${JumpInSiteURL}/events`)
-  link.searchParams.append("id", event.id)
-
-  if (event.server) {
-    link.searchParams.append("realm", event.server)
-  }
+  const link = buildEventLink(event)
 
   const notifications: EventStartedEvent[] = attendees.map((attendee) => ({
     type: Events.Type.EVENT,
@@ -116,13 +117,6 @@ export async function sendEventCreated(
     communityThumbnail?: string
   }
 ) {
-  const link = new URL(`${JumpInSiteURL}/events`)
-  link.searchParams.append("id", event.id)
-
-  if (event.server) {
-    link.searchParams.append("realm", event.server)
-  }
-
   const notifications: EventCreatedEvent[] = attendees.map((attendee) => ({
     type: Events.Type.EVENT,
     subType: Events.SubType.Event.EVENT_CREATED,
