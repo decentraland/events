@@ -112,6 +112,7 @@ export async function notifyStartedEvents(ctx: JobContext<{}>) {
 
           await sendEventStarted(event, communityMembersAttendees, {
             isLinkedToCommunity: true,
+            communityId: event.community_id,
             communityName: community.name,
             communityThumbnail: community.thumbnails?.raw,
           })
