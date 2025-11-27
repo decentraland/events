@@ -67,7 +67,7 @@
     "@types/xml": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
-    "concurrently": "^7.2.1",
+    "concurrently": "^9.1.2",
     "devcert": "^1.1.2",
     "dotenv": "^8.6.0",
     "eslint": "^7.32.0",
