@@ -16,7 +16,7 @@
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
     "aws-sdk": "^2.1002.0",
-    "core-js": "^3.22.2",
+    "core-js": "^3.42.0",
     "cssnano": "^5.0.10",
     "dcl-catalyst-client": "^21.5.0",
     "decentraland-gatsby": "^7.11.0",
