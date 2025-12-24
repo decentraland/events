@@ -97,7 +97,7 @@ export async function sendEventStarted(
       link: link.toString(),
       name: event.name,
       image: event.image || "",
-      communityId: options.communityId,
+      communityId: options.communityId || "",
       communityThumbnail: options.communityThumbnail,
       attendee: attendee.user,
     },
