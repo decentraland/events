@@ -61,20 +61,7 @@ The Community Events service is a full-stack web application that manages commun
 
 ## API Documentation
 
-API endpoints are documented using OpenAPI/Swagger specification. The OpenAPI schema is available at:
-
-```
-docs/openapi.yaml
-```
-
-Main API routes:
-
-- `/api/events` - Event CRUD operations
-- `/api/attendees` - Event attendance management
-- `/api/categories` - Event category management
-- `/api/schedules` - Schedule collections
-- `/api/profile-settings` - User notification preferences
-- `/api/profile-subscription` - Web push subscriptions
+API endpoints are documented using OpenAPI/Swagger specification. See [docs/openapi.yaml](./docs/openapi.yaml).
 
 ## Database
 
