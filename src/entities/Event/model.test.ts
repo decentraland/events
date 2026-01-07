@@ -1,89 +1,89 @@
-import { EventListOptions, EventListType } from "./types"
 import EventModel from "./model"
+import { EventListOptions, EventListType } from "./types"
 
-// We need to test the private method indirectly through getEvents,
-// but for unit testing the filter conditions, we'll test via a mock approach
-// that extracts and validates the SQL conditions
+type SQLCondition = { text: string }
+
+const ATTENDEE_FILTER_REGEX = /a\.user\s+IS\s+NOT\s+NULL/i
+
+const buildEventFilterConditions = (
+  EventModel as any
+).buildEventFilterConditions.bind(EventModel) as (
+  options: Partial<EventListOptions>
+) => SQLCondition[]
+
+function hasAttendeeFilterCondition(conditions: SQLCondition[]): boolean {
+  return conditions.some((condition) =>
+    ATTENDEE_FILTER_REGEX.test(condition.text)
+  )
+}
 
 describe("EventModel.buildEventFilterConditions", () => {
-  // Access the private method for testing
-  const buildEventFilterConditions = (
-    EventModel as any
-  ).buildEventFilterConditions.bind(EventModel)
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
-  describe("only_attendee filter", () => {
-    it("should include attendee filter when only_attendee is true and user is set", () => {
-      const options: Partial<EventListOptions> = {
-        user: "0xmyaddress",
+  describe("when only_attendee option is true", () => {
+    let options: Partial<EventListOptions>
+
+    beforeEach(() => {
+      options = {
         only_attendee: true,
         list: EventListType.Active,
       }
-
-      const conditions = buildEventFilterConditions(options)
-      const conditionTexts = conditions.map((c: any) => c.text)
-
-      // Should include the attendee filter
-      const hasAttendeeFilter = conditionTexts.some(
-        (text: string) =>
-          text.includes("a.user IS NOT NULL") ||
-          text.includes("a.user is not null")
-      )
-
-      expect(hasAttendeeFilter).toBe(true)
     })
 
-    it("should NOT include attendee filter when only_attendee is false", () => {
-      const options: Partial<EventListOptions> = {
-        user: "0xmyaddress",
+    describe("and user option is provided", () => {
+      beforeEach(() => {
+        options.user = "0x1234567890abcdef"
+      })
+
+      it("generates an attendee filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasAttendeeFilterCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and user option is not provided", () => {
+      it("does not generate an attendee filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasAttendeeFilterCondition(conditions)).toBe(false)
+      })
+    })
+  })
+
+  describe("when only_attendee option is false", () => {
+    let options: Partial<EventListOptions>
+
+    beforeEach(() => {
+      options = {
         only_attendee: false,
+        user: "0x1234567890abcdef",
         list: EventListType.Active,
       }
-
-      const conditions = buildEventFilterConditions(options)
-      const conditionTexts = conditions.map((c: any) => c.text)
-
-      const hasAttendeeFilter = conditionTexts.some(
-        (text: string) =>
-          text.includes("a.user IS NOT NULL") ||
-          text.includes("a.user is not null")
-      )
-
-      expect(hasAttendeeFilter).toBe(false)
     })
 
-    it("should NOT include attendee filter when only_attendee is true but user is not set", () => {
-      const options: Partial<EventListOptions> = {
-        only_attendee: true,
+    it("does not generate an attendee filter condition", () => {
+      const conditions = buildEventFilterConditions(options)
+
+      expect(hasAttendeeFilterCondition(conditions)).toBe(false)
+    })
+  })
+
+  describe("when only_attendee option is undefined", () => {
+    let options: Partial<EventListOptions>
+
+    beforeEach(() => {
+      options = {
         list: EventListType.Active,
       }
-
-      const conditions = buildEventFilterConditions(options)
-      const conditionTexts = conditions.map((c: any) => c.text)
-
-      const hasAttendeeFilter = conditionTexts.some(
-        (text: string) =>
-          text.includes("a.user IS NOT NULL") ||
-          text.includes("a.user is not null")
-      )
-
-      expect(hasAttendeeFilter).toBe(false)
     })
 
-    it("should NOT include attendee filter when neither only_attendee nor user is set", () => {
-      const options: Partial<EventListOptions> = {
-        list: EventListType.Active,
-      }
-
+    it("does not generate an attendee filter condition", () => {
       const conditions = buildEventFilterConditions(options)
-      const conditionTexts = conditions.map((c: any) => c.text)
 
-      const hasAttendeeFilter = conditionTexts.some(
-        (text: string) =>
-          text.includes("a.user IS NOT NULL") ||
-          text.includes("a.user is not null")
-      )
-
-      expect(hasAttendeeFilter).toBe(false)
+      expect(hasAttendeeFilterCondition(conditions)).toBe(false)
     })
   })
 })
