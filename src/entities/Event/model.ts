@@ -245,6 +245,11 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         !options.places_ids && !!options.community_id,
         SQL`AND e.community_id = ${options.community_id}`
       ),
+      // Filter to only show events the user is attending
+      conditional(
+        !!options.only_attendee && !!options.user,
+        SQL`AND a.user IS NOT NULL`
+      ),
     ].filter((condition) => !!condition.text)
   }
 
