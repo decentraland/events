@@ -26,6 +26,9 @@ WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
 COPY ./package.json         /app/package.json
 
+# Use sharp's bundled libvips instead of global one to avoid compilation issues
+ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
+
 RUN npm install
 
 COPY ./src                  /app/src
