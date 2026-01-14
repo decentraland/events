@@ -5,8 +5,7 @@
   "version": "0.0.0-development",
   "author": "",
   "engines": {
-    "node": "18.*",
-    "npm": "8.* || 9.*"
+    "node": ">=20.20.0"
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.895.0",
