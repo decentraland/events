@@ -28,6 +28,11 @@ COPY ./package.json         /app/package.json
 
 RUN npm install
 
+ARG NODE_MAX_OLD_SPACE_SIZE=6144
+ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}
+# Disable Gatsby's anonymous usage telemetry to reduce build log noise and avoid outbound analytics.
+ENV GATSBY_TELEMETRY_DISABLED=1
+
 COPY ./src                  /app/src
 COPY ./static               /app/static
 COPY ./templates            /app/templates
@@ -40,8 +45,8 @@ COPY ./gatsby-node.js       /app/gatsby-node.js
 COPY ./gatsby-ssr.js        /app/gatsby-ssr.js
 COPY ./tsconfig.json        /app/tsconfig.json
 
-RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build:server
-RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build:front -- --prefix-paths
+RUN npm run build:server
+RUN npm run build:front -- --prefix-paths
 RUN npm prune --production
 
 FROM node:18.8-alpine
