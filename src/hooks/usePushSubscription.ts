@@ -43,7 +43,9 @@ export default function usePushSubscription(path = "/sw.js") {
 
     const subscription = await state.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey,
+      applicationServerKey: new Uint8Array(
+        applicationServerKey
+      ) as BufferSource,
     })
 
     patchState({ subscription })
