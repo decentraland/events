@@ -57,6 +57,7 @@ The Community Events service is a full-stack web application that manages commun
 - **Event Lifecycle**: Events are created in a pending state, require admin/moderator approval, and can be approved, rejected, highlighted, or marked as trending. Only approved events are visible to regular users.
 - **Event Types**: Events can be one-time (single occurrence), recurrent (repeating based on RRule), or all-day (no specific times).
 - **Location Handling**: Events can be located by specific coordinates (x, y) in Decentraland land, estates (grouped parcels), worlds (private virtual spaces), places (named locations with place_id), or communities (events associated with community_id).
+- **Date Range Filtering**: Events can be filtered by date range using `from` and `to` query parameters (ISO 8601 format). The filter applies to `next_start_at` field, allowing queries like "events starting in January 2026".
 - **Event Recurrence**: The service uses RRule (RFC 5545) to handle recurring events with support for various frequencies (yearly, monthly, weekly, daily, hourly), weekday masks, month masks, position rules (first Monday, last Friday), and count/until limits.
 - **Attendee Tracking**: Users can mark attendance for events. The system tracks latest attendees, maintains total attendee counts, and can send notifications based on user profile settings.
 - **Schedules**: Curated collections of events with custom themes (e.g., Metaverse Festival, Fashion Week), active periods (active_since, active_until), and custom branding/backgrounds.
