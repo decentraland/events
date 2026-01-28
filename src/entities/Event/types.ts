@@ -189,6 +189,8 @@ export type EventListParams = {
   limit?: number
   offset?: number
   order?: "asc" | "desc"
+  from?: string // ISO 8601 date-time string
+  to?: string // ISO 8601 date-time string
 }
 
 export type EventListOptions = {
@@ -210,6 +212,8 @@ export type EventListOptions = {
   limit?: number
   offset?: number
   order?: "asc" | "desc"
+  from?: Date // Start of date range filter
+  to?: Date // End of date range filter
 }
 
 export const editEventAttributes = [

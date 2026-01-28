@@ -146,6 +146,21 @@ export async function getEventList(req: WithAuth) {
     options.community_id = communityId
   }
 
+  // Handle date range filters
+  if (query.from) {
+    const fromDate = new Date(query.from)
+    if (!isNaN(fromDate.getTime())) {
+      options.from = fromDate
+    }
+  }
+
+  if (query.to) {
+    const toDate = new Date(query.to)
+    if (!isNaN(toDate.getTime())) {
+      options.to = toDate
+    }
+  }
+
   const events = await EventModel.getEvents(options)
 
   const publicEvents = events.map((event) =>

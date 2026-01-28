@@ -197,6 +197,26 @@ paths:
             type: string
             enum: [asc, desc]
             default: asc
+        - name: from
+          in: query
+          description: |
+            Start of date range filter (ISO 8601 format).
+            Returns events with next_start_at >= from.
+            Use with 'to' to filter events within a specific date range.
+          schema:
+            type: string
+            format: date-time
+            example: "2026-01-01T00:00:00Z"
+        - name: to
+          in: query
+          description: |
+            End of date range filter (ISO 8601 format).
+            Returns events with next_start_at < to.
+            Use with 'from' to filter events within a specific date range.
+          schema:
+            type: string
+            format: date-time
+            example: "2026-01-31T23:59:59Z"
       responses:
         '200':
           description: List of events

@@ -86,4 +86,91 @@ describe("EventModel.buildEventFilterConditions", () => {
       expect(hasAttendeeFilterCondition(conditions)).toBe(false)
     })
   })
+
+  describe("when date range filters are provided", () => {
+    const DATE_RANGE_FROM_REGEX = /e\.next_start_at\s*>=\s*/i
+    const DATE_RANGE_TO_REGEX = /e\.next_start_at\s*<\s*/i
+
+    function hasFromCondition(conditions: SQLCondition[]): boolean {
+      return conditions.some((condition) =>
+        DATE_RANGE_FROM_REGEX.test(condition.text)
+      )
+    }
+
+    function hasToCondition(conditions: SQLCondition[]): boolean {
+      return conditions.some((condition) =>
+        DATE_RANGE_TO_REGEX.test(condition.text)
+      )
+    }
+
+    describe("and from option is provided", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          from: new Date("2026-01-01T00:00:00Z"),
+        }
+      })
+
+      it("generates a from date filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasFromCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and to option is provided", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          to: new Date("2026-01-31T23:59:59Z"),
+        }
+      })
+
+      it("generates a to date filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasToCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and both from and to options are provided", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          from: new Date("2026-01-01T00:00:00Z"),
+          to: new Date("2026-01-31T23:59:59Z"),
+        }
+      })
+
+      it("generates both from and to date filter conditions", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasFromCondition(conditions)).toBe(true)
+        expect(hasToCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and neither from nor to options are provided", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+        }
+      })
+
+      it("does not generate date range filter conditions", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasFromCondition(conditions)).toBe(false)
+        expect(hasToCondition(conditions)).toBe(false)
+      })
+    })
+  })
 })

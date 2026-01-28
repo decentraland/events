@@ -250,6 +250,9 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         !!options.only_attendee && !!options.user,
         SQL`AND a.user IS NOT NULL`
       ),
+      // Date range filters
+      conditional(!!options.from, SQL`AND e.next_start_at >= ${options.from}`),
+      conditional(!!options.to, SQL`AND e.next_start_at < ${options.to}`),
     ].filter((condition) => !!condition.text)
   }
 

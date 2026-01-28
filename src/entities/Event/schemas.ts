@@ -123,6 +123,18 @@ export const getEventListQuery: AjvObjectSchema = {
       format: "uuid",
       description: "Filter events by community ID",
     },
+    from: {
+      type: "string",
+      format: "date-time",
+      description:
+        "Start of date range filter (ISO 8601). Returns events with next_start_at >= from",
+    },
+    to: {
+      type: "string",
+      format: "date-time",
+      description:
+        "End of date range filter (ISO 8601). Returns events with next_start_at < to",
+    },
   },
 }
 
