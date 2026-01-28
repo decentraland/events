@@ -17,6 +17,10 @@ import fileUpload, { UploadedFile } from "express-fileupload"
 import {
   POSTER_FILE_SIZE,
   POSTER_FILE_TYPES,
+  POSTER_VERTICAL_FILE_SIZE,
+  POSTER_VERTICAL_FILE_TYPES,
+  POSTER_VERTICAL_RECOMMENDED_HEIGHT,
+  POSTER_VERTICAL_RECOMMENDED_WIDTH,
   PosterAttributes,
   extension,
 } from "./types"
@@ -46,12 +50,31 @@ export default routes((router) => {
       )
     }),
   })
+  const withVerticalFile = fileUpload({
+    limits: { fileSize: POSTER_VERTICAL_FILE_SIZE },
+    abortOnLimit: true,
+    limitHandler: handle(async () => {
+      throw new RequestError(
+        `File size limit has been reached (max ${
+          POSTER_VERTICAL_FILE_SIZE / 1024
+        } KB)`,
+        RequestError.PayloadTooLarge
+      )
+    }),
+  })
   router.post(
     "/poster",
     withAuth,
     withAuthProfile(),
     withFile,
     handle(uploadPoster)
+  )
+  router.post(
+    "/poster-vertical",
+    withAuth,
+    withAuthProfile(),
+    withVerticalFile,
+    handle(uploadPosterVertical)
   )
 })
 
@@ -117,6 +140,93 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
     poster: result,
     time,
   })
+  return result
+}
+
+export async function uploadPosterVertical(
+  req: WithAuth
+): Promise<PosterAttributes> {
+  if (!req.files || !req.files.poster) {
+    throw new RequestError(`Poster param is required`, RequestError.BadRequest)
+  }
+
+  const poster = req.files.poster as UploadedFile
+  if (Array.isArray(poster)) {
+    throw new RequestError(
+      `Multiple files are not allowed`,
+      RequestError.BadRequest
+    )
+  }
+
+  if (poster.size === 0) {
+    throw new RequestError(
+      `Empty files are not allowed`,
+      RequestError.BadRequest
+    )
+  }
+
+  // Validate file size (500 KB max)
+  if (poster.size > POSTER_VERTICAL_FILE_SIZE) {
+    throw new RequestError(
+      `File size exceeds maximum allowed (${
+        POSTER_VERTICAL_FILE_SIZE / 1024
+      } KB)`,
+      RequestError.PayloadTooLarge
+    )
+  }
+
+  const [type] = poster.mimetype.split(";")
+  // Only allow PNG and JPG for vertical posters (no GIF)
+  if (!POSTER_VERTICAL_FILE_TYPES.includes(type)) {
+    throw new RequestError(
+      `Invalid file type ${type}. Only PNG and JPG are allowed for vertical posters`,
+      RequestError.BadRequest
+    )
+  }
+
+  const initial = Date.now()
+  const auth = req.auth as string
+  const size = poster.size
+  const ext = extension(type)
+  const timeHash = Math.floor(initial / 1000)
+    .toString(16)
+    .toLowerCase()
+  const userHash = auth.slice(-8).toLowerCase()
+  // Use a different path for vertical posters
+  const verticalPath = BUCKET_PATH.replace("/poster/", "/poster-vertical/")
+  const filename = resolve(verticalPath, userHash + timeHash + ext).slice(1)
+  await ensure()
+
+  const params: AWS.S3.Types.PutObjectRequest = {
+    Bucket: BUCKET_NAME,
+    Key: filename,
+    Body: poster.data,
+    ACL: "public-read",
+    CacheControl: "public, max-age=31536000, immutable",
+  }
+
+  await new Promise((resolve, reject) =>
+    s3.upload(params, (err: Error | null | undefined, data?: any) =>
+      err ? reject(err) : resolve(data)
+    )
+  )
+
+  const time = ((Date.now() - initial) / 1000).toFixed(3)
+  const result = {
+    filename,
+    url: new URL("/" + filename, BUCKET_URL).toString(),
+    size,
+    type,
+  }
+
+  logger.log(
+    `new vertical poster created: ${JSON.stringify(result)} (time: ${time}s)`,
+    {
+      poster: result,
+      time,
+      recommendedSize: `${POSTER_VERTICAL_RECOMMENDED_WIDTH}x${POSTER_VERTICAL_RECOMMENDED_HEIGHT}`,
+    }
+  )
   return result
 }
 
