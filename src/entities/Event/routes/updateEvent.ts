@@ -145,6 +145,13 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     await validateImageUrl(req.body.image)
   }
 
+  if (
+    req.body.image_vertical &&
+    req.body.image_vertical !== event.image_vertical
+  ) {
+    await validateImageUrl(req.body.image_vertical)
+  }
+
   // make schedules unique
   if (updatedAttributes.schedules) {
     updatedAttributes.schedules = Array.from(

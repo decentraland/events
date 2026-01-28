@@ -153,7 +153,13 @@ export const eventSchema = {
       description: "The event name",
     },
     image: {
-      description: "Url to the event cover",
+      description: "Url to the event cover (horizontal format)",
+      type: "string",
+      format: "uri",
+    },
+    image_vertical: {
+      description:
+        "Url to the event cover in vertical format (portrait orientation)",
       type: "string",
       format: "uri",
     },
@@ -468,6 +474,12 @@ export const newEventSchema = {
     image: {
       type: ["string", "null"],
       format: "uri",
+    },
+    image_vertical: {
+      type: ["string", "null"],
+      format: "uri",
+      description:
+        "Url to the event cover in vertical format (portrait orientation)",
     },
     start_at: {
       type: "string",

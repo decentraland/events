@@ -90,6 +90,7 @@ export type EventAttributes = {
   id: string // primary key
   name: string
   image: string | null
+  image_vertical: string | null
   description: string
   start_at: Date
   finish_at: Date
@@ -218,6 +219,7 @@ export type EventListOptions = {
 
 export const editEventAttributes = [
   "image",
+  "image_vertical",
   "rejected",
   "name",
   "description",
