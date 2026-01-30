@@ -88,6 +88,10 @@ export const getEventListQuery: AjvObjectSchema = {
           enum: ["upcoming"],
           description: "Only future events",
         },
+        {
+          enum: ["highlight"],
+          description: "Only highlighted events",
+        },
       ],
     },
     order: {

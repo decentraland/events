@@ -173,4 +173,60 @@ describe("EventModel.buildEventFilterConditions", () => {
       })
     })
   })
+
+  describe("when list type filters are provided", () => {
+    const HIGHLIGHTED_FILTER_REGEX = /e\.highlighted\s+IS\s+TRUE/i
+    const ACTIVE_FILTER_REGEX = /e\.next_finish_at\s*>\s*now\(\)/i
+    const LIVE_FILTER_REGEX =
+      /e\.next_finish_at\s*>\s*now\(\)\s*AND\s*e\.next_start_at\s*<\s*now\(\)/i
+    const UPCOMING_FILTER_REGEX =
+      /e\.next_finish_at\s*>\s*now\(\)\s*AND\s*e\.next_start_at\s*>\s*now\(\)/i
+
+    function hasHighlightedCondition(conditions: SQLCondition[]): boolean {
+      return conditions.some((condition) =>
+        HIGHLIGHTED_FILTER_REGEX.test(condition.text)
+      )
+    }
+
+    describe("and list is Highlight", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Highlight,
+        }
+      })
+
+      it("generates a highlighted filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasHighlightedCondition(conditions)).toBe(true)
+      })
+
+      it("also filters for active events (next_finish_at > now())", () => {
+        const conditions = buildEventFilterConditions(options)
+        const hasActiveFilter = conditions.some((condition) =>
+          /e\.next_finish_at\s*>\s*now\(\)/.test(condition.text)
+        )
+
+        expect(hasActiveFilter).toBe(true)
+      })
+    })
+
+    describe("and list is Active", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+        }
+      })
+
+      it("does not generate a highlighted filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasHighlightedCondition(conditions)).toBe(false)
+      })
+    })
+  })
 })
