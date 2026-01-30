@@ -172,6 +172,7 @@ export enum EventListType {
   Live = "live",
   Upcoming = "upcoming",
   Relevance = "relevance",
+  Highlight = "highlight",
 }
 
 export type EventListParams = {
