@@ -100,7 +100,10 @@ export async function fetchConnectedUsersForEvents(
  */
 export function addConnectedUsersToEvents<
   T extends EventAttributes | SessionEventAttributes
->(events: T[], connectedUsersMap: ConnectedUsersMap): (T & { connected_addresses: string[] })[] {
+>(
+  events: T[],
+  connectedUsersMap: ConnectedUsersMap
+): (T & { connected_addresses: string[] })[] {
   return events.map((event) => {
     let key: string
     if (event.world && event.server) {

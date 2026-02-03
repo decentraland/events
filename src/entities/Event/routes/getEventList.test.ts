@@ -1,9 +1,9 @@
-import CommsGatekeeper from "../../../api/CommsGatekeeper"
 import {
   ConnectedUsersMap,
   addConnectedUsersToEvents,
   fetchConnectedUsersForEvents,
 } from "./getEventList"
+import CommsGatekeeper from "../../../api/CommsGatekeeper"
 
 // Test type representing simplified event attributes
 type TestEvent = {
@@ -148,7 +148,14 @@ describe("fetchConnectedUsersForEvents", () => {
   describe("when events include both places and worlds", () => {
     it("should fetch participants for both types", async () => {
       const events: TestEvent[] = [
-        { id: "1", name: "Place Event", x: 10, y: 20, world: false, server: null },
+        {
+          id: "1",
+          name: "Place Event",
+          x: 10,
+          y: 20,
+          world: false,
+          server: null,
+        },
         {
           id: "2",
           name: "World Event",
@@ -242,9 +249,7 @@ describe("addConnectedUsersToEvents", () => {
       { id: "1", name: "Event 1", x: 10, y: 20, world: false, server: null },
     ]
 
-    const connectedUsersMap: ConnectedUsersMap = new Map([
-      ["10,20", ["0x123"]],
-    ])
+    const connectedUsersMap: ConnectedUsersMap = new Map([["10,20", ["0x123"]]])
 
     const result = addConnectedUsersToEvents(events as any, connectedUsersMap)
 
