@@ -217,6 +217,16 @@ paths:
             type: string
             format: date-time
             example: "2026-01-31T23:59:59Z"
+        - name: with_connected_users
+          in: query
+          description: |
+            Include the list of connected user wallet addresses for each event location.
+            When enabled, each event in the response will include a `connected_addresses` array
+            containing wallet addresses of users currently at the event's location.
+            Data is cached for 5 minutes.
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           description: List of events
@@ -1407,6 +1417,15 @@ components:
           type: string
           format: date-time
           description: Event last update timestamp
+        connected_addresses:
+          type: array
+          description: |
+            List of wallet addresses currently connected to the event location.
+            Only included when with_connected_users=true. Data is cached for 5 minutes.
+          items:
+            type: string
+            pattern: '^0x[a-fA-F0-9]{40}$'
+          example: ["0x1234567890123456789012345678901234567890"]
       required:
         - id
         - name

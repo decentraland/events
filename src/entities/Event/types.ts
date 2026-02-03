@@ -193,6 +193,7 @@ export type EventListParams = {
   order?: "asc" | "desc"
   from?: string // ISO 8601 date-time string
   to?: string // ISO 8601 date-time string
+  with_connected_users?: boolean
 }
 
 export type EventListOptions = {
