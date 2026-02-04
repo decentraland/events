@@ -139,6 +139,11 @@ export const getEventListQuery: AjvObjectSchema = {
       description:
         "End of date range filter (ISO 8601). Returns events with next_start_at < to",
     },
+    with_connected_users: {
+      enum: ["true", "false", "1", "0"],
+      description:
+        "Include the list of connected user wallet addresses for each event location (connected_addresses property). Data is cached for 5 minutes.",
+    },
   },
 }
 
@@ -395,6 +400,15 @@ export const eventSchema = {
     world: {
       type: "boolean",
       description: "True if the event is in a World",
+    },
+    connected_addresses: {
+      type: "array",
+      description:
+        "List of wallet addresses currently connected to the event location (only included when with_connected_users=true)",
+      items: {
+        type: "string",
+        format: "address",
+      },
     },
   },
 }

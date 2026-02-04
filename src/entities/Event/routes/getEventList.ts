@@ -6,6 +6,7 @@ import { bool } from "decentraland-gatsby/dist/entities/Route/param"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
 
+import CommsGatekeeper from "../../../api/CommsGatekeeper"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import {
   canApproveAnyEvent,
@@ -13,7 +14,107 @@ import {
 } from "../../ProfileSettings/utils"
 import EventModel from "../model"
 import { getEventListQuery } from "../schemas"
-import { EventListOptions, EventListParams, EventListType } from "../types"
+import {
+  EventAttributes,
+  EventListOptions,
+  EventListParams,
+  EventListType,
+  SessionEventAttributes,
+} from "../types"
+
+export type ConnectedUsersMap = Map<string, string[]>
+
+/**
+ * Fetches connected users for a list of events from comms-gatekeeper.
+ * Returns a map where keys are event coordinates "x,y" (for places) or world server name (for worlds),
+ * and values are arrays of wallet addresses.
+ *
+ * @param events - Array of event attributes
+ * @returns Promise resolving to a map of event location identifiers to wallet addresses
+ */
+export async function fetchConnectedUsersForEvents(
+  events: (EventAttributes | SessionEventAttributes)[]
+): Promise<ConnectedUsersMap> {
+  const connectedUsersMap: ConnectedUsersMap = new Map()
+  const commsGatekeeper = CommsGatekeeper.get()
+
+  // Separate worlds and places, using Set to avoid duplicate requests
+  const worldNames = new Set<string>()
+  const placePointers = new Set<string>()
+
+  for (const event of events) {
+    if (event.world && event.server) {
+      worldNames.add(event.server)
+    } else if (!event.world) {
+      const pointer = `${event.x},${event.y}`
+      placePointers.add(pointer)
+    }
+  }
+
+  // Fetch in parallel for better performance
+  const fetchPromises: Promise<void>[] = []
+
+  // Fetch world participants
+  for (const worldName of worldNames) {
+    fetchPromises.push(
+      commsGatekeeper
+        .getWorldParticipants(worldName)
+        .then((addresses) => {
+          connectedUsersMap.set(worldName, addresses)
+        })
+        .catch((error) => {
+          console.error(
+            `Error fetching participants for world ${worldName}:`,
+            error
+          )
+          connectedUsersMap.set(worldName, [])
+        })
+    )
+  }
+
+  // Fetch scene participants
+  for (const pointer of placePointers) {
+    fetchPromises.push(
+      commsGatekeeper
+        .getSceneParticipants(pointer)
+        .then((addresses) => {
+          connectedUsersMap.set(pointer, addresses)
+        })
+        .catch((error) => {
+          console.error(
+            `Error fetching participants for place ${pointer}:`,
+            error
+          )
+          connectedUsersMap.set(pointer, [])
+        })
+    )
+  }
+
+  await Promise.all(fetchPromises)
+
+  return connectedUsersMap
+}
+
+/**
+ * Add connected_addresses to events based on their location
+ */
+export function addConnectedUsersToEvents<
+  T extends EventAttributes | SessionEventAttributes
+>(
+  events: T[],
+  connectedUsersMap: ConnectedUsersMap
+): (T & { connected_addresses: string[] })[] {
+  return events.map((event) => {
+    let key: string
+    if (event.world && event.server) {
+      key = event.server
+    } else {
+      key = `${event.x},${event.y}`
+    }
+    const connected_addresses = connectedUsersMap.get(key) || []
+    return { ...event, connected_addresses }
+  })
+}
 
 const validate = createValidator<EventListParams>(getEventListQuery)
 export async function getEventList(req: WithAuth) {
@@ -167,6 +268,15 @@ export async function getEventList(req: WithAuth) {
     EventModel.toPublic(event, profile)
   )
 
+  // Fetch connected users if requested
+  const withConnectedUsers = bool(query.with_connected_users) ?? false
+  let finalEvents = publicEvents
+
+  if (withConnectedUsers && publicEvents.length > 0) {
+    const connectedUsersMap = await fetchConnectedUsersForEvents(publicEvents)
+    finalEvents = addConnectedUsersToEvents(publicEvents, connectedUsersMap)
+  }
+
   // Return total count when filtering by places_ids or community_id from body
   if (
     (options.places_ids && options.places_ids.length > 0) ||
@@ -175,10 +285,10 @@ export async function getEventList(req: WithAuth) {
     const total = await EventModel.countEventsWithFilter(options)
 
     return {
-      events: publicEvents,
+      events: finalEvents,
       total,
     }
   }
 
-  return publicEvents
+  return finalEvents
 }
