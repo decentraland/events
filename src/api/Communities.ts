@@ -115,10 +115,13 @@ export default class Communities extends API {
       let fetched: number
 
       do {
-        const path = `/v1/communities/${communityId}/members${API.searchParams({
-          limit: Communities.MEMBERS_PAGE_SIZE,
-          offset,
-        }).toString()}`
+        const path = `/v1/communities/${communityId}/members?${API.searchParams(
+          {
+            limit: Communities.MEMBERS_PAGE_SIZE,
+            offset,
+          }
+        ).toString()}`
+        console.log(path)
         const result = await this.fetch<{
           data?: {
             results?: unknown[]
