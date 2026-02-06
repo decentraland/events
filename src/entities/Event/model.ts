@@ -192,6 +192,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         options.list === EventListType.Upcoming,
         SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
       ),
+      conditional(
+        options.list === EventListType.Highlight,
+        SQL`AND e.highlighted IS TRUE AND e.next_finish_at > now()`
+      ),
       conditional(!!options.search, SQL`AND "rank" > 0`),
       conditional(
         !!options.creator,
@@ -245,6 +249,14 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         !options.places_ids && !!options.community_id,
         SQL`AND e.community_id = ${options.community_id}`
       ),
+      // Filter to only show events the user is attending
+      conditional(
+        !!options.only_attendee && !!options.user,
+        SQL`AND a.user IS NOT NULL`
+      ),
+      // Date range filters
+      conditional(!!options.from, SQL`AND e.next_start_at >= ${options.from}`),
+      conditional(!!options.to, SQL`AND e.next_start_at < ${options.to}`),
     ].filter((condition) => !!condition.text)
   }
 

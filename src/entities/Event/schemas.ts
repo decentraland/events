@@ -88,6 +88,10 @@ export const getEventListQuery: AjvObjectSchema = {
           enum: ["upcoming"],
           description: "Only future events",
         },
+        {
+          enum: ["highlight"],
+          description: "Only highlighted events",
+        },
       ],
     },
     order: {
@@ -123,6 +127,23 @@ export const getEventListQuery: AjvObjectSchema = {
       format: "uuid",
       description: "Filter events by community ID",
     },
+    from: {
+      type: "string",
+      format: "date-time",
+      description:
+        "Start of date range filter (ISO 8601). Returns events with next_start_at >= from",
+    },
+    to: {
+      type: "string",
+      format: "date-time",
+      description:
+        "End of date range filter (ISO 8601). Returns events with next_start_at < to",
+    },
+    with_connected_users: {
+      enum: ["true", "false", "1", "0"],
+      description:
+        "Include the list of connected user wallet addresses for each event location (connected_addresses property). Data is cached for 5 minutes.",
+    },
   },
 }
 
@@ -141,7 +162,13 @@ export const eventSchema = {
       description: "The event name",
     },
     image: {
-      description: "Url to the event cover",
+      description: "Url to the event cover (horizontal format)",
+      type: "string",
+      format: "uri",
+    },
+    image_vertical: {
+      description:
+        "Url to the event cover in vertical format (portrait orientation)",
       type: "string",
       format: "uri",
     },
@@ -374,6 +401,15 @@ export const eventSchema = {
       type: "boolean",
       description: "True if the event is in a World",
     },
+    connected_addresses: {
+      type: "array",
+      description:
+        "List of wallet addresses currently connected to the event location (only included when with_connected_users=true)",
+      items: {
+        type: "string",
+        format: "address",
+      },
+    },
   },
 }
 
@@ -456,6 +492,12 @@ export const newEventSchema = {
     image: {
       type: ["string", "null"],
       format: "uri",
+    },
+    image_vertical: {
+      type: ["string", "null"],
+      format: "uri",
+      description:
+        "Url to the event cover in vertical format (portrait orientation)",
     },
     start_at: {
       type: "string",

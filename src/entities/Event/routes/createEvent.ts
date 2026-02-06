@@ -58,6 +58,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     data.image = null
   }
 
+  if (!data.image_vertical) {
+    data.image_vertical = null
+  }
+
   if (!data.server) {
     data.server = null
   }
@@ -70,6 +74,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   if (data.image) {
     await validateImageUrl(data.image)
+  }
+
+  if (data.image_vertical) {
+    await validateImageUrl(data.image_vertical)
   }
 
   const x = data.x

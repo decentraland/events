@@ -72,6 +72,7 @@ export async function sendEventStarted(
   attendees: EventAttendeeAttributes[],
   options: {
     isLinkedToCommunity: boolean
+    communityId?: string
     communityName?: string
     communityThumbnail?: string
   } = {
@@ -96,6 +97,7 @@ export async function sendEventStarted(
       link: link.toString(),
       name: event.name,
       image: event.image || "",
+      communityId: options.communityId || "",
       communityThumbnail: options.communityThumbnail,
       attendee: attendee.user,
     },

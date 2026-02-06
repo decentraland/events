@@ -197,6 +197,36 @@ paths:
             type: string
             enum: [asc, desc]
             default: asc
+        - name: from
+          in: query
+          description: |
+            Start of date range filter (ISO 8601 format).
+            Returns events with next_start_at >= from.
+            Use with 'to' to filter events within a specific date range.
+          schema:
+            type: string
+            format: date-time
+            example: "2026-01-01T00:00:00Z"
+        - name: to
+          in: query
+          description: |
+            End of date range filter (ISO 8601 format).
+            Returns events with next_start_at < to.
+            Use with 'from' to filter events within a specific date range.
+          schema:
+            type: string
+            format: date-time
+            example: "2026-01-31T23:59:59Z"
+        - name: with_connected_users
+          in: query
+          description: |
+            Include the list of connected user wallet addresses for each event location.
+            When enabled, each event in the response will include a `connected_addresses` array
+            containing wallet addresses of users currently at the event's location.
+            Data is cached for 5 minutes.
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           description: List of events
@@ -1057,6 +1087,69 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /poster-vertical:
+    post:
+      tags:
+        - Poster
+      summary: Upload vertical event poster image
+      description: |
+        Uploads a vertical event poster image to AWS S3 and returns the public URL.
+        This endpoint is specifically for portrait-oriented images.
+
+        **Format:** PNG or JPG only (no GIF)
+        **Recommended size:** 716 x 1814 pixels
+        **Max weight:** 500 KB
+      operationId: uploadPosterVertical
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - poster
+              properties:
+                poster:
+                  type: string
+                  format: binary
+                  description: Vertical image file (PNG or JPG only, max 500KB, recommended 716x1814 pixels)
+      responses:
+        '200':
+          description: Vertical image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Poster'
+        '400':
+          description: Bad request (invalid file type - only PNG and JPG allowed)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          description: Payload too large (file size exceeds 500KB)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          description: Service unavailable (AWS S3 issue)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Event:
@@ -1085,8 +1178,14 @@ components:
           type: string
           format: uri
           nullable: true
-          description: URL to event poster image
+          description: URL to event poster image (horizontal format)
           example: "https://events-cdn.decentraland.org/poster/abc123.jpg"
+        image_vertical:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to event poster image in vertical/portrait format
+          example: "https://events-cdn.decentraland.org/poster/abc123-vertical.jpg"
         start_at:
           type: string
           format: date-time
@@ -1318,6 +1417,15 @@ components:
           type: string
           format: date-time
           description: Event last update timestamp
+        connected_addresses:
+          type: array
+          description: |
+            List of wallet addresses currently connected to the event location.
+            Only included when with_connected_users=true. Data is cached for 5 minutes.
+          items:
+            type: string
+            pattern: '^0x[a-fA-F0-9]{40}$'
+          example: ["0x1234567890123456789012345678901234567890"]
       required:
         - id
         - name
@@ -1351,7 +1459,12 @@ components:
           type: string
           format: uri
           nullable: true
-          description: URL to event poster
+          description: URL to event poster (horizontal format)
+        image_vertical:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to event poster image in vertical/portrait format
         start_at:
           type: string
           format: date-time
@@ -1473,6 +1586,12 @@ components:
           type: string
           format: uri
           nullable: true
+          description: URL to event poster (horizontal format)
+        image_vertical:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to event poster image in vertical/portrait format
         start_at:
           type: string
           format: date-time

@@ -57,6 +57,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     contact: defaultEvent.contact || "",
     details: defaultEvent.details || "",
     image: defaultEvent.image || "",
+    image_vertical: defaultEvent.image_vertical || null,
     x: defaultEvent.x || 0,
     y: defaultEvent.x || 0,
     server: defaultEvent.server || null,
@@ -496,6 +497,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
         )
 
       case "image":
+      case "image_vertical":
       case "url":
       case "server":
         return setValue(name, value)
@@ -636,6 +638,10 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
 
     if (event.image && !isURL(event.image)) {
       errors["image"] = "Event image is invalid"
+    }
+
+    if (event.image_vertical && !isURL(event.image_vertical)) {
+      errors["image_vertical"] = "Event vertical image is invalid"
     }
 
     if ((event.x as any) === "") {

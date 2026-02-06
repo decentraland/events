@@ -57,6 +57,8 @@ import {
 import {
   POSTER_FILE_SIZE,
   POSTER_FILE_TYPES,
+  POSTER_VERTICAL_FILE_SIZE,
+  POSTER_VERTICAL_FILE_TYPES,
 } from "../../entities/Poster/types"
 import {
   canApproveAnyEvent,
@@ -85,6 +87,10 @@ type SubmitPageState = {
   errorImageSize?: boolean
   errorImageFormat?: boolean
   errorImageServer?: string | null
+  // Vertical image errors
+  errorVerticalImageSize?: boolean
+  errorVerticalImageFormat?: boolean
+  errorVerticalImageServer?: string | null
   error?: string | null
 }
 
@@ -281,6 +287,7 @@ export default function SubmitPage() {
       editActions.setValues({
         name: original.name,
         image: original.image,
+        image_vertical: original.image_vertical,
         description: original.description,
         x: original.x,
         y: original.y,
@@ -350,6 +357,37 @@ export default function SubmitPage() {
     [state]
   )
 
+  const [uploadingVerticalPoster, uploadVerticalPoster] = useAsyncTask(
+    async (file: File) => {
+      if (!POSTER_VERTICAL_FILE_TYPES.includes(file.type)) {
+        patchState({
+          errorVerticalImageSize: false,
+          errorVerticalImageFormat: true,
+          errorVerticalImageServer: null,
+        })
+      } else if (POSTER_VERTICAL_FILE_SIZE < file.size) {
+        patchState({
+          errorVerticalImageSize: true,
+          errorVerticalImageFormat: false,
+          errorVerticalImageServer: null,
+        })
+      } else {
+        patchState({
+          errorVerticalImageSize: false,
+          errorVerticalImageFormat: false,
+          errorVerticalImageServer: null,
+        })
+        try {
+          const poster = await Events.get().uploadPosterVertical(file)
+          editActions.setValue("image_vertical", poster.url)
+        } catch (err) {
+          patchState({ errorVerticalImageServer: (err as any).message })
+        }
+      }
+    },
+    [state]
+  )
+
   const [submitting, submit] = useAsyncTask(async () => {
     if (!editActions.validate({ new: isNewEvent })) {
       return null
@@ -405,6 +443,10 @@ export default function SubmitPage() {
   const errors = editing.errors
   const coverError =
     state.errorImageSize || state.errorImageFormat || !!state.errorImageServer
+  const verticalCoverError =
+    state.errorVerticalImageSize ||
+    state.errorVerticalImageFormat ||
+    !!state.errorVerticalImageServer
   const now = Date.now()
 
   if (!account || accountState.loading) {
@@ -572,6 +614,66 @@ export default function SubmitPage() {
                         <br />
                         <i style={{ opacity: 0.8 }}>
                           {l("page.submit.image_recommended_size")}
+                        </i>
+                      </Paragraph>
+                    </div>
+                  </ImageInput>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column mobile="16">
+                  <ImageInput
+                    label={
+                      l("page.submit.event_cover_vertical") ||
+                      "Event Cover (Vertical - Optional)"
+                    }
+                    value={editing.image_vertical || ""}
+                    onFileChange={uploadVerticalPoster}
+                    loading={uploadingVerticalPoster}
+                    error={verticalCoverError}
+                    message={
+                      (state.errorVerticalImageSize && (
+                        <>
+                          {l("page.submit.error_image_size") ||
+                            "The image exceeds the maximum allowed size."}{" "}
+                          <a
+                            href="https://imagecompressor.com/"
+                            target="_blank"
+                          >
+                            <strong>{l("page.submit.optimizilla")}</strong>
+                          </a>
+                        </>
+                      )) ||
+                      (state.errorVerticalImageFormat && (
+                        <>
+                          {l("page.submit.error_vertical_image_format") ||
+                            "Invalid image format. Only"}{" "}
+                          <strong>jpg</strong> or <strong>png</strong>
+                        </>
+                      )) ||
+                      state.errorVerticalImageServer || (
+                        <Info
+                          text={
+                            l("page.submit.vertical_image_recommended_label") ||
+                            "Recommended size: 716 x 1814 pixels. Max size: 500 KB. Format: PNG or JPG."
+                          }
+                        />
+                      )
+                    }
+                  >
+                    <div className="image-input__description">
+                      <AddCoverButton />
+                      <Paragraph>
+                        <span className="image-input__description-primary">
+                          {l("page.submit.browse")}
+                        </span>{" "}
+                        {l("page.submit.browse_line1_label")}
+                        <br />
+                        {l("page.submit.browse_line2_label")}
+                        <br />
+                        <i style={{ opacity: 0.8 }}>
+                          {l("page.submit.vertical_image_recommended_size") ||
+                            "Recommended size: 716 x 1814 pixels"}
                         </i>
                       </Paragraph>
                     </div>

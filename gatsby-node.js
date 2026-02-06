@@ -4,6 +4,9 @@
  * See: https://www.gatsbyjs.org/docs/node-apis/
  */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require("path")
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sharp = require("sharp")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const webpack = require("webpack")
@@ -30,6 +33,34 @@ exports.onCreateWebpackConfig = ({ actions, stage }) => {
         url: false,
         path: false,
         diagnostics_channel: false,
+      },
+      alias: {
+        // Fix ua-parser-js@2.x ESM syntax bug - force CJS files
+        // The .mjs files have invalid import syntax: { name: alias } instead of { name as alias }
+        "ua-parser-js/helpers": path.join(
+          __dirname,
+          "node_modules/ua-parser-js/src/helpers/ua-parser-helpers.js"
+        ),
+        "ua-parser-js/device-detection": path.join(
+          __dirname,
+          "node_modules/ua-parser-js/src/device-detection/device-detection.js"
+        ),
+        "ua-parser-js/bot-detection": path.join(
+          __dirname,
+          "node_modules/ua-parser-js/src/bot-detection/bot-detection.js"
+        ),
+        "ua-parser-js/browser-detection": path.join(
+          __dirname,
+          "node_modules/ua-parser-js/src/browser-detection/browser-detection.js"
+        ),
+        "ua-parser-js/extensions": path.join(
+          __dirname,
+          "node_modules/ua-parser-js/src/extensions/ua-parser-extensions.js"
+        ),
+        "ua-parser-js/enums": path.join(
+          __dirname,
+          "node_modules/ua-parser-js/src/enums/ua-parser-enums.js"
+        ),
       },
     },
   }

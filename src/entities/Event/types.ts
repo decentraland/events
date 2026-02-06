@@ -90,6 +90,7 @@ export type EventAttributes = {
   id: string // primary key
   name: string
   image: string | null
+  image_vertical: string | null
   description: string
   start_at: Date
   finish_at: Date
@@ -171,6 +172,7 @@ export enum EventListType {
   Live = "live",
   Upcoming = "upcoming",
   Relevance = "relevance",
+  Highlight = "highlight",
 }
 
 export type EventListParams = {
@@ -189,6 +191,9 @@ export type EventListParams = {
   limit?: number
   offset?: number
   order?: "asc" | "desc"
+  from?: string // ISO 8601 date-time string
+  to?: string // ISO 8601 date-time string
+  with_connected_users?: boolean
 }
 
 export type EventListOptions = {
@@ -210,10 +215,13 @@ export type EventListOptions = {
   limit?: number
   offset?: number
   order?: "asc" | "desc"
+  from?: Date // Start of date range filter
+  to?: Date // End of date range filter
 }
 
 export const editEventAttributes = [
   "image",
+  "image_vertical",
   "rejected",
   "name",
   "description",

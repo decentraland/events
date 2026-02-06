@@ -17,6 +17,7 @@ export type EditEvent = Pick<
   EventAttributes,
   | "name"
   | "image"
+  | "image_vertical"
   | "description"
   | "start_at"
   | "duration"
@@ -312,6 +313,15 @@ export default class Events extends API {
     body.append("poster", file)
     return this.fetch(
       `/poster`,
+      this.options({ method: "POST", body }).authorization({ sign: true })
+    )
+  }
+
+  async uploadPosterVertical(file: File): Promise<PosterAttributes> {
+    const body = new FormData()
+    body.append("poster", file)
+    return this.fetch(
+      `/poster-vertical`,
       this.options({ method: "POST", body }).authorization({ sign: true })
     )
   }
