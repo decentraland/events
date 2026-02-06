@@ -102,18 +102,55 @@ export default class Communities extends API {
       : null
   }
 
+  /** Page size for members API (matches typical API default/max). */
+  private static readonly MEMBERS_PAGE_SIZE = 100
+
   async getCommunityMembers(
     communityId: string
   ): Promise<CommunityMemberAttributes[]> {
     return this.safeApiCall(async () => {
-      const result = await this.fetch<any>(
-        `/v1/communities/${communityId}/members`,
-        this.options().headers({
-          Authorization: `Bearer ${Communities.Token}`,
-        })
-      )
-      const items = result.data?.results || result || []
-      return items.map(Communities.parseCommunityMember)
+      const all: CommunityMemberAttributes[] = []
+      let nextPage = 1
+      let totalPages = 1
+      const opts = Communities.Token
+        ? this.options().headers({
+            Authorization: `Bearer ${Communities.Token}`,
+          })
+        : this.options()
+
+      do {
+        const offset = (nextPage - 1) * Communities.MEMBERS_PAGE_SIZE
+        const path = `/v1/communities/${communityId}/members?${API.searchParams(
+          {
+            limit: Communities.MEMBERS_PAGE_SIZE,
+            offset,
+          }
+        ).toString()}`
+        const result = await this.fetch<{
+          data: {
+            results: unknown[]
+            total: number
+            limit: number
+            page: number
+            pages: number
+          }
+        }>(path, opts)
+
+        const data = result.data
+        const items = data.results
+        totalPages = data.pages
+        const currentPage = data.page
+
+        all.push(
+          ...items.map((item) =>
+            Communities.parseCommunityMember(item as CommunityMemberAttributes)
+          )
+        )
+
+        nextPage = currentPage + 1
+      } while (nextPage <= totalPages)
+
+      return all
     })
   }
 
