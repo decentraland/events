@@ -26,7 +26,7 @@ export type CommunityMemberAttributes = {
 export default class Communities extends API {
   static Url = env(
     "GATSBY_COMMUNITIES_API_URL",
-    `https://social-api.decentraland.zone`
+    `https://social-api.decentraland.org`
   )
 
   static Token = env("COMMUNITIES_API_ADMIN_TOKEN", "")
@@ -102,18 +102,52 @@ export default class Communities extends API {
       : null
   }
 
+  /** Page size for members API (matches typical API default/max). */
+  private static readonly MEMBERS_PAGE_SIZE = 100
+
   async getCommunityMembers(
     communityId: string
   ): Promise<CommunityMemberAttributes[]> {
     return this.safeApiCall(async () => {
-      const result = await this.fetch<any>(
-        `/v1/communities/${communityId}/members`,
-        this.options().headers({
-          Authorization: `Bearer ${Communities.Token}`,
-        })
-      )
-      const items = result.data?.results || result || []
-      return items.map(Communities.parseCommunityMember)
+      const all: CommunityMemberAttributes[] = []
+      let offset = 0
+      let total = 0
+      let fetched: number
+
+      do {
+        const path = `/v1/communities/${communityId}/members${API.searchParams({
+          limit: Communities.MEMBERS_PAGE_SIZE,
+          offset,
+        }).toString()}`
+        const result = await this.fetch<{
+          data?: {
+            results?: unknown[]
+            total?: number
+            limit?: number
+            offset?: number
+          }
+        }>(
+          path,
+          this.options().headers({
+            Authorization: `Bearer ${Communities.Token}`,
+          })
+        )
+
+        const data = result.data
+        const items = data?.results ?? []
+        total = data?.total ?? 0
+
+        for (const raw of items) {
+          all.push(
+            Communities.parseCommunityMember(raw as CommunityMemberAttributes)
+          )
+        }
+
+        fetched = items.length
+        offset += Communities.MEMBERS_PAGE_SIZE
+      } while (fetched > 0 && offset < total)
+
+      return all
     })
   }
 
