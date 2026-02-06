@@ -26,7 +26,7 @@ export type CommunityMemberAttributes = {
 export default class Communities extends API {
   static Url = env(
     "GATSBY_COMMUNITIES_API_URL",
-    `https://social-api.decentraland.org`
+    `https://social-api.decentraland.zone`
   )
 
   static Token = env("COMMUNITIES_API_ADMIN_TOKEN", "")
@@ -110,45 +110,45 @@ export default class Communities extends API {
   ): Promise<CommunityMemberAttributes[]> {
     return this.safeApiCall(async () => {
       const all: CommunityMemberAttributes[] = []
-      let offset = 0
-      let total = 0
-      let fetched: number
+      let nextPage = 1
+      let totalPages = 1
+      const opts = Communities.Token
+        ? this.options().headers({
+            Authorization: `Bearer ${Communities.Token}`,
+          })
+        : this.options()
 
       do {
+        const offset = (nextPage - 1) * Communities.MEMBERS_PAGE_SIZE
         const path = `/v1/communities/${communityId}/members?${API.searchParams(
           {
             limit: Communities.MEMBERS_PAGE_SIZE,
             offset,
           }
         ).toString()}`
-        console.log(path)
         const result = await this.fetch<{
-          data?: {
-            results?: unknown[]
-            total?: number
-            limit?: number
-            offset?: number
+          data: {
+            results: unknown[]
+            total: number
+            limit: number
+            page: number
+            pages: number
           }
-        }>(
-          path,
-          this.options().headers({
-            Authorization: `Bearer ${Communities.Token}`,
-          })
-        )
+        }>(path, opts)
 
         const data = result.data
-        const items = data?.results ?? []
-        total = data?.total ?? 0
+        const items = data.results
+        totalPages = data.pages
+        const currentPage = data.page
 
-        for (const raw of items) {
-          all.push(
-            Communities.parseCommunityMember(raw as CommunityMemberAttributes)
+        all.push(
+          ...items.map((item) =>
+            Communities.parseCommunityMember(item as CommunityMemberAttributes)
           )
-        }
+        )
 
-        fetched = items.length
-        offset += Communities.MEMBERS_PAGE_SIZE
-      } while (fetched > 0 && offset < total)
+        nextPage = currentPage + 1
+      } while (nextPage <= totalPages)
 
       return all
     })
