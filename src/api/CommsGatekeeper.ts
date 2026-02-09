@@ -56,11 +56,11 @@ export default class CommsGatekeeper extends API {
       return cached.addresses
     }
 
-    const { signal, abort } = new AbortController()
-    const fetchOptions = new Options({ signal })
+    const controller = new AbortController()
+    const fetchOptions = new Options({ signal: controller.signal })
 
     const timeoutId = setTimeout(() => {
-      abort()
+      controller.abort()
     }, Time.Second * 10)
 
     try {
@@ -107,11 +107,11 @@ export default class CommsGatekeeper extends API {
       return cached.addresses
     }
 
-    const { signal, abort } = new AbortController()
-    const fetchOptions = new Options({ signal })
+    const controller = new AbortController()
+    const fetchOptions = new Options({ signal: controller.signal })
 
     const timeoutId = setTimeout(() => {
-      abort()
+      controller.abort()
     }, Time.Second * 10)
 
     try {
