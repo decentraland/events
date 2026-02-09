@@ -16,6 +16,7 @@ export type ImageInputProps = Omit<
   message?: React.ReactNode
   error?: boolean
   loading?: boolean
+  dimension?: "square" | "wide" | "vertical" | "circle" | "standard"
 }
 
 export default function ImageInput({
@@ -25,6 +26,7 @@ export default function ImageInput({
   label,
   message,
   className,
+  dimension = "wide",
   ...props
 }: ImageInputProps) {
   const hasDocument = typeof document !== "undefined"
@@ -76,7 +78,7 @@ export default function ImageInput({
     >
       <div className="image-input__label">{label}</div>
       <div className="image-input__value">
-        <ImgFixed dimension="wide" src={value} />
+        <ImgFixed dimension={dimension} src={value} />
         <div className="image-input__background" />
         {loading && <Loader size="medium" active />}
         {!loading && (

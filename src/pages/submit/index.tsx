@@ -631,6 +631,7 @@ export default function SubmitPage() {
                     onFileChange={uploadVerticalPoster}
                     loading={uploadingVerticalPoster}
                     error={verticalCoverError}
+                    dimension="vertical"
                     message={
                       (state.errorVerticalImageSize && (
                         <>
