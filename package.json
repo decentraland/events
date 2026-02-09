@@ -12,7 +12,7 @@
     "@aws-sdk/client-sns": "^3.895.0",
     "@contentful/rich-text-react-renderer": "^16.1.6",
     "@dcl/schemas": "^22.2.0",
-    "@sentry/browser": "^7.66.0",
+    "@sentry/browser": "^9.47.1",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
     "autoprefixer": "^10.4.0",
