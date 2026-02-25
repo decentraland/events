@@ -115,11 +115,12 @@ export const getEventListQuery: AjvObjectSchema = {
     },
     places_ids: {
       type: "array",
-      description: "Filter events by places ids",
+      description:
+        "Filter events by places ids (UUIDs for land places, world names for worlds)",
       maxItems: 100,
       items: {
         type: "string",
-        format: "uuid",
+        minLength: 1,
       },
     },
     community_id: {
@@ -444,10 +445,11 @@ export const getEventListByPlacesBodySchema = {
   properties: {
     placeIds: {
       type: "array",
-      description: "Array of place IDs to filter events by",
+      description:
+        "Array of place IDs to filter events by (UUIDs for land places, world names for worlds)",
       items: {
         type: "string",
-        format: "uuid",
+        minLength: 1,
       },
       maxItems: 100,
     },
