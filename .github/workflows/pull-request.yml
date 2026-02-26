@@ -9,7 +9,6 @@ on:
       - synchronize
 
 jobs:
-
   release:
     runs-on: ubuntu-latest
 
@@ -25,7 +24,7 @@ jobs:
         with:
           node-version: 18.x
           registry-url: https://registry.npmjs.org/
-          cache: 'npm'
+          cache: "npm"
 
       - name: installing
         run: npm install
@@ -41,11 +40,6 @@ jobs:
       - name: testing
         run: npm test -- --coverage
 
-      - name: coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: setup envs
         run: touch .env
 
@@ -57,3 +51,8 @@ jobs:
           tags: ${{ github.sha }}
           dockerfiles: |
             ./Dockerfile
+
+      - name: coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

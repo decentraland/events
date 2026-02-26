@@ -13,14 +13,14 @@ on:
         description: Environment
       tag:
         required: true
-        default: 'latest'
+        default: "latest"
         type: string
-        description: 'Docker tag (quay.io)'
+        description: "Docker tag (quay.io)"
 
 jobs:
   deployment:
     if: ${{ inputs.deployment-environment }}
-    name: 'Deploy to: ${{ inputs.deployment-environment }}'
+    name: "Deploy to: ${{ inputs.deployment-environment }}"
     runs-on: ubuntu-latest
     environment: ${{ inputs.deployment-environment }}
     steps:
@@ -49,7 +49,7 @@ jobs:
         id: deploy
         uses: decentraland/dcl-deploy-action@main
         with:
-          dockerImage: 'quay.io/decentraland/events:${{ inputs.tag }}'
-          serviceName: 'events2'
+          dockerImage: "quay.io/decentraland/events:${{ inputs.tag }}"
+          serviceName: "events2"
           env: ${{ inputs.deployment-environment }}
           token: ${{ secrets.GITHUB_TOKEN }}
