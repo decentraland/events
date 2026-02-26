@@ -13,6 +13,7 @@ export type ImageInputProps = Omit<
   onFileChange?: (file: File) => void
   value?: string
   label?: string
+  hint?: React.ReactNode
   message?: React.ReactNode
   error?: boolean
   loading?: boolean
@@ -24,6 +25,7 @@ export default function ImageInput({
   error,
   loading,
   label,
+  hint,
   message,
   className,
   dimension = "wide",
@@ -70,6 +72,7 @@ export default function ImageInput({
     <div
       className={TokenList.join([
         "image-input",
+        dimension && `image-input--${dimension}`,
         error && "image-input--error",
         loading && "image-input--loading",
         value && "image-input--with-value",
@@ -77,6 +80,7 @@ export default function ImageInput({
       ])}
     >
       <div className="image-input__label">{label}</div>
+      {hint && <div className="image-input__hint">{hint}</div>}
       <div className="image-input__value">
         <ImgFixed dimension={dimension} src={value} />
         <div className="image-input__background" />
