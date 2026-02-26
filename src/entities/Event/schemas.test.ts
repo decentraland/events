@@ -1,18 +1,13 @@
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { createValidator } from "decentraland-gatsby/dist/entities/Route/validate"
 
-import {
-  getEventListByPlacesBodySchema,
-  getEventListQuery,
-} from "./schemas"
+import { getEventListByPlacesBodySchema, getEventListQuery } from "./schemas"
 import { EventListParams } from "./types"
 
 const validateQuery = createValidator<EventListParams>(getEventListQuery)
 
 type PlacesBody = { placeIds?: string[]; communityId?: string }
-const validateBody = createValidator<PlacesBody>(
-  getEventListByPlacesBodySchema
-)
+const validateBody = createValidator<PlacesBody>(getEventListByPlacesBodySchema)
 
 describe("getEventListQuery schema", () => {
   afterEach(() => {
@@ -50,10 +45,7 @@ describe("getEventListQuery schema", () => {
 
     beforeEach(() => {
       query = {
-        places_ids: [
-          "550e8400-e29b-41d4-a716-446655440000",
-          "myworld.dcl.eth",
-        ],
+        places_ids: ["550e8400-e29b-41d4-a716-446655440000", "myworld.dcl.eth"],
       }
     })
 
@@ -79,10 +71,7 @@ describe("getEventListQuery schema", () => {
 
     beforeEach(() => {
       query = {
-        places_ids: Array.from(
-          { length: 101 },
-          (_, i) => `world${i}.dcl.eth`
-        ),
+        places_ids: Array.from({ length: 101 }, (_, i) => `world${i}.dcl.eth`),
       }
     })
 
@@ -128,10 +117,7 @@ describe("getEventListByPlacesBodySchema", () => {
 
     beforeEach(() => {
       body = {
-        placeIds: [
-          "550e8400-e29b-41d4-a716-446655440000",
-          "myworld.dcl.eth",
-        ],
+        placeIds: ["550e8400-e29b-41d4-a716-446655440000", "myworld.dcl.eth"],
       }
     })
 
@@ -157,10 +143,7 @@ describe("getEventListByPlacesBodySchema", () => {
 
     beforeEach(() => {
       body = {
-        placeIds: Array.from(
-          { length: 101 },
-          (_, i) => `world${i}.dcl.eth`
-        ),
+        placeIds: Array.from({ length: 101 }, (_, i) => `world${i}.dcl.eth`),
       }
     })
 
