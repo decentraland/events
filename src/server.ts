@@ -162,6 +162,8 @@ app.use("/events", [
         "https://verify.walletconnect.com",
         "https://js.sentry-cdn.com",
         "https://browser.sentry-cdn.com",
+        "https://t.contentsquare.net",
+        "https://*.contentsquare.net",
         // Used to test the proxied service
         // "http://192.168.1.5:*",
       ].join(" "),
