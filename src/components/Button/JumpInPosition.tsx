@@ -11,6 +11,7 @@ import { eventClientOptions } from "../../entities/Event/utils"
 import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getRealms } from "../../modules/servers"
+import { MobileJumpInWrapper } from "../MobileDownloadModal/MobileDownloadModal"
 
 export type JumpInPositionProps = React.HTMLProps<HTMLAnchorElement> & {
   event?: EventAttributes
@@ -25,7 +26,6 @@ export default function JumpInPosition({
   const track = useTrackContext()
   const l = useFormatMessage()
   const [servers] = useAsyncMemo(getRealms)
-
   const isPosition = !!event
   const position = isPosition ? event && `${event.x},${event.y}` : "HTTP"
   const displayPosition = (event?.world ? event.server : position) || undefined
@@ -42,19 +42,23 @@ export default function JumpInPosition({
   }
 
   return (
-    <JumpIn
-      variant="link"
-      position={displayPosition}
-      compact={compact}
-      desktopAppOptions={event ? eventClientOptions(event, servers) : undefined}
-      downloadUrl={event ? locations.download(event.id) : undefined}
-      onTrack={handleTrack}
-      modalProps={{
-        title: l("components.modal.download.title"),
-        description: l("components.modal.download.description"),
-        buttonLabel: l("components.modal.download.button_label"),
-      }}
-      {...props}
-    />
+    <MobileJumpInWrapper>
+      <JumpIn
+        variant="link"
+        position={displayPosition}
+        compact={compact}
+        desktopAppOptions={
+          event ? eventClientOptions(event, servers) : undefined
+        }
+        downloadUrl={event ? locations.download(event.id) : undefined}
+        onTrack={handleTrack}
+        modalProps={{
+          title: l("components.modal.download.title"),
+          description: l("components.modal.download.description"),
+          buttonLabel: l("components.modal.download.button_label"),
+        }}
+        {...props}
+      />
+    </MobileJumpInWrapper>
   )
 }

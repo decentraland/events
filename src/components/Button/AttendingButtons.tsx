@@ -31,6 +31,10 @@ import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getRealms } from "../../modules/servers"
 import { Star } from "../Icon/Star"
+import {
+  MobileDownloadModal,
+  useIsMobileDevice,
+} from "../MobileDownloadModal/MobileDownloadModal"
 
 import "./AttendingButtons.css"
 
@@ -53,6 +57,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const [, state] = useEventsContext()
   const track = useTrackContext()
   const l = useFormatMessage()
+  const isMobileDevice = useIsMobileDevice()
   const approved = useMemo(() => !event || event.approved, [event])
   const loading = useMemo(
     () => props.loading ?? state.modifying.has(event?.id || ""),
@@ -279,14 +284,21 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           <img src={shareIcon} width="14" height="14" />
         </Button>
       )}
-      <DownloadModal
-        open={showModal}
-        title={l("components.modal.download.title")}
-        description={l("components.modal.download.description")}
-        buttonLabel={l("components.modal.download.button_label")}
-        onClose={() => setShowModal(false)}
-        onDownloadClick={handleModalClick}
-      />
+      {isMobileDevice ? (
+        <MobileDownloadModal
+          open={showModal}
+          onClose={() => setShowModal(false)}
+        />
+      ) : (
+        <DownloadModal
+          open={showModal}
+          title={l("components.modal.download.title")}
+          description={l("components.modal.download.description")}
+          buttonLabel={l("components.modal.download.button_label")}
+          onClose={() => setShowModal(false)}
+          onDownloadClick={handleModalClick}
+        />
+      )}
     </div>
   )
 }

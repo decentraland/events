@@ -340,7 +340,14 @@
         "title": "Download Decentraland to Jump in.",
         "description": "Download the all-new Decentraland and come back to this page to jump straight into this event.",
         "button_label": "Download"
+      },
+      "mobile_download": {
+        "description": "To Jump in, you'll need to download the Decentraland app."
       }
+    },
+    "mobile_store_badges": {
+      "download_ios": "Download on the App Store",
+      "download_android": "GET IT ON Google Play"
     }
   },
   "validation": {
