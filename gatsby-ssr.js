@@ -53,6 +53,12 @@ export function onPreRenderHTML(
     })
 
   const postBodyComponents = [...getPostBodyComponents()]
+  postBodyComponents.push(
+    <script
+      key="contentsquare"
+      src="https://t.contentsquare.net/uxa/c07af53c07b18.js"
+    />
+  )
   postBodyComponents.push(<Segment key="segment" trackPage={false} />)
   postBodyComponents.push(<Intercom key="intercom" />)
   postBodyComponents.push(<Sentry key="sentry" />)
