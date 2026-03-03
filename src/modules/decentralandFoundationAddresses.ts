@@ -1,4 +1,5 @@
 import { fetchFlags } from "@dcl/feature-flags"
+import { EthAddress } from "@dcl/schemas/dist/misc"
 import logger from "decentraland-gatsby/dist/entities/Development/logger"
 
 import { Flags } from "./features"
@@ -19,6 +20,7 @@ function parseAddressesFromVariantPayload(value: string | undefined): string[] {
     return parsed
       .filter((a): a is string => typeof a === "string")
       .map((a) => a.toLowerCase().trim())
+      .filter((a) => EthAddress.validate(a))
   } catch {
     return []
   }
