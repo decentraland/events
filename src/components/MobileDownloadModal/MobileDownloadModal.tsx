@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useState } from "react"
 
+import useAdvancedUserAgentData from "decentraland-gatsby/dist/hooks/useAdvancedUserAgentData"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
   Content,
@@ -9,11 +10,15 @@ import {
 } from "decentraland-ui2/dist/components/Modal/DownloadModal/DownloadModal.styled"
 import { ExplorerJumpIn } from "decentraland-ui2/dist/components/Modal/DownloadModal/ExplorerJumpIn"
 
-import { dclModal } from "decentraland-ui2"
+import { dclModal, launchDesktopApp, styled } from "decentraland-ui2"
 
 import { MobileStoreBadges } from "../MobileStoreBadges/MobileStoreBadges"
 
 const { Modal } = dclModal
+
+const CaptureContainer = styled("div")({
+  display: "contents",
+})
 
 export interface MobileDownloadModalProps {
   open: boolean
@@ -44,46 +49,37 @@ export const MobileDownloadModal: React.FC<MobileDownloadModalProps> = ({
   )
 }
 
-/**
- * Wraps children (e.g., <JumpIn>) and intercepts clicks on mobile
- * to show a custom modal with store badges instead of the built-in DownloadModal.
- */
-export function useIsMobileDevice() {
-  return useMemo(
-    () =>
-      typeof navigator !== "undefined" &&
-      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
-    []
-  )
-}
-
 export function MobileJumpInWrapper({
-  isMobile: isMobileProp,
   children,
+  desktopAppOptions,
 }: {
-  isMobile?: boolean
   children: React.ReactNode
+  desktopAppOptions?: Parameters<typeof launchDesktopApp>[0]
 }) {
-  const isMobileDevice = useIsMobileDevice()
-  const isMobile = isMobileProp ?? isMobileDevice
+  const [, userAgentData] = useAdvancedUserAgentData()
+  const isMobile = userAgentData?.mobile ?? false
   const [showModal, setShowModal] = useState(false)
 
   const handleCapture = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       if (isMobile) {
         e.stopPropagation()
         e.preventDefault()
-        setShowModal(true)
+        // The mobile app also handles decentraland:// deep links
+        const hasLauncher = await launchDesktopApp(desktopAppOptions ?? {})
+        if (!hasLauncher) {
+          setShowModal(true)
+        }
       }
     },
-    [isMobile]
+    [isMobile, desktopAppOptions]
   )
 
   return (
     <>
-      <div onClickCapture={handleCapture} style={{ display: "contents" }}>
+      <CaptureContainer onClickCapture={handleCapture}>
         {children}
-      </div>
+      </CaptureContainer>
       <MobileDownloadModal
         open={showModal}
         onClose={() => setShowModal(false)}

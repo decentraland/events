@@ -5,6 +5,7 @@ import { withPrefix } from "gatsby"
 import { useLocation } from "@gatsbyjs/reach-router"
 import DownloadModal from "decentraland-gatsby/dist/components/Modal/DownloadModal"
 import useTrackContext from "decentraland-gatsby/dist/context/Track/useTrackContext"
+import useAdvancedUserAgentData from "decentraland-gatsby/dist/hooks/useAdvancedUserAgentData"
 import useAsyncMemo from "decentraland-gatsby/dist/hooks/useAsyncMemo"
 import useAsyncTask from "decentraland-gatsby/dist/hooks/useAsyncTask"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
@@ -31,10 +32,7 @@ import locations from "../../modules/locations"
 import { SegmentEvent } from "../../modules/segment"
 import { getRealms } from "../../modules/servers"
 import { Star } from "../Icon/Star"
-import {
-  MobileDownloadModal,
-  useIsMobileDevice,
-} from "../MobileDownloadModal/MobileDownloadModal"
+import { MobileDownloadModal } from "../MobileDownloadModal/MobileDownloadModal"
 
 import "./AttendingButtons.css"
 
@@ -57,7 +55,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const [, state] = useEventsContext()
   const track = useTrackContext()
   const l = useFormatMessage()
-  const isMobileDevice = useIsMobileDevice()
+  const [, userAgentData] = useAdvancedUserAgentData()
+  const isMobileDevice = userAgentData?.mobile ?? false
   const approved = useMemo(() => !event || event.approved, [event])
   const loading = useMemo(
     () => props.loading ?? state.modifying.has(event?.id || ""),

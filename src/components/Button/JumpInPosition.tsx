@@ -42,7 +42,11 @@ export default function JumpInPosition({
   }
 
   return (
-    <MobileJumpInWrapper>
+    <MobileJumpInWrapper
+      desktopAppOptions={
+        event ? eventClientOptions(event, servers) : undefined
+      }
+    >
       <JumpIn
         variant="link"
         position={displayPosition}
