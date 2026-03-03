@@ -36,12 +36,15 @@ import profileSubscription from "./entities/ProfileSubscription/routes"
 import schedules from "./entities/Schedule/routes"
 import sitemap from "./entities/Sitemap/routes"
 import social from "./entities/Social/routes"
+import { refreshFoundationAddresses } from "./modules/decentralandFoundationAddresses"
 
 const jobs = new Manager({ concurrency: 10 })
 jobs.cron("@eachMinute", notifyUpcomingEvents)
 jobs.cron("@eachMinute", notifyStartedEvents)
 jobs.cron("@eachMinute", notifyEndedEvents)
 jobs.cron("@eachMinute", updateNextStartAt)
+jobs.cron("@each5Minute", refreshFoundationAddresses)
+refreshFoundationAddresses()
 
 const app = express()
 app.set("x-powered-by", false)
