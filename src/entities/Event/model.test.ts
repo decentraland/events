@@ -229,4 +229,147 @@ describe("EventModel.buildEventFilterConditions", () => {
       })
     })
   })
+
+  describe("when places_ids option is provided", () => {
+    const PLACE_ID_FILTER_REGEX = /e\.place_id\s*=\s*ANY/i
+    const COMMUNITY_ID_FILTER_REGEX = /e\.community_id\s*=/i
+
+    function hasPlaceIdCondition(conditions: SQLCondition[]): boolean {
+      return conditions.some((condition) =>
+        PLACE_ID_FILTER_REGEX.test(condition.text)
+      )
+    }
+
+    function hasCommunityIdCondition(conditions: SQLCondition[]): boolean {
+      return conditions.some((condition) =>
+        COMMUNITY_ID_FILTER_REGEX.test(condition.text)
+      )
+    }
+
+    function hasOrCondition(conditions: SQLCondition[]): boolean {
+      return conditions.some(
+        (condition) =>
+          PLACE_ID_FILTER_REGEX.test(condition.text) &&
+          /OR/i.test(condition.text) &&
+          COMMUNITY_ID_FILTER_REGEX.test(condition.text)
+      )
+    }
+
+    describe("and place_ids contain UUID-format IDs", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          places_ids: ["550e8400-e29b-41d4-a716-446655440000"],
+        }
+      })
+
+      it("should generate a place_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasPlaceIdCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and place_ids contain world-name-format IDs", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          places_ids: ["myworld.dcl.eth"],
+        }
+      })
+
+      it("should generate a place_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasPlaceIdCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and place_ids contain mixed UUID and world-name IDs", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          places_ids: [
+            "550e8400-e29b-41d4-a716-446655440000",
+            "myworld.dcl.eth",
+          ],
+        }
+      })
+
+      it("should generate a place_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasPlaceIdCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and community_id is also provided", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          places_ids: ["myworld.dcl.eth"],
+          community_id: "550e8400-e29b-41d4-a716-446655440001",
+        }
+      })
+
+      it("should generate an OR condition combining place_id and community_id", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasOrCondition(conditions)).toBe(true)
+      })
+    })
+
+    describe("and only community_id is provided without places_ids", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+          community_id: "550e8400-e29b-41d4-a716-446655440001",
+        }
+      })
+
+      it("should generate only a community_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasCommunityIdCondition(conditions)).toBe(true)
+      })
+
+      it("should not generate a place_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasPlaceIdCondition(conditions)).toBe(false)
+      })
+    })
+
+    describe("and neither places_ids nor community_id are provided", () => {
+      let options: Partial<EventListOptions>
+
+      beforeEach(() => {
+        options = {
+          list: EventListType.Active,
+        }
+      })
+
+      it("should not generate a place_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasPlaceIdCondition(conditions)).toBe(false)
+      })
+
+      it("should not generate a community_id filter condition", () => {
+        const conditions = buildEventFilterConditions(options)
+
+        expect(hasCommunityIdCondition(conditions)).toBe(false)
+      })
+    })
+  })
 })
