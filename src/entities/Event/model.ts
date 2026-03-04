@@ -25,6 +25,7 @@ import {
   SITEMAP_ITEMS_PER_PAGE,
   SessionEventAttributes,
 } from "./types"
+import { getEventCreatorDisplayName } from "../../modules/decentralandFoundationAddresses"
 import EventAttendee from "../EventAttendee/model"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 
@@ -452,6 +453,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
 
     return {
       ...event,
+      user_name: getEventCreatorDisplayName(event.user, event.user_name),
       estate_name: event.estate_name || event.scene_name,
       attending: !!event.attending,
       next_start_at,
