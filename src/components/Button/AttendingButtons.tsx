@@ -56,7 +56,8 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
   const track = useTrackContext()
   const l = useFormatMessage()
   const [, userAgentData] = useAdvancedUserAgentData()
-  const isMobileDevice = userAgentData?.mobile ?? false
+  const isAndroidDevice =
+    (userAgentData?.mobile ?? false) && userAgentData?.os?.name === "Android"
   const approved = useMemo(() => !event || event.approved, [event])
   const loading = useMemo(
     () => props.loading ?? state.modifying.has(event?.id || ""),
@@ -283,7 +284,7 @@ export default function AttendingButtons(props: AttendingButtonsProps) {
           <img src={shareIcon} width="14" height="14" />
         </Button>
       )}
-      {isMobileDevice ? (
+      {isAndroidDevice ? (
         <MobileDownloadModal
           open={showModal}
           onClose={() => setShowModal(false)}

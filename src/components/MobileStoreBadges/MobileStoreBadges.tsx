@@ -1,6 +1,12 @@
 import React from "react"
 
-import { MobileStoreBadges as BaseMobileStoreBadges } from "decentraland-ui2"
+import { GooglePlayBadge } from "decentraland-ui2/dist/components/MobileStoreBadges/GooglePlayBadge"
+import {
+  StoreBadgeIconWrapper,
+  StoreBadgeLink,
+  StoreBadgesContainer,
+} from "decentraland-ui2/dist/components/MobileStoreBadges/MobileStoreBadges.styled"
+import { config } from "decentraland-ui2/dist/config"
 
 export interface MobileStoreBadgesProps {
   size?: "small" | "large"
@@ -8,7 +14,19 @@ export interface MobileStoreBadgesProps {
 
 const MobileStoreBadges = React.memo(
   ({ size = "small" }: MobileStoreBadgesProps) => {
-    return <BaseMobileStoreBadges size={size} />
+    return (
+      <StoreBadgesContainer>
+        <StoreBadgeLink
+          href={config.get("ANDROID_STORE_URL")}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <StoreBadgeIconWrapper badgeSize={size}>
+            <GooglePlayBadge />
+          </StoreBadgeIconWrapper>
+        </StoreBadgeLink>
+      </StoreBadgesContainer>
+    )
   }
 )
 
