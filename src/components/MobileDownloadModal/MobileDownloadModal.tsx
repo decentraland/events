@@ -2,12 +2,12 @@ import React, { useCallback, useState } from "react"
 
 import useAdvancedUserAgentData from "decentraland-gatsby/dist/hooks/useAdvancedUserAgentData"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
+
 import {
   MobileDownloadModal as BaseMobileDownloadModal,
   launchDesktopApp,
+  styled,
 } from "decentraland-ui2"
-
-import { styled } from "decentraland-ui2"
 
 export interface MobileDownloadModalProps {
   open: boolean
