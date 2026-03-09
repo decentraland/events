@@ -3,22 +3,11 @@ import React, { useCallback, useState } from "react"
 import useAdvancedUserAgentData from "decentraland-gatsby/dist/hooks/useAdvancedUserAgentData"
 import useFormatMessage from "decentraland-gatsby/dist/hooks/useFormatMessage"
 import {
-  Content,
-  ImageContainer,
-  StyledDescription,
-  StyledTitle,
-} from "decentraland-ui2/dist/components/Modal/DownloadModal/DownloadModal.styled"
-import { ExplorerJumpIn } from "decentraland-ui2/dist/components/Modal/DownloadModal/ExplorerJumpIn"
+  MobileDownloadModal as BaseMobileDownloadModal,
+  launchDesktopApp,
+} from "decentraland-ui2"
 
-import { dclModal, launchDesktopApp, styled } from "decentraland-ui2"
-
-import { MobileStoreBadges } from "../MobileStoreBadges/MobileStoreBadges"
-
-const { Modal } = dclModal
-
-const CaptureContainer = styled("div")({
-  display: "contents",
-})
+import { styled } from "decentraland-ui2"
 
 export interface MobileDownloadModalProps {
   open: boolean
@@ -32,22 +21,18 @@ export const MobileDownloadModal: React.FC<MobileDownloadModalProps> = ({
   const l = useFormatMessage()
 
   return (
-    <Modal open={open} size="tiny" title=" " onClose={onClose}>
-      <Content>
-        <ImageContainer>
-          <ExplorerJumpIn />
-        </ImageContainer>
-        <StyledTitle variant="h2">
-          {l("components.modal.download.title")}
-        </StyledTitle>
-        <StyledDescription variant="body1">
-          {l("components.modal.mobile_download.description")}
-        </StyledDescription>
-        <MobileStoreBadges size="large" />
-      </Content>
-    </Modal>
+    <BaseMobileDownloadModal
+      open={open}
+      title={l("components.modal.download.title")}
+      description={l("components.modal.mobile_download.description")}
+      onClose={onClose}
+    />
   )
 }
+
+const CaptureContainer = styled("div")({
+  display: "contents",
+})
 
 export function MobileJumpInWrapper({
   children,
