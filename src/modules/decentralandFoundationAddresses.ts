@@ -1,11 +1,13 @@
 import { fetchFlags } from "@dcl/feature-flags"
 import { EthAddress } from "@dcl/schemas/dist/misc"
 import logger from "decentraland-gatsby/dist/entities/Development/logger"
+import env from "decentraland-gatsby/dist/utils/env"
 
 import { Flags } from "./features"
 
 const FOUNDATION_NAME = "Decentraland Foundation"
 
+const FEATURE_FLAGS_USER_ID = env("FEATURE_FLAGS_USER_ID")
 let cachedAddresses: string[] = []
 
 function parseAddressesFromVariantPayload(value: string | undefined): string[] {
@@ -28,7 +30,10 @@ function parseAddressesFromVariantPayload(value: string | undefined): string[] {
 
 export async function refreshFoundationAddresses() {
   try {
-    const result = await fetchFlags({ applicationName: ["events", "dapps"] })
+    const result = await fetchFlags({
+      applicationName: ["events", "dapps"],
+      userId: FEATURE_FLAGS_USER_ID,
+    })
     if (result.error) {
       throw result.error
     }
