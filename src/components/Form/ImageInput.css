@@ -17,10 +17,25 @@
   color: var(--secondary-text);
 }
 
+.image-input .image-input__hint {
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: var(--secondary-text);
+}
+
 .image-input .image-input__message {
   margin-top: 8px;
   font-size: 15px;
   color: var(--secondary-text);
+}
+
+.image-input.image-input--vertical .image-input__value {
+  max-width: 150px;
+}
+
+.image-input .ImgFixed.ImgFixed--vertical img {
+  aspect-ratio: 716 / 1814;
+  height: auto;
 }
 
 .image-input .image-input__value {

@@ -578,6 +578,9 @@ export default function SubmitPage() {
                     onFileChange={uploadPoster}
                     loading={uploadingPoster}
                     error={coverError}
+                    hint={
+                      <Info text={l("page.submit.image_recommended_label")} />
+                    }
                     message={
                       (state.errorImageSize && (
                         <>
@@ -597,9 +600,7 @@ export default function SubmitPage() {
                           <strong>gif</strong>
                         </>
                       )) ||
-                      state.errorImageServer || (
-                        <Info text={l("page.submit.image_recommended_label")} />
-                      )
+                      state.errorImageServer
                     }
                   >
                     <div className="image-input__description">
@@ -625,13 +626,21 @@ export default function SubmitPage() {
                   <ImageInput
                     label={
                       l("page.submit.event_cover_vertical") ||
-                      "Event Cover (Vertical - Optional)"
+                      "Event Banner (Portrait - Optional)"
                     }
                     value={editing.image_vertical || ""}
                     onFileChange={uploadVerticalPoster}
                     loading={uploadingVerticalPoster}
                     error={verticalCoverError}
                     dimension="vertical"
+                    hint={
+                      <Info
+                        text={
+                          l("page.submit.vertical_image_recommended_label") ||
+                          "Upload a PNG or JPG (716 × 1814 px, max 500kb). Make sure key elements (logo, text, main visuals) are positioned in the upper half of the image for better visibility."
+                        }
+                      />
+                    }
                     message={
                       (state.errorVerticalImageSize && (
                         <>
@@ -652,14 +661,7 @@ export default function SubmitPage() {
                           <strong>jpg</strong> or <strong>png</strong>
                         </>
                       )) ||
-                      state.errorVerticalImageServer || (
-                        <Info
-                          text={
-                            l("page.submit.vertical_image_recommended_label") ||
-                            "Recommended size: 716 x 1814 pixels. Max size: 500 KB. Format: PNG or JPG."
-                          }
-                        />
-                      )
+                      state.errorVerticalImageServer
                     }
                   >
                     <div className="image-input__description">
