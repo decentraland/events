@@ -256,7 +256,7 @@ export default function EventDetail({ event, ...props }: EventDetailProps) {
             )}
           </EventSection.Detail>
           <EventSection.Action>
-            <JumpInButton event={event} />
+            <JumpInButton event={event} compact />
           </EventSection.Action>
         </EventSection>
       )}

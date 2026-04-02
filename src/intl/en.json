@@ -278,8 +278,8 @@
       },
       "attending_buttons": {
         "jump_in": "jump in",
-        "going": "interested",
-        "want_to_go": "interested",
+        "going": "remind me",
+        "want_to_go": "remind me",
         "share": "share"
       },
       "edit_buttons": {
