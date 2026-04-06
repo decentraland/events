@@ -86,14 +86,23 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
   const profile = await getAuthProfileSettings(req)
+  const isOwner = event.user.toLowerCase() === user.toLowerCase()
+
+  if (!isOwner && !isAdmin(user) && !canEditAnyEvent(profile)) {
+    throw new RequestError(
+      "You don't have permission to edit this event",
+      RequestError.Forbidden
+    )
+  }
+
   const updatedAttributes = {
     ...pick(event, editEventAttributes),
-    ...pick(req.body, editEventAttributes),
   } as DeprecatedEventAttributes
 
-  if (event.user === user) {
+  if (isOwner) {
     Object.assign(
       updatedAttributes,
+      pick(req.body, editEventAttributes),
       pick(event, editOwnEventAttributes),
       pick(req.body, editOwnEventAttributes)
     )
@@ -110,6 +119,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   if (isAdmin(user) || canEditAnyEvent(profile)) {
     Object.assign(
       updatedAttributes,
+      pick(req.body, editEventAttributes),
       pick(event, editAnyEventAttributes),
       pick(req.body, editAnyEventAttributes)
     )
