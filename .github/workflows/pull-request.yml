@@ -56,3 +56,53 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: events_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/events_test
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Reconfigure git to use HTTP authentication
+        run: >
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+
+      - name: node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          registry-url: https://registry.npmjs.org/
+          cache: "npm"
+
+      - name: installing
+        run: npm install
+
+      - name: Run database migrations
+        run: >
+          ./node_modules/.bin/node-pg-migrate
+          --tsconfig ./tsconfig.json
+          -j ts
+          -m ./src/migrations
+          -d CONNECTION_STRING
+          up
+
+      - name: Run integration tests
+        run: npm run test:integration
