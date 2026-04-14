@@ -1,6 +1,7 @@
 import { resolve } from "path"
 
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
@@ -25,7 +26,7 @@ async function readFile(req: Request) {
   const publicDir = resolve(process.cwd(), "./public")
   const filePath = resolve(publicDir, "." + req.path, "./index.html")
   if (!filePath.startsWith(publicDir + "/")) {
-    throw new Error("Invalid path")
+    throw new RequestError("Invalid path", RequestError.BadRequest)
   }
   return readOnce(filePath)
 }

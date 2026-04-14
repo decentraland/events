@@ -75,24 +75,24 @@ describe("injectEventMetadata", () => {
     })
   })
 
-  describe("when the request path tries to traverse with encoded segments", () => {
+  describe("when the request path resolves to exactly the public directory parent", () => {
     let req: Request
 
     beforeEach(() => {
       req = {
-        path: "/en/..%2F..%2F..%2Fetc/passwd",
+        path: "/..",
         query: {},
-        originalUrl: "/en/..%2F..%2F..%2Fetc/passwd",
+        originalUrl: "/..",
       } as unknown as Request
     })
 
-    it("should read a file that stays within the public directory", async () => {
-      mockReadOnce.mockResolvedValueOnce(Buffer.from("<html></html>"))
-      mockReplaceHelmetMetadata.mockReturnValueOnce("<html></html>")
-      await injectEventMetadata(req)
-      const calledPath = mockReadOnce.mock.calls[0][0] as string
-      const publicDir = resolve(process.cwd(), "./public")
-      expect(calledPath.startsWith(publicDir + "/")).toBe(true)
+    it("should throw an Invalid path error", async () => {
+      await expect(injectEventMetadata(req)).rejects.toThrow("Invalid path")
+    })
+
+    it("should not read any file", async () => {
+      await expect(injectEventMetadata(req)).rejects.toThrow()
+      expect(mockReadOnce).not.toHaveBeenCalled()
     })
   })
 })
