@@ -44,8 +44,8 @@ export async function injectEventMetadata(req: Request) {
     if (event) {
       return replaceHelmetMetadata(page.toString(), {
         ...(copies.social.home as any),
-        title: escape(event.name) + " | Decentraland Events",
-        description: escape((event.description || "").trim()),
+        title: event.name + " | Decentraland Events",
+        description: (event.description || "").trim(),
         image: escape(event.image || ""),
         url: escape(eventUrl(event)),
         "twitter:card": "summary_large_image",
@@ -69,8 +69,8 @@ export async function injectScheduleMetadata(req: Request) {
     if (schedule) {
       return replaceHelmetMetadata(page.toString(), {
         ...(copies.social.home as any),
-        title: escape(schedule.name) + " | Decentraland Events",
-        description: escape((schedule.description || "").trim()),
+        title: schedule.name + " | Decentraland Events",
+        description: (schedule.description || "").trim(),
         image: escape(schedule.image || ""),
         url: escape(scheduleUrl(schedule)),
         "twitter:card": "summary_large_image",

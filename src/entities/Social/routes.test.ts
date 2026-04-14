@@ -114,17 +114,15 @@ describe("injectEventMetadata", () => {
         await injectEventMetadata(req)
       })
 
-      it("should HTML-escape the event name in the title", () => {
+      it("should pass the raw event name to replaceHelmetMetadata", () => {
         const title = mockReplaceHelmetMetadata.mock.calls[0][1].title as string
-        expect(title).not.toContain("<img")
-        expect(title).toContain("&lt;img")
+        expect(title).toContain('<img src=x onerror="alert(1)">')
       })
 
-      it("should HTML-escape the event description", () => {
+      it("should pass the raw event description to replaceHelmetMetadata", () => {
         const description = mockReplaceHelmetMetadata.mock.calls[0][1]
           .description as string
-        expect(description).not.toContain("<script>")
-        expect(description).toContain("&lt;script&gt;")
+        expect(description).toBe('"><script>alert(2)</script>')
       })
 
       it("should HTML-escape the event image", () => {
@@ -246,17 +244,15 @@ describe("injectScheduleMetadata", () => {
         await injectScheduleMetadata(req)
       })
 
-      it("should HTML-escape the schedule name in the title", () => {
+      it("should pass the raw schedule name to replaceHelmetMetadata", () => {
         const title = mockReplaceHelmetMetadata.mock.calls[0][1].title as string
-        expect(title).not.toContain("<img")
-        expect(title).toContain("&lt;img")
+        expect(title).toContain('<img src=x onerror="alert(1)">')
       })
 
-      it("should HTML-escape the schedule description", () => {
+      it("should pass the raw schedule description to replaceHelmetMetadata", () => {
         const description = mockReplaceHelmetMetadata.mock.calls[0][1]
           .description as string
-        expect(description).not.toContain("<script>")
-        expect(description).toContain("&lt;script&gt;")
+        expect(description).toBe('"><script>alert(2)</script>')
       })
 
       it("should HTML-escape the schedule image", () => {
