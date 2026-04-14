@@ -2,14 +2,9 @@ import { resolve } from "path"
 
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
 import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
-import { Request, Response } from "express"
+import { Request } from "express"
 
-import EventModel from "../Event/model"
-import ScheduleModel from "../Schedule/model"
-import {
-  injectEventMetadata,
-  injectScheduleMetadata,
-} from "./routes"
+import { injectEventMetadata, injectScheduleMetadata } from "./routes"
 
 jest.mock("decentraland-gatsby/dist/entities/Gatsby/utils")
 jest.mock("decentraland-gatsby/dist/entities/Route/routes/file")
