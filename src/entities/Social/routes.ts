@@ -22,13 +22,12 @@ export default routes((router) => {
 })
 
 async function readFile(req: Request) {
-  const path = resolve(
-    process.cwd(),
-    "./public",
-    "." + req.path,
-    "./index.html"
-  )
-  return readOnce(path)
+  const publicDir = resolve(process.cwd(), "./public")
+  const filePath = resolve(publicDir, "." + req.path, "./index.html")
+  if (!filePath.startsWith(publicDir + "/")) {
+    throw new Error("Invalid path")
+  }
+  return readOnce(filePath)
 }
 
 export async function injectEventMetadata(req: Request) {
