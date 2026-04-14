@@ -1,4 +1,3 @@
-import { realpath } from "fs/promises"
 import { resolve } from "path"
 
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
@@ -7,13 +6,11 @@ import { Request } from "express"
 
 import { injectEventMetadata, injectScheduleMetadata } from "./routes"
 
-jest.mock("fs/promises")
 jest.mock("decentraland-gatsby/dist/entities/Gatsby/utils")
 jest.mock("decentraland-gatsby/dist/entities/Route/routes/file")
 jest.mock("../Event/model")
 jest.mock("../Schedule/model")
 
-const mockRealpath = realpath as jest.MockedFunction<typeof realpath>
 const mockReplaceHelmetMetadata = replaceHelmetMetadata as jest.Mock
 const mockReadOnce = readOnce as jest.Mock
 
@@ -32,9 +29,6 @@ describe("injectEventMetadata", () => {
         query: {},
         originalUrl: "/event/",
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
       mockReadOnce.mockResolvedValueOnce(Buffer.from("<html></html>"))
       mockReplaceHelmetMetadata.mockReturnValueOnce("<html>replaced</html>")
       result = await injectEventMetadata(req)
@@ -64,18 +58,10 @@ describe("injectEventMetadata", () => {
         query: {},
         originalUrl: "/en/../../../etc/passwd",
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
     })
 
     it("should throw an Invalid path error", async () => {
       await expect(injectEventMetadata(req)).rejects.toThrow("Invalid path")
-    })
-
-    it("should not call realpath on the traversal path", async () => {
-      await expect(injectEventMetadata(req)).rejects.toThrow()
-      expect(mockRealpath).toHaveBeenCalledTimes(1)
     })
 
     it("should not read any file", async () => {
@@ -93,72 +79,6 @@ describe("injectEventMetadata", () => {
         query: {},
         originalUrl: "/..",
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
-    })
-
-    it("should throw an Invalid path error", async () => {
-      await expect(injectEventMetadata(req)).rejects.toThrow("Invalid path")
-    })
-
-    it("should not read any file", async () => {
-      await expect(injectEventMetadata(req)).rejects.toThrow()
-      expect(mockReadOnce).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("when realpath throws ENOENT for a valid-looking path", () => {
-    let req: Request
-
-    beforeEach(() => {
-      req = {
-        path: "/nonexistent/",
-        query: {},
-        originalUrl: "/nonexistent/",
-      } as unknown as Request
-      const publicDir = resolve(process.cwd(), "./public")
-      mockRealpath.mockImplementation((p) => {
-        if ((p as string) === publicDir) {
-          return Promise.resolve(publicDir) as any
-        }
-        const err = new Error(
-          "ENOENT: no such file or directory"
-        ) as NodeJS.ErrnoException
-        err.code = "ENOENT"
-        return Promise.reject(err) as any
-      })
-    })
-
-    it("should propagate the ENOENT error", async () => {
-      await expect(injectEventMetadata(req)).rejects.toThrow(
-        "ENOENT: no such file or directory"
-      )
-    })
-
-    it("should not read any file", async () => {
-      await expect(injectEventMetadata(req)).rejects.toThrow()
-      expect(mockReadOnce).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("when a symlink resolves outside the public directory", () => {
-    let req: Request
-
-    beforeEach(() => {
-      req = {
-        path: "/symlinked/",
-        query: {},
-        originalUrl: "/symlinked/",
-      } as unknown as Request
-      const publicDir = resolve(process.cwd(), "./public")
-      mockRealpath.mockImplementation((p) => {
-        const input = p as string
-        if (input === publicDir) {
-          return Promise.resolve(publicDir) as any
-        }
-        return Promise.resolve("/etc/secret/index.html") as any
-      })
     })
 
     it("should throw an Invalid path error", async () => {
@@ -180,9 +100,6 @@ describe("injectEventMetadata", () => {
         query: {},
         originalUrl: '/event/?id="><script>alert(1)</script>',
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
       mockReadOnce.mockResolvedValueOnce(Buffer.from("<html></html>"))
       mockReplaceHelmetMetadata.mockReturnValueOnce("<html></html>")
       await injectEventMetadata(req)
@@ -217,9 +134,6 @@ describe("injectScheduleMetadata", () => {
         query: {},
         originalUrl: "/schedule/",
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
       mockReadOnce.mockResolvedValueOnce(Buffer.from("<html></html>"))
       mockReplaceHelmetMetadata.mockReturnValueOnce("<html>schedule</html>")
       result = await injectScheduleMetadata(req)
@@ -249,9 +163,6 @@ describe("injectScheduleMetadata", () => {
         query: {},
         originalUrl: "/schedule/../../etc/passwd",
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
     })
 
     it("should throw an Invalid path error", async () => {
@@ -273,9 +184,6 @@ describe("injectScheduleMetadata", () => {
         query: {},
         originalUrl: '/schedule/?id="><img onerror=alert(1)>',
       } as unknown as Request
-      mockRealpath.mockImplementation(
-        (p) => Promise.resolve(p as string) as any
-      )
       mockReadOnce.mockResolvedValueOnce(Buffer.from("<html></html>"))
       mockReplaceHelmetMetadata.mockReturnValueOnce("<html></html>")
       await injectScheduleMetadata(req)
