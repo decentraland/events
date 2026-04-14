@@ -46,8 +46,8 @@ export async function injectEventMetadata(req: Request) {
         ...(copies.social.home as any),
         title: escape(event.name) + " | Decentraland Events",
         description: escape((event.description || "").trim()),
-        image: event.image || "",
-        url: eventUrl(event),
+        image: escape(event.image || ""),
+        url: escape(eventUrl(event)),
         "twitter:card": "summary_large_image",
       })
     }
@@ -71,8 +71,8 @@ export async function injectScheduleMetadata(req: Request) {
         ...(copies.social.home as any),
         title: escape(schedule.name) + " | Decentraland Events",
         description: escape((schedule.description || "").trim()),
-        image: schedule.image || "",
-        url: scheduleUrl(schedule),
+        image: escape(schedule.image || ""),
+        url: escape(scheduleUrl(schedule)),
         "twitter:card": "summary_large_image",
       })
     }
