@@ -73,6 +73,11 @@ describe("injectEventMetadata", () => {
       await expect(injectEventMetadata(req)).rejects.toThrow("Invalid path")
     })
 
+    it("should not call realpath on the traversal path", async () => {
+      await expect(injectEventMetadata(req)).rejects.toThrow()
+      expect(mockRealpath).toHaveBeenCalledTimes(1)
+    })
+
     it("should not read any file", async () => {
       await expect(injectEventMetadata(req)).rejects.toThrow()
       expect(mockReadOnce).not.toHaveBeenCalled()
@@ -95,6 +100,40 @@ describe("injectEventMetadata", () => {
 
     it("should throw an Invalid path error", async () => {
       await expect(injectEventMetadata(req)).rejects.toThrow("Invalid path")
+    })
+
+    it("should not read any file", async () => {
+      await expect(injectEventMetadata(req)).rejects.toThrow()
+      expect(mockReadOnce).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("when realpath throws ENOENT for a valid-looking path", () => {
+    let req: Request
+
+    beforeEach(() => {
+      req = {
+        path: "/nonexistent/",
+        query: {},
+        originalUrl: "/nonexistent/",
+      } as unknown as Request
+      const publicDir = resolve(process.cwd(), "./public")
+      mockRealpath.mockImplementation((p) => {
+        if ((p as string) === publicDir) {
+          return Promise.resolve(publicDir) as any
+        }
+        const err = new Error(
+          "ENOENT: no such file or directory"
+        ) as NodeJS.ErrnoException
+        err.code = "ENOENT"
+        return Promise.reject(err) as any
+      })
+    })
+
+    it("should propagate the ENOENT error", async () => {
+      await expect(injectEventMetadata(req)).rejects.toThrow(
+        "ENOENT: no such file or directory"
+      )
     })
 
     it("should not read any file", async () => {
@@ -149,10 +188,16 @@ describe("injectEventMetadata", () => {
       await injectEventMetadata(req)
     })
 
-    it("should HTML-escape the url passed to replaceHelmetMetadata", () => {
+    it("should HTML-escape angle brackets in the url", () => {
       const urlArg = mockReplaceHelmetMetadata.mock.calls[0][1].url as string
       expect(urlArg).not.toContain("<script>")
       expect(urlArg).toContain("&lt;script&gt;")
+    })
+
+    it("should HTML-escape double quotes in the url", () => {
+      const urlArg = mockReplaceHelmetMetadata.mock.calls[0][1].url as string
+      expect(urlArg).not.toContain('">')
+      expect(urlArg).toContain("&quot;")
     })
   })
 })
@@ -236,7 +281,7 @@ describe("injectScheduleMetadata", () => {
       await injectScheduleMetadata(req)
     })
 
-    it("should HTML-escape the url passed to replaceHelmetMetadata", () => {
+    it("should HTML-escape angle brackets in the url", () => {
       const urlArg = mockReplaceHelmetMetadata.mock.calls[0][1].url as string
       expect(urlArg).not.toContain("<img")
       expect(urlArg).toContain("&lt;img")

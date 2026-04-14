@@ -25,9 +25,11 @@ export default routes((router) => {
 
 async function readFile(req: Request) {
   const publicDir = await realpath(resolve(process.cwd(), "./public"))
-  const filePath = await realpath(
-    resolve(publicDir, "." + req.path, "./index.html")
-  )
+  const resolved = resolve(publicDir, "." + req.path, "./index.html")
+  if (!resolved.startsWith(publicDir + "/")) {
+    throw new RequestError("Invalid path", RequestError.BadRequest)
+  }
+  const filePath = await realpath(resolved)
   if (!filePath.startsWith(publicDir + "/")) {
     throw new RequestError("Invalid path", RequestError.BadRequest)
   }
