@@ -1,3 +1,4 @@
+import { realpath } from "fs/promises"
 import { resolve } from "path"
 
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
@@ -23,8 +24,10 @@ export default routes((router) => {
 })
 
 async function readFile(req: Request) {
-  const publicDir = resolve(process.cwd(), "./public")
-  const filePath = resolve(publicDir, "." + req.path, "./index.html")
+  const publicDir = await realpath(resolve(process.cwd(), "./public"))
+  const filePath = await realpath(
+    resolve(publicDir, "." + req.path, "./index.html")
+  )
   if (!filePath.startsWith(publicDir + "/")) {
     throw new RequestError("Invalid path", RequestError.BadRequest)
   }
@@ -53,7 +56,7 @@ export async function injectEventMetadata(req: Request) {
     }
   }
 
-  const url = siteUrl().toString() + req.originalUrl.slice(1)
+  const url = escape(siteUrl().toString() + req.originalUrl.slice(1))
   return replaceHelmetMetadata(page.toString(), {
     ...(copies.social.home as any),
     url,
@@ -78,7 +81,7 @@ export async function injectScheduleMetadata(req: Request) {
     }
   }
 
-  const url = siteUrl().toString() + req.originalUrl.slice(1)
+  const url = escape(siteUrl().toString() + req.originalUrl.slice(1))
   return replaceHelmetMetadata(page.toString(), {
     ...(copies.social.home as any),
     url,
