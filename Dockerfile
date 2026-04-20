@@ -1,4 +1,4 @@
-FROM node:18.8-alpine as compiler
+FROM node:20.13-alpine as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -49,7 +49,7 @@ RUN npm run build:server
 RUN npm run build:front -- --prefix-paths
 RUN npm prune --production
 
-FROM node:18.8-alpine
+FROM node:20.13-alpine
 WORKDIR /app
 
 RUN rm -rf \
