@@ -545,7 +545,8 @@ describe("updateEvent", () => {
         event = createBaseEvent({
           start_at: tenYearsAgo,
           recurrent: true,
-          recurrent_frequency: "HOURLY" as EventAttributes["recurrent_frequency"],
+          recurrent_frequency:
+            "HOURLY" as EventAttributes["recurrent_frequency"],
           recurrent_interval: 1,
           recurrent_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         })
@@ -579,7 +580,8 @@ describe("updateEvent", () => {
         event = createBaseEvent({
           start_at: tenYearsAgo,
           recurrent: true,
-          recurrent_frequency: "HOURLY" as EventAttributes["recurrent_frequency"],
+          recurrent_frequency:
+            "HOURLY" as EventAttributes["recurrent_frequency"],
           recurrent_interval: 1,
           recurrent_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         })
@@ -609,7 +611,8 @@ describe("updateEvent", () => {
         event = createBaseEvent({
           start_at: tenYearsAgo,
           recurrent: true,
-          recurrent_frequency: "DAILY" as EventAttributes["recurrent_frequency"],
+          recurrent_frequency:
+            "DAILY" as EventAttributes["recurrent_frequency"],
           recurrent_interval: 1,
           recurrent_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         })

@@ -359,11 +359,7 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
     const interval = Math.trunc(Number(value))
     if (value === "") {
       setValue("recurrent_interval", value as any)
-    } else if (
-      Number.isFinite(interval) &&
-      interval >= 1 &&
-      interval <= 1000
-    ) {
+    } else if (Number.isFinite(interval) && interval >= 1 && interval <= 1000) {
       setValue("recurrent_interval", interval)
     }
   }

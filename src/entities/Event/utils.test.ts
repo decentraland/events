@@ -72,9 +72,7 @@ describe("futureRecurrentDates", () => {
         ...baseRecurrence,
         start_at: oneMonthAgo,
         recurrent_frequency: Frequency.MONTHLY,
-        recurrent_until: new Date(
-          Date.now() + 2 * 365 * 24 * 60 * 60 * 1000
-        ),
+        recurrent_until: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000),
       })
       expect(dates.length).toBeGreaterThan(1)
     })
@@ -203,9 +201,7 @@ describe("estimateRecurrentPastIterations", () => {
       // over-estimate to ~53k and trip the cap; the accurate count
       // is ~26k.
       const sixYearsAgo = new Date(Date.now() - 6 * 365 * 24 * 60 * 60 * 1000)
-      const threeYearsAgo = new Date(
-        Date.now() - 3 * 365 * 24 * 60 * 60 * 1000
-      )
+      const threeYearsAgo = new Date(Date.now() - 3 * 365 * 24 * 60 * 60 * 1000)
       const result = estimateRecurrentPastIterations({
         ...baseOptions,
         start_at: sixYearsAgo,
