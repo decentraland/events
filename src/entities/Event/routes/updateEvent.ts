@@ -38,6 +38,8 @@ import {
   DeprecatedEventAttributes,
   EventAttributes,
   MAX_EVENT_DURATION,
+  MAX_RECURRENT_PAST_ITERATIONS,
+  RECURRENCE_REQUEST_FIELDS,
   approveEventAttributes,
   editAnyEventAttributes,
   editEventAttributes,
@@ -45,6 +47,7 @@ import {
 } from "../types"
 import {
   calculateRecurrentProperties,
+  estimateRecurrentPastIterations,
   eventTargetUrl,
   validateImageUrl,
 } from "../utils"
@@ -150,6 +153,29 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
+
+  // Enforce the past-iteration cap only when this request actually
+  // touches a recurrence-related field. A routine edit to name,
+  // description, image, etc. of a grandfathered row whose start_at has
+  // aged past the cap should not start failing as time moves forward.
+  // Placed immediately after validateUpdateEvent so a rejected request
+  // fails fast, before any downstream external API calls (Catalyst,
+  // Land, Places, Communities).
+  const touchesRecurrence = RECURRENCE_REQUEST_FIELDS.some(
+    (field) => req.body[field] !== undefined
+  )
+  if (
+    touchesRecurrence &&
+    updatedAttributes.recurrent &&
+    estimateRecurrentPastIterations(updatedAttributes) >
+      MAX_RECURRENT_PAST_ITERATIONS
+  ) {
+    throw new RequestError(
+      `Recurrence rule expands to too many past occurrences from the start date; choose a later start date or a coarser frequency`,
+      RequestError.BadRequest,
+      { body: updatedAttributes }
+    )
+  }
 
   if (req.body.image && req.body.image !== event.image) {
     await validateImageUrl(req.body.image)

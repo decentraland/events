@@ -350,10 +350,20 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeInterval(value?: string) {
-    const interval = Number(value)
+    // The backend schema requires integer recurrent_interval (fractional
+    // values bypass rrule's count/interval semantics), so coerce here to
+    // match. The HTML <input type="number"> has step="1" as a hint but
+    // users can still paste decimals; Math.trunc makes the UI robust.
+    // Upper bound mirrors newEventSchema (max: 1000) so a pasted value
+    // doesn't get silently rejected by the server on submit.
+    const interval = Math.trunc(Number(value))
     if (value === "") {
       setValue("recurrent_interval", value as any)
-    } else if (interval >= 1) {
+    } else if (
+      Number.isFinite(interval) &&
+      interval >= 1 &&
+      interval <= 1000
+    ) {
       setValue("recurrent_interval", interval)
     }
   }
@@ -437,10 +447,15 @@ export default function useEventEditor(defaultEvent: Partial<EditEvent> = {}) {
   }
 
   function handleChangeRecurrentCount(value?: string) {
-    const recurrent_count = Number(value)
+    // See handleChangeInterval — backend requires integer.
+    const recurrent_count = Math.trunc(Number(value))
     if (value === "") {
       setValue("recurrent_count", value as any)
-    } else if (recurrent_count > 0 && recurrent_count <= MAX_EVENT_RECURRENT) {
+    } else if (
+      Number.isFinite(recurrent_count) &&
+      recurrent_count > 0 &&
+      recurrent_count <= MAX_EVENT_RECURRENT
+    ) {
       setValue("recurrent_count", recurrent_count)
     }
   }

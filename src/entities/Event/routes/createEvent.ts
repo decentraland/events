@@ -23,9 +23,11 @@ import {
   DeprecatedEventAttributes,
   EventAttributes,
   MAX_EVENT_DURATION,
+  MAX_RECURRENT_PAST_ITERATIONS,
 } from "../types"
 import {
   calculateRecurrentProperties,
+  estimateRecurrentPastIterations,
   eventTargetUrl,
   validateImageUrl,
 } from "../utils"
@@ -95,6 +97,20 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   if (recurrent.duration > MAX_EVENT_DURATION) {
     throw new RequestError(
       `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
+      RequestError.BadRequest,
+      { body: data }
+    )
+  }
+
+  // Reject rules whose expansion from `start_at` to `now` would burn
+  // excessive CPU inside rrule. The schema already bounds frequency,
+  // interval, and count; this catches combinations that slip through
+  // (e.g. HOURLY with a very old `start_at`). See MAX_RECURRENT_PAST_ITERATIONS.
+  if (
+    estimateRecurrentPastIterations(recurrent) > MAX_RECURRENT_PAST_ITERATIONS
+  ) {
+    throw new RequestError(
+      `Recurrence rule expands to too many past occurrences from the start date; choose a later start date or a coarser frequency`,
       RequestError.BadRequest,
       { body: data }
     )

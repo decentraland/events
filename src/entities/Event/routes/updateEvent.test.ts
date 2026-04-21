@@ -57,14 +57,18 @@ jest.mock("../schemas", () => ({
     additionalProperties: true,
   },
 }))
-jest.mock("../utils", () => ({
-  calculateRecurrentProperties: () => ({
-    recurrent_dates: [new Date("2030-01-01T00:00:00Z")],
-    finish_at: new Date("2030-01-01T01:00:00Z"),
-  }),
-  eventTargetUrl: () => "https://decentraland.org/jump",
-  validateImageUrl: () => Promise.resolve(undefined),
-}))
+jest.mock("../utils", () => {
+  const actual = jest.requireActual("../utils")
+  return {
+    ...actual,
+    calculateRecurrentProperties: () => ({
+      recurrent_dates: [new Date("2030-01-01T00:00:00Z")],
+      finish_at: new Date("2030-01-01T01:00:00Z"),
+    }),
+    eventTargetUrl: () => "https://decentraland.org/jump",
+    validateImageUrl: () => Promise.resolve(undefined),
+  }
+})
 jest.mock("../../../api/Communities", () => ({
   __esModule: true,
   default: {
@@ -522,6 +526,114 @@ describe("updateEvent", () => {
         )
 
         expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe("when the owner edits a grandfathered recurrent event", () => {
+    // An event that would exceed MAX_RECURRENT_PAST_ITERATIONS if it were
+    // being created today: HOURLY frequency with start_at 10 years ago
+    // (~88k past iterations, over the 50k cap).
+    const tenYearsAgo = new Date(Date.now() - 10 * 365 * 24 * 60 * 60 * 1000)
+
+    describe("and the edit touches only non-recurrence fields", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          start_at: tenYearsAgo,
+          recurrent: true,
+          recurrent_frequency: "HOURLY" as EventAttributes["recurrent_frequency"],
+          recurrent_interval: 1,
+          recurrent_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { name: "Updated name" })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        ;(EventAttendeeModel.findOne as jest.Mock).mockResolvedValueOnce(null)
+        ;(EventModel.selectNextStartAt as jest.Mock).mockReturnValueOnce(
+          new Date("2030-01-01T00:00:00Z")
+        )
+        ;(EventModel.toPublic as jest.Mock).mockReturnValueOnce({
+          ...event,
+          attending: false,
+        })
+      })
+
+      it("should not reject the edit for exceeding the iteration cap", async () => {
+        await expect(updateEvent(req)).resolves.toBeDefined()
+        expect(EventModel.update).toHaveBeenCalled()
+      })
+    })
+
+    describe("and the edit touches start_at", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          start_at: tenYearsAgo,
+          recurrent: true,
+          recurrent_frequency: "HOURLY" as EventAttributes["recurrent_frequency"],
+          recurrent_interval: 1,
+          recurrent_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          start_at: tenYearsAgo.toJSON(),
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+      })
+
+      it("should reject the edit for exceeding the iteration cap", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          /too many past occurrences/
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+
+    describe("and the edit changes the recurrence frequency", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          start_at: tenYearsAgo,
+          recurrent: true,
+          recurrent_frequency: "DAILY" as EventAttributes["recurrent_frequency"],
+          recurrent_interval: 1,
+          recurrent_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { recurrent_frequency: "HOURLY" })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+      })
+
+      it("should reject the edit for exceeding the iteration cap", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          /too many past occurrences/
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+
+      it("should fail fast without calling Catalyst.getProfiles", async () => {
+        mockGetProfiles.mockClear()
+        await expect(updateEvent(req)).rejects.toThrow()
+
+        // The cap check is placed above the external-API block so a
+        // rejected PATCH doesn't cost an upstream profile lookup.
+        expect(mockGetProfiles).not.toHaveBeenCalled()
       })
     })
   })
