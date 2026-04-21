@@ -3,10 +3,11 @@ import { NotificationType } from "@dcl/schemas"
 import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 
 import EventModel from "./model"
-import { EventAttributes } from "./types"
+import { EventAttributes, MAX_RECURRENT_PAST_ITERATIONS } from "./types"
 import {
   calculateNextRecurrentDates,
   calculateRecurrentProperties,
+  estimateRecurrentPastIterations,
 } from "./utils"
 import Communities from "../../api/Communities"
 import EventAttendeeModel from "../EventAttendee/model"
@@ -23,6 +24,20 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
   const events = await EventModel.getRecurrentFinishedEvents()
 
   for (const event of events) {
+    // Route handlers reject rules whose past expansion exceeds the cap
+    // at request time. This guard catches any legacy or hand-inserted
+    // row that would otherwise make the cron burn excessive CPU walking
+    // from dtstart to now. Skip the row without mutating its state so
+    // the event keeps its last-known-good recurrent_dates.
+    if (
+      estimateRecurrentPastIterations(event) > MAX_RECURRENT_PAST_ITERATIONS
+    ) {
+      ctx.log(
+        `skipping updateNextStartAt for event "${event.id}": recurrence rule exceeds the iteration cap`
+      )
+      continue
+    }
+
     const update = {
       ...calculateRecurrentProperties(event),
       ...calculateNextRecurrentDates(event),
