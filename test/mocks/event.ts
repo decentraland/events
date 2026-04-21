@@ -42,7 +42,7 @@ export async function seedEvent(
     recurrent_monthday: null,
     recurrent_weekday_mask: 0,
     recurrent_month_mask: 0,
-    recurrent_interval: 0,
+    recurrent_interval: 1,
     recurrent_count: null,
     recurrent_until: null,
     recurrent_dates: [startAt],
