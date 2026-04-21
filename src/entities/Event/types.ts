@@ -21,6 +21,17 @@ export const Frequencies = [
   Frequency.SECONDLY,
 ]
 
+// Frequencies that an API client is allowed to submit on create/update.
+// Sub-hourly frequencies are rejected because they have no product use
+// case and expand to enormous iteration counts in rrule.
+export const AllowedInputFrequencies = [
+  Frequency.YEARLY,
+  Frequency.MONTHLY,
+  Frequency.WEEKLY,
+  Frequency.DAILY,
+  Frequency.HOURLY,
+]
+
 export enum WeekdayMask {
   NONE = 0,
   SUNDAY = 1 << 0,
@@ -85,6 +96,27 @@ export enum Position {
 }
 
 export const MAX_EVENT_RECURRENT = 10
+
+// Upper bound on how many past occurrences rrule is asked to step through
+// when expanding a recurrence. Past iterations happen inside rrule's inner
+// loop (even with .between) and are bounded by (now - start_at) / period.
+// 50k ≈ ~50 ms of rrule work on commodity CPUs — enough headroom for
+// legitimate DAILY/WEEKLY events going back many years, tight enough to
+// reject pathological HOURLY rules anchored in the distant past.
+export const MAX_RECURRENT_PAST_ITERATIONS = 50_000
+
+// Approximate period, in milliseconds, of one rrule step at each
+// frequency. MONTHLY and YEARLY are nominal (30 / 365 days); the check
+// is a coarse upper bound, not a billing estimate.
+export const FREQUENCY_PERIOD_MS: Record<Frequency, number> = {
+  [Frequency.SECONDLY]: 1_000,
+  [Frequency.MINUTELY]: 60 * 1_000,
+  [Frequency.HOURLY]: 60 * 60 * 1_000,
+  [Frequency.DAILY]: 24 * 60 * 60 * 1_000,
+  [Frequency.WEEKLY]: 7 * 24 * 60 * 60 * 1_000,
+  [Frequency.MONTHLY]: 30 * 24 * 60 * 60 * 1_000,
+  [Frequency.YEARLY]: 365 * 24 * 60 * 60 * 1_000,
+}
 
 export type EventAttributes = {
   id: string // primary key

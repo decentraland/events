@@ -929,6 +929,9 @@ export default function SubmitPage() {
                     <Field
                       label="&nbsp;"
                       type="number"
+                      step={1}
+                      min={1}
+                      max={1000}
                       name="recurrent_interval"
                       error={!!errors["recurrent_interval"]}
                       message={errors["recurrent_interval"]}
@@ -1163,6 +1166,9 @@ export default function SubmitPage() {
                       label="&nbsp;"
                       name="recurrent_count"
                       type="number"
+                      step={1}
+                      min={1}
+                      max={MAX_EVENT_RECURRENT}
                       error={!!errors["recurrent_count"]}
                       message={errors["recurrent_count"]}
                       value={editing.recurrent_count}
