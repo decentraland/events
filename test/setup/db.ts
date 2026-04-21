@@ -65,9 +65,8 @@ export async function initTestDb(): Promise<void> {
 
 export async function cleanTables(): Promise<void> {
   assertTestEnvironment()
-  for (const table of TABLES_TO_CLEAN) {
-    await database.query(`TRUNCATE TABLE ${table} CASCADE`)
-  }
+  const quotedTables = TABLES_TO_CLEAN.map((table) => `"${table}"`).join(", ")
+  await database.query(`TRUNCATE TABLE ${quotedTables} CASCADE`)
 }
 
 export async function closeTestDb(): Promise<void> {

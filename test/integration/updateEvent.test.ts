@@ -237,7 +237,7 @@ describe("PATCH /api/events/:event_id", () => {
         const owner = await createIdentity()
         const editor = await createIdentity()
         editorIdentity = editor.identity
-        event = await seedEvent({ user: owner.address })
+        event = await seedEvent({ user: owner.address, approved: false })
         await seedProfileSettings(editor.address, [
           ProfilePermissions.EditAnyEvent,
         ])
@@ -263,7 +263,7 @@ describe("PATCH /api/events/:event_id", () => {
 
         expect(response.status).toBe(201)
         expect(response.body.data.name).toBe("Still Updated")
-        expect(response.body.data.approved).toBe(true)
+        expect(response.body.data.approved).toBe(false)
       })
     })
 

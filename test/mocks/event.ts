@@ -59,9 +59,9 @@ export async function seedEvent(
     place_id: null,
     community_id: null,
     scene_name: null,
-    coordinates: [0, 0],
+    coordinates: [0, 0] as [number, number],
     ...overrides,
-  } as DeprecatedEventAttributes
+  } satisfies DeprecatedEventAttributes
 
   await EventModel.create(event)
   return event

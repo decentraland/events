@@ -18,7 +18,7 @@ export async function createIdentity(): Promise<{
   const identity = await Authenticator.initializeAuthChain(
     wallet.address,
     ephemeralIdentity,
-    60,
+    3600,
     (message: string) => wallet.signMessage(message)
   )
 
