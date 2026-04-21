@@ -535,7 +535,7 @@ export const newEventSchema = {
     },
     recurrent_interval: {
       type: "integer",
-      minimum: 0,
+      minimum: 1,
       maximum: 1000,
     },
     recurrent_count: {

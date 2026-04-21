@@ -39,7 +39,6 @@ import {
   EventAttributes,
   MAX_EVENT_DURATION,
   MAX_RECURRENT_PAST_ITERATIONS,
-  RECURRENCE_REQUEST_FIELDS,
   approveEventAttributes,
   editAnyEventAttributes,
   editEventAttributes,
@@ -161,9 +160,17 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   // Placed immediately after validateUpdateEvent so a rejected request
   // fails fast, before any downstream external API calls (Catalyst,
   // Land, Places, Communities).
-  const touchesRecurrence = RECURRENCE_REQUEST_FIELDS.some(
-    (field) => req.body[field] !== undefined
-  )
+  // weekday/month masks, monthday, and setpos are filters that don't
+  // change rrule's iteration count — only which dates it emits — so
+  // they're intentionally excluded.
+  const touchesRecurrence = [
+    "start_at",
+    "recurrent",
+    "recurrent_frequency",
+    "recurrent_interval",
+    "recurrent_count",
+    "recurrent_until",
+  ].some((field) => req.body[field] !== undefined)
   if (
     touchesRecurrence &&
     updatedAttributes.recurrent &&

@@ -118,19 +118,6 @@ export const FREQUENCY_PERIOD_MS: Record<Frequency, number> = {
   [Frequency.YEARLY]: 365 * 24 * 60 * 60 * 1_000,
 }
 
-// Request body fields that, if touched by a PATCH, require re-running
-// the past-iteration cap check. weekday/month masks, monthday, and
-// setpos are filters that don't change rrule's iteration count — only
-// which dates it emits — so they're intentionally excluded.
-export const RECURRENCE_REQUEST_FIELDS = [
-  "start_at",
-  "recurrent",
-  "recurrent_frequency",
-  "recurrent_interval",
-  "recurrent_count",
-  "recurrent_until",
-] as const
-
 export type EventAttributes = {
   id: string // primary key
   name: string
