@@ -9,25 +9,21 @@ on:
       - synchronize
 
 jobs:
-  release:
+  lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Reconfigure git to use HTTP authentication
-        run: >
-          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+      - uses: actions/checkout@v4
 
       - name: node.js 18
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
           registry-url: https://registry.npmjs.org/
           cache: "npm"
 
       - name: installing
-        run: npm install
+        run: npm ci
 
       - name: linters
         uses: wearerequired/lint-action@v2
@@ -40,19 +36,75 @@ jobs:
       - name: testing
         run: npm test -- --coverage
 
+      - name: coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
       - name: setup envs
         run: touch .env
 
-      - name: build image
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: events
-          tags: ${{ github.sha }}
-          dockerfiles: |
-            ./Dockerfile
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: coveralls
-        uses: coverallsapp/github-action@master
+      - name: build image
+        uses: docker/build-push-action@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          context: .
+          push: false
+          tags: events:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: events_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/events_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          registry-url: https://registry.npmjs.org/
+          cache: "npm"
+
+      - name: installing
+        run: npm ci
+
+      - name: Run database migrations
+        run: >
+          ./node_modules/.bin/node-pg-migrate
+          --tsconfig ./tsconfig.json
+          -j ts
+          -m ./src/migrations
+          -d CONNECTION_STRING
+          up
+
+      - name: Run integration tests
+        run: npm run test:integration
