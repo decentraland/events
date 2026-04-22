@@ -9,6 +9,7 @@ import {
   EventAttributes,
   EventTimeReference,
   EventType,
+  FREQUENCY_PERIOD_MS,
   MAX_EVENT_RECURRENT,
   MonthMask,
   Months,
@@ -143,57 +144,150 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
     return null
   }
 
+  // Omit byweekday/bymonth entirely when the mask is 0 so rrule's
+  // parseoptions can infer the default from dtstart. Passing [] instead
+  // of undefined makes rrule treat the field as "present but matches
+  // nothing", which for WEEKLY produces an empty expansion.
   return new RRule({
     dtstart: options.start_at,
     freq: RRule[options.recurrent_frequency],
     interval: options.recurrent_interval || 1,
     until: options.recurrent_until,
     count: options.recurrent_count,
-    byweekday: toRRuleWeekdays(options.recurrent_weekday_mask),
-    bymonth: toRRuleMonths(options.recurrent_month_mask),
+    byweekday: options.recurrent_weekday_mask
+      ? toRRuleWeekdays(options.recurrent_weekday_mask)
+      : undefined,
+    bymonth: options.recurrent_month_mask
+      ? toRRuleMonths(options.recurrent_month_mask)
+      : undefined,
     bysetpos: options.recurrent_setpos,
     bymonthday: options.recurrent_monthday,
   })
 }
 
+/**
+ * Expand a recurrence rule into the next `MAX_EVENT_RECURRENT` future
+ * occurrences. Used to materialize the `recurrent_dates` column during
+ * event create / update and during the `updateNextStartAt` cron.
+ *
+ * Returns `[]` when the rule is incomplete (no frequency, no count /
+ * until, etc. — see `toRRule`), or when the rule has already ended
+ * (`recurrent_until` is in the past). In those cases, callers are
+ * expected to fall back to `[start_at]` via
+ * `calculateRecurrentProperties`.
+ *
+ * Past occurrences are iterated internally by rrule but never
+ * allocated, so this function is safe to call on rules whose
+ * `start_at` is years in the past. CPU cost is still
+ * `O((now - start_at) / period)` in that case — route handlers reject
+ * rules above `MAX_RECURRENT_PAST_ITERATIONS` before calling this.
+ *
+ * @param options - Recurrence rule attributes. `start_at` supplies the
+ *   time-of-day for every emitted date.
+ * @returns Up to `MAX_EVENT_RECURRENT` future `Date` objects in
+ *   ascending order, each carrying the time-of-day from `start_at`.
+ */
 export function futureRecurrentDates(
   options: RecurrentEventAttributes
 ): Date[] {
-  const now = Date.now()
-  let recurrentCount = 0
-
-  return toRRuleDates(options, (date) => {
-    if (date.getTime() >= now) {
-      recurrentCount++
-    }
-
-    if (recurrentCount > MAX_EVENT_RECURRENT) {
-      return false
-    }
-
-    return true
-  }).filter(
-    (date) => date.getTime() >= Math.max(now, options.start_at.getTime())
-  )
-}
-
-export function toRRuleDates(
-  options: RecurrentEventAttributes,
-  iterator?: (d: Date, len: number) => boolean
-): Date[] {
   const rrule = toRRule(options)
-
-  if (rrule) {
-    return rrule.all(iterator).map((date) => {
-      date.setUTCHours(options.start_at.getUTCHours())
-      date.setUTCMinutes(options.start_at.getUTCMinutes())
-      date.setUTCSeconds(options.start_at.getUTCSeconds())
-      date.setUTCMilliseconds(options.start_at.getUTCMilliseconds())
-      return date
-    })
+  if (!rrule) {
+    return []
   }
 
-  return []
+  const now = new Date()
+  // rrule.between requires a concrete upper bound. When the rule ends
+  // via `count` instead of `until`, use the library's MAXYEAR (9999) as
+  // a sentinel — rrule will stop on count or on the iterator long
+  // before then.
+  const end = options.recurrent_until ?? new Date(Date.UTC(9999, 11, 31))
+  // The rule has already ended (recurrent_until is in the past). Return
+  // empty and let calculateRecurrentProperties fall back to [start_at].
+  // The updateNextStartAt cron filters these out via `finish_at > now()`
+  // so they do not get regenerated forever.
+  if (end < now) {
+    return []
+  }
+
+  // rrule iterates internally from dtstart forward, but for `between`
+  // it drops past occurrences in accept() before they reach our
+  // iterator — so past dates are never allocated into the result array.
+  // Our iterator only sees future dates and caps them at
+  // MAX_EVENT_RECURRENT via the `len` argument (current result length
+  // before push).
+  const dates = rrule.between(
+    now,
+    end,
+    /* inc */ true,
+    (_date, len) => len < MAX_EVENT_RECURRENT
+  )
+
+  return dates.map((date) => {
+    date.setUTCHours(options.start_at.getUTCHours())
+    date.setUTCMinutes(options.start_at.getUTCMinutes())
+    date.setUTCSeconds(options.start_at.getUTCSeconds())
+    date.setUTCMilliseconds(options.start_at.getUTCMilliseconds())
+    return date
+  })
+}
+
+/**
+ * Upper-bound estimate of how many past occurrences rrule will walk
+ * through when expanding the rule — i.e.
+ * `(min(now, recurrent_until) - start_at) / (interval * frequency)`,
+ * capped by `recurrent_count` when present.
+ *
+ * Used by the route handlers (`createEvent`, `updateEvent`) and the
+ * `updateNextStartAt` cron to reject or skip rules whose expansion
+ * would burn excessive CPU walking from `start_at` to `now` before
+ * producing any future dates. The check is typically compared against
+ * `MAX_RECURRENT_PAST_ITERATIONS`.
+ *
+ * Returns `0` when the rule is non-recurrent, missing a frequency, or
+ * missing a terminator (`count` / `until`) — mirrors `toRRule`'s gate
+ * so a rule that won't actually iterate is never flagged.
+ *
+ * @param options - Recurrence rule attributes. Only the fields listed
+ *   in the `Pick` are read.
+ * @returns An upper bound (may be fractional); `0` if the rule won't
+ *   iterate.
+ */
+export function estimateRecurrentPastIterations(
+  options: Pick<
+    RecurrentEventAttributes,
+    | "recurrent"
+    | "recurrent_frequency"
+    | "recurrent_interval"
+    | "recurrent_count"
+    | "recurrent_until"
+    | "start_at"
+  >
+): number {
+  if (!options.recurrent || !options.recurrent_frequency) {
+    return 0
+  }
+  // Mirror toRRule's gate: without a terminating condition rrule is
+  // never built and the rule silently becomes non-recurrent, so there
+  // are no iterations to worry about.
+  if (!options.recurrent_count && !options.recurrent_until) {
+    return 0
+  }
+  const period =
+    FREQUENCY_PERIOD_MS[options.recurrent_frequency] *
+    (options.recurrent_interval || 1)
+  // rrule iterates from dtstart until it reaches the first of:
+  // recurrent_until, recurrent_count, or our iterator callback. Bound
+  // the time span by min(now, recurrent_until) so a rule whose until
+  // is already in the past isn't over-estimated as if it ran up to
+  // today.
+  const now = Date.now()
+  const timeBound = options.recurrent_until
+    ? Math.min(now, options.recurrent_until.getTime())
+    : now
+  const span = Math.max(0, timeBound - options.start_at.getTime())
+  const byTime = span / period
+  const byCount = options.recurrent_count ?? Number.POSITIVE_INFINITY
+  return Math.min(byTime, byCount)
 }
 
 export function toRRuleMonths(mask: number) {

@@ -38,6 +38,7 @@ import {
   DeprecatedEventAttributes,
   EventAttributes,
   MAX_EVENT_DURATION,
+  MAX_RECURRENT_PAST_ITERATIONS,
   approveEventAttributes,
   editAnyEventAttributes,
   editEventAttributes,
@@ -45,6 +46,7 @@ import {
 } from "../types"
 import {
   calculateRecurrentProperties,
+  estimateRecurrentPastIterations,
   eventTargetUrl,
   validateImageUrl,
 } from "../utils"
@@ -86,14 +88,23 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   const user = req.auth!
   const event = await getEvent(req)
   const profile = await getAuthProfileSettings(req)
+  const isOwner = event.user.toLowerCase() === user.toLowerCase()
+
+  if (!isOwner && !isAdmin(user) && !canEditAnyEvent(profile)) {
+    throw new RequestError(
+      "You don't have permission to edit this event",
+      RequestError.Forbidden
+    )
+  }
+
   const updatedAttributes = {
     ...pick(event, editEventAttributes),
-    ...pick(req.body, editEventAttributes),
   } as DeprecatedEventAttributes
 
-  if (event.user === user) {
+  if (isOwner) {
     Object.assign(
       updatedAttributes,
+      pick(req.body, editEventAttributes),
       pick(event, editOwnEventAttributes),
       pick(req.body, editOwnEventAttributes)
     )
@@ -110,6 +121,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   if (isAdmin(user) || canEditAnyEvent(profile)) {
     Object.assign(
       updatedAttributes,
+      pick(req.body, editEventAttributes),
       pick(event, editAnyEventAttributes),
       pick(req.body, editAnyEventAttributes)
     )
@@ -140,6 +152,37 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
+
+  // Enforce the past-iteration cap only when this request actually
+  // touches a recurrence-related field. A routine edit to name,
+  // description, image, etc. of a grandfathered row whose start_at has
+  // aged past the cap should not start failing as time moves forward.
+  // Placed immediately after validateUpdateEvent so a rejected request
+  // fails fast, before any downstream external API calls (Catalyst,
+  // Land, Places, Communities).
+  // weekday/month masks, monthday, and setpos are filters that don't
+  // change rrule's iteration count — only which dates it emits — so
+  // they're intentionally excluded.
+  const touchesRecurrence = [
+    "start_at",
+    "recurrent",
+    "recurrent_frequency",
+    "recurrent_interval",
+    "recurrent_count",
+    "recurrent_until",
+  ].some((field) => req.body[field] !== undefined)
+  if (
+    touchesRecurrence &&
+    updatedAttributes.recurrent &&
+    estimateRecurrentPastIterations(updatedAttributes) >
+      MAX_RECURRENT_PAST_ITERATIONS
+  ) {
+    throw new RequestError(
+      `Recurrence rule expands to too many past occurrences from the start date; choose a later start date or a coarser frequency`,
+      RequestError.BadRequest,
+      { body: updatedAttributes }
+    )
+  }
 
   if (req.body.image && req.body.image !== event.image) {
     await validateImageUrl(req.body.image)

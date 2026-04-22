@@ -26,7 +26,7 @@ WORKDIR /app
 COPY ./package-lock.json    /app/package-lock.json
 COPY ./package.json         /app/package.json
 
-RUN npm install
+RUN npm ci
 
 ARG NODE_MAX_OLD_SPACE_SIZE=6144
 ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}

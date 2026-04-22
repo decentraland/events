@@ -6,7 +6,7 @@ import {
   apiResultSchema,
 } from "decentraland-gatsby/dist/entities/Schema/types"
 
-import { Frequencies } from "./types"
+import { AllowedInputFrequencies, Frequencies } from "./types"
 
 export const getEventParamsSchema: AjvObjectSchema = {
   type: "object",
@@ -516,29 +516,32 @@ export const newEventSchema = {
       type: "boolean",
     },
     recurrent_frequency: {
-      enum: [...Frequencies, null],
+      enum: [...AllowedInputFrequencies, null],
     },
     recurrent_setpos: {
-      type: ["number", "null"],
+      type: ["integer", "null"],
       minimum: -1,
     },
     recurrent_monthday: {
-      type: ["number", "null"],
+      type: ["integer", "null"],
     },
     recurrent_weekday_mask: {
-      type: "number",
+      type: "integer",
       minimum: 0,
     },
     recurrent_month_mask: {
-      type: "number",
+      type: "integer",
       minimum: 0,
     },
     recurrent_interval: {
-      type: "number",
-      minimum: 0,
+      type: "integer",
+      minimum: 1,
+      maximum: 1000,
     },
     recurrent_count: {
-      type: ["number", "null"],
+      type: ["integer", "null"],
+      minimum: 0,
+      maximum: 1000,
     },
     recurrent_until: {
       type: ["string", "null"],

@@ -1,6 +1,7 @@
 import { resolve } from "path"
 
 import { replaceHelmetMetadata } from "decentraland-gatsby/dist/entities/Gatsby/utils"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import { handleRaw } from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { readOnce } from "decentraland-gatsby/dist/entities/Route/routes/file"
@@ -22,13 +23,12 @@ export default routes((router) => {
 })
 
 async function readFile(req: Request) {
-  const path = resolve(
-    process.cwd(),
-    "./public",
-    "." + req.path,
-    "./index.html"
-  )
-  return readOnce(path)
+  const publicDir = resolve(process.cwd(), "./public")
+  const filePath = resolve(publicDir, "." + req.path, "./index.html")
+  if (!filePath.startsWith(publicDir + "/")) {
+    throw new RequestError("Invalid path", RequestError.BadRequest)
+  }
+  return readOnce(filePath)
 }
 
 export async function injectEventMetadata(req: Request) {
@@ -44,16 +44,16 @@ export async function injectEventMetadata(req: Request) {
     if (event) {
       return replaceHelmetMetadata(page.toString(), {
         ...(copies.social.home as any),
-        title: escape(event.name) + " | Decentraland Events",
-        description: escape((event.description || "").trim()),
-        image: event.image || "",
-        url: eventUrl(event),
+        title: event.name + " | Decentraland Events",
+        description: (event.description || "").trim(),
+        image: escape(event.image || ""),
+        url: escape(eventUrl(event)),
         "twitter:card": "summary_large_image",
       })
     }
   }
 
-  const url = siteUrl().toString() + req.originalUrl.slice(1)
+  const url = escape(siteUrl().toString() + req.originalUrl.slice(1))
   return replaceHelmetMetadata(page.toString(), {
     ...(copies.social.home as any),
     url,
@@ -69,16 +69,16 @@ export async function injectScheduleMetadata(req: Request) {
     if (schedule) {
       return replaceHelmetMetadata(page.toString(), {
         ...(copies.social.home as any),
-        title: escape(schedule.name) + " | Decentraland Events",
-        description: escape((schedule.description || "").trim()),
-        image: schedule.image || "",
-        url: scheduleUrl(schedule),
+        title: schedule.name + " | Decentraland Events",
+        description: (schedule.description || "").trim(),
+        image: escape(schedule.image || ""),
+        url: escape(scheduleUrl(schedule)),
         "twitter:card": "summary_large_image",
       })
     }
   }
 
-  const url = siteUrl().toString() + req.originalUrl.slice(1)
+  const url = escape(siteUrl().toString() + req.originalUrl.slice(1))
   return replaceHelmetMetadata(page.toString(), {
     ...(copies.social.home as any),
     url,
