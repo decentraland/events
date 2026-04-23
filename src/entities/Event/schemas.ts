@@ -374,11 +374,11 @@ export const eventSchema = {
       },
     },
     approved_by: {
-      descrioption: "The user who approved the event",
+      description: "The user who approved the event",
       type: ["string", "null"],
     },
     rejected_by: {
-      descrioption: "The user who rejected the event",
+      description: "The user who rejected the event",
       type: ["string", "null"],
     },
     attending: {

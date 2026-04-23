@@ -500,6 +500,33 @@ describe("events admin endpoints", () => {
         )
       })
     })
+
+    describe("when the event was previously approved", () => {
+      it("should clear approved_by along with approved", async () => {
+        const event = createBaseEvent({
+          approved: true,
+          approved_by: "0xPreviousApprover",
+        })
+        const request = createAdminRequest({
+          actor: ACTOR,
+          reason: "Suspicious external URL",
+        })
+        ;(EventModel.findOne as jest.Mock).mockResolvedValueOnce(event)
+        ;(EventModel.update as jest.Mock).mockResolvedValueOnce(undefined)
+
+        await rejectEvent(request)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            approved: false,
+            approved_by: null,
+            rejected: true,
+            rejected_by: ACTOR,
+          }),
+          { id: EVENT_ID }
+        )
+      })
+    })
   })
 
   describe("unapproveEvent", () => {
@@ -624,6 +651,80 @@ describe("events admin endpoints", () => {
           }),
           { id: EVENT_ID }
         )
+      })
+    })
+
+    describe("when the body contains only state fields", () => {
+      let event: DeprecatedEventAttributes
+
+      beforeEach(() => {
+        event = createBaseEvent()
+        ;(EventModel.findOne as jest.Mock).mockResolvedValueOnce(event)
+        ;(EventModel.update as jest.Mock).mockResolvedValueOnce(undefined)
+      })
+
+      it("should approve the event when body is { approved: true }", async () => {
+        const request = createAdminRequest({ actor: ACTOR, approved: true })
+
+        await patchEventAdmin(request)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            approved: true,
+            approved_by: ACTOR,
+          }),
+          { id: EVENT_ID }
+        )
+        expect(notifyApprovedEvent).toHaveBeenCalled()
+      })
+
+      it("should reject the event when body is { rejected: true, reason }", async () => {
+        const request = createAdminRequest({
+          actor: ACTOR,
+          rejected: true,
+          reason: "Spam",
+        })
+
+        await patchEventAdmin(request)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            approved: false,
+            approved_by: null,
+            rejected: true,
+            rejected_by: ACTOR,
+            rejection_reason: "Spam",
+          }),
+          { id: EVENT_ID }
+        )
+        expect(notifyRejectedEvent).toHaveBeenCalled()
+      })
+
+      it("should reject the request when approved and rejected are both set", async () => {
+        const request = createAdminRequest({
+          actor: ACTOR,
+          approved: true,
+          rejected: true,
+        })
+
+        await expectRequestError(patchEventAdmin(request), 400)
+      })
+
+      it("should reject the request when approved is not a boolean", async () => {
+        const request = createAdminRequest({ approved: "yes" })
+
+        await expectRequestError(patchEventAdmin(request), 400)
+      })
+    })
+
+    describe("when the body is empty", () => {
+      beforeEach(() => {
+        const event = createBaseEvent()
+        ;(EventModel.findOne as jest.Mock).mockResolvedValueOnce(event)
+      })
+
+      it("should reject the request with a 400", async () => {
+        await expectRequestError(patchEventAdmin(createAdminRequest({})), 400)
       })
     })
   })

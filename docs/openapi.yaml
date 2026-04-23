@@ -85,9 +85,27 @@ paths:
         Retrieves a list of events based on various filters. By default returns active events
         (current and future) sorted by start date ascending. Supports filtering by location,
         creator, categories, schedules, and more.
+
+        When called with the service bearer token (`Authorization: Bearer ...`), the response
+        includes pending and rejected rows and the `approved` / `rejected` query parameters are
+        honored as explicit state filters.
       operationId: getEvents
-      security: []
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
+        - name: approved
+          in: query
+          required: false
+          description: Admin-only. Filter by approval state (only applied with bearer auth).
+          schema:
+            type: boolean
+        - name: rejected
+          in: query
+          required: false
+          description: Admin-only. Filter by rejection state (only applied with bearer auth).
+          schema:
+            type: boolean
         - name: limit
           in: query
           description: Maximum number of events to return
@@ -388,67 +406,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /events/admin:
-    get:
-      tags:
-        - Events
-      summary: List events as an admin service
-      description: Lists events, including pending or rejected rows, using the service bearer token.
-      operationId: events_adminListEvents
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: approved
-          in: query
-          required: false
-          description: Filter by approval state
-          schema:
-            type: boolean
-        - name: rejected
-          in: query
-          required: false
-          description: Filter by rejection state
-          schema:
-            type: boolean
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 500
-            default: 100
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-      responses:
-        '200':
-          description: List of events
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-
   /events/{event_id}:
     get:
       tags:
@@ -457,8 +414,13 @@ paths:
       description: |
         Retrieves detailed information about a specific event.
         If authenticated, includes whether the user is attending.
+
+        When called with the service bearer token (`Authorization: Bearer ...`), pending and
+        rejected events are returned regardless of approval state.
       operationId: getEventById
-      security: []
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
         - name: event_id
           in: path
@@ -484,6 +446,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
 
     patch:
       tags:
@@ -492,8 +456,16 @@ paths:
       description: |
         Updates an existing event. Users can only update their own events unless they
         have special permissions. Some fields require admin permissions.
+
+        When called with the service bearer token (`Authorization: Bearer ...`), permission
+        checks are bypassed and the request body identifies the actor via the `actor` field.
+        The body may alternatively contain only approval/rejection fields
+        (`approved`, `rejected`, `rejection_reason`) to transition the event state without
+        re-validating every editable attribute — see `EventAdminActor` and `EventAdminReject`.
       operationId: updateEvent
-      security: []
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
         - name: event_id
           in: path
@@ -507,7 +479,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventUpdate'
+              oneOf:
+                - $ref: '#/components/schemas/EventUpdate'
+                - $ref: '#/components/schemas/EventAdminUpdate'
+                - $ref: '#/components/schemas/EventAdminActor'
+                - $ref: '#/components/schemas/EventAdminReject'
       responses:
         '200':
           description: Event updated successfully
@@ -527,265 +503,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /events/{event_id}/approved:
-    put:
-      tags:
-        - Events
-      summary: Approve an event as an admin service
-      description: Approves a pending event using the service bearer token.
-      operationId: events_approveEvent
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: event_id
-          in: path
-          required: true
-          description: Event UUID
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EventAdminActor'
-      responses:
-        '200':
-          description: Event approved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-
-    delete:
-      tags:
-        - Events
-      summary: Remove admin approval from an event
-      description: Clears the approved flag without changing rejected state.
-      operationId: events_unapproveEvent
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: event_id
-          in: path
-          required: true
-          description: Event UUID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Event approval removed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-
-  /events/{event_id}/rejected:
-    put:
-      tags:
-        - Events
-      summary: Reject an event as an admin service
-      description: Rejects an event, stores the rejection reason, and clears approval and promotional flags.
-      operationId: events_rejectEvent
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: event_id
-          in: path
-          required: true
-          description: Event UUID
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EventAdminReject'
-      responses:
-        '200':
-          description: Event rejected successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-
-    delete:
-      tags:
-        - Events
-      summary: Remove admin rejection from an event
-      description: Clears the rejected flag and rejection reason.
-      operationId: events_unrejectEvent
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: event_id
-          in: path
-          required: true
-          description: Event UUID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Event rejection removed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-
-  /events/{event_id}/admin:
-    get:
-      tags:
-        - Events
-      summary: Get event as an admin service
-      description: Retrieves an event by ID regardless of approval state using the service bearer token.
-      operationId: events_adminGetEvent
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: event_id
-          in: path
-          required: true
-          description: Event UUID
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Event details
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-
-    patch:
-      tags:
-        - Events
-      summary: Update event fields as an admin service
-      description: Updates event-editable fields using the service bearer token.
-      operationId: events_adminUpdateEvent
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: event_id
-          in: path
-          required: true
-          description: Event UUID
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EventAdminUpdate'
-      responses:
-        '200':
-          description: Event updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -2011,25 +1728,41 @@ components:
     EventAdminActor:
       type: object
       additionalProperties: false
+      description: |
+        Body for admin approval state changes sent to `PATCH /events/{event_id}` with
+        bearer auth. Set `approved: true` to approve, `approved: false` to unapprove.
+        For rejection, use `EventAdminReject`.
       properties:
         actor:
           type: string
           maxLength: 42
           default: jarvis-agent
           description: Service actor recorded in approved_by or rejected_by
+        approved:
+          type: boolean
+          description: Set to true to approve, false to clear approval
 
     EventAdminReject:
       allOf:
         - $ref: '#/components/schemas/EventAdminActor'
         - type: object
+          description: |
+            Body for admin rejection state changes sent to `PATCH /events/{event_id}` with
+            bearer auth. Set `rejected: true` with a `reason` to reject, or `rejected: false`
+            (no reason required) to clear a prior rejection.
           required:
-            - reason
+            - rejected
           properties:
+            rejected:
+              type: boolean
+              description: Set to true to reject, false to clear rejection
             reason:
               type: string
               minLength: 1
               maxLength: 500
-              description: Human-readable reason stored as rejection_reason
+              description: |
+                Human-readable reason stored as rejection_reason. Required when
+                rejected=true.
 
     EventAdminUpdate:
       type: object

@@ -60,6 +60,14 @@ const adminPatchEventAttributes = editEventAttributes.filter(
   (attribute) => attribute !== "rejected"
 )
 
+const STATE_ONLY_FIELDS = new Set([
+  "actor",
+  "approved",
+  "rejected",
+  "reason",
+  "rejection_reason",
+])
+
 type AdminEventRequest = Request<
   { event_id: string },
   unknown,
@@ -213,6 +221,7 @@ function buildRejectionChanges(
 
   return {
     approved: false,
+    approved_by: null,
     rejected: true,
     rejected_by: actor,
     rejection_reason: reason,
@@ -221,9 +230,10 @@ function buildRejectionChanges(
   }
 }
 
-export async function approveEvent(req: AdminEventRequest) {
-  const event = await getAdminEvent(req)
-  const actor = getActor(bodyAsRecord(req))
+async function approveEventByActor(
+  event: DeprecatedEventAttributes,
+  actor: string
+) {
   const changes = buildApprovalChanges(event, actor)
 
   if (!changes) {
@@ -272,9 +282,7 @@ export async function getEventAdminList(req: AdminEventListRequest) {
   return events.map((event) => toResponse(event))
 }
 
-export async function unapproveEvent(req: AdminEventRequest) {
-  const event = await getAdminEvent(req)
-
+async function unapproveEventByActor(event: DeprecatedEventAttributes) {
   if (!event.approved && !event.approved_by) {
     return toResponse(event)
   }
@@ -287,11 +295,11 @@ export async function unapproveEvent(req: AdminEventRequest) {
   return toResponse(updatedEvent)
 }
 
-export async function rejectEvent(req: AdminEventRequest) {
-  const event = await getAdminEvent(req)
-  const body = bodyAsRecord(req)
-  const actor = getActor(body)
-  const reason = getRejectionReason(body)
+async function rejectEventByActor(
+  event: DeprecatedEventAttributes,
+  actor: string,
+  reason: string
+) {
   const changes = buildRejectionChanges(event, actor, reason)
 
   if (!changes) {
@@ -305,9 +313,7 @@ export async function rejectEvent(req: AdminEventRequest) {
   return toResponse(updatedEvent)
 }
 
-export async function unrejectEvent(req: AdminEventRequest) {
-  const event = await getAdminEvent(req)
-
+async function unrejectEventByActor(event: DeprecatedEventAttributes) {
   if (!event.rejected && !event.rejected_by && !event.rejection_reason) {
     return toResponse(event)
   }
@@ -319,6 +325,63 @@ export async function unrejectEvent(req: AdminEventRequest) {
   })
 
   return toResponse(updatedEvent)
+}
+
+function isStateOnlyBody(body: Record<string, unknown>): boolean {
+  const fields = Object.keys(body)
+  if (fields.length === 0) return false
+  return fields.every((field) => STATE_ONLY_FIELDS.has(field))
+}
+
+function getBooleanField(
+  body: Record<string, unknown>,
+  field: string
+): boolean | undefined {
+  if (!(field in body)) return undefined
+  const value = body[field]
+  if (typeof value !== "boolean") {
+    throw new RequestError(
+      `${field} must be a boolean`,
+      RequestError.BadRequest
+    )
+  }
+  return value
+}
+
+async function dispatchStateChange(
+  event: DeprecatedEventAttributes,
+  body: Record<string, unknown>
+) {
+  const approved = getBooleanField(body, "approved")
+  const rejected = getBooleanField(body, "rejected")
+
+  if (approved !== undefined && rejected !== undefined) {
+    throw new RequestError(
+      "approved and rejected cannot be set in the same request",
+      RequestError.BadRequest
+    )
+  }
+
+  const actor = getActor(body)
+
+  if (approved === true) {
+    return approveEventByActor(event, actor)
+  }
+  if (approved === false) {
+    return unapproveEventByActor(event)
+  }
+  if (rejected === true) {
+    const reason = getRejectionReason(body)
+    return rejectEventByActor(event, actor, reason)
+  }
+  if (rejected === false) {
+    return unrejectEventByActor(event)
+  }
+
+  throw new RequestError(
+    "approved or rejected field is required",
+    RequestError.BadRequest
+  )
 }
 
 function validateAdminPatchBody(body: Record<string, unknown>) {
@@ -346,9 +409,38 @@ function validateAdminPatchBody(body: Record<string, unknown>) {
   }
 }
 
+export async function approveEvent(req: AdminEventRequest) {
+  const event = await getAdminEvent(req)
+  const actor = getActor(bodyAsRecord(req))
+  return approveEventByActor(event, actor)
+}
+
+export async function unapproveEvent(req: AdminEventRequest) {
+  const event = await getAdminEvent(req)
+  return unapproveEventByActor(event)
+}
+
+export async function rejectEvent(req: AdminEventRequest) {
+  const event = await getAdminEvent(req)
+  const body = bodyAsRecord(req)
+  const actor = getActor(body)
+  const reason = getRejectionReason(body)
+  return rejectEventByActor(event, actor, reason)
+}
+
+export async function unrejectEvent(req: AdminEventRequest) {
+  const event = await getAdminEvent(req)
+  return unrejectEventByActor(event)
+}
+
 export async function patchEventAdmin(req: AdminEventRequest) {
   const event = await getAdminEvent(req)
   const body = bodyAsRecord(req)
+
+  if (isStateOnlyBody(body)) {
+    return dispatchStateChange(event, body)
+  }
+
   validateAdminPatchBody(body)
 
   const updatedAttributes = {
