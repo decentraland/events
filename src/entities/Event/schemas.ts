@@ -94,6 +94,11 @@ export const getEventListQuery: AjvObjectSchema = {
         },
       ],
     },
+    owner: {
+      enum: TruthyEnum.filter((value) => typeof value === "string"),
+      description:
+        "Return events authored by the authenticated user across all statuses (approved, pending, and rejected). Requires authentication.",
+    },
     order: {
       description: "List order",
       default: "asc",

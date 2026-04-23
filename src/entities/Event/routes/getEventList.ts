@@ -140,6 +140,16 @@ export async function getEventList(
     ...req.query,
     places_ids: placesIds,
   })
+
+  const ownerFilter = bool(query.owner) ?? false
+
+  if (ownerFilter && !req.auth) {
+    throw new RequestError(
+      "owner filter requires authentication",
+      RequestError.Unauthorized
+    )
+  }
+
   const options: EventListOptions = {
     user: profile.user,
     allow_pending: routeOptions.admin
@@ -154,6 +164,7 @@ export async function getEventList(
       : 500,
     list: query.list || EventListType.Active,
     order: query.order,
+    owner: ownerFilter || undefined,
   }
 
   if (routeOptions.admin) {
@@ -223,7 +234,7 @@ export async function getEventList(
     }
   }
 
-  if (query.creator) {
+  if (query.creator && !ownerFilter) {
     if (isEthereumAddress(query.creator)) {
       options.creator = query.creator.toLowerCase()
     } else {
