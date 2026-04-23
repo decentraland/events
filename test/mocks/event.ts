@@ -55,6 +55,7 @@ export async function seedEvent(
     schedules: [],
     approved_by: null,
     rejected_by: null,
+    rejection_reason: null,
     world: false,
     place_id: null,
     community_id: null,

@@ -163,6 +163,7 @@ export type EventAttributes = {
   schedules: string[]
   approved_by: string | null
   rejected_by: string | null
+  rejection_reason: string | null
   world: boolean
   place_id: string | null
   community_id: string | null
@@ -230,6 +231,7 @@ export type EventListParams = {
 
 export type EventListOptions = {
   allow_pending?: boolean
+  include_rejected?: boolean
   list?: EventListType
   user?: string
   creator?: string
@@ -249,6 +251,8 @@ export type EventListOptions = {
   order?: "asc" | "desc"
   from?: Date // Start of date range filter
   to?: Date // End of date range filter
+  approved?: boolean
+  rejected?: boolean
 }
 
 export const editEventAttributes = [

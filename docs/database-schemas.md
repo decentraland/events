@@ -52,6 +52,7 @@ erDiagram
     UUID[] schedules
     TEXT approved_by
     TEXT rejected_by
+    TEXT rejection_reason
     BOOLEAN world
     TEXT place_id
     TEXT community_id
@@ -162,6 +163,7 @@ Stores all event information including one-time and recurrent events with locati
 | `rejected`               | BOOLEAN       | NOT NULL | Rejection status by moderator (default: false)                  |
 | `approved_by`            | TEXT          | NULL     | Moderator wallet address who approved. Stored in lowercase      |
 | `rejected_by`            | TEXT          | NULL     | Moderator wallet address who rejected. Stored in lowercase      |
+| `rejection_reason`       | TEXT          | NULL     | Reason provided by a moderator or service when rejecting        |
 | `highlighted`            | BOOLEAN       | NOT NULL | Featured/highlighted status (default: false)                    |
 | `trending`               | BOOLEAN       | NOT NULL | Trending status calculated algorithmically (default: false)     |
 | `recurrent`              | BOOLEAN       | NOT NULL | Whether event is recurrent (default: false)                     |
@@ -209,7 +211,7 @@ Stores all event information including one-time and recurrent events with locati
 
 ### Business Rules
 
-- **Address normalization**: Wallet addresses in `user`, `approved_by`, and `rejected_by` fields must be stored in lowercase
+- **Address normalization**: Wallet addresses in `user`, `approved_by`, and `rejected_by` fields must be stored in lowercase; service actors may also appear in moderator fields
 - **Attendee limit**: The `latest_attendees` array is capped at a configurable limit for performance
 - **Default coordinates**: Coordinates (0,0) represent Decentraland's Genesis Plaza
 - **Textsearch updates**: The `textsearch` column is automatically updated via trigger when `name` or `description` changes

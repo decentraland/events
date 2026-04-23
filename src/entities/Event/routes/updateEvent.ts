@@ -61,6 +61,37 @@ const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
   "https://events.decentraland.org"
 )
+const MAX_REJECTION_REASON_LENGTH = 500
+
+function normalizeRejectionReason(value: unknown): string | null {
+  if (value === null) {
+    return null
+  }
+
+  if (typeof value !== "string") {
+    throw new RequestError(
+      "rejection_reason must be a string",
+      RequestError.BadRequest
+    )
+  }
+
+  const reason = value.trim()
+  if (!reason) {
+    throw new RequestError(
+      "rejection_reason cannot be empty",
+      RequestError.BadRequest
+    )
+  }
+
+  if (reason.length > MAX_REJECTION_REASON_LENGTH) {
+    throw new RequestError(
+      `rejection_reason must be ${MAX_REJECTION_REASON_LENGTH} characters or less`,
+      RequestError.BadRequest
+    )
+  }
+
+  return reason
+}
 
 async function notifyCommunityMembers(
   event: EventAttributes,
@@ -133,6 +164,12 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
       pick(event, approveEventAttributes),
       pick(req.body, approveEventAttributes)
     )
+
+    if (req.body.rejection_reason !== undefined) {
+      updatedAttributes.rejection_reason = normalizeRejectionReason(
+        req.body.rejection_reason
+      )
+    }
   }
 
   if (

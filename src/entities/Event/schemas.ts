@@ -248,6 +248,11 @@ export const eventSchema = {
       type: "boolean",
       description: "True if the event was rejected by an admin",
     },
+    rejection_reason: {
+      type: ["string", "null"],
+      maxLength: 500,
+      description: "Reason provided by the moderator when rejecting the event",
+    },
     trending: {
       type: "boolean",
       description: "True if the event is tending",
@@ -370,13 +375,11 @@ export const eventSchema = {
     },
     approved_by: {
       descrioption: "The user who approved the event",
-      type: "string",
-      format: "address",
+      type: ["string", "null"],
     },
     rejected_by: {
       descrioption: "The user who rejected the event",
-      type: "string",
-      format: "address",
+      type: ["string", "null"],
     },
     attending: {
       type: "boolean",
@@ -484,6 +487,10 @@ export const newEventSchema = {
     },
     rejected: {
       type: "boolean",
+    },
+    rejection_reason: {
+      type: ["string", "null"],
+      maxLength: 500,
     },
     highlighted: {
       type: "boolean",

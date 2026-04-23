@@ -210,6 +210,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     scene_name: estate_name,
     approved: false,
     rejected: false,
+    rejection_reason: null,
     highlighted: false,
     trending: false,
     total_attendees: 0,

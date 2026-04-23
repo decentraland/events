@@ -160,6 +160,7 @@ function createBaseEvent(
     schedules: [],
     approved_by: null,
     rejected_by: null,
+    rejection_reason: null,
     world: false,
     place_id: null,
     community_id: null,
@@ -372,6 +373,80 @@ describe("updateEvent", () => {
           expect.objectContaining({ name: "Admin Updated Name" }),
           { id: EVENT_ID }
         )
+      })
+    })
+
+    describe("and is an admin rejecting the event with a reason", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          approved: true,
+          highlighted: true,
+          trending: true,
+        })
+        profile = createProfileSettings(OTHER_USER_ADDRESS)
+        req = createRequest(OTHER_USER_ADDRESS, {
+          rejected: true,
+          rejection_reason: "Suspicious external URL",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(true)
+        ;(EventModel.update as jest.Mock).mockResolvedValueOnce(undefined)
+        ;(EventModel.textsearch as jest.Mock).mockReturnValueOnce(null)
+        ;(EventModel.selectNextStartAt as jest.Mock).mockReturnValueOnce(
+          new Date("2030-01-01T00:00:00Z")
+        )
+        ;(EventModel.toPublic as jest.Mock).mockReturnValueOnce({})
+        ;(EventAttendeeModel.findOne as jest.Mock).mockResolvedValueOnce(null)
+        ;(
+          EventCategoryModel.validateCategories as jest.Mock
+        ).mockResolvedValueOnce(true)
+      })
+
+      it("should persist the rejection reason and clear approval state", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            approved: false,
+            rejected: true,
+            rejected_by: OTHER_USER_ADDRESS,
+            rejection_reason: "Suspicious external URL",
+            highlighted: false,
+            trending: false,
+          }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and is an admin rejecting the event with an empty reason", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent()
+        profile = createProfileSettings(OTHER_USER_ADDRESS)
+        req = createRequest(OTHER_USER_ADDRESS, {
+          rejected: true,
+          rejection_reason: "   ",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(true)
+      })
+
+      it("should reject the update without persisting changes", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          "rejection_reason cannot be empty"
+        )
+
+        expect(EventModel.update).not.toHaveBeenCalled()
       })
     })
   })

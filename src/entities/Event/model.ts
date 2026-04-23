@@ -179,7 +179,15 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     return [
-      SQL`e.rejected IS FALSE`,
+      options.rejected === undefined
+        ? options.include_rejected
+          ? SQL`TRUE`
+          : SQL`e.rejected IS FALSE`
+        : SQL`e.rejected IS ${SQL.raw(options.rejected ? "TRUE" : "FALSE")}`,
+      conditional(
+        options.approved !== undefined,
+        SQL`AND e.approved IS ${SQL.raw(options.approved ? "TRUE" : "FALSE")}`
+      ),
       conditional(options.list === EventListType.All, SQL``),
       conditional(
         options.list === EventListType.Active,

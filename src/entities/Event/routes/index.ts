@@ -5,10 +5,20 @@ import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import env from "decentraland-gatsby/dist/utils/env"
 
+import {
+  approveEvent,
+  getEventAdmin,
+  getEventAdminList,
+  patchEventAdmin,
+  rejectEvent,
+  unapproveEvent,
+  unrejectEvent,
+} from "./admin"
 import { createEvent } from "./createEvent"
 import { getAttendingEventList } from "./getAttendingEventList"
 import { getEvent } from "./getEvent"
 import { getEventList } from "./getEventList"
+import { adminBearer } from "./middleware/adminBearer"
 import { updateEvent } from "./updateEvent"
 
 export const JUMP_IN_SITE_URL = env(
@@ -39,11 +49,42 @@ export default routes((router) => {
     withAuth,
     handle(getAttendingEventList)
   )
+  router.get("/events/admin", adminBearer, handle(getEventAdminList as any))
+  router.get(
+    "/events/:event_id/admin",
+    adminBearer,
+    handle(getEventAdmin as any)
+  )
   router.get(
     "/events/:event_id",
     withPublicAccess,
     withOptionalAuth,
     handle(getEvent)
+  )
+  router.put(
+    "/events/:event_id/approved",
+    adminBearer,
+    handle(approveEvent as any)
+  )
+  router.delete(
+    "/events/:event_id/approved",
+    adminBearer,
+    handle(unapproveEvent as any)
+  )
+  router.put(
+    "/events/:event_id/rejected",
+    adminBearer,
+    handle(rejectEvent as any)
+  )
+  router.delete(
+    "/events/:event_id/rejected",
+    adminBearer,
+    handle(unrejectEvent as any)
+  )
+  router.patch(
+    "/events/:event_id/admin",
+    adminBearer,
+    handle(patchEventAdmin as any)
   )
   router.patch("/events/:event_id", withAuth, handle(updateEvent))
 })

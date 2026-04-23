@@ -4,6 +4,7 @@ import { EventListOptions, EventListType } from "./types"
 type SQLCondition = { text: string }
 
 const ATTENDEE_FILTER_REGEX = /a\.user\s+IS\s+NOT\s+NULL/i
+const REJECTED_FILTER_REGEX = /e\.rejected\s+IS\s+(TRUE|FALSE)/i
 
 const buildEventFilterConditions = (
   EventModel as any
@@ -17,9 +18,65 @@ function hasAttendeeFilterCondition(conditions: SQLCondition[]): boolean {
   )
 }
 
+function hasRejectedFilterCondition(conditions: SQLCondition[]): boolean {
+  return conditions.some((condition) =>
+    REJECTED_FILTER_REGEX.test(condition.text)
+  )
+}
+
 describe("EventModel.buildEventFilterConditions", () => {
   afterEach(() => {
     jest.resetAllMocks()
+  })
+
+  describe("when rejection filtering is not configured", () => {
+    let options: Partial<EventListOptions>
+
+    beforeEach(() => {
+      options = {
+        list: EventListType.All,
+      }
+    })
+
+    it("should filter out rejected events by default", () => {
+      const conditions = buildEventFilterConditions(options)
+
+      expect(hasRejectedFilterCondition(conditions)).toBe(true)
+    })
+  })
+
+  describe("when include_rejected option is true", () => {
+    let options: Partial<EventListOptions>
+
+    beforeEach(() => {
+      options = {
+        include_rejected: true,
+        list: EventListType.All,
+      }
+    })
+
+    it("should not generate a rejected filter condition", () => {
+      const conditions = buildEventFilterConditions(options)
+
+      expect(hasRejectedFilterCondition(conditions)).toBe(false)
+    })
+  })
+
+  describe("when rejected option is true", () => {
+    let options: Partial<EventListOptions>
+
+    beforeEach(() => {
+      options = {
+        rejected: true,
+        list: EventListType.All,
+      }
+    })
+
+    it("should generate a rejected filter condition", () => {
+      const conditions = buildEventFilterConditions(options)
+
+      expect(hasRejectedFilterCondition(conditions)).toBe(true)
+    })
   })
 
   describe("when only_attendee option is true", () => {

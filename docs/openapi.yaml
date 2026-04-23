@@ -388,6 +388,67 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /events/admin:
+    get:
+      tags:
+        - Events
+      summary: List events as an admin service
+      description: Lists events, including pending or rejected rows, using the service bearer token.
+      operationId: events_adminListEvents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: approved
+          in: query
+          required: false
+          description: Filter by approval state
+          schema:
+            type: boolean
+        - name: rejected
+          in: query
+          required: false
+          description: Filter by rejection state
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
   /events/{event_id}:
     get:
       tags:
@@ -470,6 +531,267 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  /events/{event_id}/approved:
+    put:
+      tags:
+        - Events
+      summary: Approve an event as an admin service
+      description: Approves a pending event using the service bearer token.
+      operationId: events_approveEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventAdminActor'
+      responses:
+        '200':
+          description: Event approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+    delete:
+      tags:
+        - Events
+      summary: Remove admin approval from an event
+      description: Clears the approved flag without changing rejected state.
+      operationId: events_unapproveEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event approval removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /events/{event_id}/rejected:
+    put:
+      tags:
+        - Events
+      summary: Reject an event as an admin service
+      description: Rejects an event, stores the rejection reason, and clears approval and promotional flags.
+      operationId: events_rejectEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventAdminReject'
+      responses:
+        '200':
+          description: Event rejected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+    delete:
+      tags:
+        - Events
+      summary: Remove admin rejection from an event
+      description: Clears the rejected flag and rejection reason.
+      operationId: events_unrejectEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event rejection removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /events/{event_id}/admin:
+    get:
+      tags:
+        - Events
+      summary: Get event as an admin service
+      description: Retrieves an event by ID regardless of approval state using the service bearer token.
+      operationId: events_adminGetEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+    patch:
+      tags:
+        - Events
+      summary: Update event fields as an admin service
+      description: Updates event-editable fields using the service bearer token.
+      operationId: events_adminUpdateEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventAdminUpdate'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
 
   /events/{event_id}/attendees:
     get:
@@ -1151,6 +1473,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: service-token
+
   schemas:
     Event:
       type: object
@@ -1282,16 +1610,19 @@ components:
           type: boolean
           description: Whether the event has been rejected by a moderator
           default: false
+        rejection_reason:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: Reason provided by a moderator or service when rejecting the event
         approved_by:
           type: string
           nullable: true
-          pattern: '^0x[a-fA-F0-9]{40}$'
-          description: Ethereum address of approver
+          description: Wallet address or service actor that approved the event
         rejected_by:
           type: string
           nullable: true
-          pattern: '^0x[a-fA-F0-9]{40}$'
-          description: Ethereum address of rejector
+          description: Wallet address or service actor that rejected the event
         highlighted:
           type: boolean
           description: Whether the event is highlighted in the UI
@@ -1668,10 +1999,113 @@ components:
           type: boolean
         rejected:
           type: boolean
+        rejection_reason:
+          type: string
+          nullable: true
+          maxLength: 500
         highlighted:
           type: boolean
         trending:
           type: boolean
+
+    EventAdminActor:
+      type: object
+      additionalProperties: false
+      properties:
+        actor:
+          type: string
+          maxLength: 42
+          default: jarvis-agent
+          description: Service actor recorded in approved_by or rejected_by
+
+    EventAdminReject:
+      allOf:
+        - $ref: '#/components/schemas/EventAdminActor'
+        - type: object
+          required:
+            - reason
+          properties:
+            reason:
+              type: string
+              minLength: 1
+              maxLength: 500
+              description: Human-readable reason stored as rejection_reason
+
+    EventAdminUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        actor:
+          type: string
+          maxLength: 42
+          default: jarvis-agent
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+          maxLength: 5000
+        image:
+          type: string
+          format: uri
+          nullable: true
+        image_vertical:
+          type: string
+          format: uri
+          nullable: true
+        start_at:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          minimum: 0
+        all_day:
+          type: boolean
+        x:
+          type: integer
+          minimum: -170
+          maximum: 170
+        y:
+          type: integer
+          minimum: -170
+          maximum: 170
+        server:
+          type: string
+          nullable: true
+        categories:
+          type: array
+          nullable: true
+          items:
+            type: string
+        world:
+          type: boolean
+        recurrent:
+          type: boolean
+        recurrent_frequency:
+          type: string
+          nullable: true
+          enum: [YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY]
+        recurrent_interval:
+          type: integer
+        recurrent_count:
+          type: integer
+          nullable: true
+        recurrent_until:
+          type: string
+          format: date-time
+          nullable: true
+        recurrent_weekday_mask:
+          type: integer
+        recurrent_month_mask:
+          type: integer
+        recurrent_setpos:
+          type: integer
+          nullable: true
+        recurrent_monthday:
+          type: integer
+          nullable: true
 
     EventAttendee:
       type: object
@@ -2081,3 +2515,12 @@ components:
             ok: false
             error: "Internal server error"
 
+    ServiceUnavailable:
+      description: Service unavailable - endpoint disabled or dependency unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "EVENTS_ADMIN_AUTH_TOKEN is not configured; events admin endpoints are disabled"
