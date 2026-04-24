@@ -39,19 +39,19 @@ import {
   EventAttributes,
   MAX_EVENT_DURATION,
   MAX_RECURRENT_PAST_ITERATIONS,
+  MAX_REJECTION_REASON_LENGTH,
   approveEventAttributes,
   editAnyEventAttributes,
   editEventAttributes,
   editOwnEventAttributes,
 } from "../types"
 import {
+  JUMP_IN_SITE_URL,
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
   validateImageUrl,
 } from "../utils"
-
-import { JUMP_IN_SITE_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -61,7 +61,6 @@ const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
   "https://events.decentraland.org"
 )
-const MAX_REJECTION_REASON_LENGTH = 500
 
 function normalizeRejectionReason(value: unknown): string | null {
   if (value === null) {

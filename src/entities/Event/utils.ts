@@ -21,7 +21,7 @@ import {
 import { mainRealmUrl } from "../../modules/servers"
 import { ScheduleAttributes } from "../Schedule/types"
 
-const JUMP_IN_SITE_URL = env(
+export const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump"
 )

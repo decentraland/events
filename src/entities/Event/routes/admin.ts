@@ -25,11 +25,14 @@ import {
   EventAttributes,
   EventListType,
   GetEventParams,
+  MAX_ADMIN_ACTOR_LENGTH,
   MAX_EVENT_DURATION,
   MAX_RECURRENT_PAST_ITERATIONS,
+  MAX_REJECTION_REASON_LENGTH,
   editEventAttributes,
 } from "../types"
 import {
+  JUMP_IN_SITE_URL,
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
@@ -37,16 +40,10 @@ import {
 } from "../utils"
 
 const DEFAULT_ADMIN_ACTOR = "jarvis-agent"
-const MAX_REJECTION_REASON_LENGTH = 500
-const MAX_ACTOR_LENGTH = 42
 
 const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
   "https://events.decentraland.org"
-)
-const JUMP_IN_SITE_URL = env(
-  "JUMP_IN_SITE_URL",
-  "https://decentraland.org/jump"
 )
 
 const validateParams = createValidator<GetEventParams>(
@@ -60,13 +57,7 @@ const adminPatchEventAttributes = editEventAttributes.filter(
   (attribute) => attribute !== "rejected"
 )
 
-const STATE_ONLY_FIELDS = new Set([
-  "actor",
-  "approved",
-  "rejected",
-  "reason",
-  "rejection_reason",
-])
+const STATE_ONLY_FIELDS = new Set(["actor", "approved", "rejected", "reason"])
 
 type AdminEventRequest = Request<
   { event_id: string },
@@ -100,9 +91,9 @@ function getActor(body: Record<string, unknown>): string {
     throw new RequestError("actor cannot be empty", RequestError.BadRequest)
   }
 
-  if (actor.length > MAX_ACTOR_LENGTH) {
+  if (actor.length > MAX_ADMIN_ACTOR_LENGTH) {
     throw new RequestError(
-      `actor must be ${MAX_ACTOR_LENGTH} characters or less`,
+      `actor must be ${MAX_ADMIN_ACTOR_LENGTH} characters or less`,
       RequestError.BadRequest
     )
   }
@@ -348,7 +339,7 @@ function getBooleanField(
   return value
 }
 
-async function dispatchStateChange(
+async function applyStateChange(
   event: DeprecatedEventAttributes,
   body: Record<string, unknown>
 ) {
@@ -438,7 +429,7 @@ export async function patchEventAdmin(req: AdminEventRequest) {
   const body = bodyAsRecord(req)
 
   if (isStateOnlyBody(body)) {
-    return dispatchStateChange(event, body)
+    return applyStateChange(event, body)
   }
 
   validateAdminPatchBody(body)

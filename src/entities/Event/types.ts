@@ -97,6 +97,9 @@ export enum Position {
 
 export const MAX_EVENT_RECURRENT = 10
 
+export const MAX_REJECTION_REASON_LENGTH = 500
+export const MAX_ADMIN_ACTOR_LENGTH = 42
+
 // Upper bound on how many past occurrences rrule is asked to step through
 // when expanding a recurrence. Past iterations happen inside rrule's inner
 // loop (even with .between) and are bounded by (now - start_at) / period.
