@@ -1,4 +1,5 @@
 import EventCategoryModel from "../../EventCategory/model"
+import { DEFAULT_PROFILE_SETTINGS } from "../../ProfileSettings/types"
 import {
   notifyApprovedEvent,
   notifyEditedEvent,
@@ -8,13 +9,13 @@ import EventModel from "../model"
 import { DeprecatedEventAttributes, EventAttributes } from "../types"
 import {
   approveEvent,
-  getEventAdmin,
-  getEventAdminList,
   patchEventAdmin,
   rejectEvent,
   unapproveEvent,
   unrejectEvent,
 } from "./admin"
+import { getEventWithOptions } from "./getEvent"
+import { getEventList } from "./getEventList"
 
 const VALID_TOKEN = "test-events-admin-token"
 const EVENT_ID = "550e8400-e29b-41d4-a716-446655440000"
@@ -114,6 +115,13 @@ jest.mock("../../EventCategory/model", () => ({
   default: {
     validateCategories: jest.fn(),
   },
+}))
+
+jest.mock("../../ProfileSettings/routes/getAuthProfileSettings", () => ({
+  getAuthProfileSettings: jest.fn().mockResolvedValue({
+    permissions: [],
+    user: "admin-service",
+  }),
 }))
 
 jest.mock("../../Slack/utils", () => ({
@@ -386,7 +394,7 @@ describe("events admin endpoints", () => {
     })
   })
 
-  describe("getEventAdmin", () => {
+  describe("getEventWithOptions in admin mode", () => {
     describe("when the event exists", () => {
       let event: DeprecatedEventAttributes
       let request: ReturnType<typeof createAdminRequest>
@@ -398,14 +406,21 @@ describe("events admin endpoints", () => {
       })
 
       it("should return the event even when it is pending", async () => {
-        const response = await getEventAdmin(request)
+        const response = await getEventWithOptions(request, {
+          includePending: true,
+          includeRejected: true,
+          profileForEvent: (event) => ({
+            ...DEFAULT_PROFILE_SETTINGS,
+            user: event.user,
+          }),
+        })
 
         expect(response).toEqual(expect.objectContaining({ id: EVENT_ID }))
       })
     })
   })
 
-  describe("getEventAdminList", () => {
+  describe("getEventList in admin mode", () => {
     describe("when filtering pending events", () => {
       let event: DeprecatedEventAttributes
       let request: Record<string, unknown>
@@ -419,7 +434,7 @@ describe("events admin endpoints", () => {
       })
 
       it("should query events with pending filters and allow pending rows", async () => {
-        await getEventAdminList(request as any)
+        await getEventList(request as any, { admin: true })
 
         expect(EventModel.getEvents).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -427,6 +442,41 @@ describe("events admin endpoints", () => {
             include_rejected: true,
             approved: false,
             rejected: false,
+          })
+        )
+      })
+    })
+
+    describe("when regular list filters are provided", () => {
+      let event: DeprecatedEventAttributes
+      let request: Record<string, unknown>
+
+      beforeEach(() => {
+        event = createBaseEvent()
+        request = {
+          query: {
+            approved: "true",
+            creator: "0x1111111111111111111111111111111111111111",
+            from: "2030-01-01T00:00:00.000Z",
+            search: "music",
+            to: "2030-01-31T00:00:00.000Z",
+            world: "false",
+          },
+        }
+        ;(EventModel.getEvents as jest.Mock).mockResolvedValueOnce([event])
+      })
+
+      it("should preserve normal filters and add admin visibility filters", async () => {
+        await getEventList(request as any, { admin: true })
+
+        expect(EventModel.getEvents).toHaveBeenCalledWith(
+          expect.objectContaining({
+            allow_pending: true,
+            approved: true,
+            creator: "0x1111111111111111111111111111111111111111",
+            include_rejected: true,
+            search: "music",
+            world: false,
           })
         )
       })
@@ -445,7 +495,7 @@ describe("events admin endpoints", () => {
       })
 
       it("should include rejected rows in the admin query", async () => {
-        await getEventAdminList(request as any)
+        await getEventList(request as any, { admin: true })
 
         expect(EventModel.getEvents).toHaveBeenCalledWith(
           expect.objectContaining({

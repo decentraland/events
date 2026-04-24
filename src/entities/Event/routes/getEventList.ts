@@ -117,7 +117,14 @@ export function addConnectedUsersToEvents<
 }
 
 const validate = createValidator<EventListParams>(getEventListQuery)
-export async function getEventList(req: WithAuth) {
+export type GetEventListOptions = {
+  admin?: boolean
+}
+
+export async function getEventList(
+  req: WithAuth,
+  routeOptions: GetEventListOptions = {}
+) {
   const profile = await getAuthProfileSettings(req)
 
   // Handle body format: { placeIds: [...], communityId?: string }
@@ -135,16 +142,23 @@ export async function getEventList(req: WithAuth) {
   })
   const options: EventListOptions = {
     user: profile.user,
-    allow_pending:
-      isAdmin(profile.user) ||
-      canEditAnyEvent(profile) ||
-      canApproveAnyEvent(profile),
+    allow_pending: routeOptions.admin
+      ? true
+      : isAdmin(profile.user) ||
+        canEditAnyEvent(profile) ||
+        canApproveAnyEvent(profile),
+    include_rejected: routeOptions.admin ? true : undefined,
     offset: query.offset ? Math.max(Number(query.offset), 0) : 0,
     limit: query.limit
       ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
       : 500,
     list: query.list || EventListType.Active,
     order: query.order,
+  }
+
+  if (routeOptions.admin) {
+    options.approved = bool(query.approved) ?? undefined
+    options.rejected = bool(query.rejected) ?? undefined
   }
 
   if (options.limit === 0) {

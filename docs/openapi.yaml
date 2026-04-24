@@ -460,7 +460,7 @@ paths:
         When called with the service bearer token (`Authorization: Bearer ...`), permission
         checks are bypassed and the request body identifies the actor via the `actor` field.
         The body may alternatively contain only approval/rejection fields
-        (`approved`, `rejected`, `rejection_reason`) to transition the event state without
+        (`approved`, `rejected`, `reason`) to transition the event state without
         re-validating every editable attribute — see `EventAdminActor` and `EventAdminReject`.
       operationId: updateEvent
       security:
@@ -1838,6 +1838,29 @@ components:
           nullable: true
         recurrent_monthday:
           type: integer
+          nullable: true
+        contact:
+          type: object
+          nullable: true
+        details:
+          type: object
+          nullable: true
+        community_id:
+          type: string
+          format: uuid
+          nullable: true
+        highlighted:
+          type: boolean
+        trending:
+          type: boolean
+        schedules:
+          type: array
+          items:
+            type: string
+            format: uuid
+        url:
+          type: string
+          format: uri
           nullable: true
 
     EventAttendee:

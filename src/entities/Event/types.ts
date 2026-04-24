@@ -230,6 +230,8 @@ export type EventListParams = {
   from?: string // ISO 8601 date-time string
   to?: string // ISO 8601 date-time string
   with_connected_users?: boolean
+  approved?: boolean
+  rejected?: boolean
 }
 
 export type EventListOptions = {

@@ -145,6 +145,14 @@ export const getEventListQuery: AjvObjectSchema = {
       description:
         "Include the list of connected user wallet addresses for each event location (connected_addresses property). Data is cached for 5 minutes.",
     },
+    approved: {
+      enum: ["true", "false", "1", "0"],
+      description: "Admin-only filter for event approval state",
+    },
+    rejected: {
+      enum: ["true", "false", "1", "0"],
+      description: "Admin-only filter for event rejection state",
+    },
   },
 }
 

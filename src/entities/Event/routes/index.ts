@@ -6,13 +6,14 @@ import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { Request } from "express"
 
-import { getEventAdmin, getEventAdminList, patchEventAdmin } from "./admin"
+import { patchEventAdmin } from "./admin"
 import { createEvent } from "./createEvent"
 import { getAttendingEventList } from "./getAttendingEventList"
-import { getEvent } from "./getEvent"
+import { getEvent, getEventWithOptions } from "./getEvent"
 import { getEventList } from "./getEventList"
 import { WithAdminBearer, adminBearer } from "./middleware/adminBearer"
 import { updateEvent } from "./updateEvent"
+import { DEFAULT_PROFILE_SETTINGS } from "../../ProfileSettings/types"
 
 type MaybeAdminRequest = Request & WithAdminBearer & { auth?: string }
 
@@ -24,14 +25,26 @@ function requireAuthOrAdmin(req: MaybeAdminRequest): void {
 
 async function getEventRoute(req: MaybeAdminRequest) {
   if (req.isAdminBearer) {
-    return getEventAdmin(req as Parameters<typeof getEventAdmin>[0])
+    return getEventWithOptions(
+      req as unknown as Parameters<typeof getEventWithOptions>[0],
+      {
+        includePending: true,
+        includeRejected: true,
+        profileForEvent: (event) => ({
+          ...DEFAULT_PROFILE_SETTINGS,
+          user: event.user,
+        }),
+      }
+    )
   }
   return getEvent(req as Parameters<typeof getEvent>[0])
 }
 
 async function getEventListRoute(req: MaybeAdminRequest) {
   if (req.isAdminBearer) {
-    return getEventAdminList(req as Parameters<typeof getEventAdminList>[0])
+    return getEventList(req as Parameters<typeof getEventList>[0], {
+      admin: true,
+    })
   }
   return getEventList(req as Parameters<typeof getEventList>[0])
 }
