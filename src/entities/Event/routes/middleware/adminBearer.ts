@@ -37,7 +37,11 @@ export async function assertAdminBearer(req: Pick<Request, "headers">) {
   }
 }
 
-export function adminBearer(req: Request, _res: Response, next: NextFunction) {
+export async function adminBearer(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) {
   if ((req as Request & { auth?: string }).auth) {
     return next()
   }
@@ -50,10 +54,11 @@ export function adminBearer(req: Request, _res: Response, next: NextFunction) {
     return next()
   }
 
-  assertAdminBearer(req)
-    .then(() => {
-      ;(req as Request & WithAdminBearer).isAdminBearer = true
-      next()
-    })
-    .catch(next)
+  try {
+    await assertAdminBearer(req)
+    ;(req as Request & WithAdminBearer).isAdminBearer = true
+    next()
+  } catch (err) {
+    next(err)
+  }
 }

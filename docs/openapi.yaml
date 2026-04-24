@@ -1620,6 +1620,7 @@ components:
 
     EventUpdate:
       type: object
+      additionalProperties: false
       description: Schema for updating an event (all fields optional)
       properties:
         name:

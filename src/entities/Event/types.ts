@@ -285,6 +285,12 @@ export const editEventAttributes = [
   "world",
 ] as const
 
+export const editEventAttributesWithoutRejected = editEventAttributes.filter(
+  (attribute) => attribute !== "rejected"
+) as ReadonlyArray<
+  Exclude<(typeof editEventAttributes)[number], "rejected">
+>
+
 export const editOwnEventAttributes = [
   "contact",
   "details",

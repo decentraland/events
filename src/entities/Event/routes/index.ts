@@ -6,14 +6,13 @@ import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { Request } from "express"
 
-import { patchEventAdmin } from "./admin"
+import { adminServiceProfile, patchEventAdmin } from "./admin"
 import { createEvent } from "./createEvent"
 import { getAttendingEventList } from "./getAttendingEventList"
 import { getEvent, getEventWithOptions } from "./getEvent"
 import { getEventList } from "./getEventList"
 import { WithAdminBearer, adminBearer } from "./middleware/adminBearer"
 import { updateEvent } from "./updateEvent"
-import { DEFAULT_PROFILE_SETTINGS } from "../../ProfileSettings/types"
 
 type MaybeAdminRequest = Request & WithAdminBearer & { auth?: string }
 
@@ -30,10 +29,7 @@ async function getEventRoute(req: MaybeAdminRequest) {
       {
         includePending: true,
         includeRejected: true,
-        profileForEvent: (event) => ({
-          ...DEFAULT_PROFILE_SETTINGS,
-          user: event.user,
-        }),
+        profileForEvent: (event) => adminServiceProfile(event.user),
       }
     )
   }

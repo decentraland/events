@@ -3,7 +3,11 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { Request } from "express"
 
-import { DEFAULT_PROFILE_SETTINGS } from "../../ProfileSettings/types"
+import {
+  DEFAULT_PROFILE_SETTINGS,
+  ProfileSettingsAttributes,
+  ProfileSettingsSessionAttributes,
+} from "../../ProfileSettings/types"
 import { notifyApprovedEvent, notifyRejectedEvent } from "../../Slack/utils"
 import EventModel from "../model"
 import { getEventParamsSchema } from "../schemas"
@@ -12,21 +16,37 @@ import {
   EventAttributes,
   GetEventParams,
   MAX_ADMIN_ACTOR_LENGTH,
-  MAX_REJECTION_REASON_LENGTH,
   editAnyEventAttributes,
-  editEventAttributes,
+  editEventAttributesWithoutRejected,
   editOwnEventAttributes,
 } from "../types"
+import { validateRejectionReason } from "../utils"
 import { updateEventWithOptions } from "./updateEvent"
 
 const DEFAULT_ADMIN_ACTOR = "jarvis-agent"
+
+export function adminServiceProfile(user: string): ProfileSettingsAttributes {
+  return {
+    ...DEFAULT_PROFILE_SETTINGS,
+    user,
+  }
+}
+
+export function adminServiceSessionProfile(
+  user: string
+): ProfileSettingsSessionAttributes {
+  return {
+    ...adminServiceProfile(user),
+    subscriptions: [],
+  }
+}
 
 const validateParams = createValidator<GetEventParams>(
   getEventParamsSchema as AjvObjectSchema
 )
 
 const adminPatchEventAttributes = [
-  ...editEventAttributes.filter((attribute) => attribute !== "rejected"),
+  ...editEventAttributesWithoutRejected,
   ...editOwnEventAttributes,
   ...editAnyEventAttributes,
 ]
@@ -68,37 +88,8 @@ function getActor(body: Record<string, unknown>): string {
   return actor
 }
 
-function getRejectionReason(body: Record<string, unknown>): string {
-  if (typeof body.reason !== "string") {
-    throw new RequestError(
-      "rejection reason is required",
-      RequestError.BadRequest
-    )
-  }
-
-  const reason = body.reason.trim()
-  if (!reason) {
-    throw new RequestError(
-      "rejection reason cannot be empty",
-      RequestError.BadRequest
-    )
-  }
-
-  if (reason.length > MAX_REJECTION_REASON_LENGTH) {
-    throw new RequestError(
-      `rejection reason must be ${MAX_REJECTION_REASON_LENGTH} characters or less`,
-      RequestError.BadRequest
-    )
-  }
-
-  return reason
-}
-
 function toResponse(event: DeprecatedEventAttributes) {
-  return EventModel.toPublic(event, {
-    ...DEFAULT_PROFILE_SETTINGS,
-    user: event.user,
-  })
+  return EventModel.toPublic(event, adminServiceProfile(event.user))
 }
 
 async function getAdminEvent(req: AdminEventRequest) {
@@ -269,7 +260,7 @@ async function applyStateChange(
     return unapproveEventByActor(event)
   }
   if (rejected === true) {
-    const reason = getRejectionReason(body)
+    const reason = validateRejectionReason(body.reason, "rejection reason")
     return rejectEventByActor(event, actor, reason)
   }
   if (rejected === false) {
@@ -322,7 +313,7 @@ export async function rejectEvent(req: AdminEventRequest) {
   const event = await getAdminEvent(req)
   const body = bodyAsRecord(req)
   const actor = getActor(body)
-  const reason = getRejectionReason(body)
+  const reason = validateRejectionReason(body.reason, "rejection reason")
   return rejectEventByActor(event, actor, reason)
 }
 
@@ -348,11 +339,7 @@ export async function patchEventAdmin(req: AdminEventRequest) {
       admin: true,
       actor,
       event,
-      profile: {
-        ...DEFAULT_PROFILE_SETTINGS,
-        subscriptions: [],
-        user: event.user,
-      },
+      profile: adminServiceSessionProfile(event.user),
     }
   )
 }

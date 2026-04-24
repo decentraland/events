@@ -39,10 +39,10 @@ import {
   EventAttributes,
   MAX_EVENT_DURATION,
   MAX_RECURRENT_PAST_ITERATIONS,
-  MAX_REJECTION_REASON_LENGTH,
   approveEventAttributes,
   editAnyEventAttributes,
   editEventAttributes,
+  editEventAttributesWithoutRejected,
   editOwnEventAttributes,
 } from "../types"
 import {
@@ -51,6 +51,7 @@ import {
   estimateRecurrentPastIterations,
   eventTargetUrl,
   validateImageUrl,
+  validateRejectionReason,
 } from "../utils"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
@@ -62,45 +63,11 @@ const EVENTS_BASE_URL = env(
   "https://events.decentraland.org"
 )
 
-const adminEditEventAttributes = editEventAttributes.filter(
-  (attribute) => attribute !== "rejected"
-)
-
 export type UpdateEventOptions = {
   event?: DeprecatedEventAttributes
   profile?: Awaited<ReturnType<typeof getAuthProfileSettings>>
   actor?: string
   admin?: boolean
-}
-
-function normalizeRejectionReason(value: unknown): string | null {
-  if (value === null) {
-    return null
-  }
-
-  if (typeof value !== "string") {
-    throw new RequestError(
-      "rejection_reason must be a string",
-      RequestError.BadRequest
-    )
-  }
-
-  const reason = value.trim()
-  if (!reason) {
-    throw new RequestError(
-      "rejection_reason cannot be empty",
-      RequestError.BadRequest
-    )
-  }
-
-  if (reason.length > MAX_REJECTION_REASON_LENGTH) {
-    throw new RequestError(
-      `rejection_reason must be ${MAX_REJECTION_REASON_LENGTH} characters or less`,
-      RequestError.BadRequest
-    )
-  }
-
-  return reason
 }
 
 async function notifyCommunityMembers(
@@ -149,7 +116,7 @@ export async function updateEventWithOptions(
   if (admin) {
     Object.assign(
       updatedAttributes,
-      pick(req.body, adminEditEventAttributes),
+      pick(req.body, editEventAttributesWithoutRejected),
       pick(event, editOwnEventAttributes),
       pick(req.body, editOwnEventAttributes),
       pick(event, editAnyEventAttributes),
@@ -189,8 +156,10 @@ export async function updateEventWithOptions(
     )
 
     if (req.body.rejection_reason !== undefined) {
-      updatedAttributes.rejection_reason = normalizeRejectionReason(
-        req.body.rejection_reason
+      updatedAttributes.rejection_reason = validateRejectionReason(
+        req.body.rejection_reason,
+        "rejection_reason",
+        { allowNull: true }
       )
     }
   }
