@@ -42,16 +42,17 @@ import {
   approveEventAttributes,
   editAnyEventAttributes,
   editEventAttributes,
+  editEventAttributesWithoutRejected,
   editOwnEventAttributes,
 } from "../types"
 import {
+  JUMP_IN_SITE_URL,
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
   validateImageUrl,
+  validateRejectionReason,
 } from "../utils"
-
-import { JUMP_IN_SITE_URL } from "./index"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
   newEventSchema as AjvObjectSchema
@@ -61,6 +62,13 @@ const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
   "https://events.decentraland.org"
 )
+
+export type UpdateEventOptions = {
+  event?: DeprecatedEventAttributes
+  profile?: Awaited<ReturnType<typeof getAuthProfileSettings>>
+  actor?: string
+  admin?: boolean
+}
 
 async function notifyCommunityMembers(
   event: EventAttributes,
@@ -84,13 +92,17 @@ async function notifyCommunityMembers(
   })
 }
 
-export async function updateEvent(req: WithAuthProfile<WithAuth>) {
-  const user = req.auth!
-  const event = await getEvent(req)
-  const profile = await getAuthProfileSettings(req)
+export async function updateEventWithOptions(
+  req: WithAuthProfile<WithAuth>,
+  options: UpdateEventOptions = {}
+) {
+  const user = options.actor || req.auth!
+  const event = options.event || (await getEvent(req))
+  const profile = options.profile || (await getAuthProfileSettings(req))
+  const admin = !!options.admin
   const isOwner = event.user.toLowerCase() === user.toLowerCase()
 
-  if (!isOwner && !isAdmin(user) && !canEditAnyEvent(profile)) {
+  if (!admin && !isOwner && !isAdmin(user) && !canEditAnyEvent(profile)) {
     throw new RequestError(
       "You don't have permission to edit this event",
       RequestError.Forbidden
@@ -101,7 +113,16 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     ...pick(event, editEventAttributes),
   } as DeprecatedEventAttributes
 
-  if (isOwner) {
+  if (admin) {
+    Object.assign(
+      updatedAttributes,
+      pick(req.body, editEventAttributesWithoutRejected),
+      pick(event, editOwnEventAttributes),
+      pick(req.body, editOwnEventAttributes),
+      pick(event, editAnyEventAttributes),
+      pick(req.body, editAnyEventAttributes)
+    )
+  } else if (isOwner) {
     Object.assign(
       updatedAttributes,
       pick(req.body, editEventAttributes),
@@ -118,7 +139,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     }
   }
 
-  if (isAdmin(user) || canEditAnyEvent(profile)) {
+  if (!admin && (isAdmin(user) || canEditAnyEvent(profile))) {
     Object.assign(
       updatedAttributes,
       pick(req.body, editEventAttributes),
@@ -127,12 +148,20 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
-  if (isAdmin(user) || canApproveAnyEvent(profile)) {
+  if (!admin && (isAdmin(user) || canApproveAnyEvent(profile))) {
     Object.assign(
       updatedAttributes,
       pick(event, approveEventAttributes),
       pick(req.body, approveEventAttributes)
     )
+
+    if (req.body.rejection_reason !== undefined) {
+      updatedAttributes.rejection_reason = validateRejectionReason(
+        req.body.rejection_reason,
+        "rejection_reason",
+        { allowNull: true }
+      )
+    }
   }
 
   if (
@@ -307,7 +336,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     updatedAttributes.trending = false
   }
 
-  const updatedEvent = {
+  const updatedEvent: DeprecatedEventAttributes & { attending?: boolean } = {
     ...event,
     ...updatedAttributes,
   }
@@ -324,7 +353,7 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   // Community validation is only needed if the event is being updated by the owner
   const needsCommunityValidation = updatedAttributes.community_id !== undefined
 
-  if (needsCommunityValidation) {
+  if (!admin && needsCommunityValidation) {
     try {
       const userCommunities = await Communities.get().getCommunitiesWithToken(
         user
@@ -401,14 +430,18 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
     }
   }
 
-  const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({
-    event_id: event.id,
-    user,
-  })
+  if (!admin) {
+    const attendee = await EventAttendeeModel.findOne<EventAttendeeAttributes>({
+      event_id: event.id,
+      user,
+    })
 
-  updatedEvent.attending = !!attendee
+    updatedEvent.attending = !!attendee
+  }
 
-  if (!event.approved && updatedEvent.approved) {
+  if (admin) {
+    notifyEditedEvent(updatedEvent)
+  } else if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)
   } else if (!event.rejected && updatedEvent.rejected) {
     notifyRejectedEvent(updatedEvent)
@@ -417,4 +450,8 @@ export async function updateEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   return EventModel.toPublic(updatedEvent, profile)
+}
+
+export async function updateEvent(req: WithAuthProfile<WithAuth>) {
+  return updateEventWithOptions(req)
 }

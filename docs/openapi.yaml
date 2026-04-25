@@ -85,9 +85,27 @@ paths:
         Retrieves a list of events based on various filters. By default returns active events
         (current and future) sorted by start date ascending. Supports filtering by location,
         creator, categories, schedules, and more.
+
+        When called with the service bearer token (`Authorization: Bearer ...`), the response
+        includes pending and rejected rows and the `approved` / `rejected` query parameters are
+        honored as explicit state filters.
       operationId: getEvents
-      security: []
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
+        - name: approved
+          in: query
+          required: false
+          description: Admin-only. Filter by approval state (only applied with bearer auth).
+          schema:
+            type: boolean
+        - name: rejected
+          in: query
+          required: false
+          description: Admin-only. Filter by rejection state (only applied with bearer auth).
+          schema:
+            type: boolean
         - name: limit
           in: query
           description: Maximum number of events to return
@@ -396,8 +414,13 @@ paths:
       description: |
         Retrieves detailed information about a specific event.
         If authenticated, includes whether the user is attending.
+
+        When called with the service bearer token (`Authorization: Bearer ...`), pending and
+        rejected events are returned regardless of approval state.
       operationId: getEventById
-      security: []
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
         - name: event_id
           in: path
@@ -423,6 +446,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
 
     patch:
       tags:
@@ -431,8 +456,16 @@ paths:
       description: |
         Updates an existing event. Users can only update their own events unless they
         have special permissions. Some fields require admin permissions.
+
+        When called with the service bearer token (`Authorization: Bearer ...`), permission
+        checks are bypassed and the request body identifies the actor via the `actor` field.
+        The body may alternatively contain only approval/rejection fields
+        (`approved`, `rejected`, `reason`) to transition the event state without
+        re-validating every editable attribute — see `EventAdminActor` and `EventAdminReject`.
       operationId: updateEvent
-      security: []
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
         - name: event_id
           in: path
@@ -446,7 +479,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventUpdate'
+              oneOf:
+                - $ref: '#/components/schemas/EventUpdate'
+                - $ref: '#/components/schemas/EventAdminUpdate'
+                - $ref: '#/components/schemas/EventAdminActor'
+                - $ref: '#/components/schemas/EventAdminReject'
       responses:
         '200':
           description: Event updated successfully
@@ -470,6 +507,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
 
   /events/{event_id}/attendees:
     get:
@@ -1151,6 +1190,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: service-token
+
   schemas:
     Event:
       type: object
@@ -1282,16 +1327,19 @@ components:
           type: boolean
           description: Whether the event has been rejected by a moderator
           default: false
+        rejection_reason:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: Reason provided by a moderator or service when rejecting the event
         approved_by:
           type: string
           nullable: true
-          pattern: '^0x[a-fA-F0-9]{40}$'
-          description: Ethereum address of approver
+          description: Wallet address or service actor that approved the event
         rejected_by:
           type: string
           nullable: true
-          pattern: '^0x[a-fA-F0-9]{40}$'
-          description: Ethereum address of rejector
+          description: Wallet address or service actor that rejected the event
         highlighted:
           type: boolean
           description: Whether the event is highlighted in the UI
@@ -1572,6 +1620,7 @@ components:
 
     EventUpdate:
       type: object
+      additionalProperties: false
       description: Schema for updating an event (all fields optional)
       properties:
         name:
@@ -1668,10 +1717,152 @@ components:
           type: boolean
         rejected:
           type: boolean
+        rejection_reason:
+          type: string
+          nullable: true
+          maxLength: 500
         highlighted:
           type: boolean
         trending:
           type: boolean
+
+    EventAdminActor:
+      type: object
+      additionalProperties: false
+      description: |
+        Body for admin approval state changes sent to `PATCH /events/{event_id}` with
+        bearer auth. Set `approved: true` to approve, `approved: false` to unapprove.
+        For rejection, use `EventAdminReject`.
+      properties:
+        actor:
+          type: string
+          maxLength: 42
+          default: jarvis-agent
+          description: Service actor recorded in approved_by or rejected_by
+        approved:
+          type: boolean
+          description: Set to true to approve, false to clear approval
+
+    EventAdminReject:
+      allOf:
+        - $ref: '#/components/schemas/EventAdminActor'
+        - type: object
+          description: |
+            Body for admin rejection state changes sent to `PATCH /events/{event_id}` with
+            bearer auth. Set `rejected: true` with a `reason` to reject, or `rejected: false`
+            (no reason required) to clear a prior rejection.
+          required:
+            - rejected
+          properties:
+            rejected:
+              type: boolean
+              description: Set to true to reject, false to clear rejection
+            reason:
+              type: string
+              minLength: 1
+              maxLength: 500
+              description: |
+                Human-readable reason stored as rejection_reason. Required when
+                rejected=true.
+
+    EventAdminUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        actor:
+          type: string
+          maxLength: 42
+          default: jarvis-agent
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+          maxLength: 5000
+        image:
+          type: string
+          format: uri
+          nullable: true
+        image_vertical:
+          type: string
+          format: uri
+          nullable: true
+        start_at:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          minimum: 0
+        all_day:
+          type: boolean
+        x:
+          type: integer
+          minimum: -170
+          maximum: 170
+        y:
+          type: integer
+          minimum: -170
+          maximum: 170
+        server:
+          type: string
+          nullable: true
+        categories:
+          type: array
+          nullable: true
+          items:
+            type: string
+        world:
+          type: boolean
+        recurrent:
+          type: boolean
+        recurrent_frequency:
+          type: string
+          nullable: true
+          enum: [YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY]
+        recurrent_interval:
+          type: integer
+        recurrent_count:
+          type: integer
+          nullable: true
+        recurrent_until:
+          type: string
+          format: date-time
+          nullable: true
+        recurrent_weekday_mask:
+          type: integer
+        recurrent_month_mask:
+          type: integer
+        recurrent_setpos:
+          type: integer
+          nullable: true
+        recurrent_monthday:
+          type: integer
+          nullable: true
+        contact:
+          type: object
+          nullable: true
+        details:
+          type: object
+          nullable: true
+        community_id:
+          type: string
+          format: uuid
+          nullable: true
+        highlighted:
+          type: boolean
+        trending:
+          type: boolean
+        schedules:
+          type: array
+          items:
+            type: string
+            format: uuid
+        url:
+          type: string
+          format: uri
+          nullable: true
 
     EventAttendee:
       type: object
@@ -2081,3 +2272,12 @@ components:
             ok: false
             error: "Internal server error"
 
+    ServiceUnavailable:
+      description: Service unavailable - endpoint disabled or dependency unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            ok: false
+            error: "EVENTS_ADMIN_AUTH_TOKEN is not configured; events admin endpoints are disabled"

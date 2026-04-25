@@ -3,6 +3,7 @@ import supertest from "supertest"
 
 import { signedHeaderFactory } from "decentraland-crypto-fetch"
 
+import EventModel from "../../src/entities/Event/model"
 import { DeprecatedEventAttributes } from "../../src/entities/Event/types"
 import { ProfilePermissions } from "../../src/entities/ProfileSettings/types"
 import { seedEvent } from "../mocks/event"
@@ -10,6 +11,16 @@ import { createIdentity } from "../mocks/identity"
 import { seedProfileSettings } from "../mocks/profileSettings"
 import { cleanTables, closeTestDb, initTestDb } from "../setup/db"
 import { createTestApp } from "../setup/server"
+
+jest.mock("decentraland-gatsby/dist/utils/env", () => {
+  return jest.fn((key: string, defaultValue?: string) => {
+    if (key === "EVENTS_ADMIN_AUTH_TOKEN") {
+      return "integration-events-admin-token"
+    }
+
+    return process.env[key] ?? defaultValue
+  })
+})
 
 jest.mock("decentraland-gatsby/dist/utils/api/API", () => {
   class MockAPI {
@@ -70,6 +81,9 @@ jest.mock("../../src/entities/Slack/utils", () => ({
 }))
 
 const app = createTestApp()
+const ADMIN_TOKEN = "integration-events-admin-token"
+const ACTOR = "jarvis-agent"
+let dbInitialized = false
 
 function signedPatch(
   identity: AuthIdentity,
@@ -87,17 +101,26 @@ function signedPatch(
   return supertest(app).patch(path).set(headerObj).send(body)
 }
 
+function adminRequest(request: supertest.Test): supertest.Test {
+  return request.set("Authorization", `Bearer ${ADMIN_TOKEN}`)
+}
+
 describe("PATCH /api/events/:event_id", () => {
   beforeAll(async () => {
     await initTestDb()
+    dbInitialized = true
   })
 
   afterAll(async () => {
-    await closeTestDb()
+    if (dbInitialized) {
+      await closeTestDb()
+    }
   })
 
   afterEach(async () => {
-    await cleanTables()
+    if (dbInitialized) {
+      await cleanTables()
+    }
     jest.clearAllMocks()
   })
 
@@ -591,6 +614,135 @@ describe("PATCH /api/events/:event_id", () => {
         expect(response.body.data.x).toBe(50)
         expect(response.body.data.y).toBe(-30)
         expect(response.body.data.position).toEqual([50, -30])
+      })
+    })
+  })
+
+  describe("when the request uses the admin bearer token", () => {
+    describe("and approves an event", () => {
+      let event: DeprecatedEventAttributes
+      let response: supertest.Response
+      let storedEvent: DeprecatedEventAttributes | null
+
+      beforeEach(async () => {
+        event = await seedEvent({
+          approved: false,
+          rejected: true,
+          rejected_by: "previous-admin",
+          rejection_reason: "Previous reason",
+        })
+        response = await adminRequest(
+          supertest(app).patch(`/api/events/${event.id}`).send({
+            approved: true,
+          })
+        )
+        storedEvent = await EventModel.findOne<DeprecatedEventAttributes>({
+          id: event.id,
+        })
+      })
+
+      it("should approve the event and clear rejection state", async () => {
+        expect(response.status).toBe(201)
+        expect(response.body.data.approved).toBe(true)
+        expect(response.body.data.approved_by).toBe(ACTOR)
+        expect(response.body.data.rejected).toBe(false)
+        expect(response.body.data.rejection_reason).toBeNull()
+        expect(storedEvent?.approved).toBe(true)
+        expect(storedEvent?.approved_by?.trim()).toBe(ACTOR)
+        expect(storedEvent?.rejected).toBe(false)
+        expect(storedEvent?.rejection_reason).toBeNull()
+      })
+    })
+
+    describe("and rejects an event", () => {
+      let event: DeprecatedEventAttributes
+      let response: supertest.Response
+      let storedEvent: DeprecatedEventAttributes | null
+
+      beforeEach(async () => {
+        event = await seedEvent({
+          approved: true,
+          highlighted: true,
+          rejected: false,
+          trending: true,
+        })
+        response = await adminRequest(
+          supertest(app).patch(`/api/events/${event.id}`).send({
+            rejected: true,
+            reason: "Invalid content",
+          })
+        )
+        storedEvent = await EventModel.findOne<DeprecatedEventAttributes>({
+          id: event.id,
+        })
+      })
+
+      it("should reject the event and store the rejection reason", async () => {
+        expect(response.status).toBe(201)
+        expect(response.body.data.approved).toBe(false)
+        expect(response.body.data.highlighted).toBe(false)
+        expect(response.body.data.rejected).toBe(true)
+        expect(response.body.data.rejected_by).toBe(ACTOR)
+        expect(response.body.data.rejection_reason).toBe("Invalid content")
+        expect(response.body.data.trending).toBe(false)
+        expect(storedEvent?.approved).toBe(false)
+        expect(storedEvent?.highlighted).toBe(false)
+        expect(storedEvent?.rejected).toBe(true)
+        expect(storedEvent?.rejected_by?.trim()).toBe(ACTOR)
+        expect(storedEvent?.rejection_reason).toBe("Invalid content")
+        expect(storedEvent?.trending).toBe(false)
+      })
+    })
+
+    describe("and edits event fields", () => {
+      let event: DeprecatedEventAttributes
+      let response: supertest.Response
+      let storedEvent: DeprecatedEventAttributes | null
+
+      beforeEach(async () => {
+        event = await seedEvent({
+          approved: true,
+          name: "Original Name",
+          x: 0,
+          y: 0,
+        })
+        response = await adminRequest(
+          supertest(app).patch(`/api/events/${event.id}`).send({
+            name: "Admin Updated Name",
+            x: 10,
+            y: -10,
+          })
+        )
+        storedEvent = await EventModel.findOne<DeprecatedEventAttributes>({
+          id: event.id,
+        })
+      })
+
+      it("should reuse the update pipeline and persist the edit", async () => {
+        expect(response.status).toBe(201)
+        expect(response.body.data.name).toBe("Admin Updated Name")
+        expect(response.body.data.position).toEqual([10, -10])
+        expect(storedEvent?.name).toBe("Admin Updated Name")
+        expect(storedEvent?.x).toBe(10)
+        expect(storedEvent?.y).toBe(-10)
+        expect(storedEvent?.coordinates).toEqual([10, -10])
+      })
+    })
+
+    describe("and the bearer token is invalid", () => {
+      let event: DeprecatedEventAttributes
+      let response: supertest.Response
+
+      beforeEach(async () => {
+        event = await seedEvent({ approved: true })
+        response = await supertest(app)
+          .patch(`/api/events/${event.id}`)
+          .set("Authorization", "Bearer invalid-token")
+          .send({ approved: true })
+      })
+
+      it("should respond with 401 Unauthorized", async () => {
+        expect(response.status).toBe(401)
       })
     })
   })

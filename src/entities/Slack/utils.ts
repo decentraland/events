@@ -118,14 +118,19 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "plain_text",
-          text: "Name: " + event.name,
+          text: [
+            "Name: " + event.name,
+            event.rejection_reason && "Reason: " + event.rejection_reason,
+          ]
+            .filter(Boolean)
+            .join("\n"),
         },
       },
-      event.approved_by && {
+      event.rejected_by && {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `\n_by:_ \`${event.approved_by}\`` + selfRejected,
+          text: `\n_by:_ \`${event.rejected_by}\`` + selfRejected,
         },
       },
     ].filter(Boolean),

@@ -19,9 +19,19 @@ import { EventAttributes, GetEventParams } from "../types"
 export const validateGetEventParams =
   createValidator<GetEventParams>(getEventParamsSchema)
 
-export const getEvent = oncePerRequest(async (req: WithAuth) => {
+export type GetEventOptions = {
+  includePending?: boolean
+  includeRejected?: boolean
+  profile?: ProfileSettingsAttributes
+  profileForEvent?: (event: EventAttributes) => ProfileSettingsAttributes
+}
+
+export async function getEventWithOptions(
+  req: WithAuth,
+  options: GetEventOptions = {}
+) {
   const user = req.auth
-  const profile = await getAuthProfileSettings(req)
+  let profile = options.profile
   const params = validateGetEventParams(req.params)
 
   if (!isUUID(params.event_id)) {
@@ -42,7 +52,17 @@ export const getEvent = oncePerRequest(async (req: WithAuth) => {
     )
   }
 
-  if (!event.approved) {
+  if (options.profileForEvent) {
+    profile = options.profileForEvent(event)
+  } else if (!profile) {
+    profile = await getAuthProfileSettings(req)
+  }
+
+  if ((!event.approved && !options.includePending) || event.rejected) {
+    if (event.rejected && options.includeRejected) {
+      return EventModel.toPublic(event, profile)
+    }
+
     if (!user) {
       throw new RequestError(
         `Not found event "${params.event_id}"`,
@@ -69,6 +89,10 @@ export const getEvent = oncePerRequest(async (req: WithAuth) => {
   }
 
   return { ...EventModel.toPublic(event, profile), attending }
+}
+
+export const getEvent = oncePerRequest(async (req: WithAuth) => {
+  return getEventWithOptions(req)
 })
 
 function canReadEvent(

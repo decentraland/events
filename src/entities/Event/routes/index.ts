@@ -1,20 +1,57 @@
 import { auth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
+import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import env from "decentraland-gatsby/dist/utils/env"
+import { Request } from "express"
 
+import { adminServiceProfile, patchEventAdmin } from "./admin"
 import { createEvent } from "./createEvent"
 import { getAttendingEventList } from "./getAttendingEventList"
-import { getEvent } from "./getEvent"
+import { getEvent, getEventWithOptions } from "./getEvent"
 import { getEventList } from "./getEventList"
+import { WithAdminBearer, adminBearer } from "./middleware/adminBearer"
 import { updateEvent } from "./updateEvent"
 
-export const JUMP_IN_SITE_URL = env(
-  "JUMP_IN_SITE_URL",
-  "https://decentraland.org/jump"
-)
+type MaybeAdminRequest = Request & WithAdminBearer & { auth?: string }
+
+function requireAuthOrAdmin(req: MaybeAdminRequest): void {
+  if (!req.auth && !req.isAdminBearer) {
+    throw new RequestError("Unauthorized", RequestError.Unauthorized)
+  }
+}
+
+async function getEventRoute(req: MaybeAdminRequest) {
+  if (req.isAdminBearer) {
+    return getEventWithOptions(
+      req as unknown as Parameters<typeof getEventWithOptions>[0],
+      {
+        includePending: true,
+        includeRejected: true,
+        profileForEvent: (event) => adminServiceProfile(event.user),
+      }
+    )
+  }
+  return getEvent(req as Parameters<typeof getEvent>[0])
+}
+
+async function getEventListRoute(req: MaybeAdminRequest) {
+  if (req.isAdminBearer) {
+    return getEventList(req as Parameters<typeof getEventList>[0], {
+      admin: true,
+    })
+  }
+  return getEventList(req as Parameters<typeof getEventList>[0])
+}
+
+async function patchEventRoute(req: MaybeAdminRequest) {
+  requireAuthOrAdmin(req)
+  if (req.isAdminBearer) {
+    return patchEventAdmin(req as Parameters<typeof patchEventAdmin>[0])
+  }
+  return updateEvent(req as Parameters<typeof updateEvent>[0])
+}
 
 export default routes((router) => {
   const withAuth = auth()
@@ -24,14 +61,16 @@ export default routes((router) => {
     "/events",
     withPublicAccess,
     withOptionalAuth,
-    handle(getEventList as any)
+    adminBearer,
+    handle(getEventListRoute as any)
   )
   router.post("/events", withAuth, withAuthProfile(), handle(createEvent))
   router.post(
     "/events/search",
     withPublicAccess,
     withOptionalAuth,
-    handle(getEventList as any)
+    adminBearer,
+    handle(getEventListRoute as any)
   )
   router.get(
     "/events/attending",
@@ -43,7 +82,13 @@ export default routes((router) => {
     "/events/:event_id",
     withPublicAccess,
     withOptionalAuth,
-    handle(getEvent)
+    adminBearer,
+    handle(getEventRoute as any)
   )
-  router.patch("/events/:event_id", withAuth, handle(updateEvent))
+  router.patch(
+    "/events/:event_id",
+    withOptionalAuth,
+    adminBearer,
+    handle(patchEventRoute as any)
+  )
 })

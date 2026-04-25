@@ -142,22 +142,23 @@ cp .env.example .env.development
 
 Required environment variables:
 
-| Variable                      | Description                                    | Example                                             |
-| ----------------------------- | ---------------------------------------------- | --------------------------------------------------- |
-| `CONNECTION_STRING`           | PostgreSQL connection string                   | `postgres://user:pass@localhost:5432/events`        |
-| `ADMIN_ADDRESSES`             | Comma-separated list of admin wallet addresses | `0xabc...,0xdef...`                                 |
-| `AWS_REGION`                  | AWS region for S3 and SNS                      | `us-east-1`                                         |
-| `AWS_ACCESS_KEY`              | AWS access key ID                              | -                                                   |
-| `AWS_ACCESS_SECRET`           | AWS secret access key                          | -                                                   |
-| `AWS_BUCKET_NAME`             | S3 bucket for event images                     | `events.decentraland.zone`                          |
-| `AWS_BUCKET_URL`              | Public URL for S3 bucket                       | `https://s3.amazonaws.com/...`                      |
-| `WEB_PUSH_SECRET`             | VAPID private key for web push                 | Generate with `web-push generate-vapid-keys`        |
-| `GATSBY_WEB_PUSH_KEY`         | VAPID public key for web push                  | Generate with `web-push generate-vapid-keys`        |
-| `GATSBY_DECENTRALAND_URL`     | Decentraland play URL                          | `https://play.decentraland.org`                     |
-| `GATSBY_COMMUNITIES_API_URL`  | Communities API URL                            | `https://social-api.decentraland.zone`              |
-| `NOTIFICATION_SERVICE_URL`    | Notification service URL                       | `https://notifications-processor.decentraland.zone` |
-| `NOTIFICATION_SERVICE_TOKEN`  | Auth token for notification service            | -                                                   |
-| `COMMUNITIES_API_ADMIN_TOKEN` | Admin token for communities API                | -                                                   |
+| Variable                      | Description                                               | Example                                             |
+| ----------------------------- | --------------------------------------------------------- | --------------------------------------------------- |
+| `CONNECTION_STRING`           | PostgreSQL connection string                              | `postgres://user:pass@localhost:5432/events`        |
+| `ADMIN_ADDRESSES`             | Comma-separated list of admin wallet addresses            | `0xabc...,0xdef...`                                 |
+| `EVENTS_ADMIN_AUTH_TOKEN`     | Bearer token for service-to-service event admin endpoints | -                                                   |
+| `AWS_REGION`                  | AWS region for S3 and SNS                                 | `us-east-1`                                         |
+| `AWS_ACCESS_KEY`              | AWS access key ID                                         | -                                                   |
+| `AWS_ACCESS_SECRET`           | AWS secret access key                                     | -                                                   |
+| `AWS_BUCKET_NAME`             | S3 bucket for event images                                | `events.decentraland.zone`                          |
+| `AWS_BUCKET_URL`              | Public URL for S3 bucket                                  | `https://s3.amazonaws.com/...`                      |
+| `WEB_PUSH_SECRET`             | VAPID private key for web push                            | Generate with `web-push generate-vapid-keys`        |
+| `GATSBY_WEB_PUSH_KEY`         | VAPID public key for web push                             | Generate with `web-push generate-vapid-keys`        |
+| `GATSBY_DECENTRALAND_URL`     | Decentraland play URL                                     | `https://play.decentraland.org`                     |
+| `GATSBY_COMMUNITIES_API_URL`  | Communities API URL                                       | `https://social-api.decentraland.zone`              |
+| `NOTIFICATION_SERVICE_URL`    | Notification service URL                                  | `https://notifications-processor.decentraland.zone` |
+| `NOTIFICATION_SERVICE_TOKEN`  | Auth token for notification service                       | -                                                   |
+| `COMMUNITIES_API_ADMIN_TOKEN` | Admin token for communities API                           | -                                                   |
 
 See `.env.example` for a complete list of configuration options.
 

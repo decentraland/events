@@ -97,6 +97,9 @@ export enum Position {
 
 export const MAX_EVENT_RECURRENT = 10
 
+export const MAX_REJECTION_REASON_LENGTH = 500
+export const MAX_ADMIN_ACTOR_LENGTH = 42
+
 // Upper bound on how many past occurrences rrule is asked to step through
 // when expanding a recurrence. Past iterations happen inside rrule's inner
 // loop (even with .between) and are bounded by (now - start_at) / period.
@@ -163,6 +166,7 @@ export type EventAttributes = {
   schedules: string[]
   approved_by: string | null
   rejected_by: string | null
+  rejection_reason: string | null
   world: boolean
   place_id: string | null
   community_id: string | null
@@ -226,10 +230,13 @@ export type EventListParams = {
   from?: string // ISO 8601 date-time string
   to?: string // ISO 8601 date-time string
   with_connected_users?: boolean
+  approved?: boolean
+  rejected?: boolean
 }
 
 export type EventListOptions = {
   allow_pending?: boolean
+  include_rejected?: boolean
   list?: EventListType
   user?: string
   creator?: string
@@ -249,6 +256,8 @@ export type EventListOptions = {
   order?: "asc" | "desc"
   from?: Date // Start of date range filter
   to?: Date // End of date range filter
+  approved?: boolean
+  rejected?: boolean
 }
 
 export const editEventAttributes = [
@@ -275,6 +284,10 @@ export const editEventAttributes = [
   "categories",
   "world",
 ] as const
+
+export const editEventAttributesWithoutRejected = editEventAttributes.filter(
+  (attribute) => attribute !== "rejected"
+) as ReadonlyArray<Exclude<(typeof editEventAttributes)[number], "rejected">>
 
 export const editOwnEventAttributes = [
   "contact",

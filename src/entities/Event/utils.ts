@@ -11,6 +11,7 @@ import {
   EventType,
   FREQUENCY_PERIOD_MS,
   MAX_EVENT_RECURRENT,
+  MAX_REJECTION_REASON_LENGTH,
   MonthMask,
   Months,
   Position,
@@ -21,7 +22,7 @@ import {
 import { mainRealmUrl } from "../../modules/servers"
 import { ScheduleAttributes } from "../Schedule/types"
 
-const JUMP_IN_SITE_URL = env(
+export const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump"
 )
@@ -553,6 +554,53 @@ export function isPastEvent(event: EventAttributes) {
   const now = Date.now()
   const finish_at = Time.date(event.finish_at)
   return finish_at.getTime() < now
+}
+
+export function validateRejectionReason(
+  value: unknown,
+  fieldName: string
+): string
+export function validateRejectionReason(
+  value: unknown,
+  fieldName: string,
+  options: { allowNull: true }
+): string | null
+export function validateRejectionReason(
+  value: unknown,
+  fieldName: string,
+  options: { allowNull?: boolean } = {}
+): string | null {
+  if (value === null && options.allowNull) {
+    return null
+  }
+
+  if (value === undefined || value === null) {
+    throw new RequestError(`${fieldName} is required`, RequestError.BadRequest)
+  }
+
+  if (typeof value !== "string") {
+    throw new RequestError(
+      `${fieldName} must be a string`,
+      RequestError.BadRequest
+    )
+  }
+
+  const reason = value.trim()
+  if (!reason) {
+    throw new RequestError(
+      `${fieldName} cannot be empty`,
+      RequestError.BadRequest
+    )
+  }
+
+  if (reason.length > MAX_REJECTION_REASON_LENGTH) {
+    throw new RequestError(
+      `${fieldName} must be ${MAX_REJECTION_REASON_LENGTH} characters or less`,
+      RequestError.BadRequest
+    )
+  }
+
+  return reason
 }
 
 export async function validateImageUrl(imageUrl: string) {
