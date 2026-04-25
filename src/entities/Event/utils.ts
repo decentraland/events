@@ -575,10 +575,7 @@ export function validateRejectionReason(
   }
 
   if (value === undefined || value === null) {
-    throw new RequestError(
-      `${fieldName} is required`,
-      RequestError.BadRequest
-    )
+    throw new RequestError(`${fieldName} is required`, RequestError.BadRequest)
   }
 
   if (typeof value !== "string") {
