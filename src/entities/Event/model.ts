@@ -178,14 +178,18 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         .join(",")
     }
 
+    const isOwner = !!options.owner
+
     return [
-      options.rejected === undefined
+      isOwner
+        ? SQL`lower(e.user) = ${options.user}`
+        : options.rejected === undefined
         ? options.include_rejected
           ? SQL`TRUE`
           : SQL`e.rejected IS FALSE`
         : SQL`e.rejected IS ${SQL.raw(options.rejected ? "TRUE" : "FALSE")}`,
       conditional(
-        options.approved !== undefined,
+        !isOwner && options.approved !== undefined,
         SQL`AND e.approved IS ${SQL.raw(options.approved ? "TRUE" : "FALSE")}`
       ),
       conditional(options.list === EventListType.All, SQL``),
@@ -201,17 +205,14 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         options.list === EventListType.Upcoming,
         SQL`AND e.next_finish_at > now() AND e.next_start_at > now()`
       ),
-      conditional(
-        options.list === EventListType.Highlight,
-        SQL`AND e.highlighted IS TRUE AND e.next_finish_at > now()`
-      ),
+      conditional(options.highlighted === true, SQL`AND e.highlighted IS TRUE`),
       conditional(!!options.search, SQL`AND "rank" > 0`),
       conditional(
-        !!options.creator,
+        !isOwner && !!options.creator,
         SQL`AND lower(e.user) = ${options.creator}`
       ),
       conditional(
-        !options.allow_pending && !options.user,
+        !isOwner && !options.allow_pending && !options.user,
         SQL`AND e.approved IS TRUE`
       ),
       conditional(!!options.world === true, SQL`AND e.world IS TRUE`),
@@ -220,7 +221,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         SQL`AND e.world IS FALSE`
       ),
       conditional(
-        !options.allow_pending && !!options.user,
+        !isOwner && !options.allow_pending && !!options.user,
         SQL`AND (e.approved IS TRUE OR lower(e.user) = ${options.user})`
       ),
       conditional(

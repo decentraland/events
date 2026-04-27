@@ -208,11 +208,12 @@ export enum EventListType {
   Live = "live",
   Upcoming = "upcoming",
   Relevance = "relevance",
-  Highlight = "highlight",
 }
 
 export type EventListParams = {
   list?: EventListType
+  highlighted?: boolean
+  owner?: boolean
   creator?: string
   position?: string
   positions?: string[]
@@ -238,6 +239,8 @@ export type EventListOptions = {
   allow_pending?: boolean
   include_rejected?: boolean
   list?: EventListType
+  highlighted?: boolean
+  owner?: boolean
   user?: string
   creator?: string
   x?: number

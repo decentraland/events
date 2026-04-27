@@ -90,9 +90,19 @@ export const getEventListQuery: AjvObjectSchema = {
         },
         {
           enum: ["highlight"],
-          description: "Only highlighted events",
+          description:
+            "Deprecated alias for `list=active&highlighted=true`. Prefer the `highlighted` filter.",
         },
       ],
+    },
+    highlighted: {
+      enum: TruthyEnum.filter((value) => typeof value === "string"),
+      description: "Only highlighted events",
+    },
+    owner: {
+      enum: TruthyEnum.filter((value) => typeof value === "string"),
+      description:
+        "Return events authored by the authenticated user across all statuses (approved, pending, and rejected). Requires authentication.",
     },
     order: {
       description: "List order",

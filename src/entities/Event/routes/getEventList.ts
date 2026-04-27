@@ -140,6 +140,26 @@ export async function getEventList(
     ...req.query,
     places_ids: placesIds,
   })
+
+  const ownerFilter = bool(query.owner) ?? false
+
+  if (ownerFilter && !req.auth) {
+    throw new RequestError(
+      "owner filter requires authentication",
+      RequestError.Unauthorized
+    )
+  }
+
+  // Deprecated: `list=highlight` is mapped to `list=active&highlighted=true`.
+  const isLegacyHighlightList =
+    (query.list as string | undefined) === "highlight"
+  const listValue = isLegacyHighlightList
+    ? EventListType.Active
+    : query.list || EventListType.Active
+  const highlightedValue = isLegacyHighlightList
+    ? true
+    : bool(query.highlighted) || undefined
+
   const options: EventListOptions = {
     user: profile.user,
     allow_pending: routeOptions.admin
@@ -152,8 +172,10 @@ export async function getEventList(
     limit: query.limit
       ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
       : 500,
-    list: query.list || EventListType.Active,
+    list: listValue,
     order: query.order,
+    owner: ownerFilter || undefined,
+    highlighted: highlightedValue,
   }
 
   if (routeOptions.admin) {
@@ -223,7 +245,7 @@ export async function getEventList(
     }
   }
 
-  if (query.creator) {
+  if (query.creator && !ownerFilter) {
     if (isEthereumAddress(query.creator)) {
       options.creator = query.creator.toLowerCase()
     } else {
