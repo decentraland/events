@@ -129,11 +129,15 @@ paths:
             - `all`: every event without time restriction
             - `live`: events currently running
             - `upcoming`: future events only
-            - `highlight`: highlighted events with a future finish time
           schema:
             type: string
-            enum: [all, active, live, upcoming, highlight]
+            enum: [all, active, live, upcoming]
             default: active
+        - name: highlighted
+          in: query
+          description: When true, return only events flagged as highlighted. Combine with `list` to scope by time range.
+          schema:
+            type: boolean
         - name: owner
           in: query
           description: |
@@ -341,7 +345,9 @@ paths:
                   minimum: 0
                 list:
                   type: string
-                  enum: [all, active, live, upcoming, highlight, mine]
+                  enum: [all, active, live, upcoming]
+                highlighted:
+                  type: boolean
                 position:
                   type: string
                 positions:

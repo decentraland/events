@@ -88,11 +88,11 @@ export const getEventListQuery: AjvObjectSchema = {
           enum: ["upcoming"],
           description: "Only future events",
         },
-        {
-          enum: ["highlight"],
-          description: "Only highlighted events",
-        },
       ],
+    },
+    highlighted: {
+      enum: TruthyEnum.filter((value) => typeof value === "string"),
+      description: "Only highlighted events",
     },
     owner: {
       enum: TruthyEnum.filter((value) => typeof value === "string"),

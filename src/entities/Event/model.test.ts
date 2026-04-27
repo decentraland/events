@@ -231,13 +231,8 @@ describe("EventModel.buildEventFilterConditions", () => {
     })
   })
 
-  describe("when list type filters are provided", () => {
+  describe("when highlighted option is provided", () => {
     const HIGHLIGHTED_FILTER_REGEX = /e\.highlighted\s+IS\s+TRUE/i
-    const ACTIVE_FILTER_REGEX = /e\.next_finish_at\s*>\s*now\(\)/i
-    const LIVE_FILTER_REGEX =
-      /e\.next_finish_at\s*>\s*now\(\)\s*AND\s*e\.next_start_at\s*<\s*now\(\)/i
-    const UPCOMING_FILTER_REGEX =
-      /e\.next_finish_at\s*>\s*now\(\)\s*AND\s*e\.next_start_at\s*>\s*now\(\)/i
 
     function hasHighlightedCondition(conditions: SQLCondition[]): boolean {
       return conditions.some((condition) =>
@@ -245,45 +240,38 @@ describe("EventModel.buildEventFilterConditions", () => {
       )
     }
 
-    describe("and list is Highlight", () => {
-      let options: Partial<EventListOptions>
+    it("generates a highlighted filter condition when highlighted is true", () => {
+      const conditions = buildEventFilterConditions({ highlighted: true })
 
-      beforeEach(() => {
-        options = {
-          list: EventListType.Highlight,
-        }
-      })
-
-      it("generates a highlighted filter condition", () => {
-        const conditions = buildEventFilterConditions(options)
-
-        expect(hasHighlightedCondition(conditions)).toBe(true)
-      })
-
-      it("also filters for active events (next_finish_at > now())", () => {
-        const conditions = buildEventFilterConditions(options)
-        const hasActiveFilter = conditions.some((condition) =>
-          /e\.next_finish_at\s*>\s*now\(\)/.test(condition.text)
-        )
-
-        expect(hasActiveFilter).toBe(true)
-      })
+      expect(hasHighlightedCondition(conditions)).toBe(true)
     })
 
-    describe("and list is Active", () => {
-      let options: Partial<EventListOptions>
+    it("does not generate a highlighted filter condition when highlighted is false", () => {
+      const conditions = buildEventFilterConditions({ highlighted: false })
 
-      beforeEach(() => {
-        options = {
-          list: EventListType.Active,
-        }
+      expect(hasHighlightedCondition(conditions)).toBe(false)
+    })
+
+    it("does not generate a highlighted filter condition when highlighted is omitted", () => {
+      const conditions = buildEventFilterConditions({})
+
+      expect(hasHighlightedCondition(conditions)).toBe(false)
+    })
+
+    it("composes with list=upcoming", () => {
+      const conditions = buildEventFilterConditions({
+        list: EventListType.Upcoming,
+        highlighted: true,
       })
 
-      it("does not generate a highlighted filter condition", () => {
-        const conditions = buildEventFilterConditions(options)
+      const hasUpcoming = conditions.some((c) =>
+        /e\.next_finish_at\s*>\s*now\(\)\s*AND\s*e\.next_start_at\s*>\s*now\(\)/i.test(
+          c.text
+        )
+      )
 
-        expect(hasHighlightedCondition(conditions)).toBe(false)
-      })
+      expect(hasHighlightedCondition(conditions)).toBe(true)
+      expect(hasUpcoming).toBe(true)
     })
   })
 

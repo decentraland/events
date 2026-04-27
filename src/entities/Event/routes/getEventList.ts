@@ -165,6 +165,7 @@ export async function getEventList(
     list: query.list || EventListType.Active,
     order: query.order,
     owner: ownerFilter || undefined,
+    highlighted: bool(query.highlighted) || undefined,
   }
 
   if (routeOptions.admin) {
