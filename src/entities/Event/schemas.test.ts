@@ -97,6 +97,18 @@ describe("getEventListQuery schema", () => {
       expect(() => validateQuery(query)).toThrow(RequestError)
     })
   })
+
+  describe("when list is the deprecated `highlight` alias", () => {
+    it("should accept the value for backward compatibility", () => {
+      expect(() => validateQuery({ list: "highlight" })).not.toThrow()
+    })
+  })
+
+  describe("when highlighted is a truthy string", () => {
+    it("should accept `true`", () => {
+      expect(() => validateQuery({ highlighted: "true" })).not.toThrow()
+    })
+  })
 })
 
 describe("getEventListByPlacesBodySchema", () => {

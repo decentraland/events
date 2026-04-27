@@ -150,6 +150,16 @@ export async function getEventList(
     )
   }
 
+  // Deprecated: `list=highlight` is mapped to `list=active&highlighted=true`.
+  const isLegacyHighlightList =
+    (query.list as string | undefined) === "highlight"
+  const listValue = isLegacyHighlightList
+    ? EventListType.Active
+    : query.list || EventListType.Active
+  const highlightedValue = isLegacyHighlightList
+    ? true
+    : bool(query.highlighted) || undefined
+
   const options: EventListOptions = {
     user: profile.user,
     allow_pending: routeOptions.admin
@@ -162,10 +172,10 @@ export async function getEventList(
     limit: query.limit
       ? Math.min(Math.max(Number(req.query["limit"]), 0), 500)
       : 500,
-    list: query.list || EventListType.Active,
+    list: listValue,
     order: query.order,
     owner: ownerFilter || undefined,
-    highlighted: bool(query.highlighted) || undefined,
+    highlighted: highlightedValue,
   }
 
   if (routeOptions.admin) {

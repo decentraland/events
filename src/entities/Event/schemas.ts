@@ -88,6 +88,11 @@ export const getEventListQuery: AjvObjectSchema = {
           enum: ["upcoming"],
           description: "Only future events",
         },
+        {
+          enum: ["highlight"],
+          description:
+            "Deprecated alias for `list=active&highlighted=true`. Prefer the `highlighted` filter.",
+        },
       ],
     },
     highlighted: {

@@ -129,9 +129,10 @@ paths:
             - `all`: every event without time restriction
             - `live`: events currently running
             - `upcoming`: future events only
+            - `highlight`: deprecated alias for `list=active&highlighted=true`
           schema:
             type: string
-            enum: [all, active, live, upcoming]
+            enum: [all, active, live, upcoming, highlight]
             default: active
         - name: highlighted
           in: query
@@ -345,7 +346,7 @@ paths:
                   minimum: 0
                 list:
                   type: string
-                  enum: [all, active, live, upcoming]
+                  enum: [all, active, live, upcoming, highlight]
                 highlighted:
                   type: boolean
                 position:
