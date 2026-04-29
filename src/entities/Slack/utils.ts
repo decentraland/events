@@ -31,7 +31,9 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:tada: New event submitted: <${eventSlackUrl(event)}|${event.id}>`,
+          text: `:tada: New event submitted: <${eventSlackUrl(event)}|${
+            event.id
+          }>`,
         },
       },
       {
@@ -81,9 +83,9 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:white_check_mark: new event approved: *<${eventSlackUrl(event)}|${
-            event.id
-          }>*`,
+          text: `:white_check_mark: new event approved: *<${eventSlackUrl(
+            event
+          )}|${event.id}>*`,
         },
       },
       {
@@ -114,7 +116,9 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:x: new event rejected: *<${eventSlackUrl(event)}|${event.id}>*`,
+          text: `:x: new event rejected: *<${eventSlackUrl(event)}|${
+            event.id
+          }>*`,
         },
       },
       {
@@ -187,7 +191,9 @@ export async function notifyUpcomingEvent(
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:runner: *<${eventSlackUrl(event)}|${event.id}>* is about to start`,
+          text: `:runner: *<${eventSlackUrl(event)}|${
+            event.id
+          }>* is about to start`,
         },
       },
       {
