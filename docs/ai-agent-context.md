@@ -2,7 +2,7 @@
 
 **Service Purpose:**
 
-The Community Events service is the backend API that powers community events within the Decentraland virtual world. It exposes HTTP endpoints to create, discover, and attend events in both land-based locations and virtual worlds, with features such as recurrent events, scheduling, notifications, and social-sharing metadata. The user-facing dApp lives in a separate repository.
+The Community Events service is the backend API that powers community events within the Decentraland virtual world. It exposes HTTP endpoints to create, discover, and attend events in both land-based locations and virtual worlds, with features such as recurrent events, scheduling, and notifications. The user-facing dApp lives in a separate repository and owns its own social-sharing metadata.
 
 **Key Capabilities:**
 
@@ -13,7 +13,6 @@ The Community Events service is the backend API that powers community events wit
 - Notifications: Browser push notifications and email notifications for upcoming events
 - Schedules & Collections: Curated event collections with custom theming (festivals, fashion weeks, etc.)
 - Full-Text Search: PostgreSQL-based text search across event names and descriptions
-- Social Sharing: Open Graph meta tags for social media sharing (server-rendered)
 - Admin/Moderator Tools: Event approval/rejection system with permission controls
 
 **Communication Pattern:**
@@ -58,7 +57,6 @@ The Community Events service is the backend API that powers community events wit
 - **Categories**: Events can be tagged with categories for filtering and discovery (currently limited to 1 category per event with MAX_CATEGORIES_ALLOWED = 1).
 - **Authentication & Authorization**: Wallet-based authentication through Decentraland. User addresses serve as primary identifiers. Event ownership is tied to creator's wallet address. Admin/moderator roles control approval/rejection permissions.
 - **Entity-Based Architecture**: Code is organized by entity (Event, EventAttendee, Schedule, ProfileSettings) with each containing model.ts (database queries), routes.ts (API endpoints), types.ts (TypeScript definitions), schemas.ts (validation), and utils.ts (helpers).
-- **Server-Rendered Social Metadata**: Open Graph and Twitter card metadata for individual events is rendered server-side by `src/entities/Social/routes.ts` to power link previews on social platforms.
 
 **Database notes:**
 
