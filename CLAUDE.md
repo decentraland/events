@@ -28,9 +28,8 @@ src/
     Schedule/            Curated event collections (festivals, weeks, etc.)
     Sitemap/             /events/sitemap.xml
     Slack/               Outbound Slack webhook for moderation events
-    Social/              Server-rendered OG/Twitter meta for /events/<id>
   api/                   External API clients (Communities, CommsGatekeeper, Places)
-  intl/en.json           Backend copies (used by Social/Slack/EventCategory — NOT i18n for users)
+  intl/en.json           Backend copies (used by Slack/EventCategory — NOT i18n for users)
   modules/               Backend-shared utilities
     decentralandFoundationAddresses.ts   Cron-refreshed allow-list of foundation wallets
     features.ts                          Feature-flag enum
@@ -85,7 +84,7 @@ The `GATSBY_*` prefixes survive only as fallback defaults inside `src/api/Commun
 - `GET/POST/PATCH /api/events` and subroutes — main aggregate (paginated lists, filters, recurrence via RRule, admin/moderation)
 - `/api/event-attendees`, `/api/categories`, `/api/schedules`, `/api/profile-settings`, `/api/profile-subscriptions`, `/api/poster` — supporting CRUD
 - `/api/profile/*` — wallet auth handshake (provided by `decentraland-gatsby`)
-- `/events/sitemap.xml`, `/events/social/<id>` — server-rendered for crawlers
+- `/events/sitemap.xml` — server-rendered for crawlers
 - `/metrics` — Prometheus
 
 CORS allowlist (in `src/server.ts`): `localhost`, `*.decentraland.{zone,today,org,systems}`, Vercel preview pattern, `mvfw.org`, `dcl-metrics.com`.
@@ -116,7 +115,7 @@ For any change that touches an enum or filter (e.g. `EventListType`):
 
 These look like frontend things but the API depends on them — never delete blindly:
 
-- `src/intl/en.json` — imported by `Social/routes.ts`, `Slack/utils.ts`, `EventCategory/routes.ts`
+- `src/intl/en.json` — imported by `Slack/utils.ts`, `EventCategory/routes.ts`
 - `src/modules/{decentralandFoundationAddresses,features,servers}.ts` — backend
 - `src/api/{Communities,CommsGatekeeper,Places}.ts` — backend (used by `Event/cron.ts`, `Event/routes/{createEvent,updateEvent,getEventList}.ts`)
 - `src/__mocks__/@dcl/ui-env.ts` — referenced by `jest.config.js` `moduleNameMapper`

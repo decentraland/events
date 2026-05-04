@@ -32,7 +32,6 @@ import profileSettings from "./entities/ProfileSettings/routes"
 import profileSubscription from "./entities/ProfileSubscription/routes"
 import schedules from "./entities/Schedule/routes"
 import sitemap from "./entities/Sitemap/routes"
-import social from "./entities/Social/routes"
 import { refreshFoundationAddresses } from "./modules/decentralandFoundationAddresses"
 
 const jobs = new Manager({ concurrency: 10 })
@@ -76,7 +75,6 @@ app.use("/api", [
 app.use(metrics([gatsbyRegister, register]))
 
 app.use("/events", sitemap)
-app.use("/events", social)
 
 // Logger.subscribe("error", createSegmentSubscriber())
 
