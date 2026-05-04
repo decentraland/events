@@ -7,7 +7,6 @@ import isURL from "validator/lib/isURL"
 
 import en from "../../intl/en.json"
 import { DeprecatedEventAttributes } from "../Event/types"
-import { eventUrl } from "../Event/utils"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
 
 const SLACK_WEBHOOK = env("SLACK_WEBHOOK", "")
@@ -15,6 +14,10 @@ const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump"
 )
+
+function eventSlackUrl(event: Pick<DeprecatedEventAttributes, "id">): string {
+  return `https://decentraland.org/whats-on/edit-hangout/${event.id}?openPreview`
+}
 
 if (!isURL(SLACK_WEBHOOK)) {
   logger.log(`missing config SLACK_WEBHOOK`)
@@ -28,7 +31,9 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:tada: New event submitted: <${eventUrl(event)}|${event.id}>`,
+          text: `:tada: New event submitted: <${eventSlackUrl(event)}|${
+            event.id
+          }>`,
         },
       },
       {
@@ -51,7 +56,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         text: {
           type: "mrkdwn",
           text: [
-            `at <${eventUrl(event)}|Events page>`,
+            `at <${eventSlackUrl(event)}|Events page>`,
             event.url &&
               event.url.startsWith(JUMP_IN_SITE_URL) &&
               `at <${event.url}|${
@@ -78,9 +83,9 @@ export async function notifyApprovedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:white_check_mark: new event approved: *<${eventUrl(event)}|${
-            event.id
-          }>*`,
+          text: `:white_check_mark: new event approved: *<${eventSlackUrl(
+            event
+          )}|${event.id}>*`,
         },
       },
       {
@@ -111,7 +116,9 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:x: new event rejected: *<${eventUrl(event)}|${event.id}>*`,
+          text: `:x: new event rejected: *<${eventSlackUrl(event)}|${
+            event.id
+          }>*`,
         },
       },
       {
@@ -155,7 +162,7 @@ export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
           type: "mrkdwn",
           text: `:pencil2: user ${
             event.user_name || "Guest"
-          } just edited his event: *<${eventUrl(event)}|${event.id}>*`,
+          } just edited his event: *<${eventSlackUrl(event)}|${event.id}>*`,
         },
       },
       {
@@ -184,7 +191,9 @@ export async function notifyUpcomingEvent(
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:runner: *<${eventUrl(event)}|${event.id}>* is about to start`,
+          text: `:runner: *<${eventSlackUrl(event)}|${
+            event.id
+          }>* is about to start`,
         },
       },
       {
