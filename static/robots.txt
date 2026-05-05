@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: http://events.decentraland.org/sitemap.xml

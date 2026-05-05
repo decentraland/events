@@ -10,14 +10,6 @@ RUN apk add --no-cache --virtual native-deps \
   openssh \
   shadow \
   musl-dev \
-  nasm \
-  tiff \
-  jpeg \
-  zlib \
-  zlib-dev \
-  vips \
-  vips-dev \
-  file \
   pkgconf
 
 RUN apk add --no-cache tini
@@ -30,23 +22,14 @@ RUN npm ci
 
 ARG NODE_MAX_OLD_SPACE_SIZE=6144
 ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}
-# Disable Gatsby's anonymous usage telemetry to reduce build log noise and avoid outbound analytics.
-ENV GATSBY_TELEMETRY_DISABLED=1
 
 COPY ./src                  /app/src
-COPY ./static               /app/static
 COPY ./templates            /app/templates
 COPY ./.env                 /app/.env.production
 COPY ./entrypoint.sh        /app/entrypoint.sh
-COPY ./workbox-config.js    /app/workbox-config.js
-COPY ./gatsby-browser.js    /app/gatsby-browser.js
-COPY ./gatsby-config.js     /app/gatsby-config.js
-COPY ./gatsby-node.js       /app/gatsby-node.js
-COPY ./gatsby-ssr.js        /app/gatsby-ssr.js
 COPY ./tsconfig.json        /app/tsconfig.json
 
-RUN npm run build:server
-RUN npm run build:front -- --prefix-paths
+RUN npm run build
 RUN npm prune --production
 
 FROM node:18.8-alpine
@@ -66,8 +49,6 @@ COPY --from=compiler /app/package.json         /app/package.json
 COPY --from=compiler /app/package-lock.json    /app/package-lock.json
 COPY --from=compiler /app/node_modules         /app/node_modules
 COPY --from=compiler /app/lib                  /app/lib
-COPY --from=compiler /app/public               /app/public
-COPY --from=compiler /app/static               /app/static
 COPY --from=compiler /app/templates            /app/templates
 COPY --from=compiler /app/entrypoint.sh        /app/entrypoint.sh
 
