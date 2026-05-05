@@ -14,9 +14,16 @@ const JUMP_IN_SITE_URL = env(
   "JUMP_IN_SITE_URL",
   "https://decentraland.org/jump"
 )
+const BASE_URL = env("BASE_URL", "https://decentraland.org")
 
 function eventSlackUrl(event: Pick<DeprecatedEventAttributes, "id">): string {
   return `https://decentraland.org/whats-on/edit-hangout/${event.id}?openPreview`
+}
+
+function eventReviewSlackUrl(
+  event: Pick<DeprecatedEventAttributes, "id">
+): string {
+  return `${BASE_URL}/whats-on/admin/pending-events?id=${event.id}`
 }
 
 if (!isURL(SLACK_WEBHOOK)) {
@@ -31,7 +38,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `:tada: New event submitted: <${eventSlackUrl(event)}|${
+          text: `:tada: New event submitted: <${eventReviewSlackUrl(event)}|${
             event.id
           }>`,
         },
@@ -56,7 +63,7 @@ export async function notifyNewEvent(event: DeprecatedEventAttributes) {
         text: {
           type: "mrkdwn",
           text: [
-            `at <${eventSlackUrl(event)}|Events page>`,
+            `at <${eventReviewSlackUrl(event)}|Events page>`,
             event.url &&
               event.url.startsWith(JUMP_IN_SITE_URL) &&
               `at <${event.url}|${
