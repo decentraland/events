@@ -173,7 +173,7 @@ paths:
           description: Filter events by creator's Ethereum address
           schema:
             type: string
-            pattern: '^0x[a-fA-F0-9]{40}$'
+            pattern: "^0x[a-fA-F0-9]{40}$"
             example: "0x1234567890123456789012345678901234567890"
         - name: only_attendee
           in: query
@@ -263,7 +263,7 @@ paths:
             type: boolean
             default: false
       responses:
-        '200':
+        "200":
           description: List of events
           content:
             application/json:
@@ -276,13 +276,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -298,9 +298,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewEvent'
+              $ref: "#/components/schemas/NewEvent"
       responses:
-        '200':
+        "200":
           description: Event created successfully
           content:
             application/json:
@@ -311,15 +311,15 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /events/search:
     post:
@@ -379,7 +379,7 @@ paths:
                   type: string
                   enum: [asc, desc]
       responses:
-        '200':
+        "200":
           description: List of events
           content:
             application/json:
@@ -392,11 +392,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /events/attending:
     get:
@@ -408,7 +408,7 @@ paths:
       operationId: getAttendingEvents
       security: []
       responses:
-        '200':
+        "200":
           description: List of events user is attending
           content:
             application/json:
@@ -421,11 +421,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Event'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Event"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /events/{event_id}:
     get:
@@ -451,7 +451,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Event details
           content:
             application/json:
@@ -462,13 +462,13 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Event'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
+                    $ref: "#/components/schemas/Event"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
     patch:
       tags:
@@ -501,12 +501,12 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/EventUpdate'
-                - $ref: '#/components/schemas/EventAdminUpdate'
-                - $ref: '#/components/schemas/EventAdminActor'
-                - $ref: '#/components/schemas/EventAdminReject'
+                - $ref: "#/components/schemas/EventUpdate"
+                - $ref: "#/components/schemas/EventAdminUpdate"
+                - $ref: "#/components/schemas/EventAdminActor"
+                - $ref: "#/components/schemas/EventAdminReject"
       responses:
-        '200':
+        "200":
           description: Event updated successfully
           content:
             application/json:
@@ -517,19 +517,19 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Event'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
+                    $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /events/{event_id}/attendees:
     get:
@@ -549,7 +549,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: List of attendees
           content:
             application/json:
@@ -562,11 +562,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/EventAttendee'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/EventAttendee"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -585,7 +585,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Successfully marked as attending
           content:
             application/json:
@@ -598,13 +598,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/EventAttendee'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/EventAttendee"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       tags:
@@ -623,7 +623,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Successfully removed from attendees
           content:
             application/json:
@@ -636,13 +636,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/EventAttendee'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/EventAttendee"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /events/categories:
     get:
@@ -654,7 +654,7 @@ paths:
       operationId: getEventCategories
       security: []
       responses:
-        '200':
+        "200":
           description: List of categories
           content:
             application/json:
@@ -667,9 +667,9 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/EventCategory'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/EventCategory"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /schedules:
     get:
@@ -681,7 +681,7 @@ paths:
       operationId: getSchedules
       security: []
       responses:
-        '200':
+        "200":
           description: List of schedules
           content:
             application/json:
@@ -694,9 +694,9 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Schedule'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Schedule"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -711,9 +711,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewSchedule'
+              $ref: "#/components/schemas/NewSchedule"
       responses:
-        '200':
+        "200":
           description: Schedule created successfully
           content:
             application/json:
@@ -724,15 +724,15 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Schedule'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Schedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /schedules/{schedule_id}:
     get:
@@ -752,7 +752,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Schedule details
           content:
             application/json:
@@ -763,11 +763,11 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Schedule'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Schedule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     patch:
       tags:
@@ -790,9 +790,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ScheduleUpdate'
+              $ref: "#/components/schemas/ScheduleUpdate"
       responses:
-        '200':
+        "200":
           description: Schedule updated successfully
           content:
             application/json:
@@ -803,17 +803,17 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Schedule'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Schedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /profiles/settings:
     get:
@@ -826,7 +826,7 @@ paths:
       operationId: listProfileSettings
       security: []
       responses:
-        '200':
+        "200":
           description: List of profile settings
           content:
             application/json:
@@ -839,13 +839,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ProfileSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/ProfileSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /profiles/me/settings:
     get:
@@ -857,7 +857,7 @@ paths:
       operationId: getMyProfileSettings
       security: []
       responses:
-        '200':
+        "200":
           description: Profile settings
           content:
             application/json:
@@ -868,11 +868,11 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/ProfileSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/ProfileSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     patch:
       tags:
@@ -887,9 +887,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MyProfileSettingsUpdate'
+              $ref: "#/components/schemas/MyProfileSettingsUpdate"
       responses:
-        '200':
+        "200":
           description: Settings updated successfully
           content:
             application/json:
@@ -900,13 +900,13 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/ProfileSettings'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/ProfileSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /profiles/{profile_id}/settings:
     get:
@@ -925,10 +925,10 @@ paths:
           description: Ethereum address of the user
           schema:
             type: string
-            pattern: '^0x[a-fA-F0-9]{40}$'
+            pattern: "^0x[a-fA-F0-9]{40}$"
             example: "0x1234567890123456789012345678901234567890"
       responses:
-        '200':
+        "200":
           description: Profile settings
           content:
             application/json:
@@ -939,15 +939,15 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/ProfileSettings'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/ProfileSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     patch:
       tags:
@@ -965,15 +965,15 @@ paths:
           description: Ethereum address of the user
           schema:
             type: string
-            pattern: '^0x[a-fA-F0-9]{40}$'
+            pattern: "^0x[a-fA-F0-9]{40}$"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProfileSettingsUpdate'
+              $ref: "#/components/schemas/ProfileSettingsUpdate"
       responses:
-        '200':
+        "200":
           description: Settings updated successfully
           content:
             application/json:
@@ -984,17 +984,17 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/ProfileSettings'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/ProfileSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /profiles/subscriptions:
     get:
@@ -1008,7 +1008,7 @@ paths:
       deprecated: true
       security: []
       responses:
-        '200':
+        "200":
           description: List of subscriptions
           content:
             application/json:
@@ -1020,11 +1020,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ProfileSubscription'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/ProfileSubscription"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -1041,9 +1041,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewProfileSubscription'
+              $ref: "#/components/schemas/NewProfileSubscription"
       responses:
-        '200':
+        "200":
           description: Subscription created
           content:
             application/json:
@@ -1056,12 +1056,12 @@ paths:
                   data:
                     type: boolean
                     example: true
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       tags:
@@ -1074,7 +1074,7 @@ paths:
       deprecated: true
       security: []
       responses:
-        '200':
+        "200":
           description: Subscriptions deleted
           content:
             application/json:
@@ -1087,10 +1087,10 @@ paths:
                   data:
                     type: boolean
                     example: true
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /poster:
     post:
@@ -1116,7 +1116,7 @@ paths:
                   format: binary
                   description: Image file (JPEG, PNG, or GIF, max 500KB)
       responses:
-        '200':
+        "200":
           description: Image uploaded successfully
           content:
             application/json:
@@ -1127,25 +1127,25 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Poster'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '413':
+                    $ref: "#/components/schemas/Poster"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
           description: Payload too large (file size exceeds 500KB)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
           description: Service unavailable (AWS S3 issue)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /poster-vertical:
     post:
@@ -1175,7 +1175,7 @@ paths:
                   format: binary
                   description: Vertical image file (PNG or JPG only, max 500KB, recommended 716x1814 pixels)
       responses:
-        '200':
+        "200":
           description: Vertical image uploaded successfully
           content:
             application/json:
@@ -1186,29 +1186,29 @@ paths:
                     type: boolean
                     example: true
                   data:
-                    $ref: '#/components/schemas/Poster'
-        '400':
+                    $ref: "#/components/schemas/Poster"
+        "400":
           description: Bad request (invalid file type - only PNG and JPG allowed)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '413':
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
           description: Payload too large (file size exceeds 500KB)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
           description: Service unavailable (AWS S3 issue)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
 components:
   securitySchemes:
@@ -1319,7 +1319,7 @@ components:
           example: "https://play.decentraland.org/?position=20,30"
         user:
           type: string
-          pattern: '^0x[a-fA-F0-9]{40}$'
+          pattern: "^0x[a-fA-F0-9]{40}$"
           description: Ethereum address of event creator
           example: "0x1234567890123456789012345678901234567890"
         user_name:
@@ -1470,7 +1470,7 @@ components:
           description: Ethereum addresses of latest attendees
           items:
             type: string
-            pattern: '^0x[a-fA-F0-9]{40}$'
+            pattern: "^0x[a-fA-F0-9]{40}$"
           maxItems: 10
         attending:
           type: boolean
@@ -1493,7 +1493,7 @@ components:
             Only included when with_connected_users=true. Data is cached for 5 minutes.
           items:
             type: string
-            pattern: '^0x[a-fA-F0-9]{40}$'
+            pattern: "^0x[a-fA-F0-9]{40}$"
           example: ["0x1234567890123456789012345678901234567890"]
       required:
         - id
@@ -1766,7 +1766,7 @@ components:
 
     EventAdminReject:
       allOf:
-        - $ref: '#/components/schemas/EventAdminActor'
+        - $ref: "#/components/schemas/EventAdminActor"
         - type: object
           description: |
             Body for admin rejection state changes sent to `PATCH /events/{event_id}` with
@@ -1895,7 +1895,7 @@ components:
           description: Event UUID
         user:
           type: string
-          pattern: '^0x[a-fA-F0-9]{40}$'
+          pattern: "^0x[a-fA-F0-9]{40}$"
           description: Attendee's Ethereum address
         user_name:
           type: string
@@ -2072,7 +2072,7 @@ components:
       properties:
         user:
           type: string
-          pattern: '^0x[a-fA-F0-9]{40}$'
+          pattern: "^0x[a-fA-F0-9]{40}$"
           description: User's Ethereum address
         email:
           type: string
@@ -2166,7 +2166,7 @@ components:
       properties:
         user:
           type: string
-          pattern: '^0x[a-fA-F0-9]{40}$'
+          pattern: "^0x[a-fA-F0-9]{40}$"
         endpoint:
           type: string
           format: uri
@@ -2248,7 +2248,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             ok: false
             error: "Invalid request parameters"
@@ -2258,7 +2258,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             ok: false
             error: "Unauthorized"
@@ -2268,7 +2268,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             ok: false
             error: "Forbidden"
@@ -2278,7 +2278,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             ok: false
             error: "Resource not found"
@@ -2288,7 +2288,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             ok: false
             error: "Internal server error"
@@ -2298,7 +2298,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             ok: false
             error: "EVENTS_ADMIN_AUTH_TOKEN is not configured; events admin endpoints are disabled"
