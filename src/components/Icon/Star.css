@@ -1,0 +1,24 @@
+.icon-star {
+  width: 19px;
+  height: 18px;
+  overflow: visible !important;
+}
+
+.icon-star path {
+  fill: transparent;
+}
+
+.icon-star.active path {
+  fill: #ff2d55;
+  stroke: #ff2d55;
+}
+
+:hover > .icon-star:not(.active) path {
+  fill: #000;
+  stroke: #000;
+}
+
+:hover > .icon-star.active path {
+  fill: #ff2d55;
+  stroke: #ff2d55;
+}

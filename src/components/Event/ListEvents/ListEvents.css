@@ -1,0 +1,42 @@
+.list-events__group-title {
+  padding: 16px 0 24px;
+  width: 100%;
+}
+
+.list-events__group-title .dg.SubTitle {
+  font-size: 13px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.38;
+  letter-spacing: normal;
+  color: #736e7d;
+  text-transform: uppercase;
+}
+
+.dcl.sliderfield.list-events__time-range-slider {
+  padding: 13px 20px 8px;
+  margin-bottom: 13px;
+}
+
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-left
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-from,
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-right
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-to {
+  visibility: hidden;
+}
+
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-left:hover
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-from,
+.dcl.sliderfield-wrapper
+  > input[type="range"].sliderfield-input-right:hover
+  ~ .dcl.sliderfield-rail
+  .slider-value.slider-to {
+  visibility: visible;
+}

@@ -9,7 +9,9 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/decentraland/events/badge.svg)](https://coveralls.io/github/decentraland/events)
 
-The Community Events service is the backend API that powers community events within the Decentraland virtual world. It manages event creation, discovery, attendance, schedules, recurrent events, push/email notifications, and social-sharing metadata. The user-facing dApp lives in a separate repository and consumes this service via HTTP.
+The Community Events service is a full-stack web application that manages community events within the Decentraland virtual world. It allows users to create, discover, and attend events in both land-based locations and virtual worlds, providing a dApp interface for event management with features like recurrent events, event scheduling, notifications, and social sharing.
+
+![events home page](./static/events.jpg)
 
 ## Table of Contents
 
@@ -38,6 +40,7 @@ The Community Events service is the backend API that powers community events wit
 - **Schedules & Collections**: Curated event collections with custom theming (festivals, fashion weeks, etc.)
 - **Full-Text Search**: PostgreSQL-based text search across event names and descriptions
 - **Social Sharing**: Open Graph meta tags for social media sharing
+- **PWA Support**: Progressive Web App with offline capabilities
 - **Admin/Moderator Tools**: Event approval/rejection system with permission controls
 
 ## Dependencies and Related Services
@@ -53,7 +56,7 @@ The Community Events service is the backend API that powers community events wit
 
 ### Internal Dependencies
 
-- **decentraland-gatsby**: Server-side framework providing authentication, database utilities, mailing, and job management (despite its name, this service uses only its backend modules)
+- **decentraland-gatsby**: Framework providing authentication, database utilities, and job management
 - **@dcl/schemas**: Decentraland schema definitions and validation
 
 ## API Documentation
@@ -103,7 +106,7 @@ All migrations are timestamped TypeScript files with `up()` and `down()` functio
 
 ### Prerequisites
 
-- **Node.js**: v18.x
+- **Node.js**: v18.x or higher
 - **npm**: v8.x or v9.x
 - **PostgreSQL**: v12 or higher
 - **AWS Account**: For S3 storage and SNS notifications (optional for development)
@@ -150,6 +153,9 @@ Required environment variables:
 | `AWS_BUCKET_NAME`             | S3 bucket for event images                                | `events.decentraland.zone`                          |
 | `AWS_BUCKET_URL`              | Public URL for S3 bucket                                  | `https://s3.amazonaws.com/...`                      |
 | `WEB_PUSH_SECRET`             | VAPID private key for web push                            | Generate with `web-push generate-vapid-keys`        |
+| `GATSBY_WEB_PUSH_KEY`         | VAPID public key for web push                             | Generate with `web-push generate-vapid-keys`        |
+| `GATSBY_DECENTRALAND_URL`     | Decentraland play URL                                     | `https://play.decentraland.org`                     |
+| `GATSBY_COMMUNITIES_API_URL`  | Communities API URL                                       | `https://social-api.decentraland.zone`              |
 | `NOTIFICATION_SERVICE_URL`    | Notification service URL                                  | `https://notifications-processor.decentraland.zone` |
 | `NOTIFICATION_SERVICE_TOKEN`  | Auth token for notification service                       | -                                                   |
 | `COMMUNITIES_API_ADMIN_TOKEN` | Admin token for communities API                           | -                                                   |
@@ -160,54 +166,65 @@ See `.env.example` for a complete list of configuration options.
 
 #### Development Mode
 
-Start the Express API server with file watching:
+Run both the frontend (Gatsby) and backend (Express) concurrently:
 
 ```bash
 npm start
 ```
 
-This is equivalent to running `npm run serve` and exposes the API on `http://localhost:4000` by default (configurable via `PORT` and `HOST`).
+This will start:
+
+- Express API server on `https://localhost:8000/api`
+- Gatsby development server on `https://localhost:8000`
 
 #### Production Mode
 
-Build the service:
+1. Build the frontend:
 
 ```bash
-npm run build
+npm run build:front
 ```
 
-Run the compiled service:
+2. Build the backend:
 
 ```bash
-NODE_ENV=production node lib/server.js
+npm run build:server
 ```
 
-The Docker image (`Dockerfile`) bundles `npm run build` and runs `entrypoint.sh`, which applies pending migrations before booting the server.
+3. Serve the built application (configure your production server to serve the built files and run the Express server)
+
+#### Individual Components
+
+Run only the backend server:
+
+```bash
+npm run serve
+```
+
+Run only the Gatsby development server:
+
+```bash
+npm run develop
+```
 
 ## Testing
 
-Run the unit test suite:
+Run the test suite:
 
 ```bash
 npm test
 ```
 
-Run the unit tests with coverage:
+Run tests with coverage:
 
 ```bash
 npm test -- --coverage
 ```
 
-Run the integration tests (requires a running PostgreSQL instance — `docker compose up -d` provides one):
-
-```bash
-npm run test:integration
-```
-
 Tests are organized as:
 
 - Unit tests: `src/**/*.test.ts`
-- Integration tests: `test/integration/*.test.ts`
+- Integration tests: Testing API endpoints and database interactions
 
 ## Development
 
@@ -246,23 +263,24 @@ npm run husky-setup
 ```
 events/
 ├── src/
-│   ├── api/              # External API clients (Communities, CommsGatekeeper, Places)
-│   ├── entities/         # Domain entities (Event, Attendee, Notification, etc.)
+│   ├── entities/          # Domain entities (Event, Attendee, etc.)
 │   │   ├── Event/
-│   │   │   ├── model.ts  # Database queries
-│   │   │   ├── routes/   # API endpoints
-│   │   │   ├── cron.ts   # Scheduled jobs
-│   │   │   ├── types.ts  # TypeScript types
+│   │   │   ├── model.ts   # Database queries
+│   │   │   ├── routes.ts  # API endpoints
+│   │   │   ├── types.ts   # TypeScript types
 │   │   │   ├── schemas.ts # Validation schemas
-│   │   │   └── utils.ts  # Helper functions
+│   │   │   └── utils.ts   # Helper functions
 │   │   └── ...
-│   ├── intl/             # Backend copies (email/og metadata, slack messages)
-│   ├── migrations/       # Database migrations
-│   ├── modules/          # Backend-shared utilities
+│   ├── migrations/        # Database migrations
+│   ├── hooks/             # React hooks
+│   ├── api/              # Frontend API clients
+│   ├── config/           # Configuration
 │   └── server.ts         # Express server setup
-├── templates/            # Email HTML templates
-├── test/                 # Integration tests, fixtures, and setup
-├── docs/                 # API documentation (OpenAPI, schemas, agent context)
+├── docs/                 # Documentation
+│   ├── ai-agent-context.md    # AI agent context
+│   ├── database-schemas.md    # Database schema details
+│   └── openapi.yaml          # API documentation
+├── static/              # Static assets
 └── package.json
 ```
 

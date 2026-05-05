@@ -1,0 +1,12 @@
+.users-page .ui.table td.avatar-cell img.dcl-avatar {
+  display: inline-block;
+}
+
+.users-page .ui.table tr .ui.button {
+  opacity: 0.1;
+  transition: opacity 0.1s ease;
+}
+
+.users-page .ui.table tr:hover .ui.button {
+  opacity: 1;
+}

@@ -1,4 +1,3 @@
-import { utils } from "decentraland-commons"
 import { Model } from "decentraland-gatsby/dist/entities/Database/model"
 import {
   SQL,
@@ -15,6 +14,8 @@ import {
 import Time from "decentraland-gatsby/dist/utils/date/Time"
 import { QueryPart } from "decentraland-server/dist/db/types"
 import isEthereumAddress from "validator/lib/isEthereumAddress"
+
+import { utils } from "decentraland-commons"
 
 import {
   DeprecatedEventAttributes,
