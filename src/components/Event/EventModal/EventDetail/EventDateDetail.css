@@ -1,0 +1,8 @@
+.EventDateDetail__Capitalize {
+  text-transform: capitalize;
+}
+
+.EventDateDetail__Span {
+  width: "3.5em";
+  display: "inline-block";
+}

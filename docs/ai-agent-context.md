@@ -2,7 +2,7 @@
 
 **Service Purpose:**
 
-The Community Events service is the backend API that powers community events within the Decentraland virtual world. It exposes HTTP endpoints to create, discover, and attend events in both land-based locations and virtual worlds, with features such as recurrent events, scheduling, and notifications. The user-facing dApp lives in a separate repository and owns its own social-sharing metadata.
+The Community Events service is a full-stack web application that manages community events within the Decentraland virtual world. It allows users to create, discover, and attend events in both land-based locations and virtual worlds, providing a dApp interface for event management with features like recurrent events, event scheduling, notifications, and social sharing.
 
 **Key Capabilities:**
 
@@ -13,23 +13,29 @@ The Community Events service is the backend API that powers community events wit
 - Notifications: Browser push notifications and email notifications for upcoming events
 - Schedules & Collections: Curated event collections with custom theming (festivals, fashion weeks, etc.)
 - Full-Text Search: PostgreSQL-based text search across event names and descriptions
+- Social Sharing: Open Graph meta tags for social media sharing
+- PWA Support: Progressive Web App with offline capabilities
 - Admin/Moderator Tools: Event approval/rejection system with permission controls
 
 **Communication Pattern:**
 
-- HTTP REST API
+- HTTP REST API for backend services
 - GraphQL not used (native REST endpoints)
 - WebSocket not used
 - Web Push API for browser notifications
+- Server-Side Rendering (SSR) and Static Site Generation (SSG) via Gatsby
 
 **Technology Stack:**
 
-- Runtime: Node.js v18.x
+- Runtime: Node.js v18.x or higher
 - Language: TypeScript
-- Server Framework: Express.js (with utilities from `decentraland-gatsby`'s backend modules)
+- Backend Framework: Express.js
+- Frontend Framework: Gatsby 4.x with React 18
 - Database: PostgreSQL v12 or higher
 - Database Migrations: node-pg-migrate
 - ORM/Query Builder: Custom SQL through decentraland-gatsby utilities
+- UI Components: Custom React components with React Helmet
+- Styling: PostCSS with autoprefixer and cssnano
 - Testing: Jest for unit and integration tests
 - Code Quality: ESLint + Prettier
 - Pre-commit Hooks: Husky + lint-staged
@@ -43,6 +49,7 @@ The Community Events service is the backend API that powers community events wit
 - Authentication: Decentraland wallet-based authentication
 - Communities API: Decentraland Communities API (community associations)
 - Notification Service: Event notification processing service
+- Image Processing: Sharp (image optimization)
 - Schema Validation: @dcl/schemas (Decentraland schema definitions)
 
 **Key Concepts:**
@@ -57,6 +64,7 @@ The Community Events service is the backend API that powers community events wit
 - **Categories**: Events can be tagged with categories for filtering and discovery (currently limited to 1 category per event with MAX_CATEGORIES_ALLOWED = 1).
 - **Authentication & Authorization**: Wallet-based authentication through Decentraland. User addresses serve as primary identifiers. Event ownership is tied to creator's wallet address. Admin/moderator roles control approval/rejection permissions.
 - **Entity-Based Architecture**: Code is organized by entity (Event, EventAttendee, Schedule, ProfileSettings) with each containing model.ts (database queries), routes.ts (API endpoints), types.ts (TypeScript definitions), schemas.ts (validation), and utils.ts (helpers).
+- **Hybrid Rendering**: Static pages are generated at build time with Gatsby, dynamic API endpoints are served by Express, client-side hydration provides interactive features, and PWA capabilities enable offline support.
 
 **Database notes:**
 

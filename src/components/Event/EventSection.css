@@ -1,0 +1,73 @@
+.dg.Divider.event-section__divider {
+  opacity: 0.24;
+  border-color: #736e7d;
+  margin: 0 24px;
+  border-bottom: 0;
+}
+
+.event-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 18px 24px;
+  overflow: auto;
+}
+
+.event-section.event-section--highlight {
+  background-color: #ffeed6;
+}
+
+.event-section .dg.Paragraph,
+.event-section .dg.List .dg.ListItem {
+  font-size: 15px;
+  line-height: 1.4;
+  margin: 0 0 0.8em;
+}
+
+.event-section .dg.Paragraph.error {
+  color: #ff0000;
+  text-align: right;
+  margin-top: 0.1em;
+}
+
+.event-section .dg.Paragraph .dg.Bold,
+.event-section .dg.Paragraph.Paragraph--bold {
+  font-weight: 500;
+}
+
+.event-section .event-section__icon {
+  flex: 0 0 28px;
+}
+
+.event-section .event-section__icon.event-section__icon img {
+  vertical-align: initial;
+}
+
+.event-section .event-section__icon.event-section__icon--center {
+  display: flex;
+  align-items: center;
+}
+
+.event-section .event-section__detail {
+  flex: 1 1 auto;
+  max-width: 90%;
+  overflow: auto;
+  word-break: break-word;
+}
+
+.event-section .event-section__detail a.dg.Link {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.event-section .event-section__detail .dg.ImgAvatar {
+  margin-right: 8px;
+  width: 32px;
+  height: 32px;
+}
+
+@media only screen and (max-width: 767px) {
+  .event-section {
+    justify-content: flex-end;
+  }
+}

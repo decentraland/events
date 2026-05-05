@@ -1,0 +1,76 @@
+.dcl.tabs {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.dcl.tabs .ui.container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.dcl.tabs .ui.container .ui.button {
+  bottom: 11px;
+}
+
+.dcl.header-menu {
+  margin: 0;
+}
+
+.ui.cards,
+.ui.cards ~ .ui.cards {
+  margin: -0.875em -0.5em;
+}
+
+.GroupTitle {
+  width: 100%;
+  padding: 24px 0;
+}
+
+.GroupTitle .dg.SubTitle {
+  font-size: 13px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.38;
+  letter-spacing: normal;
+  color: #736e7d;
+  text-transform: uppercase;
+}
+
+.ui.container .Row .left.Column.sidebar .dcl.box {
+  margin-left: -16px;
+  margin-top: 24px;
+}
+
+.ui.container .Row .left.Column.sidebar .dcl.sliderfield {
+  margin-top: 24px;
+}
+
+.ui.container .Row .left.Column.sidebar {
+  width: 256px;
+  padding-right: 24px;
+  padding-left: -16px;
+}
+
+.ui.container .Row .right.Column {
+  width: calc(100% - 256px);
+}
+
+.ui.container .events__all-events-title {
+  margin-top: 60px;
+}
+
+@media only screen and (max-width: 768px) {
+  .ui.container .Row .left.Column.sidebar {
+    display: none;
+  }
+
+  .ui.container .Row .right.Column {
+    width: 100%;
+  }
+  .ui.container .Row .right.Column .ui.cards > .ui.card {
+    width: 100%;
+    margin-right: 15px;
+  }
+}

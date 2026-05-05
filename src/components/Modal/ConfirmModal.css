@@ -1,0 +1,45 @@
+.ui.modal.ConfirmModal {
+  max-width: 520px;
+  position: relative;
+  text-align: center;
+  padding: 48px 80px;
+}
+
+.ui.modal.ConfirmModal .dg.Title,
+.ui.modal.ConfirmModal .dg.SubTitle,
+.ui.modal.ConfirmModal .dg.Paragraph {
+  margin-top: 0;
+}
+
+.ui.modal.ConfirmModal .dg.Title,
+.ui.modal.ConfirmModal .dg.SubTitle {
+  font-size: 21px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.43;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.ui.modal.ConfirmModal .dg.Paragraph {
+  font-size: 17px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.53;
+  letter-spacing: -0.2px;
+  text-align: center;
+}
+
+.ui.modal.ConfirmModal .ConfirmModal__Close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 14px;
+  cursor: pointer;
+}
+
+.ui.modal.ConfirmModal .ui.button {
+  width: 100%;
+}
