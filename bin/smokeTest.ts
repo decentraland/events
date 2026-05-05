@@ -295,7 +295,20 @@ function fillBody(body: unknown, env: EnvName): unknown {
   return body
 }
 
-async function runOne(env: EnvName, check: Check): Promise<Result> {
+// Cloudflare WAF / rate-limit responses come with this exact key. We use it
+// to (a) retry once with the suggested backoff, (b) downgrade to "warn" so a
+// transient edge block doesn't break the whole run.
+function isCloudflareBlock(
+  body: unknown
+): body is { cloudflare_error?: unknown; retry_after?: number } {
+  return (
+    !!body &&
+    typeof body === "object" &&
+    "cloudflare_error" in (body as Record<string, unknown>)
+  )
+}
+
+async function runOneOnce(env: EnvName, check: Check): Promise<Result> {
   const baseUrl = ENVS[env]
   const url = `${baseUrl}${fillPlaceholders(check.path, env)}`
   const started = Date.now()
@@ -367,6 +380,19 @@ async function runOne(env: EnvName, check: Check): Promise<Result> {
   }
 }
 
+async function runOne(env: EnvName, check: Check): Promise<Result> {
+  let result = await runOneOnce(env, check)
+  if (result.status === 429 && isCloudflareBlock(result.body)) {
+    const wait = Math.min(
+      ((result.body as { retry_after?: number }).retry_after ?? 1) * 1000,
+      5000
+    )
+    await new Promise((r) => setTimeout(r, wait))
+    result = await runOneOnce(env, check)
+  }
+  return result
+}
+
 function statusOk(actual: number, expected: number | number[]): boolean {
   return Array.isArray(expected)
     ? expected.includes(actual)
@@ -393,7 +419,13 @@ type Diff = {
 function compare(check: Check, zone: Result, prod: Result): Diff {
   const issues: string[] = []
   let severity: Diff["severity"] = "ok"
-  const failSeverity: Diff["severity"] = check.optional ? "warn" : "fail"
+  // If the edge (Cloudflare WAF) blocked the request, the API itself never
+  // got a chance to answer — that's environmental, not a real contract drift,
+  // so we downgrade fails to warns instead of failing the run.
+  const cloudflareBlocked =
+    isCloudflareBlock(zone.body) || isCloudflareBlock(prod.body)
+  const failSeverity: Diff["severity"] =
+    check.optional || cloudflareBlocked ? "warn" : "fail"
 
   for (const [envName, res] of [
     ["zone", zone],
@@ -438,7 +470,7 @@ function compare(check: Check, zone: Result, prod: Result): Diff {
               res.topKeys
             )})`
           )
-          severity = "fail"
+          severity = failSeverity
         }
       }
     }
@@ -469,7 +501,16 @@ function compare(check: Check, zone: Result, prod: Result): Diff {
         zone.topKeys
       )} prod=${JSON.stringify(prod.topKeys)}`
     )
-    severity = "fail"
+    severity = failSeverity
+  }
+  if (cloudflareBlocked) {
+    issues.push(
+      `cloudflare WAF blocked one env (status=${
+        isCloudflareBlock(zone.body)
+          ? `zone=${zone.status}`
+          : `prod=${prod.status}`
+      }) — re-run to recover`
+    )
   }
 
   return { check, zone, prod, issues, severity }
