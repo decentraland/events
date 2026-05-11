@@ -198,8 +198,8 @@ export async function sendEventApproved(event: EventAttributes) {
     timestamp: Date.now(),
     metadata: {
       host: event.user,
-      title: "Your hangout is approved",
-      description: `Your hangout ${event.name} has been approved.`,
+      title: event.name,
+      description: event.description,
       name: event.name,
       image: event.image || "",
       link: buildEventLink(event),
@@ -222,8 +222,8 @@ export async function sendEventRejected(
     timestamp: Date.now(),
     metadata: {
       host: event.user,
-      title: "Your hangout needs changes",
-      description: `Your hangout ${event.name} was rejected.`,
+      title: event.name,
+      description: event.description,
       name: event.name,
       image: event.image || "",
       reason,
