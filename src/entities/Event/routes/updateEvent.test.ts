@@ -95,6 +95,8 @@ jest.mock("../../Notifications", () => ({
   sendEventStarted: jest.fn(),
   sendEventStartsSoon: jest.fn(),
   sendEventEnded: jest.fn(),
+  sendEventApproved: jest.fn(),
+  sendEventRejected: jest.fn(),
 }))
 jest.mock("../../ProfileSettings/routes/getAuthProfileSettings")
 jest.mock("../../Schedule/model")

@@ -3,6 +3,7 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { Request } from "express"
 
+import { sendEventApproved, sendEventRejected } from "../../Notifications"
 import {
   DEFAULT_PROFILE_SETTINGS,
   ProfileSettingsAttributes,
@@ -168,6 +169,7 @@ async function approveEventByActor(
 
   const updatedEvent = await persistEvent(event, changes)
   await notifyApprovedEvent(updatedEvent)
+  await sendEventApproved(updatedEvent)
   return toResponse(updatedEvent)
 }
 
@@ -198,6 +200,7 @@ async function rejectEventByActor(
   const updatedEvent = await persistEvent(event, changes)
   if (!event.rejected) {
     await notifyRejectedEvent(updatedEvent)
+    await sendEventRejected(updatedEvent, reason)
   }
   return toResponse(updatedEvent)
 }

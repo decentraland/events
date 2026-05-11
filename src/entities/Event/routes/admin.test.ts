@@ -130,6 +130,11 @@ jest.mock("../../Slack/utils", () => ({
   notifyRejectedEvent: jest.fn(),
 }))
 
+jest.mock("../../Notifications", () => ({
+  sendEventApproved: jest.fn(),
+  sendEventRejected: jest.fn(),
+}))
+
 function createBaseEvent(
   overrides: Partial<EventAttributes> = {}
 ): DeprecatedEventAttributes {

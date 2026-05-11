@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.895.0",
-    "@dcl/schemas": "^22.2.0",
+    "@dcl/schemas": "^26.3.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
     "aws-sdk": "^2.1002.0",

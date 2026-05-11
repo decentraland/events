@@ -7,4 +7,6 @@ export type EventsNotifications =
   | NotificationType.EVENTS_STARTED
   | NotificationType.EVENT_CREATED
   | NotificationType.EVENTS_STARTS_SOON
+  | NotificationType.EVENT_APPROVED
+  | NotificationType.EVENT_REJECTED
   | typeof EVENTS_ENDED
