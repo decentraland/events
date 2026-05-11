@@ -1,7 +1,6 @@
 import { AuthIdentity } from "@dcl/crypto/dist/types"
-import supertest from "supertest"
-
 import { signedHeaderFactory } from "decentraland-crypto-fetch"
+import supertest from "supertest"
 
 import { DeprecatedEventAttributes } from "../../src/entities/Event/types"
 import { seedEvent } from "../mocks/event"
@@ -59,6 +58,8 @@ jest.mock("../../src/entities/Notifications", () => ({
   sendEventStarted: jest.fn(),
   sendEventStartsSoon: jest.fn(),
   sendEventEnded: jest.fn(),
+  sendEventApproved: jest.fn(),
+  sendEventRejected: jest.fn(),
 }))
 
 jest.mock("../../src/entities/Slack/utils", () => ({
