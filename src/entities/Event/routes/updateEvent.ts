@@ -18,7 +18,11 @@ import Places from "../../../api/Places"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
-import { sendEventCreated } from "../../Notifications"
+import {
+  sendEventApproved,
+  sendEventCreated,
+  sendEventRejected,
+} from "../../Notifications"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import {
   canApproveAnyEvent,
@@ -443,8 +447,10 @@ export async function updateEventWithOptions(
     notifyEditedEvent(updatedEvent)
   } else if (!event.approved && updatedEvent.approved) {
     notifyApprovedEvent(updatedEvent)
+    await sendEventApproved(updatedEvent)
   } else if (!event.rejected && updatedEvent.rejected) {
     notifyRejectedEvent(updatedEvent)
+    await sendEventRejected(updatedEvent, updatedEvent.rejection_reason || "")
   } else if (updatedEvent.user === user) {
     notifyEditedEvent(updatedEvent)
   }

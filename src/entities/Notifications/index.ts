@@ -1,7 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
+  EventApprovedEvent,
   EventCreatedEvent,
   EventEndedEvent,
+  EventRejectedEvent,
   EventStartedEvent,
   EventStartsSoonEvent,
   Events,
@@ -183,4 +185,47 @@ export async function sendEventsEnded(
     createEventEndedNotification(event, attendeeCount)
   )
   return sendNotification<EventEndedEvent>(notifications)
+}
+
+/**
+ * Notifies the event creator that the event was approved by an admin.
+ */
+export async function sendEventApproved(event: EventAttributes) {
+  const notification: EventApprovedEvent = {
+    type: Events.Type.EVENT,
+    subType: Events.SubType.Event.EVENT_APPROVED,
+    key: event.id,
+    timestamp: Date.now(),
+    metadata: {
+      host: event.user,
+      title: event.name,
+      description: event.description,
+      image: event.image || "",
+      link: buildEventLink(event),
+    },
+  }
+  return sendNotification<EventApprovedEvent>([notification])
+}
+
+/**
+ * Notifies the event creator that the event was rejected by an admin.
+ */
+export async function sendEventRejected(
+  event: EventAttributes,
+  reason: string
+) {
+  const notification: EventRejectedEvent = {
+    type: Events.Type.EVENT,
+    subType: Events.SubType.Event.EVENT_REJECTED,
+    key: event.id,
+    timestamp: Date.now(),
+    metadata: {
+      host: event.user,
+      title: event.name,
+      description: event.description,
+      image: event.image || "",
+      reason,
+    },
+  }
+  return sendNotification<EventRejectedEvent>([notification])
 }
