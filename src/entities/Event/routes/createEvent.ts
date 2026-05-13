@@ -92,6 +92,12 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
+  // Auto-correct the world flag: if coordinates are within Genesis City
+  // and no world server name is provided, this is a Genesis City event.
+  if (data.world && isInsideWorldLimits(x, y) && !data.server) {
+    data.world = false
+  }
+
   // Reject rules whose expansion from `start_at` to `now` would burn
   // excessive CPU inside rrule. The schema already bounds frequency,
   // interval, and count; this catches combinations that slip through

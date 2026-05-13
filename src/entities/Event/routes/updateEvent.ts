@@ -285,6 +285,12 @@ export async function updateEventWithOptions(
     )
   }
 
+  // Auto-correct the world flag: if coordinates are within Genesis City
+  // and no world server name is provided, this is a Genesis City event.
+  if (updatedAttributes.world && isInsideWorldLimits(x, y) && !updatedAttributes.server) {
+    updatedAttributes.world = false
+  }
+
   /**
    * Verify categories actually exist
    */
