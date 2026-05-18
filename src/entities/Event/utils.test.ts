@@ -104,6 +104,28 @@ describe("futureRecurrentDates", () => {
     })
   })
 
+  describe("when the recurrence is WEEKLY and recurrent_until is years away", () => {
+    // Regression for the symptom reported as "recurring hangouts disappear
+    // from /whats-on around late July": the old MAX_EVENT_RECURRENT cap of
+    // 10 meant that a weekly event created in early May only had ~10
+    // future dates persisted (≈10 weeks ahead), so the sites calendar
+    // showed nothing past late July even though the rule was set to
+    // recur for years. Asserts that the window now reaches at least six
+    // months into the future for a typical weekly cadence.
+    it("should populate enough future dates to cover several months of calendar navigation", () => {
+      const dates = futureRecurrentDates({
+        ...baseRecurrence,
+        start_at: new Date(),
+        recurrent_frequency: Frequency.WEEKLY,
+        recurrent_until: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000),
+      })
+
+      // 26 weeks ≈ 6 months — comfortably more than the legacy "10"
+      // produced (≈2.3 months for weekly).
+      expect(dates.length).toBeGreaterThan(26)
+    })
+  })
+
   describe("when start_at is years in the past with an absurdly large recurrent_count", () => {
     it("should not allocate past dates and should return MAX_EVENT_RECURRENT future dates", () => {
       const options = {

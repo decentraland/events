@@ -95,7 +95,11 @@ export enum Position {
   LAST = -1,
 }
 
-export const MAX_EVENT_RECURRENT = 10
+// Caps how many future occurrences `futureRecurrentDates` materializes into
+// `recurrent_dates`. 10 was set in 2021 (c65aa62) for a list-based UI; the
+// new calendar lets users navigate weeks ahead, so 10 ran out visibly.
+// 1000 matches the JSON schema bound on `recurrent_count`.
+export const MAX_EVENT_RECURRENT = 1000
 
 export const MAX_REJECTION_REASON_LENGTH = 500
 export const MAX_ADMIN_ACTOR_LENGTH = 42
