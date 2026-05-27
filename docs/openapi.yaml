@@ -1099,7 +1099,7 @@ paths:
       summary: Upload event poster image
       description: |
         Uploads an event poster image to AWS S3 and returns the public URL.
-        Maximum file size: 500KB. Supported formats: JPEG, PNG, GIF.
+        Maximum file size: 500KB. Supported formats: JPEG, PNG, GIF, WebP.
       operationId: uploadPoster
       security: []
       requestBody:
@@ -1114,7 +1114,7 @@ paths:
                 poster:
                   type: string
                   format: binary
-                  description: Image file (JPEG, PNG, or GIF, max 500KB)
+                  description: Image file (JPEG, PNG, GIF, or WebP, max 500KB)
       responses:
         "200":
           description: Image uploaded successfully
@@ -1156,7 +1156,7 @@ paths:
         Uploads a vertical event poster image to AWS S3 and returns the public URL.
         This endpoint is specifically for portrait-oriented images.
 
-        **Format:** PNG or JPG only (no GIF)
+        **Format:** PNG, JPG or WebP only (no GIF)
         **Recommended size:** 716 x 1814 pixels
         **Max weight:** 500 KB
       operationId: uploadPosterVertical
@@ -1173,7 +1173,7 @@ paths:
                 poster:
                   type: string
                   format: binary
-                  description: Vertical image file (PNG or JPG only, max 500KB, recommended 716x1814 pixels)
+                  description: Vertical image file (PNG, JPG or WebP only, max 500KB, recommended 716x1814 pixels)
       responses:
         "200":
           description: Vertical image uploaded successfully
@@ -1188,7 +1188,7 @@ paths:
                   data:
                     $ref: "#/components/schemas/Poster"
         "400":
-          description: Bad request (invalid file type - only PNG and JPG allowed)
+          description: Bad request (invalid file type - only PNG, JPG and WebP allowed)
           content:
             application/json:
               schema:
@@ -2220,7 +2220,7 @@ components:
         type:
           type: string
           description: MIME type
-          enum: [image/jpeg, image/png, image/gif]
+          enum: [image/jpeg, image/png, image/gif, image/webp]
           example: "image/jpeg"
       required:
         - filename

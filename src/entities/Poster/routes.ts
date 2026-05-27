@@ -176,10 +176,10 @@ export async function uploadPosterVertical(
   }
 
   const [type] = poster.mimetype.split(";")
-  // Only allow PNG and JPG for vertical posters (no GIF)
+  // Only allow PNG, JPG and WebP for vertical posters (no GIF)
   if (!POSTER_VERTICAL_FILE_TYPES.includes(type)) {
     throw new RequestError(
-      `Invalid file type ${type}. Only PNG and JPG are allowed for vertical posters`,
+      `Invalid file type ${type}. Only PNG, JPG and WebP are allowed for vertical posters`,
       RequestError.BadRequest
     )
   }
