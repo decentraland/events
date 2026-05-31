@@ -1,4 +1,4 @@
-FROM node:18.8-alpine as compiler
+FROM node:24-alpine as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -32,7 +32,7 @@ COPY ./tsconfig.json        /app/tsconfig.json
 RUN npm run build
 RUN npm prune --production
 
-FROM node:18.8-alpine
+FROM node:24-alpine
 WORKDIR /app
 
 RUN rm -rf \
