@@ -23,7 +23,10 @@ export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionA
     const query = SQL`DELETE FROM ${table(
       ProfileSubscriptionModel
     )} WHERE "endpoint" IN ${values(endpoints)}`
-    return this.query<ProfileSubscriptionAttributes>(query)
+    return this.namedQuery<ProfileSubscriptionAttributes>(
+      "profile_subscriptions_delete_all",
+      query
+    )
   }
 
   static async findByUsers(users: string[]) {
@@ -34,7 +37,10 @@ export default class ProfileSubscriptionModel extends Model<ProfileSubscriptionA
     const query = SQL`SELECT * FROM ${table(
       ProfileSubscriptionModel
     )} WHERE "user" IN ${values(users)}`
-    return this.query<ProfileSubscriptionAttributes>(query)
+    return this.namedQuery<ProfileSubscriptionAttributes>(
+      "profile_subscriptions_find_by_users",
+      query
+    )
   }
 
   static async findByUser(user: string) {

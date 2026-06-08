@@ -38,7 +38,10 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
     const query = SQL`SELECT * FROM ${table(
       ProfileSettingsModel
     )} WHERE "user" IN ${values(users)}`
-    return this.query<ProfileSettingsAttributes>(query)
+    return this.namedQuery<ProfileSettingsAttributes>(
+      "profile_settings_find_by_users",
+      query
+    )
   }
 
   static async list() {
@@ -47,7 +50,10 @@ export default class ProfileSettingsModel extends Model<ProfileSettingsAttribute
       FROM ${table(this)}
       WHERE "permissions" > array[]::varchar[]
     `
-    return this.query<ProfileSettingsAttributes>(query)
+    return this.namedQuery<ProfileSettingsAttributes>(
+      "profile_settings_list",
+      query
+    )
   }
 
   /** @deprecated Notification no longer used */

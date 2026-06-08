@@ -54,7 +54,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       VALUES ${objectValues(keys, [event])}
     `
 
-    return this.query(sql) as any
+    return this.namedQuery("event_create", sql) as any
   }
 
   static update<U extends QueryPart = any, P extends QueryPart = any>(
@@ -98,7 +98,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       )}
   `
 
-    return this.query(sql) as any
+    return this.namedQuery("event_update", sql) as any
   }
 
   static selectNextStartAt(
@@ -283,7 +283,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       LIMIT ${SITEMAP_ITEMS_PER_PAGE}
     `
 
-    return await EventModel.query<{ id: string }>(query)
+    return await EventModel.namedQuery<{ id: string }>("events_sitemap", query)
   }
 
   static async getEventsStartingInRange(
@@ -300,7 +300,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         AND e.next_start_at < (to_timestamp(${starting_to} / 1000.0))
     `
 
-    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+    return EventModel.buildAll(
+      await EventModel.namedQuery<EventAttributes>(
+        "events_starting_in_range",
+        query
+      )
+    )
   }
 
   static async getEventsEndingInRangeWithAttendeeCount(
@@ -322,11 +327,11 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       GROUP BY e.id, e.community_id
     `
 
-    const results = await EventModel.query<{
+    const results = await EventModel.namedQuery<{
       id: string
       community_id: string | null
       attendee_count: number
-    }>(query)
+    }>("events_ending_in_range", query)
 
     return results.map((result) => ({
       event: {
@@ -348,7 +353,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         AND (e.next_start_at + (e.duration * '1 millisecond'::interval)) < now()
     `
 
-    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+    return EventModel.buildAll(
+      await EventModel.namedQuery<EventAttributes>(
+        "events_recurrent_finished",
+        query
+      )
+    )
   }
 
   static async getEvents(options: Partial<EventListOptions> = {}) {
@@ -390,7 +400,9 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       ${offset(options.offset)}
     `
 
-    return EventModel.buildAll(await EventModel.query<EventAttributes>(query))
+    return EventModel.buildAll(
+      await EventModel.namedQuery<EventAttributes>("events_list", query)
+    )
   }
 
   static async countEventsWithFilter(options: Partial<EventListOptions> = {}) {
@@ -415,7 +427,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${join(conditions, SQL` `)}
     `
 
-    const result = await EventModel.query<{ count: string }>(query)
+    const result = await EventModel.namedQuery<{ count: string }>(
+      "events_count_filtered",
+      query
+    )
     return parseInt(result[0]?.count || "0", 10)
   }
 
@@ -425,14 +440,17 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     return EventModel.buildAll(
-      await EventModel.query<DeprecatedEventAttributes>(SQL`
+      await EventModel.namedQuery<DeprecatedEventAttributes>(
+        "events_attending",
+        SQL`
       SELECT e.*, a.user is not null as attending
       FROM ${table(EventModel)} e
       LEFT JOIN ${table(
         EventAttendee
       )} a on e.id = a.event_id AND a.user = ${user}
       WHERE e.finish_at > now() AND e.rejected IS FALSE
-    `)
+    `
+      )
     )
   }
 

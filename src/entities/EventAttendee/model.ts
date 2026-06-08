@@ -33,7 +33,10 @@ export default class EventAttendeeModel extends Model<EventAttendeeAttributes> {
       ${offset(options.offset)}
     `
 
-    return EventAttendeeModel.query<EventAttendeeAttributes>(query)
+    return EventAttendeeModel.namedQuery<EventAttendeeAttributes>(
+      "event_attendees_list_by_event",
+      query
+    )
   }
 
   static async latest(eventId: string) {
