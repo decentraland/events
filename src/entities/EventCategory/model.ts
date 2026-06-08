@@ -15,7 +15,8 @@ export default class EventCategoryModel extends Model<EventCategoryAttributes> {
     const query = SQL`SELECT count(*) FROM ${table(
       EventCategoryModel
     )} WHERE "name" IN ${values(categories)}`
-    const categoriesFound = await EventCategoryModel.query<{ count: number }>(
+    const categoriesFound = await EventCategoryModel.namedQuery<{ count: number }>(
+      "event_categories_validate_count",
       query
     )
 
