@@ -301,7 +301,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     `
 
     return EventModel.buildAll(
-      await EventModel.namedQuery<EventAttributes>("events_starting_in_range", query)
+      await EventModel.namedQuery<EventAttributes>(
+        "events_starting_in_range",
+        query
+      )
     )
   }
 
@@ -351,7 +354,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     `
 
     return EventModel.buildAll(
-      await EventModel.namedQuery<EventAttributes>("events_recurrent_finished", query)
+      await EventModel.namedQuery<EventAttributes>(
+        "events_recurrent_finished",
+        query
+      )
     )
   }
 
@@ -421,7 +427,10 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         ${join(conditions, SQL` `)}
     `
 
-    const result = await EventModel.namedQuery<{ count: string }>("events_count_filtered", query)
+    const result = await EventModel.namedQuery<{ count: string }>(
+      "events_count_filtered",
+      query
+    )
     return parseInt(result[0]?.count || "0", 10)
   }
 
@@ -431,14 +440,17 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     return EventModel.buildAll(
-      await EventModel.namedQuery<DeprecatedEventAttributes>("events_attending", SQL`
+      await EventModel.namedQuery<DeprecatedEventAttributes>(
+        "events_attending",
+        SQL`
       SELECT e.*, a.user is not null as attending
       FROM ${table(EventModel)} e
       LEFT JOIN ${table(
         EventAttendee
       )} a on e.id = a.event_id AND a.user = ${user}
       WHERE e.finish_at > now() AND e.rejected IS FALSE
-    `)
+    `
+      )
     )
   }
 
