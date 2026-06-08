@@ -111,6 +111,12 @@ For any change that touches an enum or filter (e.g. `EventListType`):
 4. `src/entities/<Entity>/routes/*.ts` (handlers)
 5. `docs/openapi.yaml` — every new query param / enum addition needs to be reflected here AND covered in an integration test in the same PR
 
+### DB query metric names (use `namedQuery`, not `query`)
+
+Every raw `Model.query()` / `Model.rowCount()` call must use the named variant — `namedQuery("<name>", sql)` / `namedRowCount("<name>", sql)` — so the Prometheus `query` label stays bounded. The deprecated `query()`/`rowCount()` label the `database_duration_seconds` metric by a SHA1 of the SQL text; dynamically-built SQL (variable `IN (...)` lists, `SQL.raw()` interpolation, conditional clauses) then produces a new hash per shape and explodes cardinality. The structured methods (`find`, `update`, `count`, …) already emit bounded labels and need no change.
+
+Naming convention: prefix with the table, singular verb for single-record mutations (`event_create`, `event_update`), plural for list/aggregate reads (`events_list`, `events_count_filtered`, `events_starting_in_range`). One stable name per logical query, regardless of how many conditional SQL shapes it builds.
+
 ### Hidden backend deps inside frontend-looking dirs
 
 These look like frontend things but the API depends on them — never delete blindly:
