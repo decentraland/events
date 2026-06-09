@@ -530,6 +530,74 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
+    delete:
+      tags:
+        - Events
+      summary: Delete (soft-delete) an event
+      description: |
+        Soft-deletes an event. The event row is preserved but flagged as deleted and
+        hidden from every listing. **The delete is terminal: a deleted event cannot be
+        restored.**
+
+        The flag set depends on the actor:
+        - the creator deleting their own event sets `deleted_by_user` (no notification).
+        - an admin (signed-in admin/editor, or the service bearer token) deleting another
+          user's event sets `deleted_by_admin` and notifies the creator (in-app + email).
+
+        An optional `reason` (stored as `deleted_reason`) may be provided for admin
+        deletions. When called with the service bearer token, the actor is identified via
+        the `actor` field.
+      operationId: deleteEvent
+      security:
+        - {}
+        - bearerAuth: []
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          description: Event UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+                  description: Optional reason stored as deleted_reason (admin deletions).
+                actor:
+                  type: string
+                  description: Actor identifier, only honored with the service bearer token.
+      responses:
+        "200":
+          description: Event deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /events/{event_id}/attendees:
     get:

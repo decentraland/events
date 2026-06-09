@@ -53,6 +53,11 @@ erDiagram
     TEXT approved_by
     TEXT rejected_by
     TEXT rejection_reason
+    BOOLEAN deleted_by_user
+    BOOLEAN deleted_by_admin
+    TEXT deleted_by
+    TIMESTAMP deleted_at
+    TEXT deleted_reason
     BOOLEAN world
     TEXT place_id
     TEXT community_id
@@ -164,6 +169,11 @@ Stores all event information including one-time and recurrent events with locati
 | `approved_by`            | TEXT          | NULL     | Moderator wallet address who approved. Stored in lowercase      |
 | `rejected_by`            | TEXT          | NULL     | Moderator wallet address who rejected. Stored in lowercase      |
 | `rejection_reason`       | TEXT          | NULL     | Reason provided by a moderator or service when rejecting        |
+| `deleted_by_user`        | BOOLEAN       | NOT NULL | True if the creator soft-deleted the event (default: false)     |
+| `deleted_by_admin`       | BOOLEAN       | NOT NULL | True if an admin soft-deleted the event (default: false)        |
+| `deleted_by`             | TEXT          | NULL     | Wallet address or admin actor that deleted. Stored in lowercase |
+| `deleted_at`             | TIMESTAMP     | NULL     | Time the event was soft-deleted                                 |
+| `deleted_reason`         | TEXT          | NULL     | Reason provided by an admin when deleting (optional)            |
 | `highlighted`            | BOOLEAN       | NOT NULL | Featured/highlighted status (default: false)                    |
 | `trending`               | BOOLEAN       | NOT NULL | Trending status calculated algorithmically (default: false)     |
 | `recurrent`              | BOOLEAN       | NOT NULL | Whether event is recurrent (default: false)                     |

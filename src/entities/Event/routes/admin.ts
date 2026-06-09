@@ -3,13 +3,21 @@ import { createValidator } from "decentraland-gatsby/dist/entities/Route/validat
 import { AjvObjectSchema } from "decentraland-gatsby/dist/entities/Schema/types"
 import { Request } from "express"
 
-import { sendEventApproved, sendEventRejected } from "../../Notifications"
+import {
+  sendEventApproved,
+  sendEventDeleted,
+  sendEventRejected,
+} from "../../Notifications"
 import {
   DEFAULT_PROFILE_SETTINGS,
   ProfileSettingsAttributes,
   ProfileSettingsSessionAttributes,
 } from "../../ProfileSettings/types"
-import { notifyApprovedEvent, notifyRejectedEvent } from "../../Slack/utils"
+import {
+  notifyApprovedEvent,
+  notifyDeletedEvent,
+  notifyRejectedEvent,
+} from "../../Slack/utils"
 import EventModel from "../model"
 import { getEventParamsSchema } from "../schemas"
 import {
@@ -21,7 +29,7 @@ import {
   editEventAttributesWithoutRejected,
   editOwnEventAttributes,
 } from "../types"
-import { validateRejectionReason } from "../utils"
+import { validateDeletedReason, validateRejectionReason } from "../utils"
 import { updateEventWithOptions } from "./updateEvent"
 
 const DEFAULT_ADMIN_ACTOR = "jarvis-agent"
@@ -219,6 +227,29 @@ async function unrejectEventByActor(event: DeprecatedEventAttributes) {
   return toResponse(updatedEvent)
 }
 
+async function deleteEventByActor(
+  event: DeprecatedEventAttributes,
+  actor: string,
+  reason: string | null
+) {
+  // Terminal soft-delete: respond idempotently if already deleted.
+  if (event.deleted_by_user || event.deleted_by_admin) {
+    return toResponse(event)
+  }
+
+  const updatedEvent = await persistEvent(event, {
+    deleted_by_admin: true,
+    deleted_by: actor,
+    deleted_at: new Date(),
+    deleted_reason: reason,
+  })
+
+  await notifyDeletedEvent(updatedEvent)
+  await sendEventDeleted(updatedEvent, reason || undefined)
+
+  return toResponse(updatedEvent)
+}
+
 function isStateOnlyBody(body: Record<string, unknown>): boolean {
   const fields = Object.keys(body)
   if (fields.length === 0) return false
@@ -323,6 +354,14 @@ export async function rejectEvent(req: AdminEventRequest) {
 export async function unrejectEvent(req: AdminEventRequest) {
   const event = await getAdminEvent(req)
   return unrejectEventByActor(event)
+}
+
+export async function adminDeleteEvent(req: AdminEventRequest) {
+  const event = await getAdminEvent(req)
+  const body = bodyAsRecord(req)
+  const actor = getActor(body)
+  const reason = validateDeletedReason(body.reason)
+  return deleteEventByActor(event, actor, reason)
 }
 
 export async function patchEventAdmin(req: AdminEventRequest) {

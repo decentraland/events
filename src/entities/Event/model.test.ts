@@ -5,6 +5,8 @@ type SQLCondition = { text: string }
 
 const ATTENDEE_FILTER_REGEX = /a\.user\s+IS\s+NOT\s+NULL/i
 const REJECTED_FILTER_REGEX = /e\.rejected\s+IS\s+(TRUE|FALSE)/i
+const DELETED_FILTER_REGEX = /e\.deleted_by_user\s+IS\s+FALSE/i
+const DELETED_INCLUDED_REGEX = /e\.deleted_by_user\s+IS\s+TRUE/i
 
 const buildEventFilterConditions = (
   EventModel as any
@@ -21,6 +23,18 @@ function hasAttendeeFilterCondition(conditions: SQLCondition[]): boolean {
 function hasRejectedFilterCondition(conditions: SQLCondition[]): boolean {
   return conditions.some((condition) =>
     REJECTED_FILTER_REGEX.test(condition.text)
+  )
+}
+
+function hasDeletedExclusionCondition(conditions: SQLCondition[]): boolean {
+  return conditions.some((condition) =>
+    DELETED_FILTER_REGEX.test(condition.text)
+  )
+}
+
+function hasDeletedInclusionCondition(conditions: SQLCondition[]): boolean {
+  return conditions.some((condition) =>
+    DELETED_INCLUDED_REGEX.test(condition.text)
   )
 }
 
@@ -76,6 +90,43 @@ describe("EventModel.buildEventFilterConditions", () => {
       const conditions = buildEventFilterConditions(options)
 
       expect(hasRejectedFilterCondition(conditions)).toBe(true)
+    })
+  })
+
+  describe("deleted (soft-delete) filtering", () => {
+    it("excludes deleted events by default", () => {
+      const conditions = buildEventFilterConditions({ list: EventListType.All })
+
+      expect(hasDeletedExclusionCondition(conditions)).toBe(true)
+    })
+
+    it("excludes deleted events even for the owner listing", () => {
+      const conditions = buildEventFilterConditions({
+        owner: true,
+        user: "0x1111111111111111111111111111111111111111",
+        list: EventListType.All,
+      })
+
+      expect(hasDeletedExclusionCondition(conditions)).toBe(true)
+    })
+
+    it("does not exclude deleted events when include_deleted is true", () => {
+      const conditions = buildEventFilterConditions({
+        include_deleted: true,
+        list: EventListType.All,
+      })
+
+      expect(hasDeletedExclusionCondition(conditions)).toBe(false)
+    })
+
+    it("includes only deleted events when deleted option is true", () => {
+      const conditions = buildEventFilterConditions({
+        deleted: true,
+        list: EventListType.All,
+      })
+
+      expect(hasDeletedInclusionCondition(conditions)).toBe(true)
+      expect(hasDeletedExclusionCondition(conditions)).toBe(false)
     })
   })
 

@@ -10,6 +10,7 @@ import {
   EventTimeReference,
   EventType,
   FREQUENCY_PERIOD_MS,
+  MAX_DELETED_REASON_LENGTH,
   MAX_EVENT_RECURRENT,
   MAX_REJECTION_REASON_LENGTH,
   MonthMask,
@@ -596,6 +597,35 @@ export function validateRejectionReason(
   if (reason.length > MAX_REJECTION_REASON_LENGTH) {
     throw new RequestError(
       `${fieldName} must be ${MAX_REJECTION_REASON_LENGTH} characters or less`,
+      RequestError.BadRequest
+    )
+  }
+
+  return reason
+}
+
+// The deleted reason is optional: an admin may delete an event without
+// providing one. undefined / null / blank all normalize to null.
+export function validateDeletedReason(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null
+  }
+
+  if (typeof value !== "string") {
+    throw new RequestError(
+      "deleted_reason must be a string",
+      RequestError.BadRequest
+    )
+  }
+
+  const reason = value.trim()
+  if (!reason) {
+    return null
+  }
+
+  if (reason.length > MAX_DELETED_REASON_LENGTH) {
+    throw new RequestError(
+      `deleted_reason must be ${MAX_DELETED_REASON_LENGTH} characters or less`,
       RequestError.BadRequest
     )
   }
