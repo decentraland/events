@@ -5,8 +5,10 @@ type SQLCondition = { text: string }
 
 const ATTENDEE_FILTER_REGEX = /a\.user\s+IS\s+NOT\s+NULL/i
 const REJECTED_FILTER_REGEX = /e\.rejected\s+IS\s+(TRUE|FALSE)/i
-const DELETED_FILTER_REGEX = /e\.deleted_by_user\s+IS\s+FALSE/i
-const DELETED_INCLUDED_REGEX = /e\.deleted_by_user\s+IS\s+TRUE/i
+const DELETED_FILTER_REGEX =
+  /e\.deleted_by_user\s+IS\s+FALSE\s+AND\s+e\.deleted_by_admin\s+IS\s+FALSE/i
+const DELETED_INCLUDED_REGEX =
+  /e\.deleted_by_user\s+IS\s+TRUE\s+OR\s+e\.deleted_by_admin\s+IS\s+TRUE/i
 
 const buildEventFilterConditions = (
   EventModel as any

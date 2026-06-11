@@ -153,7 +153,6 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
 
 export async function notifyDeletedEvent(event: DeprecatedEventAttributes) {
   logger.log(`sending deleted event "${event.id}" to slack`)
-  const selfDeleted = event.user === event.deleted_by ? " _(him/her self)_" : ""
   await sendToSlack({
     blocks: [
       {
@@ -181,7 +180,7 @@ export async function notifyDeletedEvent(event: DeprecatedEventAttributes) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `\n_by:_ \`${event.deleted_by}\`` + selfDeleted,
+          text: `\n_by:_ \`${event.deleted_by}\``,
         },
       },
     ].filter(Boolean),
