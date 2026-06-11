@@ -163,6 +163,10 @@ export const getEventListQuery: AjvObjectSchema = {
       enum: ["true", "false", "1", "0"],
       description: "Admin-only filter for event rejection state",
     },
+    deleted: {
+      enum: ["true", "false", "1", "0"],
+      description: "Admin-only filter for event deleted (soft-delete) state",
+    },
   },
 }
 
@@ -270,6 +274,28 @@ export const eventSchema = {
       type: ["string", "null"],
       maxLength: 500,
       description: "Reason provided by the moderator when rejecting the event",
+    },
+    deleted_by_user: {
+      type: "boolean",
+      description: "True if the event was soft-deleted by its creator",
+    },
+    deleted_by_admin: {
+      type: "boolean",
+      description: "True if the event was soft-deleted by an admin",
+    },
+    deleted_by: {
+      type: ["string", "null"],
+      description: "Wallet address (or admin actor) that deleted the event",
+    },
+    deleted_at: {
+      type: ["string", "null"],
+      format: "date-time",
+      description: "The time the event was deleted",
+    },
+    deleted_reason: {
+      type: ["string", "null"],
+      maxLength: 500,
+      description: "Reason provided by the admin when deleting the event",
     },
     trending: {
       type: "boolean",
@@ -507,6 +533,16 @@ export const newEventSchema = {
       type: "boolean",
     },
     rejection_reason: {
+      type: ["string", "null"],
+      maxLength: 500,
+    },
+    deleted_by_user: {
+      type: "boolean",
+    },
+    deleted_by_admin: {
+      type: "boolean",
+    },
+    deleted_reason: {
       type: ["string", "null"],
       maxLength: 500,
     },

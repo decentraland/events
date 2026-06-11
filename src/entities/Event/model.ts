@@ -187,6 +187,21 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           ? SQL`TRUE`
           : SQL`e.rejected IS FALSE`
         : SQL`e.rejected IS ${SQL.raw(options.rejected ? "TRUE" : "FALSE")}`,
+      // Deleted events (deleted_by_user OR deleted_by_admin) are a terminal
+      // soft-delete: hidden from every listing by default, including the
+      // owner's own list. Admins can opt in with the explicit `deleted` filter.
+      conditional(
+        options.deleted === undefined && !options.include_deleted,
+        SQL`AND e.deleted_by_user IS FALSE AND e.deleted_by_admin IS FALSE`
+      ),
+      conditional(
+        options.deleted === true,
+        SQL`AND (e.deleted_by_user IS TRUE OR e.deleted_by_admin IS TRUE)`
+      ),
+      conditional(
+        options.deleted === false,
+        SQL`AND e.deleted_by_user IS FALSE AND e.deleted_by_admin IS FALSE`
+      ),
       conditional(
         !isOwner && options.approved !== undefined,
         SQL`AND e.approved IS ${SQL.raw(options.approved ? "TRUE" : "FALSE")}`
@@ -278,6 +293,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       SELECT id
       FROM ${table(EventModel)} e
       WHERE e.approved IS TRUE
+        AND e.deleted_by_user IS FALSE
+        AND e.deleted_by_admin IS FALSE
       ORDER BY created_at ASC
       OFFSET ${page * SITEMAP_ITEMS_PER_PAGE}
       LIMIT ${SITEMAP_ITEMS_PER_PAGE}
@@ -295,6 +312,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       FROM ${table(EventModel)} e
       WHERE
         e.rejected IS FALSE
+        AND e.deleted_by_user IS FALSE
+        AND e.deleted_by_admin IS FALSE
         AND e.approved IS TRUE
         AND e.next_start_at >= (to_timestamp(${starting_from} / 1000.0))
         AND e.next_start_at < (to_timestamp(${starting_to} / 1000.0))
@@ -321,6 +340,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       LEFT JOIN ${table(EventAttendee)} a ON e.id = a.event_id
       WHERE
         e.rejected IS FALSE
+        AND e.deleted_by_user IS FALSE
+        AND e.deleted_by_admin IS FALSE
         AND e.approved IS TRUE
         AND e.next_finish_at >= (to_timestamp(${ending_from} / 1000.0))
         AND e.next_finish_at < (to_timestamp(${ending_to} / 1000.0))
@@ -348,6 +369,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
       FROM ${table(EventModel)} e
       WHERE
         e.rejected IS FALSE
+        AND e.deleted_by_user IS FALSE
+        AND e.deleted_by_admin IS FALSE
         AND e.recurrent IS TRUE
         AND e.finish_at > now()
         AND (e.next_start_at + (e.duration * '1 millisecond'::interval)) < now()
@@ -449,6 +472,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         EventAttendee
       )} a on e.id = a.event_id AND a.user = ${user}
       WHERE e.finish_at > now() AND e.rejected IS FALSE
+        AND e.deleted_by_user IS FALSE AND e.deleted_by_admin IS FALSE
     `
       )
     )

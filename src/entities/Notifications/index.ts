@@ -2,6 +2,7 @@
 import {
   EventApprovedEvent,
   EventCreatedEvent,
+  EventDeletedEvent,
   EventEndedEvent,
   EventRejectedEvent,
   EventStartedEvent,
@@ -228,4 +229,27 @@ export async function sendEventRejected(
     },
   }
   return sendNotification<EventRejectedEvent>([notification])
+}
+
+/**
+ * Notifies the event creator that the event was deleted by an admin.
+ */
+export async function sendEventDeleted(
+  event: EventAttributes,
+  reason?: string
+) {
+  const notification: EventDeletedEvent = {
+    type: Events.Type.EVENT,
+    subType: Events.SubType.Event.EVENT_DELETED,
+    key: event.id,
+    timestamp: Date.now(),
+    metadata: {
+      host: event.user,
+      title: event.name,
+      description: event.description,
+      image: event.image || "",
+      ...(reason ? { reason } : {}),
+    },
+  }
+  return sendNotification<EventDeletedEvent>([notification])
 }

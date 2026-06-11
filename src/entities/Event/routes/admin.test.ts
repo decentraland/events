@@ -1,13 +1,5 @@
-import EventCategoryModel from "../../EventCategory/model"
-import { DEFAULT_PROFILE_SETTINGS } from "../../ProfileSettings/types"
 import {
-  notifyApprovedEvent,
-  notifyEditedEvent,
-  notifyRejectedEvent,
-} from "../../Slack/utils"
-import EventModel from "../model"
-import { DeprecatedEventAttributes, EventAttributes } from "../types"
-import {
+  adminDeleteEvent,
   approveEvent,
   patchEventAdmin,
   rejectEvent,
@@ -16,6 +8,17 @@ import {
 } from "./admin"
 import { getEventWithOptions } from "./getEvent"
 import { getEventList } from "./getEventList"
+import EventCategoryModel from "../../EventCategory/model"
+import { sendEventDeleted } from "../../Notifications"
+import { DEFAULT_PROFILE_SETTINGS } from "../../ProfileSettings/types"
+import {
+  notifyApprovedEvent,
+  notifyDeletedEvent,
+  notifyEditedEvent,
+  notifyRejectedEvent,
+} from "../../Slack/utils"
+import EventModel from "../model"
+import { DeprecatedEventAttributes, EventAttributes } from "../types"
 
 const VALID_TOKEN = "test-events-admin-token"
 const EVENT_ID = "550e8400-e29b-41d4-a716-446655440000"
@@ -126,12 +129,14 @@ jest.mock("../../ProfileSettings/routes/getAuthProfileSettings", () => ({
 
 jest.mock("../../Slack/utils", () => ({
   notifyApprovedEvent: jest.fn(),
+  notifyDeletedEvent: jest.fn(),
   notifyEditedEvent: jest.fn(),
   notifyRejectedEvent: jest.fn(),
 }))
 
 jest.mock("../../Notifications", () => ({
   sendEventApproved: jest.fn(),
+  sendEventDeleted: jest.fn(),
   sendEventRejected: jest.fn(),
 }))
 
@@ -185,6 +190,11 @@ function createBaseEvent(
     approved_by: null,
     rejected_by: null,
     rejection_reason: null,
+    deleted_by_user: false,
+    deleted_by_admin: false,
+    deleted_by: null,
+    deleted_at: null,
+    deleted_reason: null,
     world: false,
     place_id: null,
     community_id: null,
@@ -781,6 +791,39 @@ describe("events admin endpoints", () => {
       it("should reject the request with a 400", async () => {
         await expectRequestError(patchEventAdmin(createAdminRequest({})), 400)
       })
+    })
+  })
+
+  describe("adminDeleteEvent", () => {
+    it("soft-deletes the event as deleted_by_admin and notifies the creator", async () => {
+      const event = createBaseEvent()
+      ;(EventModel.findOne as jest.Mock).mockResolvedValueOnce(event)
+
+      await adminDeleteEvent(
+        createAdminRequest({ actor: ACTOR, reason: "Against the rules" })
+      )
+
+      const changes = (EventModel.update as jest.Mock).mock.calls[0][0]
+      expect(changes.deleted_by_admin).toBe(true)
+      expect(changes.deleted_by).toBe(ACTOR)
+      expect(changes.deleted_reason).toBe("Against the rules")
+      expect(changes.deleted_at).toBeInstanceOf(Date)
+      expect(notifyDeletedEvent).toHaveBeenCalledTimes(1)
+      expect(sendEventDeleted).toHaveBeenCalledTimes(1)
+    })
+
+    it("is idempotent when the event is already deleted", async () => {
+      const event = createBaseEvent({
+        deleted_by_admin: true,
+        deleted_by: ACTOR,
+      })
+      ;(EventModel.findOne as jest.Mock).mockResolvedValueOnce(event)
+
+      await adminDeleteEvent(createAdminRequest({ actor: ACTOR }))
+
+      expect(EventModel.update).not.toHaveBeenCalled()
+      expect(notifyDeletedEvent).not.toHaveBeenCalled()
+      expect(sendEventDeleted).not.toHaveBeenCalled()
     })
   })
 })

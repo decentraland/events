@@ -151,6 +151,42 @@ export async function notifyRejectedEvent(event: DeprecatedEventAttributes) {
   })
 }
 
+export async function notifyDeletedEvent(event: DeprecatedEventAttributes) {
+  logger.log(`sending deleted event "${event.id}" to slack`)
+  await sendToSlack({
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `:wastebasket: event deleted by admin: *<${eventSlackUrl(
+            event
+          )}|${event.id}>*`,
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "plain_text",
+          text: [
+            "Name: " + event.name,
+            event.deleted_reason && "Reason: " + event.deleted_reason,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        },
+      },
+      event.deleted_by && {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `\n_by:_ \`${event.deleted_by}\``,
+        },
+      },
+    ].filter(Boolean),
+  })
+}
+
 const latestEditNotification = new Map<string, number>()
 export async function notifyEditedEvent(event: DeprecatedEventAttributes) {
   const now = Date.now()

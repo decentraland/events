@@ -98,6 +98,7 @@ export enum Position {
 export const MAX_EVENT_RECURRENT = 10
 
 export const MAX_REJECTION_REASON_LENGTH = 500
+export const MAX_DELETED_REASON_LENGTH = 500
 export const MAX_ADMIN_ACTOR_LENGTH = 42
 
 // Upper bound on how many past occurrences rrule is asked to step through
@@ -167,6 +168,11 @@ export type EventAttributes = {
   approved_by: string | null
   rejected_by: string | null
   rejection_reason: string | null
+  deleted_by_user: boolean
+  deleted_by_admin: boolean
+  deleted_by: string | null
+  deleted_at: Date | null
+  deleted_reason: string | null
   world: boolean
   place_id: string | null
   community_id: string | null
@@ -233,11 +239,13 @@ export type EventListParams = {
   with_connected_users?: boolean
   approved?: boolean
   rejected?: boolean
+  deleted?: boolean
 }
 
 export type EventListOptions = {
   allow_pending?: boolean
   include_rejected?: boolean
+  include_deleted?: boolean
   list?: EventListType
   highlighted?: boolean
   owner?: boolean
@@ -261,6 +269,7 @@ export type EventListOptions = {
   to?: Date // End of date range filter
   approved?: boolean
   rejected?: boolean
+  deleted?: boolean
 }
 
 export const editEventAttributes = [

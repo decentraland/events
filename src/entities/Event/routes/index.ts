@@ -6,8 +6,9 @@ import { withCors } from "decentraland-gatsby/dist/entities/Route/middleware"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
 import { Request } from "express"
 
-import { adminServiceProfile, patchEventAdmin } from "./admin"
+import { adminDeleteEvent, adminServiceProfile, patchEventAdmin } from "./admin"
 import { createEvent } from "./createEvent"
+import { deleteEvent } from "./deleteEvent"
 import { getAttendingEventList } from "./getAttendingEventList"
 import { getEvent, getEventWithOptions } from "./getEvent"
 import { getEventList } from "./getEventList"
@@ -53,6 +54,14 @@ async function patchEventRoute(req: MaybeAdminRequest) {
   return updateEvent(req as Parameters<typeof updateEvent>[0])
 }
 
+async function deleteEventRoute(req: MaybeAdminRequest) {
+  requireAuthOrAdmin(req)
+  if (req.isAdminBearer) {
+    return adminDeleteEvent(req as Parameters<typeof adminDeleteEvent>[0])
+  }
+  return deleteEvent(req as Parameters<typeof deleteEvent>[0])
+}
+
 export default routes((router) => {
   const withAuth = auth()
   const withOptionalAuth = auth({ optional: true })
@@ -90,5 +99,11 @@ export default routes((router) => {
     withOptionalAuth,
     adminBearer,
     handle(patchEventRoute as any)
+  )
+  router.delete(
+    "/events/:event_id",
+    withOptionalAuth,
+    adminBearer,
+    handle(deleteEventRoute as any)
   )
 })

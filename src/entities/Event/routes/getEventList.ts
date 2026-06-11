@@ -181,6 +181,8 @@ export async function getEventList(
   if (routeOptions.admin) {
     options.approved = bool(query.approved) ?? undefined
     options.rejected = bool(query.rejected) ?? undefined
+    // Deleted events stay hidden by default; an admin opts in with ?deleted=true.
+    options.deleted = bool(query.deleted) ?? undefined
   }
 
   if (options.limit === 0) {
