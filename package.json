@@ -14,7 +14,7 @@
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
     "aws-sdk": "^2.1002.0",
-    "dcl-catalyst-client": "^21.5.0",
+    "dcl-catalyst-client": "^22.0.0",
     "decentraland-gatsby": "^8.1.0",
     "express-fileupload": "^1.2.1",
     "html-escaper": "^3.0.3",

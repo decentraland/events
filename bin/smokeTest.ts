@@ -1,5 +1,3 @@
-import fetch from "node-fetch"
-
 type EnvName = "zone" | "prod"
 
 const ENVS: Record<EnvName, string> = {
@@ -313,7 +311,7 @@ async function runOneOnce(env: EnvName, check: Check): Promise<Result> {
   const url = `${baseUrl}${fillPlaceholders(check.path, env)}`
   const started = Date.now()
   try {
-    const init: Parameters<typeof fetch>[1] = {
+    const init: RequestInit = {
       method: check.method ?? "GET",
       headers: {
         accept:
@@ -325,8 +323,8 @@ async function runOneOnce(env: EnvName, check: Check): Promise<Result> {
           : {}),
         ...check.headers,
       },
-      timeout: 30_000,
-    } as never
+      signal: AbortSignal.timeout(30_000),
+    }
     if (check.body !== undefined) {
       init.body =
         typeof check.body === "string"
