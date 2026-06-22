@@ -118,8 +118,8 @@ async function main() {
     // underlying OS error (e.g. ECONNREFUSED) on `error.cause`.
     const code =
       error instanceof Error
-        ? ((error as NodeJS.ErrnoException).code ??
-          (error.cause as NodeJS.ErrnoException | undefined)?.code)
+        ? (error as NodeJS.ErrnoException).code ??
+          (error.cause as NodeJS.ErrnoException | undefined)?.code
         : undefined
     if (code === "ECONNREFUSED") {
       console.error(
