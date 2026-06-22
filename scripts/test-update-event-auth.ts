@@ -14,7 +14,6 @@
  */
 import { Authenticator } from "@dcl/crypto"
 import { Wallet } from "ethers"
-import fetch from "node-fetch"
 
 import { signedHeaderFactory } from "decentraland-crypto-fetch"
 
@@ -67,7 +66,7 @@ async function main() {
   const createHeaders = signedHeaderFactory()
   const headers = createHeaders(identity, "PATCH", path, {})
 
-  // Convert Headers to plain object for node-fetch
+  // Convert Headers to a plain object for fetch
   const headerObj: Record<string, string> = {}
   headers.forEach((value: string, key: string) => {
     headerObj[key] = value
@@ -115,11 +114,14 @@ async function main() {
       process.exit(2)
     }
   } catch (error) {
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      (error as NodeJS.ErrnoException).code === "ECONNREFUSED"
-    ) {
+    // Native fetch wraps network failures as a TypeError and puts the
+    // underlying OS error (e.g. ECONNREFUSED) on `error.cause`.
+    const code =
+      error instanceof Error
+        ? (error as NodeJS.ErrnoException).code ??
+          (error.cause as NodeJS.ErrnoException | undefined)?.code
+        : undefined
+    if (code === "ECONNREFUSED") {
       console.error(
         `ERROR: Could not connect to ${baseUrl}. Is the server running?`
       )
