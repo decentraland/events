@@ -13,6 +13,12 @@ function makeEvent(overrides: Record<string, unknown> = {}) {
     start_at: startAt,
     finish_at: new Date(startAt.getTime() + 60 * 60 * 1000),
     duration: 60 * 60 * 1000,
+    time_slots: [
+      {
+        time: startAt.getUTCHours() * 60 + startAt.getUTCMinutes(),
+        duration: 60 * 60 * 1000,
+      },
+    ],
     recurrent: true,
     recurrent_interval: 1,
     recurrent_frequency: Frequency.DAILY,
