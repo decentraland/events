@@ -8,10 +8,14 @@ import { RRule, Weekday } from "rrule"
 import {
   EventAttributes,
   EventTimeReference,
+  EventTimeSlot,
   EventType,
   FREQUENCY_PERIOD_MS,
+  Frequency,
   MAX_DELETED_REASON_LENGTH,
+  MAX_EVENT_DURATION,
   MAX_EVENT_RECURRENT,
+  MAX_EVENT_TIME_SLOTS,
   MAX_REJECTION_REASON_LENGTH,
   MonthMask,
   Months,
@@ -185,9 +189,12 @@ export function toRRule(options: RecurrentEventAttributes): RRule | null {
  * rules above `MAX_RECURRENT_PAST_ITERATIONS` before calling this.
  *
  * @param options - Recurrence rule attributes. `start_at` supplies the
- *   time-of-day for every emitted date.
- * @returns Up to `MAX_EVENT_RECURRENT` future `Date` objects in
- *   ascending order, each carrying the time-of-day from `start_at`.
+ *   time-of-day for every emitted date; with multiple `time_slots` each
+ *   day instead contributes one date per slot.
+ * @returns Occurrences covering up to `MAX_EVENT_RECURRENT` future
+ *   days, in ascending order. Single-slot rules emit one date per day
+ *   (max `MAX_EVENT_RECURRENT` dates); multi-slot rules emit one date
+ *   per slot per day (max `MAX_EVENT_RECURRENT × slots` dates).
  */
 export function futureRecurrentDates(
   options: RecurrentEventAttributes
@@ -217,20 +224,77 @@ export function futureRecurrentDates(
   // Our iterator only sees future dates and caps them at
   // MAX_EVENT_RECURRENT via the `len` argument (current result length
   // before push).
-  const dates = rrule.between(
-    now,
+  const time_slots = options.time_slots
+  if (!time_slots || time_slots.length <= 1) {
+    const dates = rrule.between(
+      now,
+      end,
+      /* inc */ true,
+      (_date, len) => len < MAX_EVENT_RECURRENT
+    )
+
+    return dates.map((date) =>
+      applyTimeOfDay(
+        date,
+        minutesOfDay(options.start_at),
+        options.start_at.getUTCSeconds(),
+        options.start_at.getUTCMilliseconds()
+      )
+    )
+  }
+
+  // Multiple time slots — only reachable for non-HOURLY frequencies
+  // (validateTimeSlots rejects HOURLY + multiple slots), where each
+  // rrule-generated date safely represents one calendar day that gets
+  // multiplied into one Date per slot.
+  //
+  // Anchored at the start of today (not `now`): a day's rrule occurrence
+  // carries only its earliest slot's time-of-day, so anchoring at `now`
+  // would drop "today" entirely once that time passes — even when a
+  // later slot today hasn't happened yet. The cap is bumped by one to
+  // compensate for today possibly being wholly in the past once
+  // expanded and filtered below — a single rrule.between() call, so no
+  // extra past-iteration walk.
+  const startOfToday = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  )
+  const days = rrule.between(
+    startOfToday,
     end,
     /* inc */ true,
-    (_date, len) => len < MAX_EVENT_RECURRENT
+    (_date, len) => len < MAX_EVENT_RECURRENT + 1
   )
 
-  return dates.map((date) => {
-    date.setUTCHours(options.start_at.getUTCHours())
-    date.setUTCMinutes(options.start_at.getUTCMinutes())
-    date.setUTCSeconds(options.start_at.getUTCSeconds())
-    date.setUTCMilliseconds(options.start_at.getUTCMilliseconds())
-    return date
-  })
+  const dates = days
+    .flatMap((date) =>
+      datesForDay(
+        date,
+        time_slots,
+        options.start_at.getUTCSeconds(),
+        options.start_at.getUTCMilliseconds()
+      )
+    )
+    .filter((date) => date.getTime() >= now.getTime())
+    .sort((a, b) => a.getTime() - b.getTime())
+
+  // The +1 above may leave one extra day when today survived the
+  // filter — trim back to MAX_EVENT_RECURRENT distinct days.
+  const result: Date[] = []
+  let dayCount = 0
+  let currentDay = ""
+  for (const date of dates) {
+    const day = date.toISOString().slice(0, 10)
+    if (day !== currentDay) {
+      currentDay = day
+      dayCount++
+      if (dayCount > MAX_EVENT_RECURRENT) {
+        break
+      }
+    }
+    result.push(date)
+  }
+
+  return result
 }
 
 /**
@@ -359,33 +423,157 @@ export function toRecurrentSetposName(date: Date) {
   }
 }
 
+export function minutesOfDay(date: Date): number {
+  return date.getUTCHours() * 60 + date.getUTCMinutes()
+}
+
+export function applyTimeOfDay(
+  date: Date,
+  timeOfDay: number,
+  seconds: number,
+  milliseconds: number
+): Date {
+  const result = new Date(date.getTime())
+  result.setUTCHours(Math.floor(timeOfDay / 60))
+  result.setUTCMinutes(timeOfDay % 60)
+  result.setUTCSeconds(seconds)
+  result.setUTCMilliseconds(milliseconds)
+  return result
+}
+
+export function normalizeTimeSlots(
+  time_slots: EventTimeSlot[] | null | undefined,
+  start_at: Date,
+  duration: number
+): EventTimeSlot[] {
+  if (!time_slots || time_slots.length === 0) {
+    return [{ time: minutesOfDay(start_at), duration }]
+  }
+
+  return [...time_slots].sort((a, b) => a.time - b.time)
+}
+
+export function datesForDay(
+  day: Date,
+  time_slots: EventTimeSlot[],
+  seconds: number,
+  milliseconds: number
+): Date[] {
+  return time_slots
+    .map((slot) => applyTimeOfDay(day, slot.time, seconds, milliseconds))
+    .sort((a, b) => a.getTime() - b.getTime())
+}
+
+export function slotForDate(
+  date: Date,
+  time_slots: EventTimeSlot[]
+): EventTimeSlot {
+  return (
+    time_slots.find((slot) => slot.time === minutesOfDay(date)) || time_slots[0]
+  )
+}
+
+export function finishForDate(date: Date, time_slots: EventTimeSlot[]): Date {
+  return new Date(date.getTime() + slotForDate(date, time_slots).duration)
+}
+
+/**
+ * @param max_duration - Per-slot duration cap. Defaults to
+ *   `MAX_EVENT_DURATION`; updates pass `Math.max(stored, MAX)` so
+ *   grandfathered rows whose duration predates the cap stay editable
+ *   (mirrors the previous `Math.max(event.duration, MAX)` guard).
+ *   Zero is allowed for the same reason: zero-duration events were
+ *   always accepted (schema `minimum: 0`) and exist in the wild.
+ */
+export function validateTimeSlots(
+  time_slots: EventTimeSlot[],
+  recurrent_frequency: Frequency | null,
+  max_duration: number = MAX_EVENT_DURATION
+): void {
+  if (time_slots.length === 0) {
+    throw new RequestError(
+      `Event must have at least one time slot`,
+      RequestError.BadRequest
+    )
+  }
+
+  if (time_slots.length > MAX_EVENT_TIME_SLOTS) {
+    throw new RequestError(
+      `Maximum allowed time slots ${MAX_EVENT_TIME_SLOTS}`,
+      RequestError.BadRequest
+    )
+  }
+
+  if (time_slots.length > 1 && recurrent_frequency === Frequency.HOURLY) {
+    throw new RequestError(
+      `Multiple time slots are not supported for HOURLY recurrence`,
+      RequestError.BadRequest
+    )
+  }
+
+  const times = new Set<number>()
+  for (const slot of time_slots) {
+    if (times.has(slot.time)) {
+      throw new RequestError(
+        `Duplicated time slot at "${slot.time}"`,
+        RequestError.BadRequest
+      )
+    }
+    times.add(slot.time)
+
+    if (slot.duration < 0 || slot.duration > max_duration) {
+      throw new RequestError(
+        `Maximum allowed duration ${max_duration / Time.Hour}Hrs`,
+        RequestError.BadRequest
+      )
+    }
+  }
+}
+
 export function calculateRecurrentProperties(
   event: Partial<RecurrentEventAttributes> &
     Partial<Pick<EventAttributes, "recurrent_dates">> &
     Pick<EventAttributes, "start_at" | "duration" | "finish_at">
-): RecurrentEventAttributes &
+): Omit<RecurrentEventAttributes, "time_slots"> &
   Pick<
     EventAttributes,
-    "start_at" | "duration" | "finish_at" | "recurrent_dates"
+    "start_at" | "duration" | "finish_at" | "recurrent_dates" | "time_slots"
   > {
   const now = Date.now()
-  const start_at = Time.date(event.start_at)
-  const finish_at = new Date(start_at.getTime() + event.duration)
+  const raw_start_at = Time.date(event.start_at)
   const duration = Math.max(event.duration, 0)
+  const time_slots = normalizeTimeSlots(
+    event.time_slots,
+    raw_start_at,
+    duration
+  )
+  // time_slots is the source of truth for times-of-day: start_at is
+  // normalized to the earliest slot and duration mirrors that slot.
+  // When no slots were provided, normalizeTimeSlots derived the slot
+  // FROM start_at/duration, so both expressions below are identities
+  // and legacy behavior is preserved unchanged.
+  const start_at = applyTimeOfDay(
+    raw_start_at,
+    time_slots[0].time,
+    raw_start_at.getUTCSeconds(),
+    raw_start_at.getUTCMilliseconds()
+  )
+  const finish_at = finishForDate(start_at, time_slots)
   const previous_recurrent_dates =
     (event.recurrent &&
       (event.recurrent_dates || []).filter(
-        (date) => date.getTime() + duration <= now
+        (date) => finishForDate(date, time_slots).getTime() <= now
       )) ||
     []
-  const recurrent: RecurrentEventAttributes &
+  const recurrent: Omit<RecurrentEventAttributes, "time_slots"> &
     Pick<
       EventAttributes,
-      "start_at" | "duration" | "finish_at" | "recurrent_dates"
+      "start_at" | "duration" | "finish_at" | "recurrent_dates" | "time_slots"
     > = {
     start_at,
-    duration,
+    duration: time_slots[0].duration,
     finish_at,
+    time_slots,
     recurrent: false,
     recurrent_interval: 1,
     recurrent_frequency: null,
@@ -424,19 +612,25 @@ export function calculateRecurrentProperties(
     const recurrent_dates = futureRecurrentDates(recurrent)
 
     if (recurrent_dates.length) {
-      const last_date = new Date(recurrent_dates[recurrent_dates.length - 1])
-      last_date.setUTCHours(start_at.getUTCHours())
-      last_date.setUTCMinutes(start_at.getUTCMinutes())
-      last_date.setUTCSeconds(start_at.getUTCSeconds())
-      last_date.setUTCMilliseconds(start_at.getUTCMilliseconds())
       recurrent.recurrent_dates = recurrent_dates
-      recurrent.finish_at = new Date(last_date.getTime() + event.duration)
     }
   }
 
   if (recurrent.recurrent_dates.length === 0) {
-    recurrent.recurrent_dates.push(start_at)
+    recurrent.recurrent_dates.push(
+      ...datesForDay(
+        start_at,
+        time_slots,
+        start_at.getUTCSeconds(),
+        start_at.getUTCMilliseconds()
+      )
+    )
   }
+
+  recurrent.finish_at = finishForDate(
+    recurrent.recurrent_dates[recurrent.recurrent_dates.length - 1],
+    time_slots
+  )
 
   return recurrent
 }
@@ -450,16 +644,16 @@ export function calculateNextRecurrentDates(
 
   if (
     !temp_start_time_at ||
-    (temp_start_time_at && temp_start_time_at.getTime() + event.duration <= now)
+    finishForDate(temp_start_time_at, event.time_slots).getTime() <= now
   ) {
     temp_start_time_at =
       event.recurrent_dates.find(
-        (date) => date.getTime() + event.duration > now
+        (date) => finishForDate(date, event.time_slots).getTime() > now
       ) || event.recurrent_dates[event.recurrent_dates.length - 1]
   }
   return {
     next_start_at: temp_start_time_at,
-    next_finish_at: Time(temp_start_time_at).add(event.duration).toDate(),
+    next_finish_at: finishForDate(temp_start_time_at, event.time_slots),
   }
 }
 

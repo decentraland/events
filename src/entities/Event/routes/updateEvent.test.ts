@@ -61,9 +61,11 @@ jest.mock("../utils", () => {
   const actual = jest.requireActual("../utils")
   return {
     ...actual,
-    calculateRecurrentProperties: () => ({
+    calculateRecurrentProperties: (event: { duration: number }) => ({
       recurrent_dates: [new Date("2030-01-01T00:00:00Z")],
       finish_at: new Date("2030-01-01T01:00:00Z"),
+      duration: event.duration,
+      time_slots: [{ time: 0, duration: event.duration }],
     }),
     eventTargetUrl: () => "https://decentraland.org/jump",
     validateImageUrl: () => Promise.resolve(undefined),
@@ -128,6 +130,7 @@ function createBaseEvent(
     next_start_at: startAt,
     next_finish_at: new Date("2030-01-01T01:00:00Z"),
     duration: 3600000,
+    time_slots: [{ time: 0, duration: 3600000 }],
     all_day: false,
     x: 0,
     y: 0,

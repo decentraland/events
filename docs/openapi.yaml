@@ -1342,8 +1342,30 @@ components:
           example: "2024-12-25T20:00:00.000Z"
         duration:
           type: integer
-          description: Event duration in milliseconds
+          description: >-
+            Event duration in milliseconds. For events with multiple
+            time_slots this is the earliest slot's duration — do not
+            compute occurrence end times as next_start_at + duration;
+            use next_finish_at (or the matching time_slots entry)
+            instead.
           example: 7200000
+        time_slots:
+          type: array
+          description: >-
+            Time-of-day (minutes since midnight UTC) and duration of each
+            showing of the event. A single-slot event has one entry
+            matching start_at/duration.
+          items:
+            type: object
+            properties:
+              time:
+                type: integer
+                description: Minutes since midnight UTC
+                example: 840
+              duration:
+                type: integer
+                description: Duration of this time slot in milliseconds
+                example: 3600000
         all_day:
           type: boolean
           description: Whether this is an all-day event
@@ -1611,6 +1633,29 @@ components:
           minimum: 0
           maximum: 86400000
           description: Event duration in milliseconds (max 24 hours)
+        time_slots:
+          type: array
+          description: >-
+            Optional list of time-of-day + duration showings for the
+            event. Defaults to a single slot derived from start_at/duration
+            when omitted. Multiple slots are not supported for HOURLY
+            recurrence.
+          minItems: 1
+          maxItems: 6
+          items:
+            type: object
+            required: [time, duration]
+            properties:
+              time:
+                type: integer
+                description: Minutes since midnight UTC
+                minimum: 0
+                maximum: 1439
+              duration:
+                type: integer
+                description: Duration of this time slot in milliseconds
+                minimum: 1
+                maximum: 86400000
         all_day:
           type: boolean
           default: false
@@ -1736,6 +1781,27 @@ components:
         duration:
           type: integer
           minimum: 0
+        time_slots:
+          type: array
+          description: >-
+            Optional list of time-of-day + duration showings for the
+            event. Multiple slots are not supported for HOURLY recurrence.
+          minItems: 1
+          maxItems: 6
+          items:
+            type: object
+            required: [time, duration]
+            properties:
+              time:
+                type: integer
+                description: Minutes since midnight UTC
+                minimum: 0
+                maximum: 1439
+              duration:
+                type: integer
+                description: Duration of this time slot in milliseconds
+                minimum: 1
+                maximum: 86400000
         all_day:
           type: boolean
         x:

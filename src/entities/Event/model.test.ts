@@ -1,4 +1,4 @@
-import EventModel from "./model"
+import EventModel, { serializeTimeSlotsForStorage } from "./model"
 import { EventListOptions, EventListType } from "./types"
 
 type SQLCondition = { text: string }
@@ -469,5 +469,109 @@ describe("EventModel.buildEventFilterConditions", () => {
         expect(hasCommunityIdCondition(conditions)).toBe(false)
       })
     })
+  })
+})
+
+describe("serializeTimeSlotsForStorage", () => {
+  it("JSON-stringifies time_slots when present", () => {
+    const payload = {
+      id: "event-1",
+      time_slots: [
+        { time: 840, duration: 3600000 },
+        { time: 1200, duration: 7200000 },
+      ],
+    }
+
+    expect(serializeTimeSlotsForStorage(payload)).toEqual({
+      id: "event-1",
+      time_slots: JSON.stringify(payload.time_slots),
+    })
+  })
+
+  it("passes payloads without time_slots through unchanged", () => {
+    const payload = { id: "event-1", name: "Watch Party" }
+    expect(serializeTimeSlotsForStorage(payload)).toEqual(payload)
+  })
+})
+
+describe("EventModel.selectNextStartAt", () => {
+  it("keeps next_start_at while its slot is still live", () => {
+    const now = Date.now()
+    const next_start_at = new Date(now - 10 * 60 * 1000)
+    const time_slots = [
+      {
+        time: next_start_at.getUTCHours() * 60 + next_start_at.getUTCMinutes(),
+        duration: 3600000,
+      },
+    ]
+
+    expect(
+      EventModel.selectNextStartAt(time_slots, next_start_at, [next_start_at])
+    ).toBe(next_start_at)
+  })
+
+  it("advances past a finished occurrence using its own slot duration", () => {
+    const now = Date.now()
+    const finished = new Date(now - 2 * 3600000)
+    const upcoming = new Date(now + 3600000)
+    const time_slots = [
+      {
+        time: finished.getUTCHours() * 60 + finished.getUTCMinutes(),
+        duration: 3600000,
+      },
+      {
+        time: upcoming.getUTCHours() * 60 + upcoming.getUTCMinutes(),
+        duration: 3600000,
+      },
+    ]
+
+    expect(
+      EventModel.selectNextStartAt(time_slots, finished, [finished, upcoming])
+    ).toBe(upcoming)
+  })
+})
+
+describe("EventModel.build", () => {
+  it("keeps recurrent_dates[0] equal to the normalized start_at and defaults time_slots", () => {
+    const start_at = new Date("2026-07-08T14:00:00.000Z")
+    const built = EventModel.build({
+      id: "event-1",
+      start_at,
+      finish_at: new Date(start_at.getTime() + 3600000),
+      duration: 3600000,
+      time_slots: [],
+      recurrent_dates: [],
+      next_start_at: null,
+    } as any)
+
+    expect(built!.recurrent_dates[0].getTime()).toBe(start_at.getTime())
+    expect(built!.time_slots).toEqual([{ time: 14 * 60, duration: 3600000 }])
+  })
+})
+
+describe("EventModel.toPublic", () => {
+  it("computes live using the matching slot's duration", () => {
+    const now = Date.now()
+    const next_start_at = new Date(now - 30 * 60 * 1000)
+    const time_slots = [
+      {
+        time: next_start_at.getUTCHours() * 60 + next_start_at.getUTCMinutes(),
+        duration: 3600000,
+      },
+    ]
+
+    const result = EventModel.toPublic(
+      {
+        id: "event-1",
+        user: "0xabc",
+        time_slots,
+        duration: 3600000,
+        next_start_at,
+        recurrent_dates: [next_start_at],
+      } as any,
+      { user: "0xabc" } as any
+    )
+
+    expect(result.live).toBe(true)
   })
 })

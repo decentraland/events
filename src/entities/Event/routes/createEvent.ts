@@ -22,14 +22,15 @@ import { newEventSchema } from "../schemas"
 import {
   DeprecatedEventAttributes,
   EventAttributes,
-  MAX_EVENT_DURATION,
   MAX_RECURRENT_PAST_ITERATIONS,
 } from "../types"
 import {
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
+  finishForDate,
   validateImageUrl,
+  validateTimeSlots,
 } from "../utils"
 
 const validateNewEvent = createValidator<EventAttributes>(
@@ -116,13 +117,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   const recurrent = calculateRecurrentProperties(data)
 
-  if (recurrent.duration > MAX_EVENT_DURATION) {
-    throw new RequestError(
-      `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
-      RequestError.BadRequest,
-      { body: data }
-    )
-  }
+  validateTimeSlots(recurrent.time_slots, recurrent.recurrent_frequency)
 
   if (data.categories.length) {
     const validation = await EventCategoryModel.validateCategories(
@@ -189,11 +184,11 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   const user_name = userProfile.name || null
   const next_start_at = EventModel.selectNextStartAt(
-    recurrent.duration,
+    recurrent.time_slots,
     recurrent.start_at,
     recurrent.recurrent_dates
   )
-  const next_finish_at = new Date(next_start_at.getTime() + recurrent.duration)
+  const next_finish_at = finishForDate(next_start_at, recurrent.time_slots)
 
   const event: DeprecatedEventAttributes = {
     ...data,

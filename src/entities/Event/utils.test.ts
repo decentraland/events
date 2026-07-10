@@ -1,9 +1,24 @@
-import { Frequency, MAX_EVENT_RECURRENT } from "./types"
 import {
+  EventTimeSlot,
+  Frequency,
+  MAX_EVENT_DURATION,
+  MAX_EVENT_RECURRENT,
+  MAX_EVENT_TIME_SLOTS,
+} from "./types"
+import {
+  applyTimeOfDay,
+  calculateNextRecurrentDates,
+  calculateRecurrentProperties,
+  datesForDay,
   estimateRecurrentPastIterations,
+  finishForDate,
   fromEventTime,
   futureRecurrentDates,
+  minutesOfDay,
+  normalizeTimeSlots,
+  slotForDate,
   toEventTime,
+  validateTimeSlots,
 } from "./utils"
 
 test(`fromEventTime`, () => {
@@ -308,5 +323,376 @@ describe("estimateRecurrentPastIterations", () => {
       expect(result).toBeGreaterThan(360)
       expect(result).toBeLessThan(370)
     })
+  })
+})
+
+test(`minutesOfDay`, () => {
+  expect(minutesOfDay(new Date("2026-07-08T00:00:00.000Z"))).toBe(0)
+  expect(minutesOfDay(new Date("2026-07-08T14:00:00.000Z"))).toBe(14 * 60)
+  expect(minutesOfDay(new Date("2026-07-08T23:59:00.000Z"))).toBe(23 * 60 + 59)
+})
+
+test(`applyTimeOfDay`, () => {
+  const date = new Date("2026-07-08T03:15:20.500Z")
+  const result = applyTimeOfDay(date, 20 * 60, 45, 250)
+  expect(result.toISOString()).toBe("2026-07-08T20:00:45.250Z")
+  expect(date.toISOString()).toBe("2026-07-08T03:15:20.500Z") // no mutation
+})
+
+test(`normalizeTimeSlots without input derives a single slot from start_at/duration`, () => {
+  const start_at = new Date("2026-07-08T14:00:00.000Z")
+  expect(normalizeTimeSlots(undefined, start_at, 3600000)).toEqual([
+    { time: 14 * 60, duration: 3600000 },
+  ])
+  expect(normalizeTimeSlots([], start_at, 3600000)).toEqual([
+    { time: 14 * 60, duration: 3600000 },
+  ])
+})
+
+test(`normalizeTimeSlots sorts provided slots by time ascending`, () => {
+  const start_at = new Date("2026-07-08T14:00:00.000Z")
+  const result = normalizeTimeSlots(
+    [
+      { time: 20 * 60, duration: 1000 },
+      { time: 14 * 60, duration: 2000 },
+    ],
+    start_at,
+    9999
+  )
+  expect(result).toEqual([
+    { time: 14 * 60, duration: 2000 },
+    { time: 20 * 60, duration: 1000 },
+  ])
+})
+
+test(`datesForDay produces one date per slot, sorted, on the same calendar day`, () => {
+  const day = new Date("2026-07-08T14:00:30.123Z")
+  const time_slots: EventTimeSlot[] = [
+    { time: 20 * 60, duration: 1000 },
+    { time: 14 * 60, duration: 2000 },
+  ]
+  const result = datesForDay(day, time_slots, 30, 123)
+  expect(result.map((d) => d.toISOString())).toEqual([
+    "2026-07-08T14:00:30.123Z",
+    "2026-07-08T20:00:30.123Z",
+  ])
+})
+
+test(`slotForDate finds the slot matching the date's time-of-day, falls back to the first`, () => {
+  const time_slots: EventTimeSlot[] = [
+    { time: 14 * 60, duration: 1000 },
+    { time: 20 * 60, duration: 2000 },
+  ]
+  expect(slotForDate(new Date("2026-07-08T20:00:00.000Z"), time_slots)).toEqual(
+    { time: 20 * 60, duration: 2000 }
+  )
+  expect(slotForDate(new Date("2026-07-08T09:00:00.000Z"), time_slots)).toEqual(
+    { time: 14 * 60, duration: 1000 }
+  )
+})
+
+test(`finishForDate adds the matching slot's duration`, () => {
+  const time_slots: EventTimeSlot[] = [
+    { time: 14 * 60, duration: 1000 },
+    { time: 20 * 60, duration: 2000 },
+  ]
+  const date = new Date("2026-07-08T20:00:00.000Z")
+  expect(finishForDate(date, time_slots).getTime()).toBe(date.getTime() + 2000)
+})
+
+test(`validateTimeSlots accepts valid single and multi slots`, () => {
+  expect(() =>
+    validateTimeSlots([{ time: 840, duration: 3600000 }], null)
+  ).not.toThrow()
+  expect(() =>
+    validateTimeSlots(
+      [
+        { time: 840, duration: 3600000 },
+        { time: 1200, duration: 7200000 },
+      ],
+      Frequency.WEEKLY
+    )
+  ).not.toThrow()
+})
+
+test(`validateTimeSlots rejects an empty list`, () => {
+  expect(() => validateTimeSlots([], null)).toThrow()
+})
+
+test(`validateTimeSlots rejects more than MAX_EVENT_TIME_SLOTS`, () => {
+  const slots = Array.from({ length: MAX_EVENT_TIME_SLOTS + 1 }, (_, i) => ({
+    time: i * 10,
+    duration: 1000,
+  }))
+  expect(() => validateTimeSlots(slots, null)).toThrow()
+})
+
+test(`validateTimeSlots rejects multiple slots combined with HOURLY recurrence`, () => {
+  expect(() =>
+    validateTimeSlots(
+      [
+        { time: 0, duration: 1000 },
+        { time: 30, duration: 1000 },
+      ],
+      Frequency.HOURLY
+    )
+  ).toThrow()
+})
+
+test(`validateTimeSlots rejects duplicated times`, () => {
+  expect(() =>
+    validateTimeSlots(
+      [
+        { time: 840, duration: 1000 },
+        { time: 840, duration: 2000 },
+      ],
+      null
+    )
+  ).toThrow()
+})
+
+test(`validateTimeSlots rejects a negative or over-cap duration but allows zero (legacy)`, () => {
+  expect(() => validateTimeSlots([{ time: 840, duration: -1 }], null)).toThrow()
+  expect(() =>
+    validateTimeSlots([{ time: 840, duration: MAX_EVENT_DURATION + 1 }], null)
+  ).toThrow()
+  expect(() =>
+    validateTimeSlots([{ time: 840, duration: 0 }], null)
+  ).not.toThrow()
+})
+
+test(`validateTimeSlots accepts a raised max_duration for grandfathered rows`, () => {
+  const grandfathered = MAX_EVENT_DURATION * 2
+  expect(() =>
+    validateTimeSlots([{ time: 840, duration: grandfathered }], null)
+  ).toThrow()
+  expect(() =>
+    validateTimeSlots(
+      [{ time: 840, duration: grandfathered }],
+      null,
+      grandfathered
+    )
+  ).not.toThrow()
+  expect(() =>
+    validateTimeSlots(
+      [{ time: 840, duration: grandfathered + 1 }],
+      null,
+      grandfathered
+    )
+  ).toThrow()
+})
+
+describe("futureRecurrentDates with multiple time slots", () => {
+  it("expands each recurrence day into one date per time slot", () => {
+    const dates = futureRecurrentDates({
+      start_at: new Date("2020-01-01T14:00:00.000Z"), // a past Wednesday
+      duration: 3600000,
+      time_slots: [
+        { time: 14 * 60, duration: 3600000 },
+        { time: 20 * 60, duration: 3600000 },
+      ],
+      recurrent: true,
+      recurrent_frequency: Frequency.WEEKLY,
+      recurrent_interval: 1,
+      recurrent_setpos: null,
+      recurrent_monthday: null,
+      recurrent_weekday_mask: 0,
+      recurrent_month_mask: 0,
+      recurrent_until: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000),
+      recurrent_count: null,
+    })
+
+    expect(dates.length).toBeGreaterThan(1)
+    expect(dates.length % 2).toBe(0) // always pairs of (14:00, 20:00)
+    for (let i = 0; i < dates.length; i += 2) {
+      expect(dates[i].getUTCHours()).toBe(14)
+      expect(dates[i + 1].getUTCHours()).toBe(20)
+      expect(dates[i].getUTCFullYear()).toBe(dates[i + 1].getUTCFullYear())
+      expect(dates[i].getUTCMonth()).toBe(dates[i + 1].getUTCMonth())
+      expect(dates[i].getUTCDate()).toBe(dates[i + 1].getUTCDate())
+    }
+  })
+
+  it("caps materialized occurrences at MAX_EVENT_RECURRENT distinct days", () => {
+    const now = Date.now()
+    // Both slots later today so the >= now filter drops nothing and
+    // the +1 day compensation would otherwise leave 11 days.
+    const slotA = new Date(now + 60 * 60 * 1000)
+    const slotB = new Date(now + 2 * 60 * 60 * 1000)
+
+    const dates = futureRecurrentDates({
+      start_at: slotA,
+      duration: 3600000,
+      time_slots: [
+        { time: minutesOfDay(slotA), duration: 3600000 },
+        { time: minutesOfDay(slotB), duration: 3600000 },
+      ],
+      recurrent: true,
+      recurrent_frequency: Frequency.DAILY,
+      recurrent_interval: 1,
+      recurrent_setpos: null,
+      recurrent_monthday: null,
+      recurrent_weekday_mask: 0,
+      recurrent_month_mask: 0,
+      recurrent_until: new Date(now + 365 * 24 * 60 * 60 * 1000),
+      recurrent_count: null,
+    })
+
+    const distinctDays = new Set(
+      dates.map((date) => date.toISOString().slice(0, 10))
+    )
+    expect(distinctDays.size).toBe(MAX_EVENT_RECURRENT)
+    expect(dates.length).toBe(MAX_EVENT_RECURRENT * 2)
+  })
+
+  it("surfaces today's later slot even after the earlier slot already passed", () => {
+    const now = Date.now()
+    const passedSlotTime = new Date(now - 30 * 60 * 1000) // 30 min ago
+    const upcomingSlotTime = new Date(now + 30 * 60 * 1000) // in 30 min
+
+    const dates = futureRecurrentDates({
+      start_at: passedSlotTime,
+      duration: 3600000,
+      time_slots: [
+        { time: minutesOfDay(passedSlotTime), duration: 3600000 },
+        { time: minutesOfDay(upcomingSlotTime), duration: 3600000 },
+      ],
+      recurrent: true,
+      recurrent_frequency: Frequency.DAILY,
+      recurrent_interval: 1,
+      recurrent_setpos: null,
+      recurrent_monthday: null,
+      recurrent_weekday_mask: 0,
+      recurrent_month_mask: 0,
+      recurrent_until: new Date(now + 365 * 24 * 60 * 60 * 1000),
+      recurrent_count: null,
+    })
+
+    expect(dates.length).toBeGreaterThan(0)
+    expect(dates[0].getTime()).toBeGreaterThanOrEqual(now)
+    expect(dates[0].getUTCHours()).toBe(upcomingSlotTime.getUTCHours())
+    expect(dates[0].getUTCMinutes()).toBe(upcomingSlotTime.getUTCMinutes())
+  })
+})
+
+describe("calculateRecurrentProperties", () => {
+  it("is byte-for-byte unchanged for legacy single-slot input", () => {
+    const start_at = new Date("2026-07-08T14:00:00.000Z")
+    const result = calculateRecurrentProperties({
+      start_at,
+      duration: 3600000,
+      finish_at: new Date(start_at.getTime() + 3600000),
+    })
+
+    expect(result.start_at.toISOString()).toBe("2026-07-08T14:00:00.000Z")
+    expect(result.duration).toBe(3600000)
+    expect(result.time_slots).toEqual([{ time: 14 * 60, duration: 3600000 }])
+    expect(result.recurrent_dates.map((d) => d.toISOString())).toEqual([
+      "2026-07-08T14:00:00.000Z",
+    ])
+    expect(result.finish_at.toISOString()).toBe("2026-07-08T15:00:00.000Z")
+  })
+
+  it("materializes all slots for a non-recurrent multi-slot event and normalizes start_at to the earliest slot", () => {
+    const start_at = new Date("2026-07-08T20:00:00.000Z") // deliberately the LATER slot
+    const result = calculateRecurrentProperties({
+      start_at,
+      duration: 3600000,
+      finish_at: new Date(start_at.getTime() + 3600000),
+      time_slots: [
+        { time: 20 * 60, duration: 3600000 }, // 20:00, 1h
+        { time: 14 * 60, duration: 10800000 }, // 14:00, 3h
+      ],
+    })
+
+    expect(result.start_at.toISOString()).toBe("2026-07-08T14:00:00.000Z")
+    expect(result.duration).toBe(10800000)
+    expect(result.time_slots).toEqual([
+      { time: 14 * 60, duration: 10800000 },
+      { time: 20 * 60, duration: 3600000 },
+    ])
+    expect(result.recurrent_dates.map((d) => d.toISOString())).toEqual([
+      "2026-07-08T14:00:00.000Z",
+      "2026-07-08T20:00:00.000Z",
+    ])
+    expect(result.finish_at.toISOString()).toBe("2026-07-08T21:00:00.000Z")
+  })
+
+  it("reconciles start_at/duration with a single explicitly-provided slot", () => {
+    // Client sends start_at at 14:00 but declares the (only) showing
+    // at 20:00 with a different duration — the slot is the source of
+    // truth, so start_at/duration/finish_at must follow it.
+    const start_at = new Date("2026-07-10T14:00:00.000Z")
+    const result = calculateRecurrentProperties({
+      start_at,
+      duration: 3600000,
+      finish_at: new Date(start_at.getTime() + 3600000),
+      time_slots: [{ time: 20 * 60, duration: 7200000 }],
+    })
+
+    expect(result.start_at.toISOString()).toBe("2026-07-10T20:00:00.000Z")
+    expect(result.duration).toBe(7200000)
+    expect(result.recurrent_dates.map((d) => d.toISOString())).toEqual([
+      "2026-07-10T20:00:00.000Z",
+    ])
+    expect(result.finish_at.toISOString()).toBe("2026-07-10T22:00:00.000Z")
+  })
+
+  it("handles a recurrent multi-slot event end-to-end", () => {
+    const start_at = new Date("2020-01-01T14:00:00.000Z")
+    const result = calculateRecurrentProperties({
+      start_at,
+      duration: 3600000,
+      finish_at: new Date(start_at.getTime() + 3600000),
+      time_slots: [
+        { time: 14 * 60, duration: 3600000 },
+        { time: 20 * 60, duration: 3600000 },
+      ],
+      recurrent: true,
+      recurrent_frequency: Frequency.WEEKLY,
+      recurrent_interval: 1,
+      recurrent_until: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000),
+    } as any)
+
+    expect(result.recurrent_dates.length).toBeGreaterThan(0)
+    expect(result.recurrent_dates.length % 2).toBe(0)
+    const last = result.recurrent_dates[result.recurrent_dates.length - 1]
+    expect(result.finish_at.getTime()).toBe(last.getTime() + 3600000)
+  })
+})
+
+describe("calculateNextRecurrentDates", () => {
+  it("keeps next_start_at while its own slot is still live", () => {
+    const now = Date.now()
+    const start_at = new Date(now - 30 * 60 * 1000)
+    const time_slots: EventTimeSlot[] = [
+      { time: minutesOfDay(start_at), duration: 3600000 },
+    ]
+
+    const result = calculateNextRecurrentDates({
+      start_at,
+      time_slots,
+      recurrent_dates: [start_at],
+    } as any)
+
+    expect(result.next_start_at).toBe(start_at)
+    expect(result.next_finish_at.getTime()).toBe(start_at.getTime() + 3600000)
+  })
+
+  it("advances to the next recurrent_dates entry once the current slot finished", () => {
+    const now = Date.now()
+    const finished = new Date(now - 2 * 3600000)
+    const upcoming = new Date(now + 3600000)
+    const time_slots: EventTimeSlot[] = [
+      { time: minutesOfDay(finished), duration: 3600000 },
+    ]
+
+    const result = calculateNextRecurrentDates({
+      start_at: finished,
+      time_slots,
+      recurrent_dates: [finished, upcoming],
+    } as any)
+
+    expect(result.next_start_at).toBe(upcoming)
   })
 })

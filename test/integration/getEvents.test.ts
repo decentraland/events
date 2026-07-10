@@ -2,6 +2,7 @@ import { AuthIdentity } from "@dcl/crypto/dist/types"
 import { signedHeaderFactory } from "decentraland-crypto-fetch"
 import supertest from "supertest"
 
+import EventModel from "../../src/entities/Event/model"
 import { DeprecatedEventAttributes } from "../../src/entities/Event/types"
 import { seedEvent } from "../mocks/event"
 import { createIdentity } from "../mocks/identity"
@@ -385,6 +386,93 @@ describe("GET /api/events/:event_id", () => {
       expect(response.body.data.rejected).toBe(true)
       expect(response.body.data.contact).toBe("owner@example.com")
       expect(response.body.data.details).toBe("Private details")
+    })
+  })
+})
+
+describe("EventModel.getEventsStartingInRange", () => {
+  beforeAll(async () => {
+    await initTestDb()
+    dbInitialized = true
+  })
+
+  afterAll(async () => {
+    if (dbInitialized) {
+      await closeTestDb()
+    }
+  })
+
+  afterEach(async () => {
+    if (dbInitialized) {
+      await cleanTables()
+    }
+  })
+
+  describe("when a multi-slot event's later slot enters the window while next_start_at still points at the earlier slot", () => {
+    let event: DeprecatedEventAttributes
+    let slotB: Date
+
+    beforeEach(async () => {
+      const now = Date.now()
+      const slotA = new Date(now - 30 * 60 * 1000) // live now
+      slotB = new Date(now + 55 * 60 * 1000) // starts in 55 min
+
+      event = await seedEvent({
+        start_at: slotA,
+        finish_at: new Date(slotB.getTime() + 3600000),
+        duration: 3600000,
+        time_slots: [
+          {
+            time: slotA.getUTCHours() * 60 + slotA.getUTCMinutes(),
+            duration: 3600000,
+          },
+          {
+            time: slotB.getUTCHours() * 60 + slotB.getUTCMinutes(),
+            duration: 3600000,
+          },
+        ],
+        recurrent_dates: [slotA, slotB],
+        // pinned to the live slot, as the cron would leave it
+        next_start_at: slotA,
+        next_finish_at: new Date(slotA.getTime() + 3600000),
+      })
+    })
+
+    it("should match the event through its materialized occurrences", async () => {
+      const results = await EventModel.getEventsStartingInRange(
+        slotB.getTime() - 60 * 1000,
+        slotB.getTime() + 60 * 1000
+      )
+
+      expect(results.map((result) => result.id)).toContain(event.id)
+    })
+  })
+
+  describe("when a single-slot event has a future occurrence that next_start_at does not point at", () => {
+    let futureDate: Date
+
+    beforeEach(async () => {
+      const now = Date.now()
+      const current = new Date(now - 30 * 60 * 1000)
+      futureDate = new Date(now + 55 * 60 * 1000)
+
+      await seedEvent({
+        start_at: current,
+        finish_at: new Date(futureDate.getTime() + 3600000),
+        duration: 3600000,
+        recurrent_dates: [current, futureDate],
+        next_start_at: current,
+        next_finish_at: new Date(current.getTime() + 3600000),
+      })
+    })
+
+    it("should preserve the next_start_at-only matching for single-slot events", async () => {
+      const results = await EventModel.getEventsStartingInRange(
+        futureDate.getTime() - 60 * 1000,
+        futureDate.getTime() + 60 * 1000
+      )
+
+      expect(results).toEqual([])
     })
   })
 })

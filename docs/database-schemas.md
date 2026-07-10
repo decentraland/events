@@ -41,6 +41,7 @@ erDiagram
     INTEGER recurrent_count
     TIMESTAMP recurrent_until
     INTEGER duration
+    JSONB time_slots
     TIMESTAMP[] recurrent_dates
     INTEGER recurrent_setpos
     INTEGER recurrent_monthday
@@ -142,62 +143,63 @@ Stores all event information including one-time and recurrent events with locati
 
 ### Columns
 
-| Column                   | Type          | Nullable | Description                                                     |
-| ------------------------ | ------------- | -------- | --------------------------------------------------------------- |
-| `id`                     | UUID          | NOT NULL | **Primary Key**. Unique event identifier                        |
-| `name`                   | TEXT          | NOT NULL | Event name/title                                                |
-| `image`                  | TEXT          | NULL     | URL to event poster image stored in S3                          |
-| `description`            | TEXT          | NULL     | Event description in markdown format                            |
-| `start_at`               | TIMESTAMP     | NOT NULL | Event start time in UTC                                         |
-| `finish_at`              | TIMESTAMP     | NOT NULL | Event end time in UTC                                           |
-| `coordinates`            | INTEGER[]     | NOT NULL | Array of [x, y] coordinates in Decentraland Genesis City        |
-| `next_start_at`          | TIMESTAMP     | NOT NULL | Next occurrence start time for recurrent events                 |
-| `next_finish_at`         | TIMESTAMP     | NOT NULL | Next occurrence end time for recurrent events                   |
-| `duration`               | INTEGER       | NOT NULL | Event duration in milliseconds                                  |
-| `all_day`                | BOOLEAN       | NOT NULL | Whether event is all-day (default: false)                       |
-| `x`                      | INTEGER       | NOT NULL | X coordinate in Decentraland Genesis City (default: 0)          |
-| `y`                      | INTEGER       | NOT NULL | Y coordinate in Decentraland Genesis City (default: 0)          |
-| `server`                 | TEXT          | NULL     | **Deprecated**. Server/realm name (use world field instead)     |
-| `url`                    | TEXT          | NULL     | Custom event URL or external link                               |
-| `scene_name`             | TEXT          | NULL     | Name of the scene where the event takes place                   |
-| `user`                   | TEXT          | NOT NULL | Creator wallet address. Stored in lowercase                     |
-| `user_name`              | TEXT          | NULL     | Creator display name                                            |
-| `estate_id`              | TEXT          | NULL     | Associated Decentraland estate ID                               |
-| `estate_name`            | TEXT          | NULL     | Estate name for display                                         |
-| `approved`               | BOOLEAN       | NOT NULL | Approval status by moderator (default: false)                   |
-| `rejected`               | BOOLEAN       | NOT NULL | Rejection status by moderator (default: false)                  |
-| `approved_by`            | TEXT          | NULL     | Moderator wallet address who approved. Stored in lowercase      |
-| `rejected_by`            | TEXT          | NULL     | Moderator wallet address who rejected. Stored in lowercase      |
-| `rejection_reason`       | TEXT          | NULL     | Reason provided by a moderator or service when rejecting        |
-| `deleted_by_user`        | BOOLEAN       | NOT NULL | True if the creator soft-deleted the event (default: false)     |
-| `deleted_by_admin`       | BOOLEAN       | NOT NULL | True if an admin soft-deleted the event (default: false)        |
-| `deleted_by`             | TEXT          | NULL     | Wallet address or admin actor that deleted. Stored in lowercase |
-| `deleted_at`             | TIMESTAMP     | NULL     | Time the event was soft-deleted                                 |
-| `deleted_reason`         | TEXT          | NULL     | Reason provided by an admin when deleting (optional)            |
-| `highlighted`            | BOOLEAN       | NOT NULL | Featured/highlighted status (default: false)                    |
-| `trending`               | BOOLEAN       | NOT NULL | Trending status calculated algorithmically (default: false)     |
-| `recurrent`              | BOOLEAN       | NOT NULL | Whether event is recurrent (default: false)                     |
-| `recurrent_frequency`    | TEXT          | NULL     | RRule frequency: YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY         |
-| `recurrent_setpos`       | INTEGER       | NULL     | Position in recurrence pattern (e.g., 1 for first, -1 for last) |
-| `recurrent_monthday`     | INTEGER       | NULL     | Day of month for monthly recurrence (1-31)                      |
-| `recurrent_weekday_mask` | INTEGER       | NOT NULL | Bitmask for weekdays (default: 0)                               |
-| `recurrent_month_mask`   | INTEGER       | NOT NULL | Bitmask for months (default: 0)                                 |
-| `recurrent_interval`     | INTEGER       | NOT NULL | Interval between occurrences (default: 1)                       |
-| `recurrent_count`        | INTEGER       | NULL     | Total number of occurrences                                     |
-| `recurrent_until`        | TIMESTAMP     | NULL     | Recurrence end date                                             |
-| `recurrent_dates`        | TIMESTAMP[]   | NOT NULL | Pre-calculated array of occurrence dates (default: {})          |
-| `contact`                | TEXT          | NULL     | Contact information for event organizer                         |
-| `details`                | TEXT          | NULL     | Additional event details or notes                               |
-| `total_attendees`        | INTEGER       | NOT NULL | Denormalized count of attendees (default: 0)                    |
-| `latest_attendees`       | TEXT[]        | NOT NULL | Array of recent attendee addresses (default: {})                |
-| `textsearch`             | TSVECTOR      | NULL     | Full-text search vector for name and description                |
-| `categories`             | VARCHAR(50)[] | NOT NULL | Array of event category tags (default: {})                      |
-| `schedules`              | UUID[]        | NOT NULL | Array of associated schedule IDs (default: {})                  |
-| `world`                  | BOOLEAN       | NOT NULL | Whether event is in a virtual world vs land (default: false)    |
-| `place_id`               | TEXT          | NULL     | Associated place ID from Catalyst                               |
-| `community_id`           | TEXT          | NULL     | Associated community ID from Communities API                    |
-| `created_at`             | TIMESTAMP     | NOT NULL | Creation timestamp (default: now())                             |
-| `updated_at`             | TIMESTAMP     | NOT NULL | Last update timestamp (default: now())                          |
+| Column                   | Type          | Nullable | Description                                                                                                                                                                                        |
+| ------------------------ | ------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                     | UUID          | NOT NULL | **Primary Key**. Unique event identifier                                                                                                                                                           |
+| `name`                   | TEXT          | NOT NULL | Event name/title                                                                                                                                                                                   |
+| `image`                  | TEXT          | NULL     | URL to event poster image stored in S3                                                                                                                                                             |
+| `description`            | TEXT          | NULL     | Event description in markdown format                                                                                                                                                               |
+| `start_at`               | TIMESTAMP     | NOT NULL | Event start time in UTC                                                                                                                                                                            |
+| `finish_at`              | TIMESTAMP     | NOT NULL | Event end time in UTC                                                                                                                                                                              |
+| `coordinates`            | INTEGER[]     | NOT NULL | Array of [x, y] coordinates in Decentraland Genesis City                                                                                                                                           |
+| `next_start_at`          | TIMESTAMP     | NOT NULL | Next occurrence start time for recurrent events                                                                                                                                                    |
+| `next_finish_at`         | TIMESTAMP     | NOT NULL | Next occurrence end time for recurrent events                                                                                                                                                      |
+| `duration`               | INTEGER       | NOT NULL | Event duration in milliseconds                                                                                                                                                                     |
+| `time_slots`             | JSONB         | NOT NULL | Array of `{time, duration}` showings: `time` = minutes since midnight UTC, `duration` in ms. Single-slot events hold one entry mirroring `start_at`/`duration` (default: `[]`, normalized on read) |
+| `all_day`                | BOOLEAN       | NOT NULL | Whether event is all-day (default: false)                                                                                                                                                          |
+| `x`                      | INTEGER       | NOT NULL | X coordinate in Decentraland Genesis City (default: 0)                                                                                                                                             |
+| `y`                      | INTEGER       | NOT NULL | Y coordinate in Decentraland Genesis City (default: 0)                                                                                                                                             |
+| `server`                 | TEXT          | NULL     | **Deprecated**. Server/realm name (use world field instead)                                                                                                                                        |
+| `url`                    | TEXT          | NULL     | Custom event URL or external link                                                                                                                                                                  |
+| `scene_name`             | TEXT          | NULL     | Name of the scene where the event takes place                                                                                                                                                      |
+| `user`                   | TEXT          | NOT NULL | Creator wallet address. Stored in lowercase                                                                                                                                                        |
+| `user_name`              | TEXT          | NULL     | Creator display name                                                                                                                                                                               |
+| `estate_id`              | TEXT          | NULL     | Associated Decentraland estate ID                                                                                                                                                                  |
+| `estate_name`            | TEXT          | NULL     | Estate name for display                                                                                                                                                                            |
+| `approved`               | BOOLEAN       | NOT NULL | Approval status by moderator (default: false)                                                                                                                                                      |
+| `rejected`               | BOOLEAN       | NOT NULL | Rejection status by moderator (default: false)                                                                                                                                                     |
+| `approved_by`            | TEXT          | NULL     | Moderator wallet address who approved. Stored in lowercase                                                                                                                                         |
+| `rejected_by`            | TEXT          | NULL     | Moderator wallet address who rejected. Stored in lowercase                                                                                                                                         |
+| `rejection_reason`       | TEXT          | NULL     | Reason provided by a moderator or service when rejecting                                                                                                                                           |
+| `deleted_by_user`        | BOOLEAN       | NOT NULL | True if the creator soft-deleted the event (default: false)                                                                                                                                        |
+| `deleted_by_admin`       | BOOLEAN       | NOT NULL | True if an admin soft-deleted the event (default: false)                                                                                                                                           |
+| `deleted_by`             | TEXT          | NULL     | Wallet address or admin actor that deleted. Stored in lowercase                                                                                                                                    |
+| `deleted_at`             | TIMESTAMP     | NULL     | Time the event was soft-deleted                                                                                                                                                                    |
+| `deleted_reason`         | TEXT          | NULL     | Reason provided by an admin when deleting (optional)                                                                                                                                               |
+| `highlighted`            | BOOLEAN       | NOT NULL | Featured/highlighted status (default: false)                                                                                                                                                       |
+| `trending`               | BOOLEAN       | NOT NULL | Trending status calculated algorithmically (default: false)                                                                                                                                        |
+| `recurrent`              | BOOLEAN       | NOT NULL | Whether event is recurrent (default: false)                                                                                                                                                        |
+| `recurrent_frequency`    | TEXT          | NULL     | RRule frequency: YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY                                                                                                                                            |
+| `recurrent_setpos`       | INTEGER       | NULL     | Position in recurrence pattern (e.g., 1 for first, -1 for last)                                                                                                                                    |
+| `recurrent_monthday`     | INTEGER       | NULL     | Day of month for monthly recurrence (1-31)                                                                                                                                                         |
+| `recurrent_weekday_mask` | INTEGER       | NOT NULL | Bitmask for weekdays (default: 0)                                                                                                                                                                  |
+| `recurrent_month_mask`   | INTEGER       | NOT NULL | Bitmask for months (default: 0)                                                                                                                                                                    |
+| `recurrent_interval`     | INTEGER       | NOT NULL | Interval between occurrences (default: 1)                                                                                                                                                          |
+| `recurrent_count`        | INTEGER       | NULL     | Total number of occurrences                                                                                                                                                                        |
+| `recurrent_until`        | TIMESTAMP     | NULL     | Recurrence end date                                                                                                                                                                                |
+| `recurrent_dates`        | TIMESTAMP[]   | NOT NULL | Pre-calculated array of occurrence dates (default: {})                                                                                                                                             |
+| `contact`                | TEXT          | NULL     | Contact information for event organizer                                                                                                                                                            |
+| `details`                | TEXT          | NULL     | Additional event details or notes                                                                                                                                                                  |
+| `total_attendees`        | INTEGER       | NOT NULL | Denormalized count of attendees (default: 0)                                                                                                                                                       |
+| `latest_attendees`       | TEXT[]        | NOT NULL | Array of recent attendee addresses (default: {})                                                                                                                                                   |
+| `textsearch`             | TSVECTOR      | NULL     | Full-text search vector for name and description                                                                                                                                                   |
+| `categories`             | VARCHAR(50)[] | NOT NULL | Array of event category tags (default: {})                                                                                                                                                         |
+| `schedules`              | UUID[]        | NOT NULL | Array of associated schedule IDs (default: {})                                                                                                                                                     |
+| `world`                  | BOOLEAN       | NOT NULL | Whether event is in a virtual world vs land (default: false)                                                                                                                                       |
+| `place_id`               | TEXT          | NULL     | Associated place ID from Catalyst                                                                                                                                                                  |
+| `community_id`           | TEXT          | NULL     | Associated community ID from Communities API                                                                                                                                                       |
+| `created_at`             | TIMESTAMP     | NOT NULL | Creation timestamp (default: now())                                                                                                                                                                |
+| `updated_at`             | TIMESTAMP     | NOT NULL | Last update timestamp (default: now())                                                                                                                                                             |
 
 ### Indexes
 

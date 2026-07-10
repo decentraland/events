@@ -96,6 +96,12 @@ export enum Position {
 }
 
 export const MAX_EVENT_RECURRENT = 10
+export const MAX_EVENT_TIME_SLOTS = 6
+
+export type EventTimeSlot = {
+  time: number // minutes since midnight UTC, 0-1439
+  duration: number // milliseconds
+}
 
 export const MAX_REJECTION_REASON_LENGTH = 500
 export const MAX_DELETED_REASON_LENGTH = 500
@@ -133,6 +139,7 @@ export type EventAttributes = {
   next_start_at: Date
   next_finish_at: Date
   duration: number
+  time_slots: EventTimeSlot[]
   all_day: boolean
   x: number
   y: number
@@ -206,7 +213,9 @@ export type RecurrentEventAttributes = Pick<
   | "recurrent_month_mask"
   | "recurrent_until"
   | "recurrent_count"
->
+> & {
+  time_slots?: EventTimeSlot[]
+}
 
 export enum EventListType {
   All = "all",
@@ -280,6 +289,7 @@ export const editEventAttributes = [
   "description",
   "start_at",
   "duration",
+  "time_slots",
   "all_day",
   "x",
   "y",

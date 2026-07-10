@@ -6,7 +6,12 @@ import {
   apiResultSchema,
 } from "decentraland-gatsby/dist/entities/Schema/types"
 
-import { AllowedInputFrequencies, Frequencies } from "./types"
+import {
+  AllowedInputFrequencies,
+  Frequencies,
+  MAX_EVENT_DURATION,
+  MAX_EVENT_TIME_SLOTS,
+} from "./types"
 
 export const getEventParamsSchema: AjvObjectSchema = {
   type: "object",
@@ -369,6 +374,24 @@ export const eventSchema = {
     duration: {
       type: "number",
     },
+    time_slots: {
+      type: "array",
+      description:
+        "The time-of-day (minutes since midnight UTC) and duration of each showing of the event",
+      items: {
+        type: "object",
+        properties: {
+          time: {
+            type: "number",
+            description: "Minutes since midnight UTC",
+          },
+          duration: {
+            type: "number",
+            description: "Duration of this time slot in milliseconds",
+          },
+        },
+      },
+    },
     recurrent_dates: {
       type: "array",
       description: "The specific position",
@@ -569,6 +592,32 @@ export const newEventSchema = {
     duration: {
       type: "number",
       minimum: 0,
+    },
+    time_slots: {
+      type: "array",
+      description:
+        "Optional list of time-of-day + duration showings for the event. Defaults to a single slot derived from start_at/duration when omitted. Multiple slots are not supported for HOURLY recurrence.",
+      minItems: 1,
+      maxItems: MAX_EVENT_TIME_SLOTS,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["time", "duration"],
+        properties: {
+          time: {
+            type: "integer",
+            description: "Minutes since midnight UTC",
+            minimum: 0,
+            maximum: 1439,
+          },
+          duration: {
+            type: "number",
+            description: "Duration of this time slot in milliseconds",
+            exclusiveMinimum: 0,
+            maximum: MAX_EVENT_DURATION,
+          },
+        },
+      },
     },
     all_day: {
       type: "boolean",
