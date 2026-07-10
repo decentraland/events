@@ -21,12 +21,29 @@ import {
   EventAttributes,
   EventListOptions,
   EventListType,
+  EventTimeSlot,
   SITEMAP_ITEMS_PER_PAGE,
   SessionEventAttributes,
 } from "./types"
+import { finishForDate, normalizeTimeSlots } from "./utils"
 import { getEventCreatorDisplayName } from "../../modules/decentralandFoundationAddresses"
 import EventAttendee from "../EventAttendee/model"
 import { ProfileSettingsAttributes } from "../ProfileSettings/types"
+
+export function serializeTimeSlotsForStorage<T extends QueryPart>(
+  payload: T
+): T {
+  const time_slots = (payload as Partial<EventAttributes>).time_slots
+
+  if (!Array.isArray(time_slots)) {
+    return payload
+  }
+
+  return {
+    ...payload,
+    time_slots: JSON.stringify(time_slots),
+  }
+}
 
 export default class EventModel extends Model<DeprecatedEventAttributes> {
   static tableName = "events"
@@ -47,11 +64,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
   }
 
   static create<U extends QueryPart = any>(event: U): Promise<U> {
-    const keys = Object.keys(event).map((key) => key.replace(/\W/gi, ""))
+    const payload = serializeTimeSlotsForStorage(event)
+    const keys = Object.keys(payload).map((key) => key.replace(/\W/gi, ""))
 
     const sql = SQL`
       INSERT INTO ${table(this)} ${columns(keys)}
-      VALUES ${objectValues(keys, [event])}
+      VALUES ${objectValues(keys, [payload])}
     `
 
     return this.namedQuery("event_create", sql) as any
@@ -61,7 +79,8 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     changes: Partial<U>,
     conditions: Partial<P>
   ): Promise<U> {
-    const changesKeys = Object.keys(changes).map((key) =>
+    const payload = serializeTimeSlotsForStorage(changes)
+    const changesKeys = Object.keys(payload).map((key) =>
       key.replace(/\W/gi, "")
     )
     const conditionsKeys = Object.keys(conditions).map((key) =>
@@ -76,7 +95,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     const updatedChanges = {
-      ...changes,
+      ...payload,
       updated_at: new Date(),
     }
 
@@ -102,18 +121,22 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
   }
 
   static selectNextStartAt(
-    duration: number,
+    time_slots: EventTimeSlot[],
     next_start_at: Date | null,
     recurrent_dates: Date[]
   ): Date {
     const now = Date.now()
-    if (next_start_at && next_start_at.getTime() + duration > now) {
+    if (
+      next_start_at &&
+      finishForDate(next_start_at, time_slots).getTime() > now
+    ) {
       return next_start_at
     }
 
     return (
-      recurrent_dates.find((date) => date.getTime() + duration > now) ||
-      recurrent_dates[recurrent_dates.length - 1]
+      recurrent_dates.find(
+        (date) => finishForDate(date, time_slots).getTime() > now
+      ) || recurrent_dates[recurrent_dates.length - 1]
     )
   }
 
@@ -129,6 +152,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     // TODO: remove
     const duration =
       Number(event.duration) || finish_at.getTime() - start_at.getTime()
+    const time_slots = normalizeTimeSlots(event.time_slots, start_at, duration)
     const recurrent_dates =
       Array.isArray(event.recurrent_dates) && event.recurrent_dates.length > 0
         ? event.recurrent_dates.map((date) => Time.date(date))
@@ -139,7 +163,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }
 
     const next_start_at = this.selectNextStartAt(
-      duration,
+      time_slots,
       event.next_start_at && Time.date(event.next_start_at),
       recurrent_dates
     )
@@ -147,6 +171,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     return {
       ...event,
       duration,
+      time_slots,
       recurrent_dates,
       next_start_at,
       scene_name: event.estate_name,
@@ -307,6 +332,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     starting_from: number,
     starting_to: number
   ) {
+    // Multi-slot events keep next_start_at pinned to the current slot
+    // until it finishes, so a later same-day slot can enter (and leave)
+    // the look-ahead window while next_start_at still points at the
+    // previous slot — match any materialized occurrence for them.
+    // Single-slot events keep the next_start_at fast path (indexed,
+    // and preserves existing notification cadence).
     const query = SQL`
       SELECT *
       FROM ${table(EventModel)} e
@@ -315,8 +346,21 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         AND e.deleted_by_user IS FALSE
         AND e.deleted_by_admin IS FALSE
         AND e.approved IS TRUE
-        AND e.next_start_at >= (to_timestamp(${starting_from} / 1000.0))
-        AND e.next_start_at < (to_timestamp(${starting_to} / 1000.0))
+        AND (
+          (
+            e.next_start_at >= (to_timestamp(${starting_from} / 1000.0))
+            AND e.next_start_at < (to_timestamp(${starting_to} / 1000.0))
+          )
+          OR (
+            jsonb_array_length(e.time_slots) > 1
+            AND EXISTS (
+              SELECT 1
+              FROM unnest(e.recurrent_dates) AS occurrence
+              WHERE occurrence >= (to_timestamp(${starting_from} / 1000.0))
+                AND occurrence < (to_timestamp(${starting_to} / 1000.0))
+            )
+          )
+        )
     `
 
     return EventModel.buildAll(
@@ -373,7 +417,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
         AND e.deleted_by_admin IS FALSE
         AND e.recurrent IS TRUE
         AND e.finish_at > now()
-        AND (e.next_start_at + (e.duration * '1 millisecond'::interval)) < now()
+        AND e.next_finish_at < now()
     `
 
     return EventModel.buildAll(
@@ -494,12 +538,12 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     const next_start_at =
       event.next_start_at ||
       event.recurrent_dates.find(
-        (date) => date.getTime() + event.duration > now
+        (date) => finishForDate(date, event.time_slots).getTime() > now
       ) ||
       event.recurrent_dates[event.recurrent_dates.length - 1]
+    const next_finish_at = finishForDate(next_start_at, event.time_slots)
     const live =
-      now >= next_start_at.getTime() &&
-      now < next_start_at.getTime() + event.duration
+      now >= next_start_at.getTime() && now < next_finish_at.getTime()
 
     return {
       ...event,
