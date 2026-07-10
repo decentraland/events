@@ -355,6 +355,111 @@ describe("PATCH /api/events/:event_id", () => {
       })
     })
 
+    describe("and sets multiple time slots", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({
+          user: owner.address,
+          recurrent: true,
+          recurrent_frequency: "WEEKLY" as any,
+          recurrent_interval: 1,
+          recurrent_until: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000),
+        })
+      })
+
+      it("round-trips time_slots as a real array through the jsonb column", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          {
+            time_slots: [
+              { time: 14 * 60, duration: 3600000 },
+              { time: 20 * 60, duration: 7200000 },
+            ],
+          }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.time_slots).toEqual([
+          { time: 14 * 60, duration: 3600000 },
+          { time: 20 * 60, duration: 7200000 },
+        ])
+        // recurrent_dates materializes both slots per recurrence day
+        expect(response.body.data.recurrent_dates.length).toBeGreaterThan(1)
+        expect(response.body.data.recurrent_dates.length % 2).toBe(0)
+
+        const fetched = await supertest(app)
+          .get(`/api/events/${event.id}`)
+          .expect(200)
+
+        expect(fetched.body.data.time_slots).toEqual([
+          { time: 14 * 60, duration: 3600000 },
+          { time: 20 * 60, duration: 7200000 },
+        ])
+      })
+
+      it("rejects a duration patch that conflicts with the stored multi-slot durations", async () => {
+        await signedPatch(ownerIdentity, `/api/events/${event.id}`, {
+          time_slots: [
+            { time: 14 * 60, duration: 3600000 },
+            { time: 20 * 60, duration: 7200000 },
+          ],
+        }).expect(201)
+
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { duration: 5400000 }
+        )
+
+        expect(response.status).toBe(400)
+      })
+
+      it("accepts a round-trip patch that echoes the derived duration unchanged", async () => {
+        await signedPatch(ownerIdentity, `/api/events/${event.id}`, {
+          time_slots: [
+            { time: 14 * 60, duration: 3600000 },
+            { time: 20 * 60, duration: 7200000 },
+          ],
+        }).expect(201)
+
+        // Full-object clients resend duration as stored (the earliest
+        // slot's) — that must not 400.
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { name: "Renamed", duration: 3600000 }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.name).toBe("Renamed")
+        expect(response.body.data.time_slots).toEqual([
+          { time: 14 * 60, duration: 3600000 },
+          { time: 20 * 60, duration: 7200000 },
+        ])
+      })
+
+      it("rejects multiple time slots combined with HOURLY recurrence", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          {
+            recurrent_frequency: "HOURLY",
+            time_slots: [
+              { time: 0, duration: 1000 },
+              { time: 30, duration: 1000 },
+            ],
+          }
+        )
+
+        expect(response.status).toBe(400)
+      })
+    })
+
     describe("and updates owner-only fields", () => {
       let event: DeprecatedEventAttributes
       let ownerIdentity: AuthIdentity
@@ -480,6 +585,73 @@ describe("PATCH /api/events/:event_id", () => {
           (e: DeprecatedEventAttributes) => e.id
         )
         expect(eventIds).not.toContain(event.id)
+      })
+    })
+
+    describe("and the event has a grandfathered duration above the maximum", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+      const grandfathered = 48 * 60 * 60 * 1000 // 48h, predates the 24h cap
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({
+          user: owner.address,
+          duration: grandfathered,
+          finish_at: new Date(
+            new Date("2030-01-01T00:00:00Z").getTime() + grandfathered
+          ),
+          time_slots: [{ time: 0, duration: grandfathered }],
+        })
+      })
+
+      it("still accepts an edit that does not touch the duration", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { name: "Renamed grandfathered event" }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.name).toBe("Renamed grandfathered event")
+        expect(response.body.data.duration).toBe(grandfathered)
+      })
+
+      it("still rejects growing the duration beyond the stored value", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { duration: grandfathered + 1 }
+        )
+
+        expect(response.status).toBe(400)
+      })
+    })
+
+    describe("and the event has a legacy zero duration", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({
+          user: owner.address,
+          duration: 0,
+          finish_at: new Date("2030-01-01T00:00:00Z"),
+          time_slots: [{ time: 0, duration: 0 }],
+        })
+      })
+
+      it("still accepts an edit that does not touch the duration", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { name: "Renamed zero-duration event" }
+        )
+
+        expect(response.status).toBe(201)
       })
     })
 
