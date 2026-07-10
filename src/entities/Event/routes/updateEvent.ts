@@ -54,8 +54,11 @@ import {
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
+  finishForDate,
+  minutesOfDay,
   validateImageUrl,
   validateRejectionReason,
+  validateTimeSlots,
 } from "../utils"
 
 const validateUpdateEvent = createValidator<DeprecatedEventAttributes>(
@@ -180,6 +183,49 @@ export async function updateEventWithOptions(
     updatedAttributes.recurrent_until
   )
 
+  // `time_slots` is always carried over from the stored event via
+  // `pick(event, editEventAttributes)` even when the request doesn't
+  // send it. Two hazards follow:
+  //
+  // - Single-slot events: the carried slot mirrors the stored
+  //   duration/start_at, so it would override a freshly patched
+  //   duration/start_at (and a grandfathered out-of-bounds duration
+  //   would fail schema validation on a request that never touched
+  //   it). Drop the key and let calculateRecurrentProperties re-derive
+  //   the slot from the merged duration/start_at.
+  // - Multi-slot events: duration and start_at's time-of-day are
+  //   DERIVED from the slots, so a request that tries to change them
+  //   without resending time_slots would be silently discarded.
+  //   Reject those explicitly instead.
+  if (req.body.time_slots === undefined) {
+    if (updatedAttributes.time_slots.length <= 1) {
+      delete (updatedAttributes as Partial<EventAttributes>).time_slots
+    } else {
+      if (
+        req.body.duration !== undefined &&
+        req.body.duration !== updatedAttributes.time_slots[0].duration
+      ) {
+        throw new RequestError(
+          `duration is derived from time_slots on events with multiple time slots; edit time_slots instead`,
+          RequestError.BadRequest,
+          { body: req.body }
+        )
+      }
+
+      const patched_start_at = req.body.start_at && Time.date(req.body.start_at)
+      if (
+        patched_start_at &&
+        minutesOfDay(patched_start_at) !== updatedAttributes.time_slots[0].time
+      ) {
+        throw new RequestError(
+          `start_at time-of-day is derived from time_slots on events with multiple time slots; edit time_slots instead`,
+          RequestError.BadRequest,
+          { body: req.body }
+        )
+      }
+    }
+  }
+
   validateUpdateEvent({
     ...updatedAttributes,
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
@@ -251,20 +297,6 @@ export async function updateEventWithOptions(
     }
   }
 
-  /**
-   * Verify that the duration event is not longer than the max allowed or the previous duration
-   */
-  if (
-    updatedAttributes.duration &&
-    updatedAttributes.duration > Math.max(event.duration, MAX_EVENT_DURATION)
-  ) {
-    throw new RequestError(
-      `Maximum allowed duration ${MAX_EVENT_DURATION / Time.Hour}Hrs`,
-      RequestError.BadRequest,
-      { body: updatedAttributes }
-    )
-  }
-
   const userProfiles = await Catalyst.getInstance().getProfiles([event.user])
   if (
     userProfiles &&
@@ -323,14 +355,27 @@ export async function updateEventWithOptions(
     calculateRecurrentProperties(updatedAttributes)
   )
 
+  // Cap mirrors the previous guard (`Math.max(event.duration, MAX)`)
+  // so grandfathered rows whose stored duration predates the cap stay
+  // editable as long as the duration doesn't grow.
+  validateTimeSlots(
+    updatedAttributes.time_slots,
+    updatedAttributes.recurrent_frequency,
+    Math.max(
+      MAX_EVENT_DURATION,
+      ...event.time_slots.map((slot) => slot.duration)
+    )
+  )
+
   updatedAttributes.next_start_at = EventModel.selectNextStartAt(
-    updatedAttributes.duration,
+    updatedAttributes.time_slots,
     updatedAttributes.start_at,
     updatedAttributes.recurrent_dates
   )
 
-  updatedAttributes.next_finish_at = new Date(
-    updatedAttributes.next_start_at.getTime() + updatedAttributes.duration
+  updatedAttributes.next_finish_at = finishForDate(
+    updatedAttributes.next_start_at,
+    updatedAttributes.time_slots
   )
 
   if (updatedAttributes.rejected) {
