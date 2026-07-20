@@ -1,5 +1,34 @@
 import EventModel from "./model"
-import { EventListOptions, EventListType } from "./types"
+import {
+  DeprecatedEventAttributes,
+  EventListOptions,
+  EventListType,
+  SessionEventAttributes,
+} from "./types"
+import { ProfileSettingsAttributes } from "../ProfileSettings/types"
+
+const TO_PUBLIC_USER = "0x1111111111111111111111111111111111111111"
+
+function createEvent(
+  overrides: Partial<DeprecatedEventAttributes> = {}
+): DeprecatedEventAttributes {
+  const startAt = new Date("2030-01-01T00:00:00Z")
+  return {
+    user: TO_PUBLIC_USER,
+    user_name: "Creator",
+    description: "Original description",
+    contact: null,
+    details: null,
+    estate_name: "Estate",
+    scene_name: null,
+    x: 10,
+    y: 20,
+    duration: 3600000,
+    next_start_at: startAt,
+    recurrent_dates: [startAt],
+    ...overrides,
+  } as unknown as DeprecatedEventAttributes
+}
 
 type SQLCondition = { text: string }
 
@@ -468,6 +497,47 @@ describe("EventModel.buildEventFilterConditions", () => {
 
         expect(hasCommunityIdCondition(conditions)).toBe(false)
       })
+    })
+  })
+})
+
+describe("EventModel.toPublic", () => {
+  let profile: ProfileSettingsAttributes
+
+  beforeEach(() => {
+    profile = { user: TO_PUBLIC_USER } as ProfileSettingsAttributes
+  })
+
+  describe("when the event description contains client-rendered markup", () => {
+    let result: SessionEventAttributes
+
+    beforeEach(() => {
+      const event = createEvent({
+        description:
+          'Join <link="decentraland://?position=0,0">click here</link>',
+      })
+      result = EventModel.toPublic(event, profile)
+    })
+
+    it("should strip the markup from the returned description", () => {
+      expect(result.description).toBe("Join click here")
+    })
+  })
+
+  describe("when the event description contains markdown", () => {
+    let result: SessionEventAttributes
+
+    beforeEach(() => {
+      const event = createEvent({
+        description: "See [our site](https://decentraland.org) for **details**",
+      })
+      result = EventModel.toPublic(event, profile)
+    })
+
+    it("should leave the markdown untouched", () => {
+      expect(result.description).toBe(
+        "See [our site](https://decentraland.org) for **details**"
+      )
     })
   })
 })

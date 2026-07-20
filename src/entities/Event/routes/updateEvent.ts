@@ -54,6 +54,7 @@ import {
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
+  sanitizeEventDescription,
   validateImageUrl,
   validateRejectionReason,
 } from "../utils"
@@ -66,6 +67,64 @@ const EVENTS_BASE_URL = env(
   "EVENTS_BASE_URL",
   "https://events.decentraland.org"
 )
+
+// Owner-editable fields that are scheduling/control only: changing them
+// doesn't alter what content is shown or where, so on their own they must
+// NOT push an already-approved event back through moderation.
+const NON_MODERATED_EDITABLE_FIELDS = new Set<string>([
+  "start_at",
+  "duration",
+  "all_day",
+  "recurrent",
+  "recurrent_frequency",
+  "recurrent_setpos",
+  "recurrent_monthday",
+  "recurrent_weekday_mask",
+  "recurrent_month_mask",
+  "recurrent_interval",
+  "recurrent_count",
+  "recurrent_until",
+  "rejected",
+])
+
+// Public, creator-editable content/location fields whose change re-opens
+// moderation — derived from the owner-editable surface minus the
+// scheduling/control fields above (name, description, image, image_vertical,
+// x, y, server, world, categories). Deriving it this way means any field
+// later added to `editEventAttributes` re-moderates by default (fail-safe),
+// and it closes the edit-after-approval bypass across the whole public
+// surface, not just the description.
+const MODERATED_CONTENT_FIELDS = editEventAttributes.filter(
+  (field) => !NON_MODERATED_EDITABLE_FIELDS.has(field)
+)
+
+// Whether a moderated field's incoming request value differs from what the
+// event currently holds. Compared against the raw request (not the enriched
+// `updatedAttributes`) so server-maintained defaults — e.g. the world branch
+// backfilling a missing image — never count as a user content change. The
+// description is compared through the same sanitizer the API exposes, so a
+// client round-tripping the already-sanitized text (identical on read and
+// write) isn't mistaken for an edit. Arrays (categories) compare by value.
+function isModeratedFieldChanged(
+  field: string,
+  next: unknown,
+  current: unknown
+): boolean {
+  if (field === "description") {
+    return (
+      sanitizeEventDescription(String(next ?? "")) !==
+      sanitizeEventDescription(String(current ?? ""))
+    )
+  }
+
+  if (Array.isArray(next) || Array.isArray(current)) {
+    const a = (Array.isArray(next) ? next : []).map(String).sort()
+    const b = (Array.isArray(current) ? current : []).map(String).sort()
+    return a.length !== b.length || a.some((value, index) => value !== b[index])
+  }
+
+  return next !== current
+}
 
 export type UpdateEventOptions = {
   event?: DeprecatedEventAttributes
@@ -336,6 +395,33 @@ export async function updateEventWithOptions(
   if (updatedAttributes.rejected) {
     updatedAttributes.rejected = true
     updatedAttributes.approved = false
+    updatedAttributes.highlighted = false
+    updatedAttributes.trending = false
+  }
+
+  // Re-queue an already-approved event for moderation whenever its
+  // content changes, unless the actor is authorized to approve — a
+  // moderator's edit is itself a review. Closes the edit-after-approval
+  // bypass where an owner could get a benign event approved and then edit
+  // in content that stayed live without re-review.
+  const actorCanApprove =
+    admin ||
+    isAdmin(user) ||
+    canApproveAnyEvent(profile) ||
+    (isOwner && canApproveOwnEvent(profile))
+  const requestBody = req.body as Record<string, unknown>
+  const moderatedContentChanged = MODERATED_CONTENT_FIELDS.some(
+    (field) =>
+      field in requestBody &&
+      isModeratedFieldChanged(
+        field,
+        requestBody[field],
+        event[field as keyof EventAttributes]
+      )
+  )
+  if (event.approved && moderatedContentChanged && !actorCanApprove) {
+    updatedAttributes.approved = false
+    updatedAttributes.approved_by = null
     updatedAttributes.highlighted = false
     updatedAttributes.trending = false
   }
