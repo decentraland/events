@@ -102,6 +102,18 @@ function signedPatch(
   return supertest(app).patch(path).set(headerObj).send(body)
 }
 
+function signedGet(identity: AuthIdentity, path: string) {
+  const createHeaders = signedHeaderFactory()
+  const headers = createHeaders(identity, "GET", path, {})
+
+  const headerObj: Record<string, string> = {}
+  headers.forEach((value: string, key: string) => {
+    headerObj[key] = value
+  })
+
+  return supertest(app).get(path).set(headerObj)
+}
+
 function adminRequest(request: supertest.Test): supertest.Test {
   return request.set("Authorization", `Bearer ${ADMIN_TOKEN}`)
 }
@@ -347,9 +359,13 @@ describe("PATCH /api/events/:event_id", () => {
           name: "Persisted Name",
         }).expect(201)
 
-        const response = await supertest(app)
-          .get(`/api/events/${event.id}`)
-          .expect(200)
+        // Editing a content field (name) on an approved event re-queues it
+        // for moderation (approved -> false), so an anonymous read now 404s.
+        // Read back as the owner, who can always see their own pending event.
+        const response = await signedGet(
+          ownerIdentity,
+          `/api/events/${event.id}`
+        ).expect(200)
 
         expect(response.body.data.name).toBe("Persisted Name")
       })

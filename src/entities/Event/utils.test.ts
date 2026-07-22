@@ -3,6 +3,7 @@ import {
   estimateRecurrentPastIterations,
   fromEventTime,
   futureRecurrentDates,
+  sanitizeEventDescription,
   toEventTime,
 } from "./utils"
 
@@ -307,6 +308,201 @@ describe("estimateRecurrentPastIterations", () => {
       })
       expect(result).toBeGreaterThan(360)
       expect(result).toBeLessThan(370)
+    })
+  })
+})
+
+describe("sanitizeEventDescription", () => {
+  describe("when the description embeds a TMP <link> tag to a custom protocol", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        'Join <link="decentraland://?position=0,0">click here</link>'
+      )
+    })
+
+    it("should strip both sides of the unsafe link and keep the inner text", () => {
+      expect(result).toBe("Join click here")
+    })
+  })
+
+  describe("when the description embeds a <link> tag to a file/smb target", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        'a <link="file:///etc/passwd">x</link> b <link="smb://h/s">y</link> c'
+      )
+    })
+
+    it("should strip every unsafe link without leaving orphan tags", () => {
+      expect(result).toBe("a x b y c")
+    })
+  })
+
+  describe("when the description embeds a safe https <link> tag", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        'Join <link="https://decentraland.org">our site</link>'
+      )
+    })
+
+    it("should preserve the link tag untouched", () => {
+      expect(result).toBe(
+        'Join <link="https://decentraland.org">our site</link>'
+      )
+    })
+  })
+
+  describe("when the description embeds a safe http <link> tag", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription('<link="http://example.com">x</link>')
+    })
+
+    it("should preserve the link tag untouched", () => {
+      expect(result).toBe('<link="http://example.com">x</link>')
+    })
+  })
+
+  describe("when the description mixes a safe and an unsafe link", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        '<link="https://a.com">A</link><link="javascript:alert(1)">B</link>'
+      )
+    })
+
+    it("should keep the safe link and strip the unsafe one", () => {
+      expect(result).toBe('<link="https://a.com">A</link>B')
+    })
+  })
+
+  describe("when a link tag carries extra content after the target", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        "<link=https://a.com onclick=x>t</link>"
+      )
+    })
+
+    it("should strip the ambiguous tag (fail-safe)", () => {
+      expect(result).toBe("t")
+    })
+  })
+
+  describe("when a link points at the cloud-metadata IP", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        '<link="http://169.254.169.254/latest/meta-data/">x</link>'
+      )
+    })
+
+    it("should strip it", () => {
+      expect(result).toBe("x")
+    })
+  })
+
+  describe("when a link points at an obfuscated loopback IP", () => {
+    let result: string
+
+    beforeEach(() => {
+      // 2130706433 === 127.0.0.1; the URL parser normalizes it before the check.
+      result = sanitizeEventDescription('<link="http://2130706433/">x</link>')
+    })
+
+    it("should strip it", () => {
+      expect(result).toBe("x")
+    })
+  })
+
+  describe("when a link points at a private or localhost host", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        'a <link="http://192.168.1.1/">x</link> b <link="http://localhost:8080/">y</link> c'
+      )
+    })
+
+    it("should strip both internal links", () => {
+      expect(result).toBe("a x b y c")
+    })
+  })
+
+  describe("when a link points at a public host", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription('<link="https://8.8.8.8/">x</link>')
+    })
+
+    it("should keep it", () => {
+      expect(result).toBe('<link="https://8.8.8.8/">x</link>')
+    })
+  })
+
+  describe("when a link points at a single-label or reserved-suffix host", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        'a <link="http://router/">x</link> b <link="http://printer.lan/">y</link> c <link="http://nas.local/">z</link> d'
+      )
+    })
+
+    it("should strip these local-looking hosts", () => {
+      expect(result).toBe("a x b y c z d")
+    })
+  })
+
+  describe("when the description contains HTML anchor and image tags", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        '<a href="smb://attacker/share">x</a><img src="file:///etc/passwd">'
+      )
+    })
+
+    it("should remove every tag", () => {
+      expect(result).toBe("x")
+    })
+  })
+
+  describe("when the description contains markdown and comparison operators", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        "See [our site](https://decentraland.org) for **details** — 5 < 10 and 10 > 5 and I <3 events"
+      )
+    })
+
+    it("should preserve markdown, comparisons and non-tag angle brackets", () => {
+      expect(result).toBe(
+        "See [our site](https://decentraland.org) for **details** — 5 < 10 and 10 > 5 and I <3 events"
+      )
+    })
+  })
+
+  describe("when the description is empty", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription("")
+    })
+
+    it("should return it unchanged", () => {
+      expect(result).toBe("")
     })
   })
 })

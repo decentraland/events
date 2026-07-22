@@ -722,4 +722,323 @@ describe("updateEvent", () => {
       })
     })
   })
+
+  describe("when editing the content of an already-approved event", () => {
+    function mockUpdateSuccess() {
+      ;(EventModel.update as jest.Mock).mockResolvedValueOnce(undefined)
+      ;(EventModel.textsearch as jest.Mock).mockReturnValueOnce(null)
+      ;(EventModel.selectNextStartAt as jest.Mock).mockReturnValueOnce(
+        new Date("2030-01-01T00:00:00Z")
+      )
+      ;(EventModel.toPublic as jest.Mock).mockReturnValueOnce({})
+      ;(EventAttendeeModel.findOne as jest.Mock).mockResolvedValueOnce(null)
+      ;(
+        EventCategoryModel.validateCategories as jest.Mock
+      ).mockResolvedValueOnce(true)
+    }
+
+    describe("and the owner lacks approval permission", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({
+          approved: true,
+          approved_by: "0x9999999999999999999999999999999999999999",
+          highlighted: true,
+          trending: true,
+        })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          description: "Edited description",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should reset approval and clear promotion flags to re-queue for moderation", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            approved: false,
+            approved_by: null,
+            highlighted: false,
+            trending: false,
+          }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and the owner has the ApproveOwnEvent permission", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true })
+        const profile = createProfileSettings(OWNER_ADDRESS, [
+          ProfilePermissions.ApproveOwnEvent,
+        ])
+        req = createRequest(OWNER_ADDRESS, {
+          description: "Edited description",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should keep the event approved", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({ approved: true }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and a moderator with edit and approve permissions edits it", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true })
+        const profile = createProfileSettings(OTHER_USER_ADDRESS, [
+          ProfilePermissions.EditAnyEvent,
+          ProfilePermissions.ApproveAnyEvent,
+        ])
+        req = createRequest(OTHER_USER_ADDRESS, {
+          description: "Moderator reviewed description",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should keep the event approved because the edit is itself a review", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({ approved: true }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and an editor without approval permission edits it", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({
+          approved: true,
+          approved_by: "0x9999999999999999999999999999999999999999",
+        })
+        const profile = createProfileSettings(OTHER_USER_ADDRESS, [
+          ProfilePermissions.EditAnyEvent,
+        ])
+        req = createRequest(OTHER_USER_ADDRESS, {
+          description: "Editor changed description",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should reset approval to re-queue for moderation", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({ approved: false, approved_by: null }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and the owner edits only a non-content field", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { details: "VIP details" })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should not reset approval", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.not.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and the owner changes the vertical image", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          image_vertical: "https://example.com/vertical.png",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should reset approval to re-queue for moderation", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and the owner changes the categories", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true, categories: [] })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { categories: ["art"] })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should reset approval to re-queue for moderation", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and the owner re-submits the same categories", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true, categories: ["art"] })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { categories: ["art"] })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should not reset approval", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.not.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and the owner switches the location to a world", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        const event = createBaseEvent({ approved: true, world: false })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          world: true,
+          server: "myworld.dcl.eth",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should reset approval to re-queue for moderation", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and a non-content field is edited on a legacy approved world event with no image", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        // The world branch backfills a default image into updatedAttributes;
+        // detection must read the request, not the enriched attributes, so
+        // this non-content edit does not spuriously re-queue.
+        const event = createBaseEvent({
+          approved: true,
+          world: true,
+          server: "myworld.dcl.eth",
+          image: null,
+        })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { contact: "new@example.com" })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should not reset approval", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.not.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+
+    describe("and a non-content edit carries the already-sanitized description", () => {
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        // The stored description holds raw markup; the API exposes (and the
+        // client round-trips) the sanitized form. Comparing both sides
+        // through the sanitizer means resubmitting the sanitized text is not
+        // seen as a content change.
+        const event = createBaseEvent({
+          approved: true,
+          description: 'Hi <link="file://x">bad</link>',
+        })
+        const profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          contact: "new@example.com",
+          description: "Hi bad",
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        mockUpdateSuccess()
+      })
+
+      it("should not reset approval", async () => {
+        await updateEvent(req)
+
+        expect(EventModel.update).toHaveBeenCalledWith(
+          expect.not.objectContaining({ approved: false }),
+          { id: EVENT_ID }
+        )
+      })
+    })
+  })
 })
