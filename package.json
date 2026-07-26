@@ -9,7 +9,7 @@
     "npm": "8.* || 9.*"
   },
   "dependencies": {
-    "@aws-sdk/client-sns": "^3.895.0",
+    "@aws-sdk/client-sns": "^3.1095.0",
     "@dcl/schemas": "^26.5.0",
     "abort-controller": "^3.0.0",
     "apicache": "^1.6.2",
