@@ -743,29 +743,15 @@ function isSafeLinkTarget(target: string): boolean {
   return !isInternalLinkHost(url.hostname.toLowerCase())
 }
 
-/**
- * Neutralize unsafe markup in a user-authored description while preserving
- * safe hyperlinks.
- *
- * The client renders descriptions as TextMeshPro rich text and turns
- * `<link="target">text</link>` into a clickable link that reaches an
- * unrestricted `Application.OpenURL(target)` — so a `file://` / `smb://` /
- * `decentraland://` target fires a local handler on the viewer's machine.
- * `<link>` tags pointing at http(s) URLs — the legitimate use case — are
- * kept; links to any other scheme and every other markup tag are stripped.
- * When a link is stripped, both its `<link>` and `</link>` sides are
- * removed so no orphan tag is left behind. Markdown and non-tag
- * comparisons like "5 < 10" survive intact.
- */
-export function sanitizeEventDescription(description: string): string {
-  if (!description) {
-    return description
-  }
+// Upper bound on sanitization passes (see sanitizeEventDescription). Real content stabilizes
+// in one pass; a reassembly attack needs two. Beyond this we fail closed instead of looping.
+const MAX_SANITIZE_PASSES = 5
 
-  // `replace` visits matches left-to-right, so a stack records whether the
-  // `<link>` currently being closed was kept, to decide its `</link>`.
+// One left-to-right strip pass over `text`. A stack records whether the `<link>` currently
+// being closed was kept, to decide its `</link>`.
+function stripMarkupOnce(text: string): string {
   const openLinkKept: boolean[] = []
-  return description.replace(MARKUP_TAG_REGEX, (tag) => {
+  return text.replace(MARKUP_TAG_REGEX, (tag) => {
     if (LINK_CLOSE_TAG_REGEX.test(tag)) {
       // Drop orphan closers; otherwise mirror the matching opener.
       return openLinkKept.length > 0 && openLinkKept.pop() ? tag : ""
@@ -780,6 +766,44 @@ export function sanitizeEventDescription(description: string): string {
 
     return ""
   })
+}
+
+/**
+ * Neutralize unsafe markup in a user-authored description while preserving
+ * safe hyperlinks.
+ *
+ * The client renders descriptions as TextMeshPro rich text and turns
+ * `<link="target">text</link>` into a clickable link that reaches an
+ * unrestricted `Application.OpenURL(target)` — so a `file://` / `smb://` /
+ * `decentraland://` target fires a local handler on the viewer's machine.
+ * `<link>` tags pointing at http(s) URLs — the legitimate use case — are
+ * kept; links to any other scheme and every other markup tag are stripped.
+ * When a link is stripped, both its `<link>` and `</link>` sides are
+ * removed so no orphan tag is left behind. Markdown and non-tag
+ * comparisons like "5 < 10" survive intact.
+ *
+ * Stripping a tag can fuse residual text into a NEW tag the single pass never
+ * revisits (e.g. `<<b>link="javascript:…">` → strip `<b>` → live `<link…>`),
+ * so we re-run to a fixed point. Each changing pass strictly shortens the
+ * string, so it converges — at the stable point the only tags left are safe
+ * links that were kept. If a pathological input has not stabilized within
+ * MAX_SANITIZE_PASSES we fail closed by removing every angle bracket, so no
+ * markup can survive.
+ */
+export function sanitizeEventDescription(description: string): string {
+  if (!description) {
+    return description
+  }
+
+  let current = description
+  for (let pass = 0; pass < MAX_SANITIZE_PASSES; pass++) {
+    const next = stripMarkupOnce(current)
+    if (next === current) {
+      return current
+    }
+    current = next
+  }
+  return current.replace(/[<>]/g, "")
 }
 
 export async function validateImageUrl(imageUrl: string) {
