@@ -397,6 +397,23 @@ describe("sanitizeEventDescription", () => {
     })
   })
 
+  describe("when a malformed opener embeds a nested tag before its closing bracket", () => {
+    let result: string
+
+    beforeEach(() => {
+      // Without failing closed, the outer `<link…` fragment would survive and
+      // the leftover pieces could re-assemble into a live
+      // `<link="javascript:alert(1)">` opener.
+      result = sanitizeEventDescription(
+        '<link="javascript:alert(1)"<b>>click</link>'
+      )
+    })
+
+    it("should not leave a live unsafe link in the output", () => {
+      expect(result).not.toMatch(/<link/i)
+    })
+  })
+
   describe("when a link points at the cloud-metadata IP", () => {
     let result: string
 
