@@ -512,6 +512,56 @@ describe("sanitizeEventDescription", () => {
     })
   })
 
+  describe("when a link points at a fully-qualified internal host (trailing dot)", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        'a <link="http://localhost./">x</link> b <link="http://nas.local./">y</link> c <link="http://router./">z</link> d'
+      )
+    })
+
+    it("should strip hosts whose trailing dot would otherwise bypass the check", () => {
+      expect(result).toBe("a x b y c z d")
+    })
+  })
+
+  describe("when a link points at a fully-qualified public host (trailing dot)", () => {
+    let result: string
+
+    beforeEach(() => {
+      result = sanitizeEventDescription(
+        '<link="https://example.com./">ok</link>'
+      )
+    })
+
+    it("should keep it (a trailing dot does not make a public host internal)", () => {
+      expect(result).toBe('<link="https://example.com./">ok</link>')
+    })
+  })
+
+  describe("when a link tag has mismatched quotes", () => {
+    let openQuoteOnly: string
+    let closeQuoteOnly: string
+
+    beforeEach(() => {
+      openQuoteOnly = sanitizeEventDescription(
+        '<link="https://example.com>click'
+      )
+      closeQuoteOnly = sanitizeEventDescription(
+        '<link=https://example.com">click'
+      )
+    })
+
+    it("should strip a tag with an opening quote but no closing quote", () => {
+      expect(openQuoteOnly).not.toMatch(/<link/i)
+    })
+
+    it("should strip a tag with a closing quote but no opening quote", () => {
+      expect(closeQuoteOnly).not.toMatch(/<link/i)
+    })
+  })
+
   describe("when the description contains HTML anchor and image tags", () => {
     let result: string
 

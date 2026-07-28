@@ -646,12 +646,12 @@ export function validateDeletedReason(value: unknown): string | null {
 // link (fail-closed).
 const MARKUP_TAG_REGEX = /<\/?[a-zA-Z][^>]*>/g
 
-// A TMP `<link=…>` / `<link="…">` opening tag, capturing the (optionally
-// quoted) target, and its matching `</link>` closing tag. The opening
-// pattern only matches a *clean* single-value link tag — any extra
-// attributes or stray quotes make it fall through to the strip branch, so
-// ambiguous tags are never preserved (fail-safe).
-const LINK_OPEN_TAG_REGEX = /^<link\s*=\s*"?([^"<>]*)"?\s*>$/i
+// A TMP `<link=…>` / `<link="…">` opening tag and its matching `</link>`
+// closing tag. The opening pattern matches the quoted (group 1) and unquoted
+// (group 2) forms as separate alternatives, so a *mismatched* quote
+// (`<link="x>` / `<link=x">`) matches neither and falls through to the strip
+// branch — only a clean single-value link tag is ever preserved (fail-safe).
+const LINK_OPEN_TAG_REGEX = /^<link\s*=\s*(?:"([^"<>]*)"|([^"<>]*))\s*>$/i
 const LINK_CLOSE_TAG_REGEX = /^<\/link\s*>$/i
 
 // A `<`/`</` that begins a `link` tag with NO closing `>` before the next `<` or end of
@@ -678,10 +678,15 @@ const INTERNAL_HOST_SUFFIXES = [
 ]
 
 function isInternalLinkHost(hostname: string): boolean {
-  const host =
+  const unbracketed =
     hostname.startsWith("[") && hostname.endsWith("]")
       ? hostname.slice(1, -1)
       : hostname
+  // A trailing dot is the fully-qualified form of the same host (`localhost.`,
+  // `router.local.`) and resolves identically, so normalize it away before the
+  // single-label / suffix checks — otherwise `localhost.` reads as a dotted,
+  // non-reserved name and slips through.
+  const host = unbracketed.replace(/\.+$/, "")
 
   const ipv4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host)
   if (ipv4) {
@@ -765,7 +770,7 @@ function stripMarkupOnce(text: string): string {
 
     const openMatch = tag.match(LINK_OPEN_TAG_REGEX)
     if (openMatch) {
-      const keep = isSafeLinkTarget(openMatch[1])
+      const keep = isSafeLinkTarget(openMatch[1] ?? openMatch[2])
       openLinkKept.push(keep)
       return keep ? tag : ""
     }
