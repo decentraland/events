@@ -430,6 +430,21 @@ describe("sanitizeEventDescription", () => {
     })
   })
 
+  describe("when the input contains an unclosed <link opener with no closing bracket", () => {
+    let result: string
+
+    beforeEach(() => {
+      // A real TMP link needs its `>`; the tag strip leaves this fragment, so the `<` is dropped.
+      result = sanitizeEventDescription(
+        "see <color=red><link=javascript:alert(1)"
+      )
+    })
+
+    it("should not leave a <link opener in the output", () => {
+      expect(result).not.toMatch(/<link/i)
+    })
+  })
+
   describe("when a link points at the cloud-metadata IP", () => {
     let result: string
 
