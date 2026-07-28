@@ -639,15 +639,26 @@ export function validateDeletedReason(value: unknown): string | null {
 // A bare `<` in prose ("5 < 10", "I <3 events") is left untouched because
 // it isn't immediately followed by a letter or slash, so plain text and
 // markdown ([text](url), **bold**, # headings) survive intact.
-const MARKUP_TAG_REGEX = /<\/?[a-zA-Z][^<>]*>/g
+// The body is `[^>]*` (not `[^<>]*`) so a malformed opener that embeds a
+// nested tag — `<link="javascript:…"<b>` — is captured as one span up to
+// the first `>` and rejected whole, rather than being left as an unmatched
+// `<link…` fragment that a later strip could re-assemble into a live unsafe
+// link (fail-closed).
+const MARKUP_TAG_REGEX = /<\/?[a-zA-Z][^>]*>/g
 
-// A TMP `<link=…>` / `<link="…">` opening tag, capturing the (optionally
-// quoted) target, and its matching `</link>` closing tag. The opening
-// pattern only matches a *clean* single-value link tag — any extra
-// attributes or stray quotes make it fall through to the strip branch, so
-// ambiguous tags are never preserved (fail-safe).
-const LINK_OPEN_TAG_REGEX = /^<link\s*=\s*"?([^"<>]*)"?\s*>$/i
+// A TMP `<link=…>` / `<link="…">` opening tag and its matching `</link>`
+// closing tag. The opening pattern matches the quoted (group 1) and unquoted
+// (group 2) forms as separate alternatives, so a *mismatched* quote
+// (`<link="x>` / `<link=x">`) matches neither and falls through to the strip
+// branch — only a clean single-value link tag is ever preserved (fail-safe).
+const LINK_OPEN_TAG_REGEX = /^<link\s*=\s*(?:"([^"<>]*)"|([^"<>]*))\s*>$/i
 const LINK_CLOSE_TAG_REGEX = /^<\/link\s*>$/i
+
+// A `<`/`</` that begins a `link` tag with NO closing `>` before the next `<` or end of
+// string — an unclosed opener the tag strip leaves untouched (a real TMP link needs its `>`).
+// Its `<` is dropped so it can never be read as a link; a kept safe link / closer keeps its
+// `>` and fails the negative lookahead, so it is left intact.
+const UNCLOSED_LINK_LT_REGEX = /<(?=\/?link\b)(?![^<>]*>)/gi
 
 // Hosts a link must never point at: loopback, private, link-local (incl.
 // the `169.254.169.254` cloud-metadata endpoint), carrier-grade NAT, and
@@ -667,10 +678,15 @@ const INTERNAL_HOST_SUFFIXES = [
 ]
 
 function isInternalLinkHost(hostname: string): boolean {
-  const host =
+  const unbracketed =
     hostname.startsWith("[") && hostname.endsWith("]")
       ? hostname.slice(1, -1)
       : hostname
+  // A trailing dot is the fully-qualified form of the same host (`localhost.`,
+  // `router.local.`) and resolves identically, so normalize it away before the
+  // single-label / suffix checks — otherwise `localhost.` reads as a dotted,
+  // non-reserved name and slips through.
+  const host = unbracketed.replace(/\.+$/, "")
 
   const ipv4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host)
   if (ipv4) {
@@ -738,6 +754,37 @@ function isSafeLinkTarget(target: string): boolean {
   return !isInternalLinkHost(url.hostname.toLowerCase())
 }
 
+// Upper bound on sanitization passes (see sanitizeEventDescription). Real content stabilizes
+// in one pass; a reassembly attack needs two. Beyond this we fail closed instead of looping.
+const MAX_SANITIZE_PASSES = 5
+
+// One left-to-right strip pass over `text`. A stack records whether the `<link>` currently
+// being closed was kept, to decide its `</link>`.
+function stripMarkupOnce(text: string): string {
+  const openLinkKept: boolean[] = []
+  return text.replace(MARKUP_TAG_REGEX, (tag) => {
+    if (LINK_CLOSE_TAG_REGEX.test(tag)) {
+      // Drop orphan closers; otherwise mirror the matching opener.
+      return openLinkKept.length > 0 && openLinkKept.pop() ? tag : ""
+    }
+
+    const openMatch = tag.match(LINK_OPEN_TAG_REGEX)
+    if (openMatch) {
+      const keep = isSafeLinkTarget(openMatch[1] ?? openMatch[2])
+      openLinkKept.push(keep)
+      return keep ? tag : ""
+    }
+
+    return ""
+  })
+}
+
+// One sanitization pass: strip complete markup tags, then drop the `<` of any unclosed `<link`
+// left behind so removed markup can never leave a dangling link opener.
+function stripPass(text: string): string {
+  return stripMarkupOnce(text).replace(UNCLOSED_LINK_LT_REGEX, "")
+}
+
 /**
  * Neutralize unsafe markup in a user-authored description while preserving
  * safe hyperlinks.
@@ -751,30 +798,30 @@ function isSafeLinkTarget(target: string): boolean {
  * When a link is stripped, both its `<link>` and `</link>` sides are
  * removed so no orphan tag is left behind. Markdown and non-tag
  * comparisons like "5 < 10" survive intact.
+ *
+ * Stripping a tag can fuse residual text into a NEW tag the single pass never
+ * revisits (e.g. `<<b>link="javascript:…">` → strip `<b>` → live `<link…>`),
+ * so we re-run `stripPass` to a fixed point. Each changing pass strictly
+ * shortens the string, so it converges — at the stable point the only complete
+ * tags left are safe links that were kept, and any unclosed `<link` has had its
+ * `<` dropped by `stripPass`. If a pathological input has not stabilized within
+ * MAX_SANITIZE_PASSES we fail closed by removing every angle bracket, so no
+ * markup can survive.
  */
 export function sanitizeEventDescription(description: string): string {
   if (!description) {
     return description
   }
 
-  // `replace` visits matches left-to-right, so a stack records whether the
-  // `<link>` currently being closed was kept, to decide its `</link>`.
-  const openLinkKept: boolean[] = []
-  return description.replace(MARKUP_TAG_REGEX, (tag) => {
-    if (LINK_CLOSE_TAG_REGEX.test(tag)) {
-      // Drop orphan closers; otherwise mirror the matching opener.
-      return openLinkKept.length > 0 && openLinkKept.pop() ? tag : ""
+  let current = description
+  for (let pass = 0; pass < MAX_SANITIZE_PASSES; pass++) {
+    const next = stripPass(current)
+    if (next === current) {
+      return current
     }
-
-    const openMatch = tag.match(LINK_OPEN_TAG_REGEX)
-    if (openMatch) {
-      const keep = isSafeLinkTarget(openMatch[1])
-      openLinkKept.push(keep)
-      return keep ? tag : ""
-    }
-
-    return ""
-  })
+    current = next
+  }
+  return current.replace(/[<>]/g, "")
 }
 
 export async function validateImageUrl(imageUrl: string) {
