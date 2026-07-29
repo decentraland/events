@@ -25,7 +25,6 @@ ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}
 
 COPY ./src                  /app/src
 COPY ./templates            /app/templates
-COPY ./.env                 /app/.env.production
 COPY ./entrypoint.sh        /app/entrypoint.sh
 COPY ./tsconfig.json        /app/tsconfig.json
 

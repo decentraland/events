@@ -55,6 +55,7 @@ import {
   estimateRecurrentPastIterations,
   eventTargetUrl,
   sanitizeEventDescription,
+  validateEventUrl,
   validateImageUrl,
   validateRejectionReason,
 } from "../utils"
@@ -244,6 +245,10 @@ export async function updateEventWithOptions(
     start_at: Time.date(updatedAttributes.start_at)?.toJSON(),
     recurrent_until: Time.date(updatedAttributes.recurrent_until)?.toJSON(),
   })
+
+  if (req.body.url !== undefined) {
+    validateEventUrl(updatedAttributes.url)
+  }
 
   // Enforce the past-iteration cap only when this request actually
   // touches a recurrence-related field. A routine edit to name,
