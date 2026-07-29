@@ -15,8 +15,8 @@ import { getEvent } from "../Event/routes/getEvent"
 import EventAttendeeModel from "../EventAttendee/model"
 
 export default routes((router) => {
-  const withAuth = auth({ optional: true })
-  const withUserProfile = withAuthProfile({ optional: true })
+  const withAuth = auth()
+  const withUserProfile = withAuthProfile()
 
   router.get("/events/:event_id/attendees", handle(getEventAttendees))
   router.post(

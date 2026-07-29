@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto"
 import { resolve } from "path"
 import { promisify } from "util"
 
@@ -11,8 +12,9 @@ import { withAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middl
 import RequestError from "decentraland-gatsby/dist/entities/Route/error"
 import handle from "decentraland-gatsby/dist/entities/Route/handle"
 import routes from "decentraland-gatsby/dist/entities/Route/routes"
-import env, { requiredEnv } from "decentraland-gatsby/dist/utils/env"
+import env from "decentraland-gatsby/dist/utils/env"
 import fileUpload, { UploadedFile } from "express-fileupload"
+import { fromBuffer } from "file-type"
 
 import {
   POSTER_FILE_SIZE,
@@ -98,20 +100,16 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
     )
   }
 
-  const [type] = poster.mimetype.split(";")
-  if (!POSTER_FILE_TYPES.includes(type)) {
-    throw new RequestError(`Invalid file type ${type}`, RequestError.BadRequest)
-  }
+  const type = await validatePosterContentType(
+    poster.data,
+    poster.mimetype,
+    POSTER_FILE_TYPES
+  )
 
   const initial = Date.now()
-  const auth = req.auth as string
   const size = poster.size
   const ext = extension(type)
-  const timeHash = Math.floor(initial / 1000)
-    .toString(16)
-    .toLowerCase()
-  const userHash = auth.slice(-8).toLowerCase()
-  const filename = resolve(BUCKET_PATH, userHash + timeHash + ext).slice(1)
+  const filename = resolve(BUCKET_PATH, randomUUID() + ext).slice(1)
   await ensure()
 
   const params: AWS.S3.Types.PutObjectRequest = {
@@ -120,6 +118,8 @@ export async function uploadPoster(req: WithAuth): Promise<PosterAttributes> {
     Body: poster.data,
     ACL: "public-read",
     CacheControl: "public, max-age=31536000, immutable",
+    ContentLength: size,
+    ContentType: type,
   }
 
   await new Promise((resolve, reject) =>
@@ -175,26 +175,18 @@ export async function uploadPosterVertical(
     )
   }
 
-  const [type] = poster.mimetype.split(";")
-  // Only allow PNG, JPG and WebP for vertical posters (no GIF)
-  if (!POSTER_VERTICAL_FILE_TYPES.includes(type)) {
-    throw new RequestError(
-      `Invalid file type ${type}. Only PNG, JPG and WebP are allowed for vertical posters`,
-      RequestError.BadRequest
-    )
-  }
+  const type = await validatePosterContentType(
+    poster.data,
+    poster.mimetype,
+    POSTER_VERTICAL_FILE_TYPES
+  )
 
   const initial = Date.now()
-  const auth = req.auth as string
   const size = poster.size
   const ext = extension(type)
-  const timeHash = Math.floor(initial / 1000)
-    .toString(16)
-    .toLowerCase()
-  const userHash = auth.slice(-8).toLowerCase()
   // Use a different path for vertical posters
   const verticalPath = BUCKET_PATH.replace("/poster/", "/poster-vertical/")
-  const filename = resolve(verticalPath, userHash + timeHash + ext).slice(1)
+  const filename = resolve(verticalPath, randomUUID() + ext).slice(1)
   await ensure()
 
   const params: AWS.S3.Types.PutObjectRequest = {
@@ -203,6 +195,8 @@ export async function uploadPosterVertical(
     Body: poster.data,
     ACL: "public-read",
     CacheControl: "public, max-age=31536000, immutable",
+    ContentLength: size,
+    ContentType: type,
   }
 
   await new Promise((resolve, reject) =>
@@ -228,6 +222,28 @@ export async function uploadPosterVertical(
     }
   )
   return result
+}
+
+export async function validatePosterContentType(
+  data: Buffer,
+  declaredMimeType: string,
+  allowedMimeTypes: string[]
+): Promise<string> {
+  const [normalizedDeclaredType] = declaredMimeType.toLowerCase().split(";", 1)
+  const detectedType = await fromBuffer(data)
+
+  if (
+    !detectedType ||
+    detectedType.mime !== normalizedDeclaredType ||
+    !allowedMimeTypes.includes(detectedType.mime)
+  ) {
+    throw new RequestError(
+      `Invalid file content; expected one of ${allowedMimeTypes.join(", ")}`,
+      RequestError.BadRequest
+    )
+  }
+
+  return detectedType.mime
 }
 
 async function ensure() {

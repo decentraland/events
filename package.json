@@ -5,8 +5,8 @@
   "version": "0.0.0-development",
   "author": "",
   "engines": {
-    "node": "18.*",
-    "npm": "8.* || 9.*"
+    "node": "24.*",
+    "npm": "10.* || 11.*"
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.895.0",
@@ -17,6 +17,7 @@
     "dcl-catalyst-client": "^22.0.0",
     "decentraland-gatsby": "^8.4.6",
     "express-fileupload": "^1.2.1",
+    "file-type": "^16.5.4",
     "html-escaper": "^3.0.3",
     "node-pg-migrate": "^6.0.0",
     "pg": "^8.7.1",
@@ -61,6 +62,10 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.8.0",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "sharp": "^0.35.3",
+    "swiper": "^12.1.2"
   },
   "keywords": [],
   "license": "MIT",

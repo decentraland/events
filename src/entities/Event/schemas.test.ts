@@ -184,6 +184,29 @@ describe("getEventListByPlacesBodySchema", () => {
 })
 
 describe("newEventSchema", () => {
+  describe.each([
+    ["url", "javascript:alert(1)"],
+    ["image", "data:image/svg+xml,<svg/>"],
+    ["image_vertical", "file:///etc/passwd"],
+  ])("when %s uses an unsafe URI scheme", (field, value) => {
+    let body: Record<string, unknown>
+
+    beforeEach(() => {
+      body = {
+        ...validNewEventBase(),
+        [field]: value,
+      }
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it("should throw a RequestError", () => {
+      expect(() => validateNewEvent(body)).toThrow(RequestError)
+    })
+  })
+
   describe("when recurrent_frequency is one of the allowed values", () => {
     it.each(["HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"])(
       "should accept %s",

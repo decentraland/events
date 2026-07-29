@@ -3,3 +3,4 @@ tsconfig.tsbuildinfo
 .cache
 .git
 .vscode
+.env*

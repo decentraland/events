@@ -20,7 +20,6 @@ import {
   WeekdayMask,
   Weekdays,
 } from "./types"
-import { mainRealmUrl } from "../../modules/servers"
 import { ScheduleAttributes } from "../Schedule/types"
 
 export const JUMP_IN_SITE_URL = env(
@@ -824,13 +823,43 @@ export function sanitizeEventDescription(description: string): string {
   return current.replace(/[<>]/g, "")
 }
 
-export async function validateImageUrl(imageUrl: string) {
-  const url = new URL(imageUrl)
-  const whitelistedDomains = [BUCKET_URL].filter(
-    (domain): domain is string => !!domain
-  )
+export function validateEventUrl(eventUrl: string): string {
+  if (!isSafeLinkTarget(eventUrl)) {
+    throw new RequestError(
+      `Invalid event url ${eventUrl}; only public HTTP(S) URLs are allowed`,
+      RequestError.BadRequest
+    )
+  }
 
-  if (!whitelistedDomains.some((domain) => domain.endsWith(url.host))) {
+  return eventUrl
+}
+
+export async function validateImageUrl(imageUrl: string): Promise<string> {
+  if (!BUCKET_URL) {
+    throw new RequestError(
+      "Poster uploads are unavailable because AWS_BUCKET_URL is not configured",
+      RequestError.ServiceUnavailable
+    )
+  }
+
+  let url: URL
+  let bucketUrl: URL
+  try {
+    url = new URL(imageUrl)
+    bucketUrl = new URL(BUCKET_URL)
+  } catch {
+    throw new RequestError(
+      `Invalid image url ${imageUrl}, please upload the image through the upload poster endpoint (POST /poster)`,
+      RequestError.BadRequest
+    )
+  }
+
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.username ||
+    url.password ||
+    url.origin !== bucketUrl.origin
+  ) {
     throw new RequestError(
       `Invalid image url ${imageUrl}, please upload the image through the upload poster endpoint (POST /poster)`,
       RequestError.BadRequest

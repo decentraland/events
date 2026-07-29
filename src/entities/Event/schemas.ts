@@ -555,10 +555,14 @@ export const newEventSchema = {
     image: {
       type: ["string", "null"],
       format: "uri",
+      maxLength: 2048,
+      pattern: "^https?://",
     },
     image_vertical: {
       type: ["string", "null"],
       format: "uri",
+      maxLength: 2048,
+      pattern: "^https?://",
       description:
         "Url to the event cover in vertical format (portrait orientation)",
     },
@@ -634,6 +638,8 @@ export const newEventSchema = {
     url: {
       type: "string",
       format: "uri",
+      maxLength: 2048,
+      pattern: "^https?://",
     },
     categories: {
       type: ["array", "null"],

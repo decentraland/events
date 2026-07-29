@@ -29,6 +29,7 @@ import {
   calculateRecurrentProperties,
   estimateRecurrentPastIterations,
   eventTargetUrl,
+  validateEventUrl,
   validateImageUrl,
 } from "../utils"
 
@@ -47,6 +48,7 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   const userProfile = req.authProfile!
   const profile = await getAuthProfileSettings(req)
   const data = req.body as EventAttributes
+  const hasCustomUrl = !!data?.url
 
   if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
     throw new RequestError("Empty event data", RequestError.BadRequest, {
@@ -73,6 +75,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   validateNewEvent(data)
+
+  if (hasCustomUrl) {
+    validateEventUrl(data.url)
+  }
 
   if (data.image) {
     await validateImageUrl(data.image)
