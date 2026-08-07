@@ -15,7 +15,7 @@
     "apicache": "^1.6.2",
     "aws-sdk": "^2.1002.0",
     "dcl-catalyst-client": "^22.0.0",
-    "decentraland-gatsby": "^8.4.6",
+    "decentraland-gatsby": "^8.4.8",
     "express-fileupload": "^1.2.1",
     "file-type": "^16.5.4",
     "html-escaper": "^3.0.3",
