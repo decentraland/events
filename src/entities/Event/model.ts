@@ -419,7 +419,7 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
           )}
       WHERE
         ${join(conditions, SQL` `)}
-      ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}
+      ORDER BY ${SQL.raw(orderBy)} ${SQL.raw(orderDirection)}, e.id ASC
       ${limit(options.limit, { max: 500 })}
       ${offset(options.offset)}
     `
