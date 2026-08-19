@@ -1,6 +1,7 @@
 import EventModel from "./model"
 import {
   DeprecatedEventAttributes,
+  EventAttributes,
   EventListOptions,
   EventListType,
   SessionEventAttributes,
@@ -545,49 +546,279 @@ describe("EventModel.toPublic", () => {
 describe("EventModel.getEvents ordering", () => {
   let namedQuerySpy: jest.SpyInstance
 
+  function createMockEventRow(
+    overrides: Partial<EventAttributes> = {}
+  ): EventAttributes {
+    const startAt = new Date("2030-01-01T00:00:00Z")
+    return {
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Test Event",
+      image: null,
+      image_vertical: null,
+      description: "desc",
+      start_at: startAt,
+      finish_at: new Date("2030-01-01T01:00:00Z"),
+      next_start_at: startAt,
+      next_finish_at: new Date("2030-01-01T01:00:00Z"),
+      duration: 3600000,
+      all_day: false,
+      x: 0,
+      y: 0,
+      server: null,
+      url: "",
+      user: "0x0000000000000000000000000000000000000000",
+      estate_id: null,
+      estate_name: null,
+      user_name: null,
+      approved: true,
+      rejected: false,
+      highlighted: false,
+      trending: false,
+      created_at: new Date(),
+      updated_at: new Date(),
+      recurrent: false,
+      recurrent_frequency: null,
+      recurrent_setpos: null,
+      recurrent_monthday: null,
+      recurrent_weekday_mask: 0,
+      recurrent_month_mask: 0,
+      recurrent_interval: 1,
+      recurrent_count: null,
+      recurrent_until: null,
+      recurrent_dates: [startAt],
+      contact: null,
+      details: null,
+      total_attendees: 0,
+      latest_attendees: [],
+      textsearch: null,
+      categories: [],
+      schedules: [],
+      approved_by: null,
+      rejected_by: null,
+      rejection_reason: null,
+      deleted_by_user: false,
+      deleted_by_admin: false,
+      deleted_by: null,
+      deleted_at: null,
+      deleted_reason: null,
+      world: false,
+      place_id: null,
+      community_id: null,
+      ...overrides,
+    } satisfies EventAttributes
+  }
+
   beforeEach(() => {
-    namedQuerySpy = jest
-      .spyOn(EventModel, "namedQuery")
-      .mockResolvedValue([])
+    namedQuerySpy = jest.spyOn(EventModel, "namedQuery")
   })
 
   afterEach(() => {
     namedQuerySpy.mockRestore()
   })
 
-  it("should sort by next_start_at ASC with e.id ASC tiebreaker by default", async () => {
+  it("should include e.id ASC tiebreaker in the ORDER BY clause", async () => {
+    namedQuerySpy.mockResolvedValue([])
     await EventModel.getEvents({ list: EventListType.Active })
 
     const sql = namedQuerySpy.mock.calls[0][1].text
-    const orderByMatch = sql.match(
+    expect(sql).toMatch(
       /ORDER BY\s+e\.next_start_at\s+ASC\s*,\s*e\.id\s+ASC/i
     )
-    expect(orderByMatch).not.toBeNull()
   })
 
-  it("should sort by rank DESC with e.id ASC tiebreaker when searching", async () => {
+  it("should include e.id ASC tiebreaker when searching by rank", async () => {
+    namedQuerySpy.mockResolvedValue([])
     await EventModel.getEvents({
       list: EventListType.Active,
       search: "test event",
     })
 
     const sql = namedQuerySpy.mock.calls[0][1].text
-    const orderByMatch = sql.match(
-      /ORDER BY\s+"rank"\s+DESC\s*,\s*e\.id\s+ASC/i
-    )
-    expect(orderByMatch).not.toBeNull()
+    expect(sql).toMatch(/ORDER BY\s+"rank"\s+DESC\s*,\s*e\.id\s+ASC/i)
   })
 
-  it("should respect explicit desc order with e.id ASC tiebreaker", async () => {
+  it("should include e.id ASC tiebreaker with explicit desc order", async () => {
+    namedQuerySpy.mockResolvedValue([])
     await EventModel.getEvents({
       list: EventListType.Active,
       order: "desc",
     })
 
     const sql = namedQuerySpy.mock.calls[0][1].text
-    const orderByMatch = sql.match(
+    expect(sql).toMatch(
       /ORDER BY\s+e\.next_start_at\s+DESC\s*,\s*e\.id\s+ASC/i
     )
-    expect(orderByMatch).not.toBeNull()
+  })
+
+  it("should return events sorted by next_start_at ascending", async () => {
+    const early = createMockEventRow({
+      id: "00000000-0000-0000-0000-000000000002",
+      name: "Early Event",
+      next_start_at: new Date("2030-01-01T10:00:00Z"),
+      start_at: new Date("2030-01-01T10:00:00Z"),
+      finish_at: new Date("2030-01-01T11:00:00Z"),
+      next_finish_at: new Date("2030-01-01T11:00:00Z"),
+      recurrent_dates: [new Date("2030-01-01T10:00:00Z")],
+    })
+    const mid = createMockEventRow({
+      id: "00000000-0000-0000-0000-000000000003",
+      name: "Mid Event",
+      next_start_at: new Date("2030-01-02T10:00:00Z"),
+      start_at: new Date("2030-01-02T10:00:00Z"),
+      finish_at: new Date("2030-01-02T11:00:00Z"),
+      next_finish_at: new Date("2030-01-02T11:00:00Z"),
+      recurrent_dates: [new Date("2030-01-02T10:00:00Z")],
+    })
+    const late = createMockEventRow({
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Late Event",
+      next_start_at: new Date("2030-01-03T10:00:00Z"),
+      start_at: new Date("2030-01-03T10:00:00Z"),
+      finish_at: new Date("2030-01-03T11:00:00Z"),
+      next_finish_at: new Date("2030-01-03T11:00:00Z"),
+      recurrent_dates: [new Date("2030-01-03T10:00:00Z")],
+    })
+
+    namedQuerySpy.mockResolvedValue([early, mid, late])
+    const results = await EventModel.getEvents({ list: EventListType.Active })
+
+    expect(results.map((e) => e.name)).toEqual([
+      "Early Event",
+      "Mid Event",
+      "Late Event",
+    ])
+  })
+
+  it("should use id as tiebreaker when events share the same next_start_at", async () => {
+    const sameStartAt = new Date("2030-06-15T18:00:00Z")
+    const sameFinishAt = new Date("2030-06-15T19:00:00Z")
+
+    const eventA = createMockEventRow({
+      id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      name: "Event A (first by id)",
+      next_start_at: sameStartAt,
+      start_at: sameStartAt,
+      finish_at: sameFinishAt,
+      next_finish_at: sameFinishAt,
+      recurrent_dates: [sameStartAt],
+    })
+    const eventB = createMockEventRow({
+      id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      name: "Event B (second by id)",
+      next_start_at: sameStartAt,
+      start_at: sameStartAt,
+      finish_at: sameFinishAt,
+      next_finish_at: sameFinishAt,
+      recurrent_dates: [sameStartAt],
+    })
+    const eventC = createMockEventRow({
+      id: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      name: "Event C (third by id)",
+      next_start_at: sameStartAt,
+      start_at: sameStartAt,
+      finish_at: sameFinishAt,
+      next_finish_at: sameFinishAt,
+      recurrent_dates: [sameStartAt],
+    })
+
+    namedQuerySpy.mockResolvedValue([eventA, eventB, eventC])
+    const results = await EventModel.getEvents({ list: EventListType.Active })
+
+    expect(results.map((e) => e.id)).toEqual([
+      "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "cccccccc-cccc-cccc-cccc-cccccccccccc",
+    ])
+    expect(results.map((e) => e.name)).toEqual([
+      "Event A (first by id)",
+      "Event B (second by id)",
+      "Event C (third by id)",
+    ])
+  })
+
+  it("should order by next_start_at first then by id within same start time", async () => {
+    const earlyStart = new Date("2030-03-01T10:00:00Z")
+    const lateStart = new Date("2030-03-02T10:00:00Z")
+
+    const earlyA = createMockEventRow({
+      id: "22222222-2222-2222-2222-222222222222",
+      name: "Early - second by id",
+      next_start_at: earlyStart,
+      start_at: earlyStart,
+      finish_at: new Date("2030-03-01T11:00:00Z"),
+      next_finish_at: new Date("2030-03-01T11:00:00Z"),
+      recurrent_dates: [earlyStart],
+    })
+    const earlyB = createMockEventRow({
+      id: "11111111-1111-1111-1111-111111111111",
+      name: "Early - first by id",
+      next_start_at: earlyStart,
+      start_at: earlyStart,
+      finish_at: new Date("2030-03-01T11:00:00Z"),
+      next_finish_at: new Date("2030-03-01T11:00:00Z"),
+      recurrent_dates: [earlyStart],
+    })
+    const lateC = createMockEventRow({
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Late - only event",
+      next_start_at: lateStart,
+      start_at: lateStart,
+      finish_at: new Date("2030-03-02T11:00:00Z"),
+      next_finish_at: new Date("2030-03-02T11:00:00Z"),
+      recurrent_dates: [lateStart],
+    })
+
+    namedQuerySpy.mockResolvedValue([earlyB, earlyA, lateC])
+    const results = await EventModel.getEvents({ list: EventListType.Active })
+
+    expect(results.map((e) => e.name)).toEqual([
+      "Early - first by id",
+      "Early - second by id",
+      "Late - only event",
+    ])
+  })
+
+  it("should preserve deterministic order across repeated calls", async () => {
+    const sameStartAt = new Date("2030-06-15T18:00:00Z")
+    const sameFinishAt = new Date("2030-06-15T19:00:00Z")
+
+    const events = [
+      createMockEventRow({
+        id: "aaaaaaaa-0000-0000-0000-000000000001",
+        name: "Alpha",
+        next_start_at: sameStartAt,
+        start_at: sameStartAt,
+        finish_at: sameFinishAt,
+        next_finish_at: sameFinishAt,
+        recurrent_dates: [sameStartAt],
+      }),
+      createMockEventRow({
+        id: "aaaaaaaa-0000-0000-0000-000000000002",
+        name: "Beta",
+        next_start_at: sameStartAt,
+        start_at: sameStartAt,
+        finish_at: sameFinishAt,
+        next_finish_at: sameFinishAt,
+        recurrent_dates: [sameStartAt],
+      }),
+      createMockEventRow({
+        id: "aaaaaaaa-0000-0000-0000-000000000003",
+        name: "Gamma",
+        next_start_at: sameStartAt,
+        start_at: sameStartAt,
+        finish_at: sameFinishAt,
+        next_finish_at: sameFinishAt,
+        recurrent_dates: [sameStartAt],
+      }),
+    ]
+
+    namedQuerySpy.mockResolvedValue(events)
+    const first = await EventModel.getEvents({ list: EventListType.Active })
+
+    namedQuerySpy.mockResolvedValue(events)
+    const second = await EventModel.getEvents({ list: EventListType.Active })
+
+    expect(first.map((e) => e.id)).toEqual(second.map((e) => e.id))
+    expect(first.map((e) => e.name)).toEqual(["Alpha", "Beta", "Gamma"])
   })
 })
