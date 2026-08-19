@@ -541,3 +541,53 @@ describe("EventModel.toPublic", () => {
     })
   })
 })
+
+describe("EventModel.getEvents ordering", () => {
+  let namedQuerySpy: jest.SpyInstance
+
+  beforeEach(() => {
+    namedQuerySpy = jest
+      .spyOn(EventModel, "namedQuery")
+      .mockResolvedValue([])
+  })
+
+  afterEach(() => {
+    namedQuerySpy.mockRestore()
+  })
+
+  it("should sort by next_start_at ASC with e.id ASC tiebreaker by default", async () => {
+    await EventModel.getEvents({ list: EventListType.Active })
+
+    const sql = namedQuerySpy.mock.calls[0][1].text
+    const orderByMatch = sql.match(
+      /ORDER BY\s+e\.next_start_at\s+ASC\s*,\s*e\.id\s+ASC/i
+    )
+    expect(orderByMatch).not.toBeNull()
+  })
+
+  it("should sort by rank DESC with e.id ASC tiebreaker when searching", async () => {
+    await EventModel.getEvents({
+      list: EventListType.Active,
+      search: "test event",
+    })
+
+    const sql = namedQuerySpy.mock.calls[0][1].text
+    const orderByMatch = sql.match(
+      /ORDER BY\s+"rank"\s+DESC\s*,\s*e\.id\s+ASC/i
+    )
+    expect(orderByMatch).not.toBeNull()
+  })
+
+  it("should respect explicit desc order with e.id ASC tiebreaker", async () => {
+    await EventModel.getEvents({
+      list: EventListType.Active,
+      order: "desc",
+    })
+
+    const sql = namedQuerySpy.mock.calls[0][1].text
+    const orderByMatch = sql.match(
+      /ORDER BY\s+e\.next_start_at\s+DESC\s*,\s*e\.id\s+ASC/i
+    )
+    expect(orderByMatch).not.toBeNull()
+  })
+})
