@@ -621,9 +621,7 @@ describe("EventModel.getEvents ordering", () => {
     await EventModel.getEvents({ list: EventListType.Active })
 
     const sql = namedQuerySpy.mock.calls[0][1].text
-    expect(sql).toMatch(
-      /ORDER BY\s+e\.next_start_at\s+ASC\s*,\s*e\.id\s+ASC/i
-    )
+    expect(sql).toMatch(/ORDER BY\s+e\.next_start_at\s+ASC\s*,\s*e\.id\s+ASC/i)
   })
 
   it("should include e.id ASC tiebreaker when searching by rank", async () => {
@@ -645,9 +643,7 @@ describe("EventModel.getEvents ordering", () => {
     })
 
     const sql = namedQuerySpy.mock.calls[0][1].text
-    expect(sql).toMatch(
-      /ORDER BY\s+e\.next_start_at\s+DESC\s*,\s*e\.id\s+ASC/i
-    )
+    expect(sql).toMatch(/ORDER BY\s+e\.next_start_at\s+DESC\s*,\s*e\.id\s+ASC/i)
   })
 
   it("should return events sorted by next_start_at ascending", async () => {
