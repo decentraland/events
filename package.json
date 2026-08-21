@@ -59,7 +59,7 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.6.2",
     "supertest": "^7.2.2",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.8.0",
     "typescript": "^5.9.3"
   },
