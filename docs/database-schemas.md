@@ -61,6 +61,7 @@ erDiagram
     BOOLEAN world
     TEXT place_id
     TEXT community_id
+    TEXT featured_item
   }
 
   event_attendees {
@@ -196,6 +197,7 @@ Stores all event information including one-time and recurrent events with locati
 | `world`                  | BOOLEAN       | NOT NULL | Whether event is in a virtual world vs land (default: false)    |
 | `place_id`               | TEXT          | NULL     | Associated place ID from Catalyst                               |
 | `community_id`           | TEXT          | NULL     | Associated community ID from Communities API                    |
+| `featured_item`          | TEXT          | NULL     | URN of a wearable/emote item or collection to feature           |
 | `created_at`             | TIMESTAMP     | NOT NULL | Creation timestamp (default: now())                             |
 | `updated_at`             | TIMESTAMP     | NOT NULL | Last update timestamp (default: now())                          |
 
