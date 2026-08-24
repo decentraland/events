@@ -604,6 +604,7 @@ describe("EventModel.getEvents ordering", () => {
       world: false,
       place_id: null,
       community_id: null,
+      featured_item: null,
       ...overrides,
     } satisfies EventAttributes
   }

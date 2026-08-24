@@ -171,6 +171,7 @@ function createBaseEvent(
     world: false,
     place_id: null,
     community_id: null,
+    featured_item: null,
     scene_name: null,
     coordinates: [0, 0],
     ...overrides,
