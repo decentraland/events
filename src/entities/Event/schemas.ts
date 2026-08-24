@@ -461,7 +461,7 @@ export const eventSchema = {
     featured_item: {
       type: ["string", "null"],
       maxLength: 500,
-      description: "URN of a wearable/emote item or collection to feature"
+      description: "URN of a wearable/emote item or collection to feature",
     },
   },
 }
@@ -665,7 +665,7 @@ export const newEventSchema = {
     featured_item: {
       type: ["string", "null"],
       maxLength: 500,
-      description: "URN of a wearable/emote item or collection to feature"
+      description: "URN of a wearable/emote item or collection to feature",
     },
   },
 }
