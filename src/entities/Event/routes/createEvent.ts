@@ -88,6 +88,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     await validateImageUrl(data.image_vertical)
   }
 
+  if (!data.featured_item) { 
+    data.featured_item = null 
+  }
+
   const x = data.x
   const y = data.y
   if (!isInsideWorldLimits(x, y)) {
