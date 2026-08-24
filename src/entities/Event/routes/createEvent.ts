@@ -150,8 +150,9 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   // Verify community ownership if community_id is provided
   if (data.community_id) {
     try {
-      const userCommunities =
-        await Communities.get().getCommunitiesWithToken(user)
+      const userCommunities = await Communities.get().getCommunitiesWithToken(
+        user
+      )
       const community = userCommunities.find((c) => c.id === data.community_id)
 
       if (!community) {
