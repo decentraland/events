@@ -460,7 +460,9 @@ export const eventSchema = {
     },
     featured_item: {
       type: ["string", "null"],
-      maxLength: 500,
+      maxLength: 160,
+      pattern:
+        "^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\\d+)?$",
       description: "URN of a wearable/emote item or collection to feature",
     },
   },
@@ -664,7 +666,9 @@ export const newEventSchema = {
     },
     featured_item: {
       type: ["string", "null"],
-      maxLength: 500,
+      maxLength: 160,
+      pattern:
+        "^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\\d+)?$",
       description: "URN of a wearable/emote item or collection to feature",
     },
   },

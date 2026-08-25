@@ -70,6 +70,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     data.server = null
   }
 
+  if (!data.featured_item) {
+    data.featured_item = null
+  }
+
   if (!data.url) {
     data.url = eventTargetUrl(data)
   }
@@ -86,10 +90,6 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
 
   if (data.image_vertical) {
     await validateImageUrl(data.image_vertical)
-  }
-
-  if (!data.featured_item) {
-    data.featured_item = null
   }
 
   const x = data.x

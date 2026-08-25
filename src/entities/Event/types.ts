@@ -296,6 +296,7 @@ export const editEventAttributes = [
   "recurrent_until",
   "categories",
   "world",
+  "featured_item",
 ] as const
 
 export const editEventAttributesWithoutRejected = editEventAttributes.filter(
@@ -306,7 +307,6 @@ export const editOwnEventAttributes = [
   "contact",
   "details",
   "community_id",
-  "featured_item",
 ] as const
 
 export const editAnyEventAttributes = [

@@ -1531,7 +1531,8 @@ components:
         featured_item:
           type: string
           nullable: true
-          maxLength: 500
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
           description: URN of a wearable/emote item or collection to feature in the event
           example: "urn:decentraland:matic:collections-v2:0x1234567890abcdef1234567890abcdef12345678"
         total_attendees:
@@ -1674,7 +1675,8 @@ components:
         featured_item:
           type: string
           nullable: true
-          maxLength: 500
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
           description: URN of a wearable/emote item or collection to feature in the event
         recurrent:
           type: boolean
@@ -1828,7 +1830,8 @@ components:
         featured_item:
           type: string
           nullable: true
-          maxLength: 500
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
           description: URN of a wearable/emote item or collection to feature in the event
 
     EventAdminActor:
@@ -1971,7 +1974,8 @@ components:
         featured_item:
           type: string
           nullable: true
-          maxLength: 500
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
           description: URN of a wearable/emote item or collection to feature in the event
 
     EventAttendee:
