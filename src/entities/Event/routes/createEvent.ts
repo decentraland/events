@@ -70,6 +70,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     data.server = null
   }
 
+  if (!data.featured_item) {
+    data.featured_item = null
+  }
+
   if (!data.url) {
     data.url = eventTargetUrl(data)
   }

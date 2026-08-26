@@ -176,6 +176,7 @@ export type EventAttributes = {
   world: boolean
   place_id: string | null
   community_id: string | null
+  featured_item: string | null
 }
 
 export type GetEventParams = {
@@ -295,6 +296,7 @@ export const editEventAttributes = [
   "recurrent_until",
   "categories",
   "world",
+  "featured_item",
 ] as const
 
 export const editEventAttributesWithoutRejected = editEventAttributes.filter(

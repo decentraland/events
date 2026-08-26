@@ -458,6 +458,13 @@ export const eventSchema = {
         format: "address",
       },
     },
+    featured_item: {
+      type: ["string", "null"],
+      maxLength: 160,
+      pattern:
+        "^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\\d+)?$",
+      description: "URN of a wearable/emote item or collection to feature",
+    },
   },
 }
 
@@ -656,6 +663,13 @@ export const newEventSchema = {
       type: ["string", "null"],
       format: "uuid",
       description: "Community ID associated with the event",
+    },
+    featured_item: {
+      type: ["string", "null"],
+      maxLength: 160,
+      pattern:
+        "^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\\d+)?$",
+      description: "URN of a wearable/emote item or collection to feature",
     },
   },
 }

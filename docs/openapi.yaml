@@ -1528,6 +1528,13 @@ components:
           format: uuid
           nullable: true
           description: Community ID this event is associated with
+        featured_item:
+          type: string
+          nullable: true
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
+          description: URN of a wearable/emote item or collection to feature in the event
+          example: "urn:decentraland:matic:collections-v2:0x1234567890abcdef1234567890abcdef12345678"
         total_attendees:
           type: integer
           minimum: 0
@@ -1665,6 +1672,12 @@ components:
           format: uuid
           nullable: true
           description: Associated community ID
+        featured_item:
+          type: string
+          nullable: true
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
+          description: URN of a wearable/emote item or collection to feature in the event
         recurrent:
           type: boolean
           default: false
@@ -1814,6 +1827,12 @@ components:
           type: boolean
         trending:
           type: boolean
+        featured_item:
+          type: string
+          nullable: true
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
+          description: URN of a wearable/emote item or collection to feature in the event
 
     EventAdminActor:
       type: object
@@ -1952,6 +1971,12 @@ components:
           type: string
           format: uri
           nullable: true
+        featured_item:
+          type: string
+          nullable: true
+          maxLength: 160
+          pattern: '^urn:decentraland:(matic|ethereum|amoy|sepolia):collections-v2:0x[a-fA-F0-9]{40}(:\d+)?$'
+          description: URN of a wearable/emote item or collection to feature in the event
 
     EventAttendee:
       type: object

@@ -323,4 +323,73 @@ describe("newEventSchema", () => {
       expect(() => validateNewEvent(body)).toThrow(RequestError)
     })
   })
+
+  describe("when featured_item is a valid collections-v2 URN", () => {
+    const address = "0x1234567890abcdef1234567890abcdef12345678"
+
+    it.each([
+      ["matic item", `urn:decentraland:matic:collections-v2:${address}:1`],
+      ["matic collection", `urn:decentraland:matic:collections-v2:${address}`],
+      [
+        "ethereum item",
+        `urn:decentraland:ethereum:collections-v2:${address}:42`,
+      ],
+      ["amoy item", `urn:decentraland:amoy:collections-v2:${address}:0`],
+      [
+        "sepolia collection",
+        `urn:decentraland:sepolia:collections-v2:${address}`,
+      ],
+      [
+        "mixed-case hex address",
+        "urn:decentraland:matic:collections-v2:0xAbCdEf1234567890ABCDEF1234567890abcdef12:7",
+      ],
+    ])("should accept %s", (_label, value) => {
+      const body = { ...validNewEventBase(), featured_item: value }
+      expect(() => validateNewEvent(body)).not.toThrow()
+    })
+
+    it("should accept null", () => {
+      const body = { ...validNewEventBase(), featured_item: null }
+      expect(() => validateNewEvent(body)).not.toThrow()
+    })
+  })
+
+  describe("when featured_item is not a valid collections-v2 URN", () => {
+    const address = "0x1234567890abcdef1234567890abcdef12345678"
+
+    it.each([
+      [
+        "unsupported chain",
+        `urn:decentraland:mainnet:collections-v2:${address}:1`,
+      ],
+      ["collections-v1", `urn:decentraland:matic:collections-v1:${address}:1`],
+      [
+        "39-char address",
+        "urn:decentraland:matic:collections-v2:0x1234567890abcdef1234567890abcdef1234567:1",
+      ],
+      [
+        "41-char address",
+        "urn:decentraland:matic:collections-v2:0x1234567890abcdef1234567890abcdef123456789:1",
+      ],
+      [
+        "non-hex address",
+        "urn:decentraland:matic:collections-v2:0x1234567890abcdef1234567890abcdef1234567g:1",
+      ],
+      ["extra segment", `urn:decentraland:matic:collections-v2:${address}:1:2`],
+      [
+        "non-numeric token id",
+        `urn:decentraland:matic:collections-v2:${address}:abc`,
+      ],
+      ["missing urn prefix", `decentraland:matic:collections-v2:${address}:1`],
+      ["plain text", "my favourite wearable"],
+      ["empty string", ""],
+      [
+        "longer than 160 chars",
+        `urn:decentraland:matic:collections-v2:${address}:${"1".repeat(130)}`,
+      ],
+    ])("should reject %s", (_label, value) => {
+      const body = { ...validNewEventBase(), featured_item: value }
+      expect(() => validateNewEvent(body)).toThrow(RequestError)
+    })
+  })
 })

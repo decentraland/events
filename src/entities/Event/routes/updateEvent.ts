@@ -173,6 +173,13 @@ export async function updateEventWithOptions(
     )
   }
 
+  // Mirror createEvent: an empty featured_item means "none". Normalize the
+  // raw body (not just updatedAttributes) so the moderation diff below
+  // compares null against null and a cleared field isn't persisted as "".
+  if (req.body && req.body.featured_item === "") {
+    req.body.featured_item = null
+  }
+
   const updatedAttributes = {
     ...pick(event, editEventAttributes),
   } as DeprecatedEventAttributes

@@ -83,6 +83,8 @@ jest.mock("../../src/entities/Slack/utils", () => ({
 
 const app = createTestApp()
 const ADMIN_TOKEN = "integration-events-admin-token"
+const FEATURED_ITEM =
+  "urn:decentraland:matic:collections-v2:0x1234567890abcdef1234567890abcdef12345678:1"
 const ACTOR = "jarvis-agent"
 let dbInitialized = false
 
@@ -329,6 +331,56 @@ describe("PATCH /api/events/:event_id", () => {
         expect(response.body.data.approved).toBe(true)
       })
     })
+    describe("and has moderator permissions and edits the featured_item", () => {
+      let event: DeprecatedEventAttributes
+      let moderatorIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        const moderator = await createIdentity()
+        moderatorIdentity = moderator.identity
+        event = await seedEvent({ user: owner.address, approved: true })
+        await seedProfileSettings(moderator.address, [
+          ProfilePermissions.ApproveAnyEvent,
+          ProfilePermissions.EditAnyEvent,
+        ])
+      })
+
+      it("should update the featured_item and keep the event approved", async () => {
+        const response = await signedPatch(
+          moderatorIdentity,
+          `/api/events/${event.id}`,
+          { featured_item: FEATURED_ITEM }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.featured_item).toBe(FEATURED_ITEM)
+        expect(response.body.data.approved).toBe(true)
+
+        const stored = await EventModel.findOne({ id: event.id })
+        expect(stored?.featured_item).toBe(FEATURED_ITEM)
+        expect(stored?.approved).toBe(true)
+      })
+
+      it("should be able to clear an abusive featured_item with null", async () => {
+        await EventModel.update(
+          { featured_item: FEATURED_ITEM },
+          { id: event.id }
+        )
+
+        const response = await signedPatch(
+          moderatorIdentity,
+          `/api/events/${event.id}`,
+          { featured_item: null }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.featured_item).toBeNull()
+
+        const stored = await EventModel.findOne({ id: event.id })
+        expect(stored?.featured_item).toBeNull()
+      })
+    })
   })
 
   describe("when the caller is the event owner", () => {
@@ -497,6 +549,141 @@ describe("PATCH /api/events/:event_id", () => {
         )
         expect(eventIds).not.toContain(event.id)
       })
+    })
+
+    describe("and sets a valid featured_item", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({ user: owner.address })
+      })
+
+      it("should respond with 201 and include the featured_item", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { featured_item: FEATURED_ITEM }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.featured_item).toBe(FEATURED_ITEM)
+      })
+
+      it("should persist the featured_item to the database", async () => {
+        await signedPatch(ownerIdentity, `/api/events/${event.id}`, {
+          featured_item: FEATURED_ITEM,
+        }).expect(201)
+
+        const stored = await EventModel.findOne({ id: event.id })
+        expect(stored?.featured_item).toBe(FEATURED_ITEM)
+      })
+
+      it("should re-queue an approved event for moderation", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { featured_item: FEATURED_ITEM }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.approved).toBe(false)
+
+        const stored = await EventModel.findOne({ id: event.id })
+        expect(stored?.approved).toBe(false)
+        expect(stored?.approved_by).toBeNull()
+      })
+    })
+
+    describe("and clears the featured_item with an empty string", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({
+          user: owner.address,
+          featured_item: FEATURED_ITEM,
+        })
+      })
+
+      it("should normalize it to null", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { featured_item: "" }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.featured_item).toBeNull()
+
+        const stored = await EventModel.findOne({ id: event.id })
+        expect(stored?.featured_item).toBeNull()
+      })
+    })
+
+    describe("and sends an empty featured_item for an event without one", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({ user: owner.address, featured_item: null })
+      })
+
+      it("should not re-queue the approved event for moderation", async () => {
+        const response = await signedPatch(
+          ownerIdentity,
+          `/api/events/${event.id}`,
+          { featured_item: "" }
+        )
+
+        expect(response.status).toBe(201)
+        expect(response.body.data.featured_item).toBeNull()
+        expect(response.body.data.approved).toBe(true)
+      })
+    })
+
+    describe("and sets an invalid featured_item", () => {
+      let event: DeprecatedEventAttributes
+      let ownerIdentity: AuthIdentity
+
+      beforeEach(async () => {
+        const owner = await createIdentity()
+        ownerIdentity = owner.identity
+        event = await seedEvent({ user: owner.address })
+      })
+
+      it.each([
+        ["plain text", "my favourite wearable"],
+        [
+          "unsupported chain",
+          "urn:decentraland:mainnet:collections-v2:0x1234567890abcdef1234567890abcdef12345678:1",
+        ],
+        [
+          "collections-v1",
+          "urn:decentraland:matic:collections-v1:0x1234567890abcdef1234567890abcdef12345678:1",
+        ],
+        ["longer than 160 chars", `${FEATURED_ITEM}${"1".repeat(130)}`],
+      ])(
+        "should respond with 400 Bad Request for %s",
+        async (_label, value) => {
+          const response = await signedPatch(
+            ownerIdentity,
+            `/api/events/${event.id}`,
+            { featured_item: value }
+          )
+
+          expect(response.status).toBe(400)
+
+          const stored = await EventModel.findOne({ id: event.id })
+          expect(stored?.featured_item).toBeNull()
+        }
+      )
     })
 
     describe("and sets a duration exceeding the maximum", () => {
