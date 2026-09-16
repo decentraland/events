@@ -405,6 +405,10 @@ export async function updateEventWithOptions(
     "recurrent_interval",
     "recurrent_count",
     "recurrent_until",
+    "recurrent_setpos",
+    "recurrent_monthday",
+    "recurrent_weekday_mask",
+    "recurrent_month_mask",
   ].some((field) => req.body[field] !== undefined)
   if (touchesDates) {
     const now = new Date()

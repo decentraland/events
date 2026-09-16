@@ -142,7 +142,11 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   // If recurrent_until is in the past but start_at is in the future,
   // finish_at falls back to start_at + duration (future) and the check
   // above would pass — this guard catches that nonsensical combination.
-  if (recurrent.recurrent && recurrent.recurrent_until && recurrent.recurrent_until <= now) {
+  if (
+    recurrent.recurrent &&
+    recurrent.recurrent_until &&
+    recurrent.recurrent_until <= now
+  ) {
     throw new RequestError(
       "The recurrence end date (Until) must be in the future",
       RequestError.BadRequest,

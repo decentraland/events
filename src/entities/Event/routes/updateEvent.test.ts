@@ -1119,7 +1119,8 @@ describe("updateEvent", () => {
       beforeEach(() => {
         event = createBaseEvent({
           recurrent: true,
-          recurrent_frequency: "WEEKLY" as EventAttributes["recurrent_frequency"],
+          recurrent_frequency:
+            "WEEKLY" as EventAttributes["recurrent_frequency"],
           recurrent_interval: 1,
           recurrent_until: new Date("2030-12-31T00:00:00Z"),
         })
@@ -1141,6 +1142,45 @@ describe("updateEvent", () => {
       it("should reject with a 400 error", async () => {
         await expect(updateEvent(req)).rejects.toThrow(
           /recurrence end date.*must be in the future/i
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+
+    describe("when only a selector field (recurrent_weekday_mask) is updated and eliminates all future dates", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          recurrent: true,
+          recurrent_frequency:
+            "WEEKLY" as EventAttributes["recurrent_frequency"],
+          recurrent_interval: 1,
+          recurrent_weekday_mask: 127,
+          recurrent_until: new Date("2030-12-31T00:00:00Z"),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          recurrent_weekday_mask: 0,
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        // Simulates the mask eliminating all occurrences, pushing finish_at
+        // into the past.
+        ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce({
+          recurrent_dates: [],
+          finish_at: new Date("2020-06-01T01:00:00Z"),
+          recurrent: true,
+          recurrent_until: new Date("2030-12-31T00:00:00Z"),
+        })
+      })
+
+      it("should reject with a 400 error (selector-only regression)", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          /end date is already in the past/
         )
         expect(EventModel.update).not.toHaveBeenCalled()
       })

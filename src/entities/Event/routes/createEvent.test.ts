@@ -28,7 +28,11 @@ jest.mock("@dcl/schemas/dist/dapps/world", () => ({
 }))
 jest.mock("../model")
 jest.mock("../schemas", () => ({
-  newEventSchema: { type: "object", properties: {}, additionalProperties: true },
+  newEventSchema: {
+    type: "object",
+    properties: {},
+    additionalProperties: true,
+  },
 }))
 jest.mock("../utils", () => {
   const actual = jest.requireActual("../utils")
@@ -49,7 +53,9 @@ jest.mock("../utils", () => {
 })
 jest.mock("../../../api/Communities", () => ({
   __esModule: true,
-  default: { get: () => ({ getCommunitiesWithToken: () => Promise.resolve([]) }) },
+  default: {
+    get: () => ({ getCommunitiesWithToken: () => Promise.resolve([]) }),
+  },
 }))
 jest.mock("../../../api/Places", () => ({
   __esModule: true,
