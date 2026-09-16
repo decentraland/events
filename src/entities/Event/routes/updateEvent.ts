@@ -394,6 +394,44 @@ export async function updateEventWithOptions(
     calculateRecurrentProperties(updatedAttributes)
   )
 
+  // Mirror createEvent: reject updates that push the event entirely into the
+  // past. Conditioned on date-related fields being touched so routine metadata
+  // edits (name, description, image) to a recently-ended event are not blocked.
+  const touchesDates = [
+    "start_at",
+    "duration",
+    "recurrent",
+    "recurrent_frequency",
+    "recurrent_interval",
+    "recurrent_count",
+    "recurrent_until",
+    "recurrent_setpos",
+    "recurrent_monthday",
+    "recurrent_weekday_mask",
+    "recurrent_month_mask",
+  ].some((field) => req.body[field] !== undefined)
+  if (touchesDates) {
+    const now = new Date()
+    if (updatedAttributes.finish_at <= now) {
+      throw new RequestError(
+        "The event end date is already in the past",
+        RequestError.BadRequest,
+        { body: updatedAttributes }
+      )
+    }
+    if (
+      updatedAttributes.recurrent &&
+      updatedAttributes.recurrent_until &&
+      updatedAttributes.recurrent_until <= now
+    ) {
+      throw new RequestError(
+        "The recurrence end date (Until) must be in the future",
+        RequestError.BadRequest,
+        { body: updatedAttributes }
+      )
+    }
+  }
+
   updatedAttributes.next_start_at = EventModel.selectNextStartAt(
     updatedAttributes.duration,
     updatedAttributes.start_at,

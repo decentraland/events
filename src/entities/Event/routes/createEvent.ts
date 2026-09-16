@@ -125,6 +125,34 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   }
 
   const recurrent = calculateRecurrentProperties(data)
+  const now = new Date()
+
+  // Reject events whose computed end date is already in the past — covers
+  // both one-time events (start_at + duration in the past) and recurring
+  // events where all occurrences have already elapsed.
+  if (recurrent.finish_at <= now) {
+    throw new RequestError(
+      "The event end date is already in the past",
+      RequestError.BadRequest,
+      { body: data }
+    )
+  }
+
+  // For recurring events, also check the series boundary explicitly.
+  // If recurrent_until is in the past but start_at is in the future,
+  // finish_at falls back to start_at + duration (future) and the check
+  // above would pass — this guard catches that nonsensical combination.
+  if (
+    recurrent.recurrent &&
+    recurrent.recurrent_until &&
+    recurrent.recurrent_until <= now
+  ) {
+    throw new RequestError(
+      "The recurrence end date (Until) must be in the future",
+      RequestError.BadRequest,
+      { body: data }
+    )
+  }
 
   if (recurrent.duration > MAX_EVENT_DURATION) {
     throw new RequestError(
@@ -173,7 +201,6 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     }
   }
 
-  const now = new Date()
   const event_id = randomUUID()
   let estate_name: string | null = null
   let image = ""

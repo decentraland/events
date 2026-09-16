@@ -4,6 +4,7 @@ import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middl
 
 import { getEvent } from "./getEvent"
 import { updateEvent } from "./updateEvent"
+import * as utils from "../utils"
 import EventAttendeeModel from "../../EventAttendee/model"
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
@@ -61,10 +62,10 @@ jest.mock("../utils", () => {
   const actual = jest.requireActual("../utils")
   return {
     ...actual,
-    calculateRecurrentProperties: () => ({
+    calculateRecurrentProperties: jest.fn(() => ({
       recurrent_dates: [new Date("2030-01-01T00:00:00Z")],
       finish_at: new Date("2030-01-01T01:00:00Z"),
-    }),
+    })),
     eventTargetUrl: () => "https://decentraland.org/jump",
     validateImageUrl: () => Promise.resolve(undefined),
   }
@@ -1039,6 +1040,149 @@ describe("updateEvent", () => {
           expect.not.objectContaining({ approved: false }),
           { id: EVENT_ID }
         )
+      })
+    })
+  })
+
+  describe("past-date temporal validation", () => {
+    describe("when a date field is updated to push finish_at into the past", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent()
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          start_at: new Date("2020-01-01T00:00:00Z").toJSON(),
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce({
+          recurrent_dates: [],
+          finish_at: new Date("2020-01-01T01:00:00Z"),
+          recurrent: false,
+          recurrent_until: null,
+        })
+      })
+
+      it("should reject with a 400 error", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          /end date is already in the past/
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+
+    describe("when only non-date metadata is updated on a past event", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          finish_at: new Date("2020-01-01T01:00:00Z"),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, { name: "Updated name" })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce({
+          recurrent_dates: [],
+          finish_at: new Date("2020-01-01T01:00:00Z"),
+          recurrent: false,
+          recurrent_until: null,
+        })
+        ;(EventAttendeeModel.findOne as jest.Mock).mockResolvedValueOnce(null)
+        ;(EventModel.selectNextStartAt as jest.Mock).mockReturnValueOnce(
+          new Date("2020-01-01T00:00:00Z")
+        )
+        ;(EventModel.toPublic as jest.Mock).mockReturnValueOnce({
+          ...event,
+          name: "Updated name",
+        })
+      })
+
+      it("should allow the edit (date fields not touched)", async () => {
+        await expect(updateEvent(req)).resolves.toBeDefined()
+        expect(EventModel.update).toHaveBeenCalled()
+      })
+    })
+
+    describe("when recurrent_until is set to a past date", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          recurrent: true,
+          recurrent_frequency:
+            "WEEKLY" as EventAttributes["recurrent_frequency"],
+          recurrent_interval: 1,
+          recurrent_until: new Date("2030-12-31T00:00:00Z"),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          recurrent_until: new Date("2020-01-01T00:00:00Z").toJSON(),
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce({
+          recurrent_dates: [new Date("2030-01-01T00:00:00Z")],
+          finish_at: new Date("2030-01-01T01:00:00Z"),
+          recurrent: true,
+          recurrent_until: new Date("2020-01-01T00:00:00Z"),
+        })
+      })
+
+      it("should reject with a 400 error", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          /recurrence end date.*must be in the future/i
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+
+    describe("when only a selector field (recurrent_weekday_mask) is updated and eliminates all future dates", () => {
+      let event: DeprecatedEventAttributes
+      let profile: ProfileSettingsSessionAttributes
+      let req: WithAuthProfile<WithAuth>
+
+      beforeEach(() => {
+        event = createBaseEvent({
+          recurrent: true,
+          recurrent_frequency:
+            "WEEKLY" as EventAttributes["recurrent_frequency"],
+          recurrent_interval: 1,
+          recurrent_weekday_mask: 127,
+          recurrent_until: new Date("2030-12-31T00:00:00Z"),
+        })
+        profile = createProfileSettings(OWNER_ADDRESS)
+        req = createRequest(OWNER_ADDRESS, {
+          recurrent_weekday_mask: 0,
+        })
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(event)
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(profile)
+        ;(isAdmin as unknown as jest.Mock).mockReturnValue(false)
+        // Simulates the mask eliminating all occurrences, pushing finish_at
+        // into the past.
+        ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce({
+          recurrent_dates: [],
+          finish_at: new Date("2020-06-01T01:00:00Z"),
+          recurrent: true,
+          recurrent_until: new Date("2030-12-31T00:00:00Z"),
+        })
+      })
+
+      it("should reject with a 400 error (selector-only regression)", async () => {
+        await expect(updateEvent(req)).rejects.toThrow(
+          /end date is already in the past/
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
       })
     })
   })
