@@ -19,7 +19,7 @@
     "express-fileupload": "^1.2.1",
     "file-type": "^16.5.4",
     "html-escaper": "^3.0.3",
-    "node-pg-migrate": "^6.0.0",
+    "node-pg-migrate": "^9.0.0",
     "pg": "^8.7.1",
     "rrule": "^2.6.8",
     "tsc-files": "^1.1.3",
