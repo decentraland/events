@@ -1,4 +1,4 @@
-FROM node:24-alpine@sha256:98e4e60b35fd50143e1838da2957488c25aa3a3efbd48bb679923f77d6d3d873 as compiler
+FROM node:24-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5 as compiler
 
 RUN apk add --no-cache openssh-client \
  && mkdir ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
@@ -31,7 +31,7 @@ COPY ./tsconfig.json        /app/tsconfig.json
 RUN npm run build
 RUN npm prune --production
 
-FROM node:24-alpine@sha256:98e4e60b35fd50143e1838da2957488c25aa3a3efbd48bb679923f77d6d3d873
+FROM node:24-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5
 WORKDIR /app
 
 RUN rm -rf \
