@@ -44,7 +44,7 @@ export async function updateNextStartAt(ctx: JobContext<{}>) {
     }
 
     ctx.log(`updating next_start_at for event: "${event.id}"`)
-    EventModel.update<EventAttributes>(update, { id: event.id })
+    await EventModel.update<EventAttributes>(update, { id: event.id })
   }
 }
 
