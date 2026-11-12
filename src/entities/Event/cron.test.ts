@@ -2,14 +2,56 @@ import JobContext from "decentraland-gatsby/dist/entities/Job/context"
 
 import { updateNextStartAt } from "./cron"
 import EventModel from "./model"
-import { Frequency } from "./types"
+import { DeprecatedEventAttributes, Frequency } from "./types"
 
 jest.mock("./model")
 
-function makeEvent(overrides: Record<string, unknown> = {}) {
+function makeEvent(
+  overrides: Partial<DeprecatedEventAttributes> = {}
+): DeprecatedEventAttributes {
   const startAt = new Date()
   return {
     id: "00000000-0000-0000-0000-000000000001",
+    name: "Recurring event",
+    image: null,
+    image_vertical: null,
+    description: "",
+    all_day: false,
+    x: 0,
+    y: 0,
+    server: null,
+    url: "https://example.org/event",
+    user: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    estate_id: null,
+    estate_name: null,
+    user_name: null,
+    approved: true,
+    rejected: false,
+    highlighted: false,
+    trending: false,
+    created_at: startAt,
+    updated_at: startAt,
+    contact: null,
+    details: null,
+    total_attendees: 0,
+    latest_attendees: [],
+    textsearch: null,
+    categories: [],
+    schedules: [],
+    approved_by: null,
+    rejected_by: null,
+    rejection_reason: null,
+    deleted_by_user: false,
+    deleted_by_admin: false,
+    deleted_by: null,
+    deleted_at: null,
+    deleted_reason: null,
+    world: false,
+    place_id: null,
+    community_id: null,
+    featured_item: null,
+    scene_name: null,
+    coordinates: [0, 0],
     start_at: startAt,
     finish_at: new Date(startAt.getTime() + 60 * 60 * 1000),
     duration: 60 * 60 * 1000,
@@ -94,5 +136,72 @@ describe("updateNextStartAt", () => {
         expect.objectContaining({ id: healthy.id })
       )
     })
+  })
+})
+
+describe("when recurrence persistence is still pending", () => {
+  let finishWrite: (value: {}) => void
+  let pendingWrite: Promise<{}>
+  let job: Promise<void>
+  let completed: boolean
+
+  beforeEach(async () => {
+    pendingWrite = new Promise<{}>((resolve) => {
+      finishWrite = resolve
+    })
+    completed = false
+    jest
+      .mocked(EventModel.getRecurrentFinishedEvents)
+      .mockResolvedValueOnce([
+        makeEvent(),
+        makeEvent({ id: "00000000-0000-0000-0000-000000000002" }),
+      ])
+    jest
+      .mocked(EventModel.update)
+      .mockReturnValueOnce(pendingWrite)
+      .mockResolvedValueOnce({})
+    job = updateNextStartAt(makeCtx()).then(() => {
+      completed = true
+    })
+    await Promise.resolve()
+    await Promise.resolve()
+  })
+
+  afterEach(async () => {
+    finishWrite({})
+    await job
+    jest.resetAllMocks()
+  })
+
+  it("should keep the job pending until the database write finishes", () => {
+    expect(completed).toBe(false)
+  })
+
+  it("should wait before starting the next event update", () => {
+    expect(EventModel.update).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("when recurrence persistence fails", () => {
+  let failure: Error
+
+  beforeEach(() => {
+    failure = new Error("database write failed")
+    jest
+      .mocked(EventModel.getRecurrentFinishedEvents)
+      .mockResolvedValueOnce([
+        makeEvent(),
+        makeEvent({ id: "00000000-0000-0000-0000-000000000002" }),
+      ])
+    jest.mocked(EventModel.update).mockRejectedValueOnce(failure)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it("should reject the job so the scheduler observes the failure", async () => {
+    await expect(updateNextStartAt(makeCtx())).rejects.toBe(failure)
+    expect(EventModel.update).toHaveBeenCalledTimes(1)
   })
 })
