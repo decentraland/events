@@ -61,7 +61,7 @@
     "supertest": "^7.2.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.8.0",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "overrides": {
     "sharp": "^0.35.3",
