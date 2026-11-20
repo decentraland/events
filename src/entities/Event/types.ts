@@ -323,6 +323,27 @@ export const SITEMAP_ITEMS_PER_PAGE = 100
 export const DEFAULT_EVENT_DURATION = Time.Hour
 export const MAX_EVENT_DURATION = Time.Day
 
+// Creator scheduling limits. Team members (admin wallets and moderators with
+// `approve_any_event` / `edit_any_event`) are exempt; see
+// `canBypassSchedulingLimits` in `schedulingLimits.ts`.
+//
+// An event that repeats every day may last at most 2 hours, so a single
+// listing can't stay "live" around the clock.
+export const MAX_DAILY_EVENT_DURATION = 2 * Time.Hour
+// A place (a Genesis City scene or a World) may host at most this many events
+// per UTC day. Genesis Plaza is exempt.
+export const MAX_EVENTS_PER_PLACE_PER_DAY = 2
+// Genesis Plaza is identified by the place that contains this parcel.
+export const GENESIS_PLAZA_POSITION = "0,0"
+// How far ahead the per-place limit expands a recurring event's occurrences.
+export const PLACE_DAILY_LIMIT_HORIZON = 365 * Time.Day
+
+// Stable `code` values on the 400 responses, so clients can show their own copy.
+export enum SchedulingLimitErrorCode {
+  DailyEventTooLong = "daily_event_too_long",
+  PlaceDailyLimitReached = "place_daily_limit_reached",
+}
+
 export enum EventType {
   All = "all",
   One = "one",

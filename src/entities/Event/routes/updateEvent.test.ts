@@ -4,7 +4,6 @@ import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middl
 
 import { getEvent } from "./getEvent"
 import { updateEvent } from "./updateEvent"
-import * as utils from "../utils"
 import EventAttendeeModel from "../../EventAttendee/model"
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
@@ -14,7 +13,13 @@ import {
   ProfileSettingsSessionAttributes,
 } from "../../ProfileSettings/types"
 import EventModel from "../model"
-import { DeprecatedEventAttributes, EventAttributes } from "../types"
+import {
+  DeprecatedEventAttributes,
+  EventAttributes,
+  Frequency,
+  SchedulingLimitErrorCode,
+} from "../types"
+import * as utils from "../utils"
 
 const mockGetProfiles = jest.fn().mockResolvedValue([])
 
@@ -203,6 +208,11 @@ function createRequest(
 }
 
 describe("updateEvent", () => {
+  beforeEach(() => {
+    // No other events at the place unless a test says otherwise.
+    ;(EventModel.getActiveEventsAtPlace as jest.Mock).mockResolvedValue([])
+  })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -1181,6 +1191,117 @@ describe("updateEvent", () => {
       it("should reject with a 400 error (selector-only regression)", async () => {
         await expect(updateEvent(req)).rejects.toThrow(
           /end date is already in the past/
+        )
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe("creator scheduling limits", () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const dailyBody = {
+      recurrent: true,
+      recurrent_frequency: Frequency.DAILY,
+      recurrent_interval: 1,
+      recurrent_until: new Date("2030-02-01T00:00:00Z").toJSON(),
+      duration: DAY,
+    }
+
+    beforeEach(() => {
+      ;(EventModel.selectNextStartAt as jest.Mock).mockReturnValue(
+        new Date("2030-01-01T00:00:00Z")
+      )
+    })
+
+    describe("when the owner changes their event to repeat daily for 24 hours", () => {
+      beforeEach(() => {
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(
+          createBaseEvent({ x: 50, y: 50 })
+        )
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(
+          createProfileSettings(OWNER_ADDRESS)
+        )
+      })
+
+      it("should reject it with the daily_event_too_long code", async () => {
+        await expect(
+          updateEvent(createRequest(OWNER_ADDRESS, dailyBody))
+        ).rejects.toMatchObject({
+          code: SchedulingLimitErrorCode.DailyEventTooLong,
+        })
+        expect(EventModel.update).not.toHaveBeenCalled()
+      })
+    })
+
+    describe("when a moderator schedules their event to repeat daily for 24 hours", () => {
+      beforeEach(() => {
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(
+          createBaseEvent({ x: 50, y: 50 })
+        )
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(
+          createProfileSettings(OWNER_ADDRESS, [
+            ProfilePermissions.EditAnyEvent,
+          ])
+        )
+      })
+
+      it("should save it", async () => {
+        await updateEvent(createRequest(OWNER_ADDRESS, dailyBody))
+        expect(EventModel.update).toHaveBeenCalled()
+      })
+    })
+
+    describe("when the owner edits only the name of an existing 24-hour daily event", () => {
+      beforeEach(() => {
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(
+          createBaseEvent({
+            x: 50,
+            y: 50,
+            recurrent: true,
+            recurrent_frequency: Frequency.DAILY,
+            recurrent_interval: 1,
+            recurrent_until: new Date("2030-02-01T00:00:00Z"),
+            duration: DAY,
+          })
+        )
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(
+          createProfileSettings(OWNER_ADDRESS)
+        )
+      })
+
+      it("should save it without re-checking the schedule", async () => {
+        await updateEvent(createRequest(OWNER_ADDRESS, { name: "Renamed" }))
+        expect(EventModel.update).toHaveBeenCalled()
+        expect(EventModel.getActiveEventsAtPlace).not.toHaveBeenCalled()
+      })
+    })
+
+    describe("when the owner moves their event to a place that already has 2 events that day", () => {
+      beforeEach(() => {
+        ;(getEvent as jest.Mock).mockResolvedValueOnce(
+          createBaseEvent({ x: 50, y: 50 })
+        )
+        ;(getAuthProfileSettings as jest.Mock).mockResolvedValueOnce(
+          createProfileSettings(OWNER_ADDRESS)
+        )
+        ;(EventModel.getActiveEventsAtPlace as jest.Mock).mockResolvedValue(
+          ["2030-01-01T08:00:00Z", "2030-01-01T12:00:00Z"].map((start_at) =>
+            createBaseEvent({ id: start_at, start_at: new Date(start_at) })
+          )
+        )
+      })
+
+      it("should reject it with the place_daily_limit_reached code", async () => {
+        await expect(
+          updateEvent(createRequest(OWNER_ADDRESS, { x: 60, y: 60 }))
+        ).rejects.toMatchObject({
+          code: SchedulingLimitErrorCode.PlaceDailyLimitReached,
+        })
+        expect(EventModel.getActiveEventsAtPlace).toHaveBeenCalledWith(
+          expect.objectContaining({
+            positions: [[60, 60]],
+            exclude_id: EVENT_ID,
+          })
         )
         expect(EventModel.update).not.toHaveBeenCalled()
       })

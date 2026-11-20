@@ -2,6 +2,10 @@ import { WithAuth } from "decentraland-gatsby/dist/entities/Auth/middleware"
 import { WithAuthProfile } from "decentraland-gatsby/dist/entities/Profile/middleware"
 
 import { createEvent } from "./createEvent"
+import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
+import { ProfilePermissions } from "../../ProfileSettings/types"
+import EventModel from "../model"
+import { Frequency, SchedulingLimitErrorCode } from "../types"
 import * as utils from "../utils"
 
 jest.mock("decentraland-gatsby/dist/entities/Route/validate", () => ({
@@ -153,6 +157,135 @@ describe("createEvent — past-date temporal validation", () => {
           })
         )
       ).rejects.toThrow(/recurrence end date.*must be in the future/i)
+    })
+  })
+})
+
+describe("createEvent — creator scheduling limits", () => {
+  const DAY = 24 * 60 * 60 * 1000
+  const dailyRecurrence = (duration: number) => ({
+    recurrent_dates: [
+      new Date("2030-01-01T10:00:00Z"),
+      new Date("2030-01-02T10:00:00Z"),
+    ],
+    finish_at: new Date(new Date("2030-01-02T10:00:00Z").getTime() + duration),
+    recurrent: true,
+    recurrent_frequency: Frequency.DAILY,
+    recurrent_interval: 1,
+    recurrent_setpos: null,
+    recurrent_monthday: null,
+    recurrent_weekday_mask: 0,
+    recurrent_month_mask: 0,
+    recurrent_count: null,
+    recurrent_until: new Date("2030-01-02T23:59:59Z"),
+    duration,
+    start_at: new Date("2030-01-01T10:00:00Z"),
+  })
+
+  function mockPermissions(permissions: ProfilePermissions[]) {
+    ;(getAuthProfileSettings as jest.Mock).mockResolvedValue({
+      user: USER_ADDRESS,
+      permissions,
+      subscriptions: [],
+    })
+  }
+
+  beforeEach(() => {
+    ;(EventModel.getActiveEventsAtPlace as jest.Mock).mockResolvedValue([])
+    ;(EventModel.selectNextStartAt as jest.Mock).mockReturnValue(
+      new Date("2030-01-01T10:00:00Z")
+    )
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  describe("when a creator submits a daily event longer than 2 hours", () => {
+    beforeEach(() => {
+      mockPermissions([])
+      ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce(
+        dailyRecurrence(DAY)
+      )
+    })
+
+    it("should reject it with the daily_event_too_long code", async () => {
+      await expect(
+        createEvent(createRequest({ x: 50, y: 50 }))
+      ).rejects.toMatchObject({
+        message: expect.stringMatching(/Daily events can last up to 2 hours/),
+        code: SchedulingLimitErrorCode.DailyEventTooLong,
+      })
+      expect(EventModel.create).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("when a creator submits a 2-hour daily event", () => {
+    beforeEach(() => {
+      mockPermissions([])
+      ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce(
+        dailyRecurrence(2 * 60 * 60 * 1000)
+      )
+    })
+
+    it("should create it", async () => {
+      await createEvent(createRequest({ x: 50, y: 50 }))
+      expect(EventModel.create).toHaveBeenCalled()
+    })
+  })
+
+  describe("when a moderator submits a daily event longer than 2 hours", () => {
+    beforeEach(() => {
+      mockPermissions([ProfilePermissions.ApproveAnyEvent])
+      ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce(
+        dailyRecurrence(DAY)
+      )
+    })
+
+    it("should create it without checking the place limit", async () => {
+      await createEvent(createRequest({ x: 50, y: 50 }))
+      expect(EventModel.create).toHaveBeenCalled()
+      expect(EventModel.getActiveEventsAtPlace).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("when the place already has 2 events that day", () => {
+    beforeEach(() => {
+      mockPermissions([])
+      ;(utils.calculateRecurrentProperties as jest.Mock).mockReturnValueOnce({
+        recurrent_dates: [new Date("2030-01-01T20:00:00Z")],
+        finish_at: new Date("2030-01-01T21:00:00Z"),
+        recurrent: false,
+        recurrent_frequency: null,
+        recurrent_interval: 1,
+        recurrent_setpos: null,
+        recurrent_monthday: null,
+        recurrent_weekday_mask: 0,
+        recurrent_month_mask: 0,
+        recurrent_count: null,
+        recurrent_until: null,
+        duration: 3600000,
+        start_at: new Date("2030-01-01T20:00:00Z"),
+      })
+      ;(EventModel.getActiveEventsAtPlace as jest.Mock).mockResolvedValue(
+        ["2030-01-01T08:00:00Z", "2030-01-01T12:00:00Z"].map((start_at) => ({
+          start_at: new Date(start_at),
+          duration: 3600000,
+          recurrent: false,
+          recurrent_frequency: null,
+          recurrent_until: null,
+          recurrent_count: null,
+        }))
+      )
+    })
+
+    it("should reject it with the place_daily_limit_reached code", async () => {
+      await expect(
+        createEvent(createRequest({ x: 50, y: 50 }))
+      ).rejects.toMatchObject({
+        code: SchedulingLimitErrorCode.PlaceDailyLimitReached,
+      })
+      expect(EventModel.create).not.toHaveBeenCalled()
     })
   })
 })

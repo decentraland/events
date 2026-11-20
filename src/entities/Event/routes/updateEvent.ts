@@ -14,7 +14,7 @@ import pick from "lodash/pick"
 
 import { getEvent } from "./getEvent"
 import Communities, { CommunityAttributes } from "../../../api/Communities"
-import Places from "../../../api/Places"
+import Places, { PlaceAttributes } from "../../../api/Places"
 import EventAttendeeModel from "../../EventAttendee/model"
 import { EventAttendeeAttributes } from "../../EventAttendee/types"
 import EventCategoryModel from "../../EventCategory/model"
@@ -37,6 +37,13 @@ import {
   notifyRejectedEvent,
 } from "../../Slack/utils"
 import EventModel from "../model"
+import {
+  canBypassSchedulingLimits,
+  isSameLocation,
+  resolveSchedulingPlace,
+  validateDailyEventDuration,
+  validatePlaceDailyLimit,
+} from "../schedulingLimits"
 import { newEventSchema } from "../schemas"
 import {
   DeprecatedEventAttributes,
@@ -376,8 +383,9 @@ export async function updateEventWithOptions(
   const tile = await API.catch(Land.getInstance().getTile([x, y]))
   updatedAttributes.coordinates = [x, y]
 
+  let place: PlaceAttributes | null = null
   if (!updatedAttributes.world) {
-    const place = await Places.get().getPlaceByPosition(`${x},${y}`)
+    place = await Places.get().getPlaceByPosition(`${x},${y}`)
     updatedAttributes.estate_id = tile?.estateId || updatedAttributes.estate_id
     updatedAttributes.estate_name = tile?.name || updatedAttributes.estate_name
     updatedAttributes.scene_name = updatedAttributes.estate_name
@@ -430,6 +438,33 @@ export async function updateEventWithOptions(
         { body: updatedAttributes }
       )
     }
+  }
+
+  // Creator limits (daily events max 2h, max 2 events per place per day),
+  // enforced when the schedule or the location changes. The team, and the
+  // admin service, can schedule outside them.
+  const touchesLocation = ["x", "y", "world", "server"].some(
+    (field) => req.body[field] !== undefined
+  )
+  const bypassSchedulingLimits =
+    admin || canBypassSchedulingLimits(user, profile)
+  if (!bypassSchedulingLimits && touchesDates) {
+    validateDailyEventDuration(updatedAttributes, updatedAttributes)
+  }
+
+  if (!bypassSchedulingLimits && (touchesDates || touchesLocation)) {
+    await validatePlaceDailyLimit({
+      event: updatedAttributes,
+      place: resolveSchedulingPlace(updatedAttributes, place),
+      eventId: event.id,
+      // Days this event already held at this place stay valid; a rejected
+      // event being resubmitted is checked from scratch.
+      previous:
+        !event.rejected && isSameLocation(event, updatedAttributes)
+          ? event
+          : null,
+      body: updatedAttributes,
+    })
   }
 
   updatedAttributes.next_start_at = EventModel.selectNextStartAt(

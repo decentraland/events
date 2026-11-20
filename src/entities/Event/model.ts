@@ -364,6 +364,52 @@ export default class EventModel extends Model<DeprecatedEventAttributes> {
     }))
   }
 
+  /**
+   * Pending and approved events that haven't finished, at a World
+   * (`world_name`) or on any of the given Genesis City parcels, whose first
+   * occurrence starts before `start_before`. Used by the per-place daily limit.
+   */
+  static async getActiveEventsAtPlace(options: {
+    world_name: string | null
+    positions: Array<[number, number]>
+    exclude_id: string | null
+    start_before: Date
+  }) {
+    const xs = options.positions.map(([x]) => x)
+    const ys = options.positions.map(([, y]) => y)
+    // World events carry x=0,y=0, so a land lookup skips anything that names
+    // a World (rows flagged `world` without a name count as land).
+    const placeCondition = options.world_name
+      ? SQL`AND e.world IS TRUE AND lower(e.server) = ${options.world_name.toLowerCase()}`
+      : SQL`AND NOT (e.world IS TRUE AND COALESCE(e.server, '') <> '')
+        AND (e.x, e.y) IN (
+          SELECT p.x, p.y FROM unnest(${xs}::int[], ${ys}::int[]) AS p(x, y)
+        )`
+
+    const query = SQL`
+      SELECT *
+      FROM ${table(EventModel)} e
+      WHERE
+        e.rejected IS FALSE
+        AND e.deleted_by_user IS FALSE
+        AND e.deleted_by_admin IS FALSE
+        AND e.finish_at > now()
+        AND e.start_at < ${options.start_before}
+        ${conditional(
+          !!options.exclude_id,
+          SQL`AND e.id <> ${options.exclude_id}`
+        )}
+        ${placeCondition}
+    `
+
+    return EventModel.buildAll(
+      await EventModel.namedQuery<EventAttributes>(
+        "events_active_at_place",
+        query
+      )
+    )
+  }
+
   static async getRecurrentFinishedEvents() {
     const query = SQL`
       SELECT *

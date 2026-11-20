@@ -13,11 +13,17 @@ import env from "decentraland-gatsby/dist/utils/env"
 import omit from "lodash/omit"
 
 import Communities from "../../../api/Communities"
-import Places from "../../../api/Places"
+import Places, { PlaceAttributes } from "../../../api/Places"
 import EventCategoryModel from "../../EventCategory/model"
 import { getAuthProfileSettings } from "../../ProfileSettings/routes/getAuthProfileSettings"
 import { notifyNewEvent } from "../../Slack/utils"
 import EventModel from "../model"
+import {
+  canBypassSchedulingLimits,
+  resolveSchedulingPlace,
+  validateDailyEventDuration,
+  validatePlaceDailyLimit,
+} from "../schedulingLimits"
 import { newEventSchema } from "../schemas"
 import {
   DeprecatedEventAttributes,
@@ -162,6 +168,13 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     )
   }
 
+  // Creator limits (daily events max 2h, max 2 events per place per day).
+  // The team can schedule outside them.
+  const bypassSchedulingLimits = canBypassSchedulingLimits(user, profile)
+  if (!bypassSchedulingLimits) {
+    validateDailyEventDuration(recurrent, data)
+  }
+
   if (data.categories.length) {
     const validation = await EventCategoryModel.validateCategories(
       data.categories
@@ -206,9 +219,10 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
   let image = ""
   let estate_id = null
   let place_id = null
+  let place: PlaceAttributes | null = null
   if (!data.world) {
     const tiles = await API.catch(Land.getInstance().getTiles([x, y], [x, y]))
-    const place = await Places.get().getPlaceByPosition(`${x},${y}`)
+    place = await Places.get().getPlaceByPosition(`${x},${y}`)
     const tile = tiles && tiles[[x, y].join(",")]
     estate_id = tile?.estateId || null
     estate_name = tile?.name || null
@@ -222,6 +236,14 @@ export async function createEvent(req: WithAuthProfile<WithAuth>) {
     const world = await Places.get().getWorldByName(data.server!)
     image = data.image || `${EVENTS_BASE_URL}/images/event-default.jpg`
     place_id = world?.id || null
+  }
+
+  if (!bypassSchedulingLimits) {
+    await validatePlaceDailyLimit({
+      event: recurrent,
+      place: resolveSchedulingPlace(data, place),
+      body: data,
+    })
   }
 
   const user_name = userProfile.name || null

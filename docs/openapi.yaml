@@ -291,6 +291,18 @@ paths:
       description: |
         Creates a new event. Requires authentication. Events are created in pending status
         and require approval unless the user has special permissions.
+
+        Creator scheduling limits (wallets in `ADMIN_ADDRESSES` and users with the
+        `approve_any_event` or `edit_any_event` permission are exempt):
+        - An event that repeats daily (DAILY or finer, or any rule whose occurrences
+          fall a day or less apart) can last at most 2 hours. Otherwise the request fails
+          with 400 and `code: "daily_event_too_long"`.
+        - A place (a Genesis City scene, or a World) can host at most 2 events per UTC
+          day, counting every creator's pending and approved events. Genesis Plaza (the
+          scene holding parcel 0,0) is exempt. Recurring events are checked for a year
+          from their first occurrence. Otherwise the request fails with 400,
+          `code: "place_daily_limit_reached"` and the first full day in `data.date`
+          (`YYYY-MM-DD`).
       operationId: createEvent
       security: []
       requestBody:
@@ -483,6 +495,11 @@ paths:
         The body may alternatively contain only approval/rejection fields
         (`approved`, `rejected`, `reason`) to transition the event state without
         re-validating every editable attribute — see `EventAdminActor` and `EventAdminReject`.
+
+        The creator scheduling limits described on `createEvent` (`daily_event_too_long`,
+        `place_daily_limit_reached`) apply when the request changes the schedule or the
+        location. Days the event already held at the same place are not re-checked.
+        The service bearer token and team permissions are exempt.
       operationId: updateEvent
       security:
         - {}
